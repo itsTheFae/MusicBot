@@ -2450,6 +2450,26 @@ class MusicBot(discord.Client):
         await self.safe_send_message(author, '\n'.join(lines))
         return Response("\N{OPEN MAILBOX WITH RAISED FLAG}", delete_after=20)
 
+########################################################################################################################################################
+    async def cmd_getvslink(self, guild, channel, author):
+        """
+            Usage:
+              {command_prefix}getvslink
+            
+            Creates a Discord Video Sharing link for the Voice Channel of the requesting user.
+            You must be in a voice channel to use this command.
+        """
+        if not author.voice:
+            raise exceptions.CommandError(self.str.get('cmd-summon-novc', 'You are not connected to voice. Try joining a voice channel!'))
+        else:
+            url = "https://discordapp.com/channels/{}/{}".format(guild.id, author.voice.channel.id)
+            log.debug("Discord Voice Sharing Link:  {}".format(url))
+            
+            return Response("Video Sharing Link for Voice Channel: {}  --  {}".format(author.voice.channel, url))
+       
+    
+
+########################################################################################################################################################
 
     @owner_only
     async def cmd_setname(self, leftover_args, name):
