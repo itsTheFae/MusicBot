@@ -2468,7 +2468,269 @@ class MusicBot(discord.Client):
             
             return Response("Video Sharing Link for Voice Channel: {}  --  {}".format(author.voice.channel, url))
        
-    
+    @owner_only
+    async def cmd_cachestats(self):
+        """
+        Usage:
+            {command_prefix}cachestats
+
+        Prints infomation about the audio_cache, number of files and total storage used.
+        """
+        ostr = "!"
+        try:
+            sizeBytes = 0
+            numFiles = 0
+            dList = os.listdir( AUDIO_CACHE_PATH )
+            for f in dList :
+                #if 'youtube' not in f and 'soundcloud' not in f :
+                #    continue
+
+                fpath = os.path.join(AUDIO_CACHE_PATH, f)
+                if os.path.isfile(fpath) :
+                    numFiles = 1 + numFiles
+                    sizeBytes = sizeBytes + os.path.getsize( fpath )
+
+            rSize = sizeof_fmt(sizeBytes)
+            ostr = "Cache contains %d files, using %s of storage." % (numFiles, rSize)
+        except Exception as e:
+            raise exceptions.CommandError("Error while getting cache stats: %s" % e, expire_in=20)
+
+        log.info(ostr)
+        return Response(ostr, delete_after=20)
+
+    @owner_only
+    async def cmd_cacheclear(self, leftover_args):
+        """
+        Usage:
+            {command_prefix}cacheclear [time_frame] [time_scale]
+
+        Removes any file inside of AUDIO_CACHE_PATH older than the given time frame.
+        [time_scale] must be one of:  days, hours, day, or hour.
+        [time_frame] must be a number.
+        """
+        valid_scales = ["days", "hours", "day", "hour"]
+        time_scale = "days"
+        time_frame = 30
+        hours_old = 0
+
+        if len(leftover_args) >= 1 :
+            try:
+                tf = int( leftover_args[0] )
+                tf = abs( tf )
+            except:
+                tf = 0
+
+            if tf > 0 :
+                time_frame = tf
+
+        if len(leftover_args) >= 2 :
+            arg = str(leftover_args[1]).lower()
+            if arg in valid_scales :
+                time_scale = arg
+
+        if time_scale[-1:] == 's' :
+            time_scale = time_scale[:-1]
+
+        if time_scale == "hour" :
+            hours_old = time_frame * 1
+
+        if time_scale == "day" :
+            hours_old = time_frame * 24
+
+        numRemoved = 0
+        bytesRemoved = 0
+        oldest_time = time.time() - (hours_old * 3600)
+        for f in os.listdir( AUDIO_CACHE_PATH ) :
+            fpath = os.path.join(AUDIO_CACHE_PATH, f)
+            compTime = os.path.getctime( fpath )
+
+            if compTime < oldest_time :
+                bytesRemoved = bytesRemoved + os.path.getsize( fpath )
+                numRemoved = 1 + numRemoved
+                os.remove( fpath )
+
+        rBytes = sizeof_fmt(bytesRemoved)
+        ostr = "Removed %d cached files with ctime older than %d %s(s), reclaimed %s of storage." % (numRemoved, time_frame, time_scale, rBytes)
+        log.info( ostr )
+        return Response(ostr, delete_after=20)
+
+    @owner_only
+    async def cmd_chpurge(self, message, channel, guild, author, search_range=50):
+        """
+          Usage:
+            {command_prefix}chpurge [range]
+
+          Removes up to [range] messages in the channel it is invoked in. Default: 50, Max: 1000
+        """
+        try:
+            # Slightly better check, allows the "Default" value to still apply when none are given.
+            if search_range == None:
+                search_range = 50
+            elif len(search_range) == 0:
+                search_range = 50
+
+            float(search_range)  # lazy check
+            search_range = min(int(search_range), 1000)
+        except:
+            return Response(self.str.get('cmd-clean-invalid', "Invalid parameter. Please provide a number of messages to search."), reply=True, delete_after=8)
+
+        await self.safe_delete_message(message, quiet=True)
+
+        def is_possible_command_invoke(entry):
+            valid_call = any(
+                entry.content.startswith(prefix) for prefix in [self.config.command_prefix])  # can be expanded
+            return valid_call and not entry.content[1:2].isspace()
+
+        delete_invokes = True
+        delete_all = channel.permissions_for(author).manage_messages or self.config.owner_id == author.id
+
+        def check(message):
+            return True
+
+        if self.user.bot:
+            if channel.permissions_for(guild.me).manage_messages:
+                deleted = await channel.purge(check=check, limit=search_range, before=message)
+                return Response(self.str.get('cmd-clean-reply', 'Cleaned up {0} message{1}.').format(len(deleted), 's' * bool(deleted)), delete_after=15)
+
+
+    async def cmd_apladd(self, player, channel, author, permissions, leftover_args, song_url=''):
+        """
+        Usage:
+            {command_prefix}apladd [song_url]
+
+        Adds the given song_url to the auto playlist. 
+        If no URL is given, attempt to add the currently playing track.  
+
+        This command will also enable the auto playlist if it is disabled.
+        """
+
+        await self.send_typing(channel)
+
+        song_url = song_url.strip()
+
+        if not song_url and not player.current_entry:
+            raise exceptions.CommandError("No track currently playing, or no Song URL was given!", expire_in=20)
+
+        title = None
+        if not song_url and player.current_entry:
+            title = player.current_entry.title
+            song_url = player.current_entry.url
+        else:
+            #info = await self.downloader.safe_extract_info(player.playlist.loop, song_url, download=False, process=False)
+            #title = info.get('title', '')
+            try:
+                info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
+                title = info.get('title', '')
+            except downloader.youtube_dl.utils.DownloadError as e:
+                if 'YouTube said:' in e.args[0]:
+                    # url is bork, remove from list and put in removed list
+                    log.error("Error processing youtube url:\n{}".format(e.args[0]))
+
+                else:
+                    # Probably an error from a different extractor, but I've only seen youtube's
+                    log.error("Error processing \"{url}\": {ex}".format(url=song_url, ex=e))
+                
+                raise exceptions.CommandError("Error getting information from YouTube!", expire_in=20)
+
+
+        if not title:
+            raise exceptions.CommandError('Possibly invalid url - The extractor could not get a title from the URL', expire_in=20)
+
+        if song_url not in self.autoplaylist:
+            log.info("Updating autoplaylist - adding song url")
+            self.autoplaylist.append(song_url)
+            write_file(self.config.auto_playlist_file, self.autoplaylist)
+
+            if player.autoplaylist and song_url not in player.autoplaylist:
+                player.autoplaylist.append( song_url )
+
+            log.debug("Appended {} to autoplaylist".format(song_url))
+            return Response(self.str.get('cmd-save-success', 'Added <{0}> to the autoplaylist.').format(song_url))
+        else:
+            raise exceptions.CommandError(self.str.get('cmd-save-exists', 'This song is already in the autoplaylist.'))
+
+    async def cmd_aplrm(self, player, channel, author, permissions, leftover_args, song_url=''):
+        """
+        Usage:
+            {command_prefix}aplrm 
+            {command_prefix}aplrm [song_url]
+
+        Remove the currently playing song from the auto playlist.
+        Alternatively remove a song from auto playlist by its URL.
+        """
+
+        await self.send_typing(channel)
+
+        song_url = song_url.strip()
+
+        if not song_url and not player.current_entry:
+            raise exceptions.CommandError("No track currently playing, or no Song URL was given!", expire_in=20)
+
+        title = None
+        is_now_playing = False
+        if not song_url and player.current_entry:
+            title = player.current_entry.title
+            song_url = player.current_entry.url
+            is_now_playing = True
+        else:
+            #info = await self.downloader.safe_extract_info(player.playlist.loop, song_url, download=False, process=False)
+            #title = info.get('title', '')
+            try:
+                info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
+                title = info.get('title', '')
+            except downloader.youtube_dl.utils.DownloadError as e:
+                if 'YouTube said:' in e.args[0]:
+                    # url is bork, remove from list and put in removed list
+                    log.error("Error processing youtube url:\n{}".format(e.args[0]))
+
+                else:
+                    # Probably an error from a different extractor, but I've only seen youtube's
+                    log.error("Error processing \"{url}\": {ex}".format(url=song_url, ex=e))
+                
+                raise exceptions.CommandError("Error getting information from YouTube!", expire_in=20)
+
+
+        if not title and not is_now_playing:
+            raise exceptions.CommandError('Possibly invalid url - The extractor could not get a title from the URL', expire_in=20)
+
+        if song_url in self.autoplaylist:
+            ex = Exception('Removed by {}/{} in {}/#{} '.format(author.id, author.name, channel.guild.name, channel.name))
+            await self.remove_from_autoplaylist(song_url, ex=ex, delete_from_ap=True)
+            if player.autoplaylist and song_url in player.autoplaylist:
+                player.autoplaylist.remove(song_url)
+
+            if player.is_paused:
+                player.resume()
+                if self.server_specific_data[player.voice_client.channel.guild]['auto_paused']:
+                    self.server_specific_data[player.voice_client.channel.guild]['auto_paused'] = False
+
+            if is_now_playing:
+                player.skip()
+
+            return Response( "**Song removed from auto playlist:**  \n  {}\n  `{}`".format(title, song_url), delete_after=25)
+        else:
+            return Response( "Song was not found in auto playlist!", delete_after=20)
+
+    async def cmd_aplcheck(self, player, channel, author, permissions, leftover_args):
+        """
+        Usage:
+            {command_prefix}aplcheck
+
+        Prints information about the Auto Playlist.
+        """
+
+        await self.send_typing(channel)
+
+        if self.config.auto_playlist:
+            n_apl = len(self.autoplaylist)
+            n_oapl = len(player.autoplaylist)
+            out = "**Auto Playlist Enabled**  \nSongs Total:  {apl}  \nRemaining:  {opl}".format(opl=n_oapl, apl=n_apl)
+        else:
+            out = "**Auto Playlist Disabled**"
+
+        return Response( out, delete_after=30)
+
+
 
 ########################################################################################################################################################
 
