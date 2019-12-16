@@ -2476,6 +2476,13 @@ class MusicBot(discord.Client):
 
         Prints infomation about the audio_cache, number of files and total storage used.
         """
+        def sizeof_fmt(num, suffix='B'):
+            for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+                if abs(num) < 1024.0:
+                    return "%3.1f%s%s" % (num, unit, suffix)
+                num /= 1024.0
+            return "%.1f%s%s" % (num, 'Yi', suffix)
+        
         ostr = "!"
         try:
             sizeBytes = 0
@@ -2508,6 +2515,15 @@ class MusicBot(discord.Client):
         [time_scale] must be one of:  days, hours, day, or hour.
         [time_frame] must be a number.
         """
+        
+        def sizeof_fmt(num, suffix='B'):
+            for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+                if abs(num) < 1024.0:
+                    return "%3.1f%s%s" % (num, unit, suffix)
+                num /= 1024.0
+            return "%.1f%s%s" % (num, 'Yi', suffix)
+
+        
         valid_scales = ["days", "hours", "day", "hour"]
         time_scale = "days"
         time_frame = 30
