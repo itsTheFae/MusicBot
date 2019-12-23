@@ -119,8 +119,17 @@ class Permissions:
         # We loop again so that we don't return a role based group before we find an assigned one
         for group in self.groups:
             for role in user.roles:
-                if role.id in group.granted_to_roles:
-                    return group
+                try:
+                    if role.id in group.granted_to_roles:
+                        log.debug("Permissions found role.id without casting!")
+                        return group
+                except:
+                    if str(role.id) in group.granted_to_roles:
+                        log.debug("Permissions found Exception with role.id and str() was used instead!")
+                        log.debug("Permissions looking for {} in data: {} ".format(role.id, group.granted_to_roles))
+                        return group
+                #if role.id in group.granted_to_roles:
+                #    return group
 
         return self.default_group
 
