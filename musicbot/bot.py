@@ -2747,6 +2747,45 @@ class MusicBot(discord.Client):
         return Response( out, delete_after=30)
 
 
+    async def cmd_dice(self, channel, author, sides:int=6, number:int=1):
+        """
+        Usage: 
+            {command_prefix}dice [sides] [number]
+            Performs a dice roll using dice with given number of sides.  
+            Multiple dice can be thrown by passing an optional number of dice
+        """
+        try:
+            if not sides:
+                sides = 6
+            
+            if not number:
+                number = 1
+            
+            sides = int(sides)
+            number = int(number)
+        except:
+            raise exceptions.CommandError("Invalid parameter. Arguments must be whole numbers.", expire_in=20)
+        
+        if sides <= 1:
+            raise exceptions.CommandError("Must have two sides or more!", expire_in=20)
+        if number <= 0:
+            raise exceptions.CommandError("Must roll one or more times!", expire_in=20)
+        
+        rolls = []
+        n = number
+        while n > 0:
+            roll = random.randint(1, sides)
+            rolls.append(roll)
+            n = n - 1
+        
+        t = "times"
+        total = " or **{0}** total.".format(str(sum(rolls)))
+        if number == 1:
+            t = "time"
+            total = ""
+        
+        return Response("You roll a {0} sided dice {1} {2} resulting in: **{3}**{4}".format(sides, number, t, ", ".join(map(str,rolls)), total))
+        
 
 ########################################################################################################################################################
 
