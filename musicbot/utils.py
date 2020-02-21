@@ -330,7 +330,10 @@ class NumericStringParser(object):
         num_string = re.sub(r'((?:\d+\.)?\d+)!', r'factorial(\1)', num_string)
         
         self.exprStack = []
-        results = self.bnf.parseString(num_string, parseAll)
-        val = self.evaluate_stack(self.exprStack[:])
-        return val
+        try:
+            results = self.bnf.parseString(num_string, parseAll)
+            val = self.evaluate_stack(self.exprStack[:])
+            return val
+        except ParseException as ex:
+            raise NumericStringParser.IdentifierException(f'ParseException - {ex}')
 

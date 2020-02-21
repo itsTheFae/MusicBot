@@ -2775,9 +2775,9 @@ class MusicBot(discord.Client):
             try:
                 sides = abs(nsp.eval(args[0]))
                 if type(sides) == int:
-                    return Response(f'You rolled: {random.randint(1, sides)}')
+                    return Response(f'You rolled: {str(random.randint(1, sides))}')
                 if type(sides) == float:
-                    return Response(f'The value:  {random.uniform(0, sides)}')
+                    return Response(f'The value:  {str(random.uniform(0, sides))}')
             except NumericStringParser.IdentifierException:
                 sides = args[0]
                 n = re.sub(r'.+([0-9]+)$', r'\1', sides, flags=re.S)
@@ -2787,7 +2787,7 @@ class MusicBot(discord.Client):
                     return Response(f'Your samples are:  {", ".join(random.sample(sides, number))}')
                 else:
                     return Response(f'The result is:  {random.choice(sides)}')
-            except pyparsing.ParseException as ex:
+            except Exception as ex:
                 log.error("Error doing 1-Arg parse!")
                 log.exception("NSP Exception", ex_info=ex)
                 return Response('Sorry, that last one was too tough.')
@@ -2815,7 +2815,12 @@ class MusicBot(discord.Client):
             except NumericStringParser.IdentifierException:
                 try:
                     n = int(abs(nsp.eval(args[1])))
-                    return Response(f'The dice yields:  {", ".join(random.sample(args[0], n))}')
+                    if n > 1:
+                        number = n
+                        rolls = [str(random.choice(sides)) for _ in range(number)]
+                        return Response(f'The dice yields:  {", ".join(rolls)}')
+                    else:
+                        return Response(f'The dice yields: {str(random.choice(sides))}')
                 except:
                     pool = []
                     for arg in args:
@@ -2823,11 +2828,11 @@ class MusicBot(discord.Client):
                             continue
                         try:
                             a = nsp.eval(arg)
-                            pool.append(str(a))
+                            pool.append(a)
                         except:
                             pool.append(arg)
-                    return Response(f'It lands on:  {random.choice(pool)}')                
-            except pyparsing.ParseException as ex:
+                    return Response(f'It lands on:  {str(random.choice(pool))}')                
+            except Exception as ex:
                 log.error("Error doing 2-Arg parse!")
                 log.exception("NSP Exception", ex_info=ex)
                 return Response('Sorry, that last one was too tough.')
@@ -2844,13 +2849,21 @@ class MusicBot(discord.Client):
                     continue
                 try:
                     a = nsp.eval(arg)
-                    pool.append(str(a))
+                    pool.append(a)
                 except:
                     pool.append(arg)
+            if type(pool[-1]) == int or type(pool[-1]) == float:
+                if pool[-1] > 1:
+                    number = int(pool[-1])
             
-            return Response(f'You rolled:  {random.choice(pool)}')
+            if number > 1:
+                pool = pool[:-1]
+                rolls = [str(random.choice(pool)) for _ in range(number)]
+                return Response(f'You roll: {", ".join(rolls)}')
+            else:
+                return Response(f'You rolled:  {str(random.choice(pool))}')
             
-        
+        return Response("Sorry, that last one was too tough.")
         #return Response("You roll a {0} sided dice {1} {2} resulting in: **{3}**{4}".format(sides, number, t, ", ".join(map(str,rolls)), total))
         
 
