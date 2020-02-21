@@ -586,7 +586,7 @@ class MusicBot(discord.Client):
 
                 except Exception as e:
                     log.error("Error processing \"{url}\": {ex}".format(url=song_url, ex=e))
-                    log.exception()
+                    log.exception("Exception", ex=e)
 
                     self.autoplaylist.remove(song_url)
                     continue
@@ -2787,9 +2787,9 @@ class MusicBot(discord.Client):
                     return Response(f'Your samples are:  {", ".join(random.sample(sides, number))}')
                 else:
                     return Response(f'The result is:  {random.choice(sides)}')
-            except:
+            except pyparsing.ParseException as ex:
                 log.error("Error doing 1-Arg parse!")
-                log.exception()
+                log.exception("NSP Exception", ex_info=ex)
                 return Response('Sorry, that last one was too tough.')
                 #raise
 
@@ -2827,9 +2827,9 @@ class MusicBot(discord.Client):
                         except:
                             pool.append(arg)
                     return Response(f'It lands on:  {random.choice(pool)}')                
-            except:
+            except pyparsing.ParseException as ex:
                 log.error("Error doing 2-Arg parse!")
-                log.exception()
+                log.exception("NSP Exception", ex_info=ex)
                 return Response('Sorry, that last one was too tough.')
                 #raise
 
