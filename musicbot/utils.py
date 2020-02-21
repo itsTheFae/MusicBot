@@ -1,3 +1,22 @@
+from __future__ import division
+from pyparsing import (
+    Literal,
+    Word,
+    Group,
+    Forward,
+    alphas,
+    alphanums,
+    Regex,
+    ParseException,
+    CaselessKeyword,
+    Suppress,
+    delimitedList,
+)
+import re
+import math
+import random
+import operator
+
 import sys
 import logging
 import aiohttp
@@ -165,3 +184,153 @@ def _get_variable(name):
                 del frame
     finally:
         del stack
+
+
+
+class NumericStringParser(object):
+    '''
+    Most of this code comes from the fourFn.py pyparsing example
+    __author__ = 'Paul McGuire'
+    __version__ = '$Revision: 0.0 $'
+    __date__ = '$Date: 2009-03-20 $'
+    __source__ = http://pyparsing.wikispaces.com/file/view/fourFn.py
+    http://pyparsing.wikispaces.com/message/view/home/15549426
+    
+    All I've done is rewrap Paul McGuire's fourFn.py as a class, so I can use it
+    more easily in other places.
+    '''
+    
+    class IdentifierException(Exception):
+        pass
+    
+    def push_first(self, strg, loc, toks):
+        self.exprStack.append(toks[0])
+    
+    def push_unary_minus(self, strg, loc, toks):
+        for t in toks:
+            if t == '-':
+                self.exprStack.append('unary -')
+            else:
+                break
+    
+    def __init__(self):
+        """
+        expop   :: '^'
+        multop  :: '*' | '/'
+        addop   :: '+' | '-'
+        integer :: ['+' | '-'] '0'..'9'+
+        atom    :: PI | E | real | fn '(' expr ')' | '(' expr ')'
+        factor  :: atom [ expop factor ]*
+        term    :: factor [ multop factor ]*
+        expr    :: term [ addop term ]*
+        """
+        # use CaselessKeyword for e and pi, to avoid accidentally matching
+        # functions that start with 'e' or 'pi' (such as 'exp'); Keyword
+        # and CaselessKeyword only match whole words
+        e = CaselessKeyword("E")
+        pi = CaselessKeyword("PI")
+        # fnumber = Combine(Word("+-"+nums, nums) +
+        #                    Optional("." + Optional(Word(nums))) +
+        #                    Optional(e + Word("+-"+nums, nums)))
+        # or use provided pyparsing_common.number, but convert back to str:
+        # fnumber = ppc.number().addParseAction(lambda t: str(t[0]))
+        fnumber = Regex(r"[+-]?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?")
+        ident = Word(alphas, alphanums + "_$")
+
+        plus, minus, mult, div, mod = map(Literal, "+-*/%")
+        lpar, rpar = map(Suppress, "()")
+        addop = plus | minus
+        multop = mult | div | mod
+        expop = Literal("^")
+
+        expr = Forward()
+        expr_list = delimitedList(Group(expr))
+        # add parse action that replaces the function identifier with a (name, number of args) tuple
+        fn_call = (ident + lpar - Group(expr_list) + rpar).setParseAction(
+            lambda t: t.insert(0, (t.pop(0), len(t[0])))
+        )
+        atom = (
+            addop[...]
+            + (
+                (fn_call | pi | e | fnumber | ident).setParseAction(self.push_first)
+                | Group(lpar + expr + rpar)
+            )
+        ).setParseAction(self.push_unary_minus)
+
+        # by defining exponentiation as "atom [ ^ factor ]..." instead of "atom [ ^ atom ]...", we get right-to-left
+        # exponents, instead of left-to-right that is, 2^3^2 = 2^(3^2), not (2^3)^2.
+        factor = Forward()
+        factor <<= atom + (expop + factor).setParseAction(self.push_first)[...]
+        term = factor + (multop + factor).setParseAction(self.push_first)[...]
+        expr <<= term + (addop + term).setParseAction(self.push_first)[...]
+        self.bnf = expr
+        
+        # map operator symbols to corresponding arithmetic operations
+        self.epsilon = 1e-12
+        self.opn = {
+            "+": operator.add,
+            "-": operator.sub,
+            "*": operator.mul,
+            "/": operator.truediv,
+            "^": operator.pow,
+            "%": operator.mod,
+        }
+
+        self.fn = {
+            "sin": math.sin,
+            "cos": math.cos,
+            "tan": math.tan,
+            "exp": math.exp,
+            "abs": abs,
+            "int": int,
+            "sqrt": math.sqrt,
+            "factorial": self.factorial,
+            "trunc": lambda a: int(a),
+            "round": round,
+            "sgn": lambda a: -1 if a < -epsilon else 1 if a > epsilon else 0,
+        }
+    
+    def factorial(self, a):
+        return math.factorial(int(a))
+    
+    def evaluate_stack(self, s):
+        op, num_args = s.pop(), 0
+        if isinstance(op, tuple):
+            op, num_args = op
+        if op == "unary -":
+            return -self.evaluate_stack(s)
+        if op in "+-*/^%":
+            # note: operands are pushed onto the stack in reverse order
+            op2 = self.evaluate_stack(s)
+            op1 = self.evaluate_stack(s)
+            return self.opn[op](op1, op2)
+        elif op == "PI":
+            return math.pi  # 3.1415926535
+        elif op == "E":
+            return math.e  # 2.718281828
+        elif op in self.fn:
+            # note: args are pushed onto the stack in reverse order
+            args = reversed([self.evaluate_stack(s) for _ in range(num_args)])
+            return self.fn[op](*args)
+        elif op[0].isalpha():
+            raise NumericStringParser.IdentifierException(f'invalid identifier \'{op}\'')
+        else:
+            # try to evaluate as int first, then as float if int fails
+            try:
+                return int(op)
+            except ValueError:
+                return float(op)
+    
+    def eval(self, num_string, parseAll=True):
+        # handle decimal numbers without a leading number.
+        num_string = re.sub(r'^(\.\d+)', r'0\g<1>', num_string)
+        num_string = re.sub(r'([-\+\*\^%/!])(\.\d+)', r'\g<1>0\g<2>', num_string)
+        
+        # factorial by way of ! is a funny edge case, we handle here with regex.
+        num_string = re.sub(r'((?:\d+\.)?\d+)!', r'factorial(\1)', num_string)
+        
+        self.exprStack = []
+        results = self.bnf.parseString(num_string, parseAll)
+        val = self.evaluate_stack(self.exprStack[:])
+        return val
+

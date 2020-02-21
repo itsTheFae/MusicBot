@@ -35,7 +35,7 @@ from .config import Config, ConfigDefaults
 from .permissions import Permissions, PermissionsDefaults
 from .aliases import Aliases, AliasesDefault
 from .constructs import SkipState, Response
-from .utils import load_file, write_file, fixg, ftimedelta, _func_, _get_variable
+from .utils import load_file, write_file, fixg, ftimedelta, _func_, _get_variable, NumericStringParser
 from .spotify import Spotify
 from .json import Json
 
@@ -2747,44 +2747,111 @@ class MusicBot(discord.Client):
         return Response( out, delete_after=30)
 
 
-    async def cmd_dice(self, channel, author, sides:int=6, number:int=1):
+    async def cmd_dice(self, channel, author, leftover_args):
         """
         Usage: 
-            {command_prefix}dice [sides] [number]
+            {command_prefix}dice [[sides] [rolls] | [some args]]
             Performs a dice roll using dice with given number of sides.  
-            Multiple dice can be thrown by passing an optional number of dice
+            Multiple dice can be thrown by passing an optional number of dice.
+            Some other things may be possible...
+            
         """
-        try:
-            if not sides:
-                sides = 6
-            
-            if not number:
-                number = 1
-            
-            sides = int(sides)
-            number = int(number)
-        except:
-            raise exceptions.CommandError("Invalid parameter. Arguments must be whole numbers.", expire_in=20)
-        
-        if sides <= 1:
-            raise exceptions.CommandError("Must have two sides or more!", expire_in=20)
-        if number <= 0:
-            raise exceptions.CommandError("Must roll one or more times!", expire_in=20)
-        
+        if leftover_args:
+            args = ' '.join(leftover_args)
+            args = re.sub(r'\s{2,}', r' ', args)
+            args = re.sub(r'\s+([-\+\*/\^\%]{1})\s+', r'\1', args)
+            args = args.split(' ')
+        else:
+            args = ['6']
+
+        nsp = NumericStringParser()
         rolls = []
-        n = number
-        while n > 0:
-            roll = random.randint(1, sides)
-            rolls.append(roll)
-            n = n - 1
+        number = 1
+        if len(args) == 1:
+            ''' 1 Argument Only
+                arg 1 should be a number of faces on 1 dice.
+                if arg 1 is not a number, the characters become the faces :^)
+            '''
+            try:
+                sides = abs(nsp.eval(args[0]))
+                if type(sides) == int:
+                    return Response(f'You rolled: {random.randint(1, sides)}')
+                if type(sides) == float:
+                    return Response(f'The value:  {random.uniform(0, sides)}')
+            except NumericStringParser.IdentifierException:
+                sides = args[0]
+                n = re.sub(r'.+([0-9]+)$', r'\1', sides, flags=re.S)
+                if n != sides:
+                    number = int(n)
+                    sides = sides[:(len(sides)-len(n))]
+                    return Response(f'Your samples are:  {", ".join(random.sample(sides, number))}')
+                else:
+                    return Response(f'The result is:  {random.choice(sides)}')
+            except:
+                log.error("Error doing 1-Arg parse!")
+                log.exception()
+                return Response('Sorry, that last one was too tough.')
+                #raise
+
+        if len(args) == 2:
+            ''' 2 Argument Only
+                arg 1 should be a number of faces.
+                arg 2 should be a number of dice or times thrown.
+                if arg 1 is not number but arg 2 is number, select sample as with 1-arg only
+                if arg 1 or 2 are not numbers assume "coin flip" between them.
+            '''
+            try:
+                n = abs(nsp.eval(args[1]))
+                sides = abs(nsp.eval(args[0]))
+                if type(n) == int and type(sides) == int:
+                    if n > 1:
+                        number = int(n)
+                    rolls = [str(random.randint(1,sides)) for _ in range(number)]
+                if type(n) == float and type(sides) == float:
+                    if n > 1:
+                        number = int(n)
+                    rolls = [str(random.uniform(0,sides)) for _ in range(number)]
+                return Response(f' You\'ve rolled:  {", ".join(rolls)}')
+            except NumericStringParser.IdentifierException:
+                try:
+                    n = int(abs(nsp.eval(args[1])))
+                    return Response(f'The dice yields:  {", ".join(random.sample(args[0], n))}')
+                except:
+                    pool = []
+                    for arg in args:
+                        if arg == None:
+                            continue
+                        try:
+                            a = nsp.eval(arg)
+                            pool.append(str(a))
+                        except:
+                            pool.append(arg)
+                    return Response(f'It lands on:  {random.choice(pool)}')                
+            except:
+                log.error("Error doing 2-Arg parse!")
+                log.exception()
+                return Response('Sorry, that last one was too tough.')
+                #raise
+
+        if len(args) > 2:
+            ''' N-Arguments
+                ez choice
+                maybe if the last arg is a number that should be number of rolls?
+            '''
+            pool = []
+            for arg in args:
+                if arg == None:
+                    continue
+                try:
+                    a = nsp.eval(arg)
+                    pool.append(str(a))
+                except:
+                    pool.append(arg)
+            
+            return Response(f'You rolled:  {random.choice(pool)}')
+            
         
-        t = "times"
-        total = " or **{0}** total.".format(str(sum(rolls)))
-        if number == 1:
-            t = "time"
-            total = ""
-        
-        return Response("You roll a {0} sided dice {1} {2} resulting in: **{3}**{4}".format(sides, number, t, ", ".join(map(str,rolls)), total))
+        #return Response("You roll a {0} sided dice {1} {2} resulting in: **{3}**{4}".format(sides, number, t, ", ".join(map(str,rolls)), total))
         
 
 ########################################################################################################################################################
