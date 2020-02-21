@@ -2807,7 +2807,7 @@ class MusicBot(discord.Client):
                     if n > 1:
                         number = int(n)
                     rolls = [str(random.randint(1,sides)) for _ in range(number)]
-                if type(n) == float and type(sides) == float:
+                if type(sides) == float:
                     if n > 1:
                         number = int(n)
                     rolls = [str(random.uniform(0,sides)) for _ in range(number)]
