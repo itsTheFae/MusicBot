@@ -2812,7 +2812,7 @@ class MusicBot(discord.Client):
                         return await RespondL(f'The value:  {str(random.uniform(0, sides))}')
             except NumericStringParser.IdentifierException:
                 sides = args[0]
-                n = re.sub(r'.+([0-9]+)$', r'\1', sides, flags=re.S)
+                n = re.sub(r'[^\d]+(\d+)$', r'\1', sides, flags=re.S)
                 if n != sides:
                     number = clamp(int(n))
                     sides = sides[:(len(sides)-len(n))]
