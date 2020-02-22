@@ -2770,6 +2770,13 @@ class MusicBot(discord.Client):
             else:
                 return a
         
+        def clamp_sides(sides):
+            if sides > sys.maxsize:
+                sides = sys.maxsize
+            elif sides < (-sys.maxsize-1):
+                sides = (-sys.maxsize-1)
+            return sides
+        
         async def RespondL(msg:str=""):
             msgMax = 2000
             fileMax = 8388608
@@ -2791,11 +2798,18 @@ class MusicBot(discord.Client):
                 if arg 1 is not a number, the characters become the faces :^)
             '''
             try:
-                sides = abs(nsp.eval(args[0]))
+                sides = nsp.eval(args[0])
                 if type(sides) == int:
-                    return await RespondL(f'You rolled:  {str(random.randint(1, sides))}')
+                    sides = clamp_sides(sides)
+                    if sides < 0:
+                        return await RespondL(f'You rolled:  {str(random.randint(sides, -1))}')
+                    else:
+                        return await RespondL(f'You rolled:  {str(random.randint(1, sides))}')
                 if type(sides) == float:
-                    return await RespondL(f'The value:  {str(random.uniform(0, sides))}')
+                    if sides < 0:
+                        return await RespondL(f'The value:  {str(random.uniform(sides, 0))}')
+                    else:
+                        return await RespondL(f'The value:  {str(random.uniform(0, sides))}')
             except NumericStringParser.IdentifierException:
                 sides = args[0]
                 n = re.sub(r'.+([0-9]+)$', r'\1', sides, flags=re.S)
@@ -2829,15 +2843,22 @@ class MusicBot(discord.Client):
             try:
                 try:
                     n = abs(nsp.eval(args[1]))
-                    sides = abs(nsp.eval(args[0]))
+                    sides = nsp.eval(args[0])
                     if type(n) == int and type(sides) == int:
                         if n > 1:
                             number = clamp(int(n))
-                        rolls = [str(random.randint(1,sides)) for _ in range(number)]
+                        sides = clamp_sides(sides)
+                        if sides < 0:
+                            rolls = [str(random.randint(sides, -1)) for _ in range(number)]
+                        else:
+                            rolls = [str(random.randint(1, sides)) for _ in range(number)]
                     if type(sides) == float:
                         if n > 1:
                             number = clamp(int(n))
-                        rolls = [str(random.uniform(0,sides)) for _ in range(number)]
+                        if sides < 0:
+                            rolls = [str(random.uniform(sides, 0)) for _ in range(number)]
+                        else:
+                            rolls = [str(random.uniform(0, sides)) for _ in range(number)]
                     return await RespondL(f' You\'ve rolled:  {", ".join(rolls)}')
                 except NumericStringParser.IdentifierException:
                     try:
