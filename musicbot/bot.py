@@ -2763,6 +2763,12 @@ class MusicBot(discord.Client):
             args = args.split(' ')
         else:
             args = ['6']
+        
+        def clamp(a, b=1000):
+            if a > b:
+                return b
+            else:
+                return a
 
         nsp = NumericStringParser()
         rolls = []
@@ -2782,14 +2788,22 @@ class MusicBot(discord.Client):
                 sides = args[0]
                 n = re.sub(r'.+([0-9]+)$', r'\1', sides, flags=re.S)
                 if n != sides:
-                    number = int(n)
+                    number = clamp(int(n))
                     sides = sides[:(len(sides)-len(n))]
                     return Response(f'Your samples are:  {", ".join(random.sample(sides, number))}')
                 else:
                     return Response(f'The result is:  {random.choice(sides)}')
+            except MemoryError as ex:
+                log.error("Error doing 1-Arg parse!")
+                log.exception("MemoryError", exc_info=ex)
+                return Response('My Tiny Brain Cannot Phathom These Immense Potentials!')
+            except ArithmeticError as ex:
+                log.error("Error doing 1-Arg parse!")
+                log.exception("ArithmeticError", exc_info=ex)
+                return Response('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
             except Exception as ex:
                 log.error("Error doing 1-Arg parse!")
-                log.exception("NSP Exception", ex_info=ex)
+                log.exception("NSP Exception", exc_info=ex)
                 return Response('Sorry, that last one was too tough.')
                 #raise
 
@@ -2805,18 +2819,18 @@ class MusicBot(discord.Client):
                 sides = abs(nsp.eval(args[0]))
                 if type(n) == int and type(sides) == int:
                     if n > 1:
-                        number = int(n)
+                        number = clamp(int(n))
                     rolls = [str(random.randint(1,sides)) for _ in range(number)]
                 if type(sides) == float:
                     if n > 1:
-                        number = int(n)
+                        number = clamp(int(n))
                     rolls = [str(random.uniform(0,sides)) for _ in range(number)]
                 return Response(f' You\'ve rolled:  {", ".join(rolls)}')
             except NumericStringParser.IdentifierException:
                 try:
                     n = int(abs(nsp.eval(args[1])))
                     if n > 1:
-                        number = n
+                        number = clamp(n)
                         rolls = [str(random.choice(sides)) for _ in range(number)]
                         return Response(f'The dice yields:  {", ".join(rolls)}')
                     else:
@@ -2831,10 +2845,18 @@ class MusicBot(discord.Client):
                             pool.append(a)
                         except:
                             pool.append(arg)
-                    return Response(f'It lands on:  {str(random.choice(pool))}')                
+                    return Response(f'It lands on:  {str(random.choice(pool))}')
+            except MemoryError as ex:
+                log.error("Error doing 2-Arg parse!")
+                log.exception("MemoryError", exc_info=ex)
+                return Response('My Tiny Brain Cannot Phathom These Immense Potentials!')
+            except ArithmeticError as ex:
+                log.error("Error doing 2-Arg parse!")
+                log.exception("ArithmeticError", exc_info=ex)
+                return Response('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
             except Exception as ex:
                 log.error("Error doing 2-Arg parse!")
-                log.exception("NSP Exception", ex_info=ex)
+                log.exception("NSP Exception", exc_info=ex)
                 return Response('Sorry, that last one was too tough.')
                 #raise
 
@@ -2850,19 +2872,29 @@ class MusicBot(discord.Client):
                 try:
                     a = nsp.eval(arg)
                     pool.append(a)
-                except:
+                except (Exception, NumericStringParser.IdentifierException, MemoryError, ArithmeticError):
                     pool.append(arg)
             if type(pool[-1]) == int or type(pool[-1]) == float:
                 if pool[-1] > 1:
-                    number = int(pool[-1])
+                    number = clamp(int(pool[-1]))
             
-            if number > 1:
-                pool = pool[:-1]
-                rolls = [str(random.choice(pool)) for _ in range(number)]
-                return Response(f'You roll: {", ".join(rolls)}')
-            else:
-                return Response(f'You rolled:  {str(random.choice(pool))}')
-            
+            try:
+                if number > 1:
+                    number = clamp(number)
+                    pool = pool[:-1]
+                    rolls = [str(random.choice(pool)) for _ in range(number)]
+                    return Response(f'You roll: {", ".join(rolls)}')
+                else:
+                    return Response(f'You rolled:  {str(random.choice(pool))}')
+            except MemoryError as ex:
+                log.error("Error doing N-Arg parse!")
+                log.exception("MemoryError", exc_info=ex)
+                return Response('My Tiny Brain Cannot Phathom These Immense Potentials!')
+            except ArithmeticError as ex:
+                log.error("Error doing N-Arg parse!")
+                log.exception("ArithmeticError", exc_info=ex)
+                return Response('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
+                
         return Response("Sorry, that last one was too tough.")
         #return Response("You roll a {0} sided dice {1} {2} resulting in: **{3}**{4}".format(sides, number, t, ", ".join(map(str,rolls)), total))
         
