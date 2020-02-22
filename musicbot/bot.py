@@ -2764,11 +2764,23 @@ class MusicBot(discord.Client):
         else:
             args = ['6']
         
-        def clamp(a, b=1000):
+        def clamp(a, b=1000000):
             if a > b:
                 return b
             else:
                 return a
+        
+        async def RespondL(msg:str=""):
+            msgMax = 2000
+            fileMax = 8388608
+            if len(msg) <= msgMax:
+                return Response(msg)
+            if len(msg) > msgMax and len(msg) < fileMax:
+                log.debug("Dice sending as file.")
+                await channel.send(file=discord.File(StringIO(msg), filename="dice_results.txt"))
+                return Response("Dice results sent as a file.")
+            if len(msg) > fileMax:
+                return Response("The result is too large to send...")
 
         nsp = NumericStringParser()
         rolls = []
@@ -2781,30 +2793,30 @@ class MusicBot(discord.Client):
             try:
                 sides = abs(nsp.eval(args[0]))
                 if type(sides) == int:
-                    return Response(f'You rolled: {str(random.randint(1, sides))}')
+                    return await RespondL(f'You rolled:  {str(random.randint(1, sides))}')
                 if type(sides) == float:
-                    return Response(f'The value:  {str(random.uniform(0, sides))}')
+                    return await RespondL(f'The value:  {str(random.uniform(0, sides))}')
             except NumericStringParser.IdentifierException:
                 sides = args[0]
                 n = re.sub(r'.+([0-9]+)$', r'\1', sides, flags=re.S)
                 if n != sides:
                     number = clamp(int(n))
                     sides = sides[:(len(sides)-len(n))]
-                    return Response(f'Your samples are:  {", ".join(random.sample(sides, number))}')
+                    return await RespondL(f'Your samples are:  {", ".join(random.sample(sides, number))}')
                 else:
-                    return Response(f'The result is:  {random.choice(sides)}')
+                    return await RespondL(f'The result is:  {random.choice(sides)}')
             except MemoryError as ex:
                 log.error("Error doing 1-Arg parse!")
                 log.exception("MemoryError", exc_info=ex)
-                return Response('My Tiny Brain Cannot Phathom These Immense Potentials!')
+                return await RespondL('My Tiny Brain Cannot Fathom These Immense Potentials!')
             except ArithmeticError as ex:
                 log.error("Error doing 1-Arg parse!")
                 log.exception("ArithmeticError", exc_info=ex)
-                return Response('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
+                return await RespondL('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
             except Exception as ex:
                 log.error("Error doing 1-Arg parse!")
                 log.exception("NSP Exception", exc_info=ex)
-                return Response('Sorry, that last one was too tough.')
+                return await RespondL('Sorry, that last one was too tough.')
                 #raise
 
         if len(args) == 2:
@@ -2815,49 +2827,51 @@ class MusicBot(discord.Client):
                 if arg 1 or 2 are not numbers assume "coin flip" between them.
             '''
             try:
-                n = abs(nsp.eval(args[1]))
-                sides = abs(nsp.eval(args[0]))
-                if type(n) == int and type(sides) == int:
-                    if n > 1:
-                        number = clamp(int(n))
-                    rolls = [str(random.randint(1,sides)) for _ in range(number)]
-                if type(sides) == float:
-                    if n > 1:
-                        number = clamp(int(n))
-                    rolls = [str(random.uniform(0,sides)) for _ in range(number)]
-                return Response(f' You\'ve rolled:  {", ".join(rolls)}')
-            except NumericStringParser.IdentifierException:
                 try:
-                    n = int(abs(nsp.eval(args[1])))
-                    if n > 1:
-                        number = clamp(n)
-                        rolls = [str(random.choice(sides)) for _ in range(number)]
-                        return Response(f'The dice yields:  {", ".join(rolls)}')
-                    else:
-                        return Response(f'The dice yields: {str(random.choice(sides))}')
-                except:
-                    pool = []
-                    for arg in args:
-                        if arg == None:
-                            continue
-                        try:
-                            a = nsp.eval(arg)
-                            pool.append(a)
-                        except:
-                            pool.append(arg)
-                    return Response(f'It lands on:  {str(random.choice(pool))}')
+                    n = abs(nsp.eval(args[1]))
+                    sides = abs(nsp.eval(args[0]))
+                    if type(n) == int and type(sides) == int:
+                        if n > 1:
+                            number = clamp(int(n))
+                        rolls = [str(random.randint(1,sides)) for _ in range(number)]
+                    if type(sides) == float:
+                        if n > 1:
+                            number = clamp(int(n))
+                        rolls = [str(random.uniform(0,sides)) for _ in range(number)]
+                    return await RespondL(f' You\'ve rolled:  {", ".join(rolls)}')
+                except NumericStringParser.IdentifierException:
+                    try:
+                        sides = args[0]
+                        n = int(abs(nsp.eval(args[1])))
+                        if n > 1:
+                            number = clamp(n)
+                            rolls = [str(random.choice(sides)) for _ in range(number)]
+                            return await RespondL(f'The dice yields:  {", ".join(rolls)}')
+                        else:
+                            return await RespondL(f'The dice yields: {str(random.choice(sides))}')
+                    except NumericStringParser.IdentifierException:
+                        pool = []
+                        for arg in args:
+                            if arg == None:
+                                continue
+                            try:
+                                a = nsp.eval(arg)
+                                pool.append(a)
+                            except:
+                                pool.append(arg)
+                        return await RespondL(f'It lands on:  {str(random.choice(pool))}')
             except MemoryError as ex:
                 log.error("Error doing 2-Arg parse!")
                 log.exception("MemoryError", exc_info=ex)
-                return Response('My Tiny Brain Cannot Phathom These Immense Potentials!')
+                return await RespondL('My Tiny Brain Cannot Fathom These Immense Potentials!')
             except ArithmeticError as ex:
                 log.error("Error doing 2-Arg parse!")
                 log.exception("ArithmeticError", exc_info=ex)
-                return Response('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
+                return await RespondL('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
             except Exception as ex:
                 log.error("Error doing 2-Arg parse!")
                 log.exception("NSP Exception", exc_info=ex)
-                return Response('Sorry, that last one was too tough.')
+                return await RespondL('Sorry, that last one was too tough.')
                 #raise
 
         if len(args) > 2:
@@ -2883,19 +2897,19 @@ class MusicBot(discord.Client):
                     number = clamp(number)
                     pool = pool[:-1]
                     rolls = [str(random.choice(pool)) for _ in range(number)]
-                    return Response(f'You roll: {", ".join(rolls)}')
+                    return await RespondL(f'You roll: {", ".join(rolls)}')
                 else:
-                    return Response(f'You rolled:  {str(random.choice(pool))}')
+                    return await RespondL(f'You rolled:  {str(random.choice(pool))}')
             except MemoryError as ex:
                 log.error("Error doing N-Arg parse!")
                 log.exception("MemoryError", exc_info=ex)
-                return Response('My Tiny Brain Cannot Phathom These Immense Potentials!')
+                return await RespondL('My Tiny Brain Cannot Fathom These Immense Potentials!')
             except ArithmeticError as ex:
                 log.error("Error doing N-Arg parse!")
                 log.exception("ArithmeticError", exc_info=ex)
-                return Response('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
+                return await RespondL('Overflow, Zero-Division, or Floating Point Error?  Math is hard sometimes.')
                 
-        return Response("Sorry, that last one was too tough.")
+        return await RespondL("Sorry, that last one was too tough.")
         #return Response("You roll a {0} sided dice {1} {2} resulting in: **{3}**{4}".format(sides, number, t, ", ".join(map(str,rolls)), total))
         
 
