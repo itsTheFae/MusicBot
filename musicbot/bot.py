@@ -2816,7 +2816,8 @@ class MusicBot(discord.Client):
                 if n != sides:
                     number = clamp(int(n))
                     sides = sides[:(len(sides)-len(n))]
-                    return await RespondL(f'Your samples are:  {", ".join(random.sample(sides, number))}')
+                    rolls = [str(random.sample(sides)) for _ in range(number)]
+                    return await RespondL(f'Your samples are:  {", ".join(rolls)}')
                 else:
                     return await RespondL(f'The result is:  {random.choice(sides)}')
             except MemoryError as ex:
