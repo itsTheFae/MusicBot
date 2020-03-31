@@ -123,6 +123,19 @@ class MusicBot(discord.Client):
                 log.warning('There was a problem initialising the connection to Spotify. Is your client ID and secret correct? Details: {0}. Continuing anyway in 5 seconds...'.format(e))
                 self.config._spotify = False
                 time.sleep(5)  # make sure they see the problem
+        else:
+            try:
+                log.warning('The config did not have Spotify app credentials, attempting to use guest mode.')
+                self.spotify = Spotify(None, None, aiosession=self.aiosession, loop=self.loop)
+                if not self.spotify.token:
+                    log.warning('Spotify did not provide us with a token. Disabling.')
+                    self.config._spotify = False
+                else:
+                    log.info('Authenticated with Spotify successfully using guest mode.')
+                    self.config._spotify = True
+            except exceptions.SpotifyError as e:
+                log.warning('There was a problem initialising the connection to Spotify using guest mode. Details: {0}.'.format(e))
+                self.config._spotify = False
 
     # TODO: Add some sort of `denied` argument for a message to send when someone else tries to use it
     def owner_only(func):
@@ -1383,6 +1396,19 @@ class MusicBot(discord.Client):
                 except exceptions.SpotifyError:
                     raise exceptions.CommandError(self.str.get('cmd-play-spotify-invalid', 'You either provided an invalid URI, or there was a problem.'))
 
+        async def get_info(song_url):
+            info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
+            # If there is an exception arise when processing we go on and let extract_info down the line report it
+            # because info might be a playlist and thing that's broke it might be individual entry
+            try:
+                info_process = await self.downloader.extract_info(player.playlist.loop, song_url, download=False)
+                info_process_err = None
+            except Exception as e:
+                info_process = None
+                info_process_err = e
+
+            return (info, info_process, info_process_err)
+
         # This lock prevent spamming play command to add entries that exceeds time limit/ maximum song limit
         async with self.aiolocks[_func_() + ':' + str(author.id)]:
             if permissions.max_songs and player.playlist.count_for_user(author) >= permissions.max_songs:
@@ -1398,14 +1424,7 @@ class MusicBot(discord.Client):
             # Try to determine entry type, if _type is playlist then there should be entries
             while True:
                 try:
-                    info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
-                    # If there is an exception arise when processing we go on and let extract_info down the line report it
-                    # because info might be a playlist and thing that's broke it might be individual entry
-                    try:
-                        info_process = await self.downloader.extract_info(player.playlist.loop, song_url, download=False)
-                    except:
-                        info_process = None
-
+                    info, info_process, info_process_err = await get_info(song_url)
                     log.debug(info)
 
                     if info_process and info and info_process.get('_type', None) == 'playlist' and 'entries' not in info and not info.get('url', '').startswith('ytsearch'):
@@ -1423,7 +1442,7 @@ class MusicBot(discord.Client):
                 except Exception as e:
                     if 'unknown url type' in str(e):
                         song_url = song_url.replace(':', '')  # it's probably not actually an extractor
-                        info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
+                        info, info_process, info_process_err = await get_info(song_url)
                     else:
                         raise exceptions.CommandError(e, expire_in=30)
 
@@ -1442,32 +1461,21 @@ class MusicBot(discord.Client):
             # our ytdl options allow us to use search strings as input urls
             if info.get('url', '').startswith('ytsearch'):
                 # print("[Command:play] Searching for \"%s\"" % song_url)
-                info = await self.downloader.extract_info(
-                    player.playlist.loop,
-                    song_url,
-                    download=False,
-                    process=True,    # ASYNC LAMBDAS WHEN
-                    on_error=lambda e: asyncio.ensure_future(
-                        self.safe_send_message(channel, "```\n%s\n```" % e, expire_in=120), loop=self.loop),
-                    retry_on_error=True
-                )
-
-                if not info:
+                if info_process:
+                    info = info_process
+                else:
+                    await self.safe_send_message(channel, "```\n%s\n```" % info_process_err, expire_in=120)
                     raise exceptions.CommandError(
                         self.str.get('cmd-play-nodata', "Error extracting info from search string, youtubedl returned no data. "
                                                         "You may need to restart the bot if this continues to happen."), expire_in=30
-                    )
+                    )                    
 
-                if not all(info.get('entries', [])):
-                    # empty list, no data
-                    log.debug("Got empty list, no data")
-                    return
+                song_url = info_process.get('webpage_url', None) or info_process.get('url', None)
 
-                # TODO: handle 'webpage_url' being 'ytsearch:...' or extractor type
-                song_url = info['entries'][0]['webpage_url']
-                info = await self.downloader.extract_info(player.playlist.loop, song_url, download=False, process=False)
-                # Now I could just do: return await self.cmd_play(player, channel, author, song_url)
-                # But this is probably fine
+                if 'entries' in info:
+                    # if entry is playlist then only get the first one
+                    song_url = info['entries'][0]['webpage_url']
+                    info = info['entries'][0]
 
             # If it's playlist
             if 'entries' in info:
@@ -1569,14 +1577,14 @@ class MusicBot(discord.Client):
                 reply_text %= (btext, position)
 
             else:
+                reply_text %= (btext, position)
                 try:
                     time_until = await player.playlist.estimate_time_until(position, player)
-                    reply_text += self.str.get('cmd-play-eta', ' - estimated time until playing: %s')
+                    reply_text += (self.str.get('cmd-play-eta', ' - estimated time until playing: %s') % ftimedelta(time_until))
+                except exceptions.InvalidDataError:
+                    reply_text += self.str.get('cmd-play-eta-error', ' - cannot estimate time until playing')
                 except:
                     traceback.print_exc()
-                    time_until = ''
-
-                reply_text %= (btext, position, ftimedelta(time_until))
 
         return Response(reply_text, delete_after=30)
 
@@ -1842,7 +1850,7 @@ class MusicBot(discord.Client):
 
             # TODO: Fix timedelta garbage with util function
             song_progress = ftimedelta(timedelta(seconds=player.progress))
-            song_total = ftimedelta(timedelta(seconds=player.current_entry.duration))
+            song_total = ftimedelta(timedelta(seconds=player.current_entry.duration)) if player.current_entry.duration != None else '(no duration data)'
 
             streaming = isinstance(player.current_entry, StreamPlaylistEntry)
             prog_str = ('`[{progress}]`' if streaming else '`[{progress}/{total}]`').format(
@@ -1852,7 +1860,7 @@ class MusicBot(discord.Client):
 
             # percentage shows how much of the current song has already been played
             percentage = 0.0
-            if player.current_entry.duration > 0:
+            if player.current_entry.duration and player.current_entry.duration > 0:
                 percentage = player.progress / player.current_entry.duration
 
             # create the actual bar
@@ -2243,7 +2251,7 @@ class MusicBot(discord.Client):
         if player.is_playing:
             # TODO: Fix timedelta garbage with util function
             song_progress = ftimedelta(timedelta(seconds=player.progress))
-            song_total = ftimedelta(timedelta(seconds=player.current_entry.duration))
+            song_total = ftimedelta(timedelta(seconds=player.current_entry.duration)) if player.current_entry.duration != None else '(no duration data)'
             prog_str = '`[%s/%s]`' % (song_progress, song_total)
 
             if player.current_entry.meta.get('channel', False) and player.current_entry.meta.get('author', False):
@@ -3380,6 +3388,10 @@ class MusicBot(discord.Client):
         elif after.channel:
             channel = after.channel
         else:
+            return
+
+        if member == self.user and not after.channel: # if bot was disconnected from channel
+            await self.disconnect_voice_client(before.channel.guild)
             return
 
         if not self.config.auto_pause:
