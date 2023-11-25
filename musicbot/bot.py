@@ -113,6 +113,7 @@ class MusicBot(discord.Client):
             "last_np_msg": None,
             "availability_paused": False,
             "auto_paused": False,
+            "inactive_player_timer": asyncio.Event(),
             "timeout_event": (
                 asyncio.Event(),
                 False,
@@ -491,7 +492,10 @@ class MusicBot(discord.Client):
             return
 
         if guild.id in self.players:
-            self.players.pop(guild.id).kill()
+            player = self.players.pop(guild.id)
+            if self.config.leave_player_inactive_for > 0:
+                await self.reset_player_inactivity( player )
+            player.kill()
 
         await vc.disconnect()
 
@@ -557,6 +561,7 @@ class MusicBot(discord.Client):
 
     async def on_player_play(self, player, entry):
         log.debug("Running on_player_play")
+        await self.reset_player_inactivity(player)
         await self.update_now_playing_status(entry)
         player.skip_state.reset()
 
@@ -664,15 +669,18 @@ class MusicBot(discord.Client):
 
     async def on_player_resume(self, player, entry, **_):
         log.debug("Running on_player_resume")
+        await self.reset_player_inactivity(player)
         await self.update_now_playing_status(entry)
 
     async def on_player_pause(self, player, entry, **_):
         log.debug("Running on_player_pause")
         await self.update_now_playing_status(entry, True)
+        await self.handle_inactive_player(player)
         # await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_stop(self, player, **_):
         log.debug("Running on_player_stop")
+        await self.handle_inactive_player(player)
         await self.update_now_playing_status()
 
     async def on_player_finished_playing(self, player, **_):
@@ -680,6 +688,7 @@ class MusicBot(discord.Client):
         if self.config.leave_after_song:
             guild = player.voice_client.guild
             if player.playlist.entries.__len__() == 0:
+                log.info("Player finished and queue is empty, leaving voice channel...")
                 await self.disconnect_voice_client(guild)
 
         # delete last_np_msg somewhere if we have cached it
@@ -1087,7 +1096,8 @@ class MusicBot(discord.Client):
                 "Bot cannot login, bad credentials.",
                 "Fix your token in the options file.  "
                 "Remember that each field should be on their own line.",
-            )  #     ^^^^ In theory self.config.auth should never have no items
+                #     ^^^^ In theory self.config.auth should never have no items
+            )
 
         finally:
             try:
@@ -1341,6 +1351,21 @@ class MusicBot(discord.Client):
                 + ["Disabled", "Enabled"][self.config.leavenonowners]
             )
             log.info(
+                "  Leave inactive VC: "
+                + ["Disabled", "Enabled"][self.config.leave_inactive_channel]
+            )
+            log.info(
+                f"    Timeout: {self.config.leave_inactive_channel_timeout} seconds"
+            )
+            log.info(
+                "  Leave at song end/empty queue: "
+                + ["Disabled", "Enabled"][self.config.leave_after_song]
+            )
+            log.info(
+                f"  Leave when player idles: {'Disabled' if self.config.leave_player_inactive_for == 0 else 'Enabled'}"
+            )
+            log.info(f"    Timeout: {self.config.leave_player_inactive_for} seconds")
+            log.info(
                 "  Self Deafen: " + ["Disabled", "Enabled"][self.config.self_deafen]
             )
 
@@ -1408,24 +1433,57 @@ class MusicBot(discord.Client):
         self.server_specific_data[guild]["timeout_event"] = (event, True)
 
         try:
-            log.info(
-                f"Waiting {self.config.leave_inactiveVCTimeOut} seconds to leave the channel {guild.me.voice.channel.name}."
+            log.debug(
+                f"Channel activity waiting {self.config.leave_inactive_channel_timeout} seconds to leave channel: {guild.me.voice.channel.name}"
             )
             await discord.utils.sane_wait_for(
-                [event.wait()], timeout=self.config.leave_inactiveVCTimeOut
+                [event.wait()], timeout=self.config.leave_inactive_channel_timeout
             )
         except asyncio.TimeoutError:
-            log.info(f"Timer for {guild.name} has expired. Disconnecting.")
-
+            log.debug(
+                f"Channel activity timer for {guild.name} has expired. Disconnecting."
+            )
             await self.on_timeout_expired(guild.me.voice.channel)
         else:
-            log.info(
-                f"{guild.me.voice.channel.name} in {guild.name} is no longer inactive. Cancelling timer."
+            log.debug(
+                f"Channel activity timer canceled for: {guild.me.voice.channel.name} in {guild.name}"
             )
         finally:
-            log.info(f"Cleaning up timer for guild {guild.name}.")
+            log.debug(f"Cleaning up channel activity timer for guild {guild.name}.")
             self.server_specific_data[guild]["timeout_event"] = (event, False)
             event.clear()
+
+    async def handle_inactive_player(self, player):
+        # TODO / FIXME:  account for auto-join channels, we shouldn't leave those.  
+        if not self.config.leave_player_inactive_for:
+            return
+        guild = player.voice_client.channel.guild
+        event = self.server_specific_data[guild]["inactive_player_timer"]
+        try:
+            log.debug(
+                f"Player activity timer waiting {self.config.leave_player_inactive_for} seconds to leave channel: {guild.me.voice.channel.name}"
+            )
+            await discord.utils.sane_wait_for(
+                [event.wait()], timeout=self.config.leave_player_inactive_for
+            )
+        except asyncio.TimeoutError:
+            log.debug(
+                f"Player activity timer for {guild.name} has expired. Disconnecting."
+            )
+            await self.on_timeout_expired(guild.me.voice.channel)
+        else:
+            log.debug(
+                f"Player activity timer canceled for: {guild.me.voice.channel.name} in {guild.name}"
+            )
+        finally:
+            log.debug(f"Cleaning up player activity timer for guild {guild.name}.")
+            event.clear()
+
+    async def reset_player_inactivity(self, player):
+        if not self.config.leave_player_inactive_for:
+            return
+        guild = player.voice_client.channel.guild
+        self.server_specific_data[guild]["inactive_player_timer"].set()
 
     async def cmd_resetplaylist(self, player, channel):
         """
@@ -3351,7 +3409,7 @@ class MusicBot(discord.Client):
 
         if permission_force_skip and (force_skip or self.config.legacy_skip):
             if not permissions.skiplooped and player.repeatsong:
-                raise errors.PermissionsError(
+                raise exceptions.PermissionsError(
                     self.str.get(
                         "cmd-skip-force-noperms-looped-song",
                         "You do not have permission to force skip a looped song.",
@@ -4479,7 +4537,7 @@ class MusicBot(discord.Client):
                         f"Leaving voice channel {voice_channel.name} in {voice_channel.guild} due to inactivity.",
                         expire_in=30,
                     )
-            except Exception as e:
+            except Exception:
                 log.info(
                     f"Leaving voice channel {voice_channel.name} in {voice_channel.guild} due to inactivity."
                 )
@@ -4489,7 +4547,7 @@ class MusicBot(discord.Client):
         if not self.init_ok:
             return  # Ignore stuff before ready
 
-        if self.config.leave_inactives:
+        if self.config.leave_inactive_channel:
             guild = member.guild
             event, active = self.server_specific_data[guild]["timeout_event"]
 
