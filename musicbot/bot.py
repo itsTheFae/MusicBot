@@ -45,6 +45,7 @@ from .utils import (
     _func_,
     _get_variable,
     format_song_duration,
+    format_size_bytes,
 )
 
 load_opus_lib()
@@ -230,19 +231,64 @@ class MusicBot(discord.Client):
         )
 
     def _delete_old_audiocache(self, path=AUDIO_CACHE_PATH):
-        try:
-            shutil.rmtree(path)
-            return True
-        except:
+        def _unlink_path(path: pathlib.Path):
             try:
-                os.rename(path, path + "__")
-            except:
+                path.unlink(missing_ok=True)
+                return True
+            except Exception:
+                log.exception(f"Failed to delete cache file:  {path}")
                 return False
+
+        if self.config.save_videos:
+            if (
+                self.config.storage_limit_bytes == 0
+                and self.config.storage_limit_days == 0
+            ):
+                log.debug("Skip delete audio cache, no limits set.")
+                return False
+
+            # Sort cache by access-time and delete any that are older than set limit.
+            # Accumulate file sizes until a set limit is reached and purge remaining files.
+            max_age = time.time() - (86400 * self.config.storage_limit_days)
+            cached_size = 0
+            cached_files = sorted(pathlib.Path(path).iterdir(), key=os.path.getatime)
+            removed_count = 0
+            removed_size = 0
+            for cache_file in cached_files:
+                file_size = os.path.getsize(cache_file)
+                if (
+                    self.config.storage_limit_bytes
+                    and self.config.storage_limit_bytes <= cached_size
+                ):
+                    _unlink_path(cache_file)
+                    removed_count += 1
+                    removed_size += file_size
+                    continue
+
+                if self.config.storage_limit_days:
+                    if os.path.getatime(cache_file) < max_age:
+                        _unlink_path(cache_file)
+                        removed_count += 1
+                        removed_size += file_size
+                        continue
+
+                cached_size += file_size
+            rsize = format_size_bytes(removed_size)
+            log.debug(f"Deleted {removed_count} files from cache, total of {rsize}. ")
+        else:
             try:
                 shutil.rmtree(path)
-            except:
-                os.rename(path + "__", path)
-                return False
+                return True
+            except Exception:
+                try:
+                    os.rename(path, path + "__")
+                except Exception:
+                    return False
+                try:
+                    shutil.rmtree(path)
+                except Exception:
+                    os.rename(path + "__", path)
+                    return False
 
         return True
 
@@ -959,7 +1005,7 @@ class MusicBot(discord.Client):
             for guild in sorted(self.guilds, key=lambda s: int(s.id)):
                 f.write("{:<22} {}\n".format(guild.id, guild.name))
 
-        if not self.config.save_videos and os.path.isdir(AUDIO_CACHE_PATH):
+        if os.path.isdir(AUDIO_CACHE_PATH):
             if self._delete_old_audiocache():
                 log.debug("Deleted old audio cache")
             else:
@@ -1362,6 +1408,14 @@ class MusicBot(discord.Client):
                 "  Downloaded songs will be "
                 + ["deleted", "saved"][self.config.save_videos]
             )
+            if self.config.save_videos and self.config.storage_limit_days:
+                log.info(
+                    f"    Delete if unused for {self.config.storage_limit_days} days"
+                )
+            if self.config.save_videos and self.config.storage_limit_bytes:
+                size = format_size_bytes(self.config.storage_limit_bytes)
+                log.info(f"    Delete if size exceeds {size}")
+
             if self.config.status_message:
                 log.info("  Status message: " + self.config.status_message)
             log.info(
@@ -3725,6 +3779,59 @@ class MusicBot(discord.Client):
                         "The parameters provided were invalid.",
                     )
                 )
+
+    @owner_only
+    async def cmd_cache(self, leftover_args, opt="info"):
+        """
+        Usage:
+            {command_prefix}cache
+
+        Display cache storage info or clear cache files.
+        Valid options are:  info, clear
+        """
+        opt = opt.lower()
+        valid_opt = ["info", "clear"]
+        if opt not in valid_opt:
+            opt = "info"
+
+        if opt == "info":
+            save_videos = ["Disabled", "Enabled"][self.config.save_videos]
+            time_limit = f"{self.config.storage_limit_days} days"
+            size_limit = format_size_bytes(self.config.storage_limit_bytes)
+            size_now = ""
+
+            if not self.config.storage_limit_bytes:
+                size_limit = "Unlimited"
+
+            if not self.config.storage_limit_days:
+                time_limit = "Unlimited"
+
+            if os.path.isdir(AUDIO_CACHE_PATH):
+                cached_bytes = 0
+                cached_files = 0
+                for cache_file in pathlib.Path(AUDIO_CACHE_PATH).iterdir():
+                    cached_files += 1
+                    cached_bytes += os.path.getsize(cache_file)
+                cached_size = format_size_bytes(cached_bytes)
+                size_now = "\n\n**Cached Now:**  {} in {} files".format(
+                    cached_size, cached_files
+                )
+
+            info = "**Video Cache:** *{}*\n**Size Target:** *{}*\n**Time Limit:** *{}*{}".format(
+                save_videos, size_limit, time_limit, size_now
+            )
+            return Response(info, delete_after=60)
+
+        if opt == "clear":
+            if os.path.isdir(AUDIO_CACHE_PATH):
+                if self._delete_old_audiocache():
+                    return Response("Cache has been cleared.", delete_after=30)
+                else:
+                    return Response(
+                        "**Failed** to delete cache, check logs for more info...",
+                        delete_after=30,
+                    )
+            return Response("No cache found to clear.", delete_after=30)
 
     async def cmd_queue(self, channel, player):
         """
