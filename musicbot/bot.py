@@ -494,7 +494,7 @@ class MusicBot(discord.Client):
         if guild.id in self.players:
             player = self.players.pop(guild.id)
             if self.config.leave_player_inactive_for > 0:
-                await self.reset_player_inactivity( player )
+                await self.reset_player_inactivity(player)
             player.kill()
 
         await vc.disconnect()
@@ -1454,10 +1454,16 @@ class MusicBot(discord.Client):
             event.clear()
 
     async def handle_inactive_player(self, player):
-        # TODO / FIXME:  account for auto-join channels, we shouldn't leave those.  
         if not self.config.leave_player_inactive_for:
             return
-        guild = player.voice_client.channel.guild
+        channel = player.voice_channel.channel
+        if channel in self.autojoin_channels:
+            log.debug(
+                f"Ignoring player inactivity in auto-joined channel:  {channel.name}"
+            )
+            return
+
+        guild = channel.guild
         event = self.server_specific_data[guild]["inactive_player_timer"]
         try:
             log.debug(
