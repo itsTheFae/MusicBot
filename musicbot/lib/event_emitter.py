@@ -20,7 +20,7 @@ class EventEmitter:
                 else:
                     cb(*args, **kwargs)
 
-            except:
+            except Exception:
                 traceback.print_exc()
 
     def on(self, event, cb):

@@ -76,7 +76,7 @@ class BasePlaylistEntry(Serializable):
             try:
                 cb(future)
 
-            except:
+            except Exception:
                 traceback.print_exc()
 
     def __eq__(self, other):
@@ -245,7 +245,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
                                 self.playlist.bot.aiosession, self.url, "CONTENT-LENGTH"
                             )
                         )
-                    except:
+                    except Exception:
                         rsize = 0
 
                     lfile = os.path.join(
@@ -305,7 +305,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
                     try:
                         mediainfo = pymediainfo.MediaInfo.parse(self.filename)
                         self.duration = mediainfo.tracks[0].duration / 1000
-                    except:
+                    except Exception:
                         self.duration = None
 
                 else:
@@ -348,7 +348,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             if self.playlist.bot.config.use_experimental_equalization:
                 try:
                     aoptions = await self.get_mean_volume(self.filename)
-                except Exception as e:
+                except Exception:
                     log.error(
                         "There as a problem with working out EQ, likely caused by a strange installation of FFmpeg. "
                         "This has not impacted the ability for the bot to work, but will mean your tracks will not be equalised."
@@ -362,9 +362,10 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # Trigger ready callbacks.
             self._for_each_future(lambda future: future.set_result(self))
 
-        except Exception as e:
+        # Flake8 thinks 'e' is never used. The lambda is perhaps too much for Flake8 here.
+        except Exception as e:  # noqa: F841
             traceback.print_exc()
-            self._for_each_future(lambda future: future.set_exception(e))
+            self._for_each_future(lambda future: future.set_exception(e))  # noqa: F821
 
         finally:
             self._is_downloading = False
@@ -386,10 +387,10 @@ class URLPlaylistEntry(BasePlaylistEntry):
         i_matches = re.findall(r'"input_i" : "(-?([0-9]*\.[0-9]+))",', output)
         if i_matches:
             log.debug("i_matches={}".format(i_matches[0][0]))
-            I = float(i_matches[0][0])
+            Ival = float(i_matches[0][0])
         else:
             log.debug("Could not parse I in normalise json.")
-            I = float(0)
+            Ival = float(0)
 
         lra_matches = re.findall(r'"input_lra" : "(-?([0-9]*\.[0-9]+))",', output)
         if lra_matches:
@@ -424,7 +425,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             offset = float(0)
 
         return "-af loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:measured_I={}:measured_LRA={}:measured_TP={}:measured_thresh={}:offset={}".format(
-            I, LRA, TP, thresh, offset
+            Ival, LRA, TP, thresh, offset
         )
 
     # noinspection PyShadowingBuiltins
