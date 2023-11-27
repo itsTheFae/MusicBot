@@ -26,7 +26,7 @@ class GIT(object):
     def works(cls):
         try:
             return bool(subprocess.check_output("git --version", shell=True))
-        except:
+        except Exception:
             return False
 
 
@@ -40,7 +40,7 @@ class PIP(object):
             return PIP.run_python_m(*command.split(), check_output=check_output)
         except subprocess.CalledProcessError as e:
             return e.returncode
-        except:
+        except Exception:
             traceback.print_exc()
             print("Error using -m method")
 
@@ -65,7 +65,7 @@ class PIP(object):
 
             try:
                 pip.main(args)
-            except:
+            except Exception:
                 traceback.print_exc()
             finally:
                 sys.stdout = sys.__stdout__
@@ -90,7 +90,7 @@ class PIP(object):
     @classmethod
     def works(cls):
         try:
-            import pip
+            import pip  # noqa: F401
 
             return True
         except ImportError:
@@ -112,7 +112,7 @@ class PIP(object):
                 return expectedversion.split()[1]
             else:
                 return [x.split()[1] for x in datas if x.startswith("Version: ")][0]
-        except:
+        except Exception:
             pass
 
     @classmethod
@@ -151,7 +151,7 @@ def finalize_logging():
             if os.path.isfile("logs/musicbot.log.last"):
                 os.unlink("logs/musicbot.log.last")
             os.rename("logs/musicbot.log", "logs/musicbot.log.last")
-        except:
+        except Exception:
             pass
 
     with open("logs/musicbot.log", "w", encoding="utf8") as f:
@@ -243,12 +243,12 @@ def req_ensure_py3():
             try:
                 subprocess.check_output('py -3.8 -c "exit()"', shell=True)
                 pycom = "py -3.8"
-            except:
+            except Exception:
                 log.info('Trying "python3"')
                 try:
                     subprocess.check_output('python3 -c "exit()"', shell=True)
                     pycom = "python3"
-                except:
+                except Exception:
                     pass
 
             if pycom:
@@ -267,7 +267,7 @@ def req_ensure_py3():
                     .strip()
                     .decode()
                 )
-            except:
+            except Exception:
                 pass
 
             if pycom:
