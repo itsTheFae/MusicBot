@@ -31,7 +31,7 @@ from .constants import DISCORD_MSG_CHAR_LIMIT, AUDIO_CACHE_PATH
 from .constants import VERSION as BOTVERSION
 from .constructs import SkipState, Response
 from .entry import StreamPlaylistEntry
-from .json import Json
+from .json import Json, I18nJson
 from .opus_loader import load_opus_lib
 from .permissions import Permissions, PermissionsDefaults
 from .player import MusicPlayer
@@ -61,7 +61,7 @@ class MusicBot(discord.Client):
     def __init__(self, config_file=None, perms_file=None, aliases_file=None):
         try:
             sys.stdout.write("\x1b]2;MusicBot {}\x07".format(BOTVERSION))
-        except:
+        except Exception:
             pass
 
         print()
@@ -86,7 +86,7 @@ class MusicBot(discord.Client):
         self._setup_logging()
 
         self.permissions = Permissions(perms_file, grant_all=[self.config.owner_id])
-        self.str = Json(self.config.i18n_file)
+        self.str = I18nJson(self.config.i18n_file)
 
         if self.config.usealias:
             self.aliases = Aliases(aliases_file)
@@ -1149,7 +1149,7 @@ class MusicBot(discord.Client):
         try:
             await self.logout()
             await self.session.close()
-        except:
+        except Exception:
             pass
 
         pending = asyncio.all_tasks(loop=self.loop)
@@ -2062,7 +2062,7 @@ class MusicBot(discord.Client):
         try:
             indexes.append(int(command) - 1)
             indexes.append(int(leftover_args[0]) - 1)
-        except:
+        except Exception:
             return Response(
                 self.str.get(
                     "cmd-move-indexes_not_intergers", "Song indexes must be integers!"
@@ -2559,7 +2559,7 @@ class MusicBot(discord.Client):
                     reply_text += self.str.get(
                         "cmd-play-eta-error", " - cannot estimate time until playing"
                     )
-                except:
+                except Exception:
                     traceback.print_exc()
 
         return Response(reply_text, delete_after=30)
@@ -2642,7 +2642,7 @@ class MusicBot(discord.Client):
                         player.playlist.entries.remove(e)
                         entries_added.remove(e)
                         drop_count += 1
-                    except:
+                    except Exception:
                         pass
 
             if drop_count:
@@ -3089,7 +3089,7 @@ class MusicBot(discord.Client):
             song_progress = ftimedelta(timedelta(seconds=player.progress))
             song_total = (
                 ftimedelta(timedelta(seconds=player.current_entry.duration))
-                if player.current_entry.duration != None
+                if player.current_entry.duration is not None
                 else "(no duration data)"
             )
 
@@ -3850,7 +3850,7 @@ class MusicBot(discord.Client):
             song_progress = ftimedelta(timedelta(seconds=player.progress))
             song_total = (
                 ftimedelta(timedelta(seconds=player.current_entry.duration))
-                if player.current_entry.duration != None
+                if player.current_entry.duration is not None
                 else "(no duration data)"
             )
             prog_str = "`[%s/%s]`" % (song_progress, song_total)
@@ -3926,7 +3926,7 @@ class MusicBot(discord.Client):
         try:
             float(search_range)  # lazy check
             search_range = min(int(search_range), 1000)
-        except:
+        except Exception:
             return Response(
                 self.str.get(
                     "cmd-clean-invalid",
@@ -4116,7 +4116,7 @@ class MusicBot(discord.Client):
 
         if not user_mentions and target:
             user = guild.get_member_named(target)
-            if user == None:
+            if user is None:
                 try:
                     user = await self.fetch_user(target)
                 except discord.NotFound:
@@ -4382,7 +4382,7 @@ class MusicBot(discord.Client):
 
         try:
             result = eval(code, scope)
-        except:
+        except Exception:
             try:
                 exec(code, scope)
             except Exception as e:

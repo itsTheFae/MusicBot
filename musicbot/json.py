@@ -25,6 +25,16 @@ class Json:
         try:
             data = self.data[item]
         except KeyError:
-            log.warning("Could not grab data from i18n key {0}.".format(item, fallback))
+            log.warning("Could not grab data from JSON key {0}.".format(item))
+            data = fallback
+        return data
+
+
+class I18nJson (Json):
+    def get(self, item, fallback=None):
+        try:
+            data = self.data[item]
+        except KeyError:
+            log.warning("Could not grab data from i18n key {0}.".format(item))
             data = fallback
         return data
