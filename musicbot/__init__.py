@@ -30,7 +30,9 @@ def _add_logger_level(levelname, level, *, func_name=None):
     logging.addLevelName(level, levelname)
 
     exec(
-        _func_prototype.format(logger_func_name=func_name, levelname=levelname),  # noqa: F821
+        _func_prototype.format(  # noqa: F821
+            logger_func_name=func_name, levelname=levelname
+        ),
         logging.__dict__,
         locals(),
     )

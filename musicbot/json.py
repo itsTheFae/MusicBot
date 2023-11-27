@@ -30,7 +30,7 @@ class Json:
         return data
 
 
-class I18nJson (Json):
+class I18nJson(Json):
     def get(self, item, fallback=None):
         try:
             data = self.data[item]
