@@ -1456,7 +1456,7 @@ class MusicBot(discord.Client):
     async def handle_inactive_player(self, player):
         if not self.config.leave_player_inactive_for:
             return
-        channel = player.voice_channel.channel
+        channel = player.voice_client.channel
         if channel in self.autojoin_channels:
             log.debug(
                 f"Ignoring player inactivity in auto-joined channel:  {channel.name}"
