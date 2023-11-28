@@ -113,7 +113,10 @@ class MusicBot(discord.Client):
             "last_np_msg": None,
             "availability_paused": False,
             "auto_paused": False,
-            "inactive_player_timer": asyncio.Event(),
+            "inactive_player_timer": (
+                asyncio.Event(),
+                False,  # event state tracking.
+            ),
             "timeout_event": (
                 asyncio.Event(),
                 False,
@@ -1464,7 +1467,11 @@ class MusicBot(discord.Client):
             return
 
         guild = channel.guild
-        event = self.server_specific_data[guild]["inactive_player_timer"]
+        event, event_active = self.server_specific_data[guild]["inactive_player_timer"]
+        self.server_specific_data[guild]["inactive_player_timer"] = (event, True)
+        if event_active:
+            event.clear()
+
         try:
             log.debug(
                 f"Player activity timer waiting {self.config.leave_player_inactive_for} seconds to leave channel: {guild.me.voice.channel.name}"
@@ -1484,12 +1491,13 @@ class MusicBot(discord.Client):
         finally:
             log.debug(f"Cleaning up player activity timer for guild {guild.name}.")
             event.clear()
+            self.server_specific_data[guild]["inactive_player_timer"] = (event, False)
 
     async def reset_player_inactivity(self, player):
         if not self.config.leave_player_inactive_for:
             return
         guild = player.voice_client.channel.guild
-        self.server_specific_data[guild]["inactive_player_timer"].set()
+        self.server_specific_data[guild]["inactive_player_timer"][0].set()
 
     async def cmd_resetplaylist(self, player, channel):
         """
