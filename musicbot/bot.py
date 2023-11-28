@@ -739,12 +739,12 @@ class MusicBot(discord.Client):
     async def on_player_pause(self, player, entry, **_):
         log.debug("Running on_player_pause")
         await self.update_now_playing_status(entry, True)
-        await self.handle_inactive_player(player)
+        await self.handle_player_inactivity(player)
         # await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_stop(self, player, **_):
         log.debug("Running on_player_stop")
-        await self.handle_inactive_player(player)
+        await self.handle_player_inactivity(player)
         await self.update_now_playing_status()
 
     async def on_player_finished_playing(self, player, **_):
@@ -1561,19 +1561,21 @@ class MusicBot(discord.Client):
             self.server_specific_data[guild]["timeout_event"] = (event, False)
             event.clear()
 
-    async def handle_inactive_player(self, player):
+    async def handle_player_inactivity(self, player):
         if not self.config.leave_player_inactive_for:
             return
         channel = player.voice_client.channel
+        guild = channel.guild
+        event, event_active = self.server_specific_data[guild]["inactive_player_timer"]
+
         if channel in self.autojoin_channels:
             log.debug(
                 f"Ignoring player inactivity in auto-joined channel:  {channel.name}"
             )
             return
 
-        guild = channel.guild
-        event, event_active = self.server_specific_data[guild]["inactive_player_timer"]
         if event_active:
+            log.debug(f"Player activity timer already waiting in guild: {guild}")
             return
         self.server_specific_data[guild]["inactive_player_timer"] = (event, True)
 
@@ -1595,14 +1597,17 @@ class MusicBot(discord.Client):
             )
         finally:
             log.debug(f"Cleaning up player activity timer for guild {guild.name}.")
-            event.clear()
             self.server_specific_data[guild]["inactive_player_timer"] = (event, False)
+            event.clear()
 
     async def reset_player_inactivity(self, player):
         if not self.config.leave_player_inactive_for:
             return
         guild = player.voice_client.channel.guild
-        self.server_specific_data[guild]["inactive_player_timer"][0].set()
+        event, active = self.server_specific_data[guild]["inactive_player_timer"]
+        if active:
+            event.set()
+            log.debug("Player activity timer is being reset.")
 
     async def cmd_resetplaylist(self, player, channel):
         """
