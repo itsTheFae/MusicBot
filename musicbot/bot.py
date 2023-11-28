@@ -1573,9 +1573,9 @@ class MusicBot(discord.Client):
 
         guild = channel.guild
         event, event_active = self.server_specific_data[guild]["inactive_player_timer"]
-        self.server_specific_data[guild]["inactive_player_timer"] = (event, True)
         if event_active:
-            event.clear()
+            return
+        self.server_specific_data[guild]["inactive_player_timer"] = (event, True)
 
         try:
             log.debug(
