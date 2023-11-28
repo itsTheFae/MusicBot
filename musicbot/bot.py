@@ -678,12 +678,12 @@ class MusicBot(discord.Client):
     async def on_player_pause(self, player, entry, **_):
         log.debug("Running on_player_pause")
         await self.update_now_playing_status(entry, True)
-        await self.handle_inactive_player(player)
+        await self.handle_player_inactivity(player)
         # await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_stop(self, player, **_):
         log.debug("Running on_player_stop")
-        await self.handle_inactive_player(player)
+        await self.handle_player_inactivity(player)
         await self.update_now_playing_status()
 
     async def on_player_finished_playing(self, player, **_):
@@ -1456,42 +1456,46 @@ class MusicBot(discord.Client):
             self.server_specific_data[guild]["timeout_event"] = (event, False)
             event.clear()
 
-    async def handle_inactive_player(self, player):
+    async def handle_player_inactivity(self, player):
         if not self.config.leave_player_inactive_for:
             return
         channel = player.voice_client.channel
+        guild = channel.guild
+        event, event_active = self.server_specific_data[guild]["inactive_player_timer"]
+
         if channel in self.autojoin_channels:
             log.debug(
                 f"Ignoring player inactivity in auto-joined channel:  {channel.name}"
             )
             return
 
-        guild = channel.guild
-        event, event_active = self.server_specific_data[guild]["inactive_player_timer"]
         if event_active:
+            log.debug(f"Player activity timer already waiting in guild: {guild}")
             return
         self.server_specific_data[guild]["inactive_player_timer"] = (event, True)
 
-        try:
-            log.debug(
-                f"Player activity timer waiting {self.config.leave_player_inactive_for} seconds to leave channel: {guild.me.voice.channel.name}"
-            )
-            await discord.utils.sane_wait_for(
-                [event.wait()], timeout=self.config.leave_player_inactive_for
-            )
-        except asyncio.TimeoutError:
-            log.debug(
-                f"Player activity timer for {guild.name} has expired. Disconnecting."
-            )
-            await self.on_timeout_expired(guild.me.voice.channel)
-        else:
-            log.debug(
-                f"Player activity timer canceled for: {guild.me.voice.channel.name} in {guild.name}"
-            )
-        finally:
-            log.debug(f"Cleaning up player activity timer for guild {guild.name}.")
-            event.clear()
-            self.server_specific_data[guild]["inactive_player_timer"] = (event, False)
+        lockid = _func_() + ":" + str( player.voice_client.channel.guild.id )
+        async with self.aiolocks[lockid]:
+            try:
+                log.debug(
+                    f"Player activity timer waiting {self.config.leave_player_inactive_for} seconds to leave channel: {guild.me.voice.channel.name}"
+                )
+                await discord.utils.sane_wait_for(
+                    [event.wait()], timeout=self.config.leave_player_inactive_for
+                )
+            except asyncio.TimeoutError:
+                log.debug(
+                    f"Player activity timer for {guild.name} has expired. Disconnecting."
+                )
+                await self.on_timeout_expired(guild.me.voice.channel)
+            else:
+                log.debug(
+                    f"Player activity timer canceled for: {guild.me.voice.channel.name} in {guild.name}"
+                )
+            finally:
+                log.debug(f"Cleaning up player activity timer for guild {guild.name}.")
+                event.clear()
+                self.server_specific_data[guild]["inactive_player_timer"] = (event, False)
 
     async def reset_player_inactivity(self, player):
         if not self.config.leave_player_inactive_for:
