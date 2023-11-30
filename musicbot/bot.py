@@ -96,7 +96,7 @@ class MusicBot(discord.Client):
         self.autoplaylist = load_file(self.config.auto_playlist_file)
 
         self.aiolocks = defaultdict(asyncio.Lock)
-        self.downloader = downloader.Downloader(download_folder="audio_cache")
+        self.downloader = downloader.Downloader(download_folder=AUDIO_CACHE_PATH)
 
         log.info("Starting MusicBot {}".format(BOTVERSION))
 
