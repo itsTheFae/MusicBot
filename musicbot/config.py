@@ -221,11 +221,15 @@ class Config:
             "DefaultSearchResults",
             fallback=ConfigDefaults.defaultsearchresults,
         )
-
         self.enable_options_per_guild = config.getboolean(
             "MusicBot",
             "EnableOptionsPerGuild",
             fallback=ConfigDefaults.enable_options_per_guild,
+        )
+        self.round_robin_queue = config.getboolean(
+            "MusicBot",
+            "RoundRobinQueue",
+            fallback=ConfigDefaults.defaultround_robin_queue,
         )
 
         self.debug_level = config.get(
@@ -561,6 +565,7 @@ class ConfigDefaults:
     defaultsearchresults = 3
     enable_options_per_guild = False
     footer_text = "Just-Some-Bots/MusicBot ({})".format(BOTVERSION)
+    defaultround_robin_queue = False
 
     options_file = "config/options.ini"
     blacklist_file = "config/blacklist.txt"

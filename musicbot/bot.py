@@ -731,7 +731,11 @@ class MusicBot(discord.Client):
             else:
                 log.error("Unkknown link or unable to get video ID.")
             content = self._gen_embed()
-            content.title = newmsg
+            if self.config.now_playing_mentions:
+                content.title = None
+                content.add_field(name="\n", value=newmsg, inline=True)
+            else:
+                content.title = newmsg
             content.set_image(url=f"https://i1.ytimg.com/vi/{videoID}/hqdefault.jpg")
 
         # send it in specified channel
@@ -1952,6 +1956,38 @@ class MusicBot(discord.Client):
             head=False,
         )
 
+    async def cmd_shuffleplay(
+        self, message, _player, channel, author, permissions, leftover_args, song_url
+    ):
+        """
+        Usage:
+            {command_prefix}shuffleplay playlist_link
+        Adds a playlist to be shhuffled then played. Shorthand for doing {command_prefix}play and then {command_prefix}shuffle
+        If nothing is playing, then the first few songs will be played in order while the rest of the playlist downloads.
+        """
+        # TO-DO, don't play the first few songs so the entire playlist can be shuffled
+        # In my test run it's only 2-3 songs that get played in the order this is because of how the _cmd_play works.
+        player = self.get_player_in(channel.guild)
+
+        await self._cmd_play(
+            message,
+            _player,
+            channel,
+            author,
+            permissions,
+            leftover_args,
+            song_url,
+            head=False,
+        )
+
+        player.playlist.shuffle()
+        return Response(
+            self.str.get("cmd-shuffleplay-shuffled", "Shuffled {0}'s playlist").format(
+                message.guild
+            ),
+            delete_after=30,
+        )
+
     async def cmd_playnext(
         self, message, _player, channel, author, permissions, leftover_args, song_url
     ):
@@ -2007,10 +2043,9 @@ class MusicBot(discord.Client):
             return Response(
                 self.str.get(
                     "cmd-repeat-no-songs",
-                    "No songs are queued. Play something with{}play.".format(
-                        self._get_guild_cmd_prefix(channel.guild)
-                    ),
-                ),
+                    "No songs are queued. Play something with{}play."
+                ).format(self._get_guild_cmd_prefix(channel.guild)),
+                delete_after=30,
             )
 
         if option == "all":
@@ -3745,11 +3780,10 @@ class MusicBot(discord.Client):
 
         Valid options:
             autoplaylist, save_videos, now_playing_mentions, auto_playlist_random, auto_pause,
-            delete_messages, delete_invoking, write_current_song
+            delete_messages, delete_invoking, write_current_song, round_robin_queue
 
         For information about these options, see the option's comment in the config file.
         """
-
         option = option.lower()
         value = value.lower()
         bool_y = ["on", "y", "enabled"]
@@ -3762,6 +3796,7 @@ class MusicBot(discord.Client):
             "delete_messages",
             "delete_invoking",
             "write_current_song",
+            "round_robin_queue",
         ]  # these need to match attribute names in the Config class
         if option in ["autoplaylist", "auto_playlist"]:
             if value in bool_y:
