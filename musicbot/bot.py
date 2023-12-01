@@ -2043,7 +2043,7 @@ class MusicBot(discord.Client):
             return Response(
                 self.str.get(
                     "cmd-repeat-no-songs",
-                    "No songs are queued. Play something with{}play."
+                    "No songs are currently playing. Play something with {}play.",
                 ).format(self._get_guild_cmd_prefix(channel.guild)),
                 delete_after=30,
             )
