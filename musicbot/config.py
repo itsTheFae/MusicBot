@@ -575,7 +575,7 @@ class ConfigDefaults:
     leave_inactive_channel = False
     leave_inactive_channel_timeout = 300
     leave_after_song = False
-    leave_player_inactive_for = 900
+    leave_player_inactive_for = 0
     defaultsearchresults = 3
     enable_options_per_guild = False
     footer_text = "Just-Some-Bots/MusicBot ({})".format(BOTVERSION)
