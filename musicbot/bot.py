@@ -2037,6 +2037,7 @@ class MusicBot(discord.Client):
                     "Use %ssummon to summon it to your voice channel.",
                 )
                 % self._get_guild_cmd_prefix(channel.guild),
+                expire_in=30,
             )
 
         if not player.current_entry:
