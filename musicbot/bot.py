@@ -4991,13 +4991,6 @@ class MusicBot(discord.Client):
                     ] = True
                     player.pause()
 
-    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
-        if before.region != after.region:
-            log.warning(
-                'Guild "%s" changed regions: %s -> %s'
-                % (after.name, before.region, after.region)
-            )
-
     async def on_guild_join(self, guild: discord.Guild):
         log.info("Bot has been added to guild: {}".format(guild.name))
         owner = self._get_owner(voice=True) or self._get_owner()
