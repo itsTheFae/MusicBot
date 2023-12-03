@@ -1679,7 +1679,10 @@ class MusicBot(discord.Client):
                     return Response(
                         "```\n{0}```{1}".format(
                             dedent(cmd.__doc__),
-                            f"\n**Prefix Required:**  {prefix}`{command} ...`\n"
+                            self.str.get(
+                                "cmd-help-prefix-required",
+                                "\n**Prefix required for use:**\n{example_cmd}\n",
+                            ).format(example_cmd=f"{prefix}`{command} ...`")
                             if is_emoji
                             else "",
                         ).format(
@@ -1701,7 +1704,7 @@ class MusicBot(discord.Client):
 
         if is_emoji:
             desc = (
-                f"---\n{prefix}`"
+                f"\n{prefix}`"
                 + f"`, {prefix}`".join(commands)
                 + "`\n\n"
                 + self.str.get(
