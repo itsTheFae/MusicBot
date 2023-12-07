@@ -592,6 +592,8 @@ class MusicBot(discord.Client):
         log.debug("Running on_player_play")
         await self.reset_player_inactivity(player)
         await self.update_now_playing_status(entry)
+        # manage the cache since we may have downloaded something.
+        self.filecache.handle_new_cache_entry(entry)
         player.skip_state.reset()
 
         # This is the one event where it's ok to serialize autoplaylist entries
@@ -699,9 +701,6 @@ class MusicBot(discord.Client):
         )
 
         # TODO: Check channel voice state?
-
-        # manage the cache since we may have downloaded something.
-        self.filecache.handle_new_cache_entry(entry)
 
     async def on_player_resume(self, player, entry, **_):
         log.debug("Running on_player_resume")
