@@ -21,7 +21,7 @@ jobs:
         pip install black flake8 flake8-type-checking
     - name: Check with black
       run: |
-        python -m black --diff --color
+        python -m black --diff --color ./
     - name: Check with flake8
       run: |
-        python -m flake8
+        python -m flake8 ./
