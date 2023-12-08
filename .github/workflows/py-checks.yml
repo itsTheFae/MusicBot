@@ -21,9 +21,9 @@ jobs:
         pip install black flake8 flake8-type-checking
     - name: Check with black
       run: |
+        VERNUM=${{ matrix.python-version }}
+        TARGETV="py${VERNUM/./}"
         python -m black -t $TARGETV --diff --color --check ./
     - name: Check with flake8
       run: |
-        VERNUM=${{ matrix.python-version }}
-        TARGETV="py${VERNUM/./}"
         python -m flake8 ./
