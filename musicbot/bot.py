@@ -8,7 +8,6 @@ import pathlib
 import random
 import re
 import shlex
-import shutil
 import sys
 import time
 import traceback
