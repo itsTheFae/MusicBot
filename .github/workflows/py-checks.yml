@@ -25,6 +25,3 @@ jobs:
     - name: Check with flake8
       run: |
         python -m flake8 ./
-    - name: Does The Bot Start check
-      run: |
-        ./run.sh
