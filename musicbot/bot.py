@@ -526,6 +526,7 @@ class MusicBot(discord.Client):
                 await self.reset_player_inactivity(player)
             player.kill()
 
+        await self.update_now_playing_status()
         await vc.disconnect()
 
     async def disconnect_all_voice_clients(self):
@@ -1502,23 +1503,22 @@ class MusicBot(discord.Client):
         self.server_specific_data[guild]["inactive_vc_timer"] = (event, True)
 
         try:
-            log.debug(
+            log.info(
                 f"Channel activity waiting {self.config.leave_inactive_channel_timeout} seconds to leave channel: {guild.me.voice.channel.name}"
             )
             await discord.utils.sane_wait_for(
                 [event.wait()], timeout=self.config.leave_inactive_channel_timeout
             )
         except asyncio.TimeoutError:
-            log.debug(
+            log.info(
                 f"Channel activity timer for {guild.name} has expired. Disconnecting."
             )
             await self.on_inactivity_timeout_expired(guild.me.voice.channel)
         else:
-            log.debug(
+            log.info(
                 f"Channel activity timer canceled for: {guild.me.voice.channel.name} in {guild.name}"
             )
         finally:
-            log.debug(f"Cleaning up channel activity timer for guild {guild.name}.")
             self.server_specific_data[guild]["inactive_vc_timer"] = (event, False)
             event.clear()
 
@@ -1541,23 +1541,22 @@ class MusicBot(discord.Client):
         self.server_specific_data[guild]["inactive_player_timer"] = (event, True)
 
         try:
-            log.debug(
+            log.info(
                 f"Player activity timer waiting {self.config.leave_player_inactive_for} seconds to leave channel: {channel.name}"
             )
             await discord.utils.sane_wait_for(
                 [event.wait()], timeout=self.config.leave_player_inactive_for
             )
         except asyncio.TimeoutError:
-            log.debug(
+            log.info(
                 f"Player activity timer for {guild.name} has expired. Disconnecting."
             )
             await self.on_inactivity_timeout_expired(channel)
         else:
-            log.debug(
+            log.info(
                 f"Player activity timer canceled for: {channel.name} in {guild.name}"
             )
         finally:
-            log.debug(f"Cleaning up player activity timer for guild {guild.name}.")
             self.server_specific_data[guild]["inactive_player_timer"] = (event, False)
             event.clear()
 
