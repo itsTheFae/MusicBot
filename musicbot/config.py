@@ -232,7 +232,7 @@ class Config:
         )
         self.enable_options_per_guild = config.getboolean(
             "MusicBot",
-            "EnableOptionsPerGuild",
+            "EnablePrefixPerGuild",
             fallback=ConfigDefaults.enable_options_per_guild,
         )
         self.round_robin_queue = config.getboolean(
