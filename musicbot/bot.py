@@ -1154,10 +1154,10 @@ class MusicBot(discord.Client):
 
         for task in pending:
             task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
 
     # noinspection PyMethodOverriding
     async def run(self):
