@@ -1,4 +1,5 @@
 import asyncio
+import certifi
 import inspect
 import json
 import logging
@@ -8,6 +9,8 @@ import pathlib
 import random
 import re
 import shlex
+import shutil
+import ssl
 import sys
 import time
 import traceback
@@ -134,11 +137,23 @@ class MusicBot(discord.Client):
 
         super().__init__(intents=intents)
 
-    async def _doBotInit(self):
+    async def _doBotInit(self, use_certifi: bool = False):
         self.http.user_agent = "MusicBot/%s" % BOTVERSION
-        self.session = aiohttp.ClientSession(
-            headers={"User-Agent": self.http.user_agent}
-        )
+        if use_certifi:
+            ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+            tcp_connector = aiohttp.TCPConnector(ssl_context=ssl_ctx)
+
+            # Patches discord.py HTTPClient.
+            self.http.connector = tcp_connector
+
+            self.session = aiohttp.ClientSession(
+                headers={"User-Agent": self.http.user_agent},
+                connector=tcp_connector,
+            )
+        else:
+            self.session = aiohttp.ClientSession(
+                headers={"User-Agent": self.http.user_agent}
+            )
 
         self.spotify = None
         if self.config._spotify:
@@ -1509,6 +1524,16 @@ class MusicBot(discord.Client):
                 url = player.current_entry.url
 
             return url
+
+    def _add_url_to_autoplaylist(self, url):
+        self.autoplaylist.append(url)
+        write_file(self.config.auto_playlist_file, self.autoplaylist)
+        log.debug("Appended {} to autoplaylist".format(url))
+
+    def _remove_url_from_autoplaylist(self, url):
+        self.autoplaylist.remove(url)
+        write_file(self.config.auto_playlist_file, self.autoplaylist)
+        log.debug("Removed {} from autoplaylist".format(url))
 
     async def handle_vc_inactivity(self, guild: discord.Guild):
         event, active = self.server_specific_data[guild]["inactive_vc_timer"]
