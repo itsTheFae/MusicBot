@@ -529,8 +529,11 @@ class MusicBot(discord.Client):
             client = await channel.connect(timeout=60, reconnect=True)
             if isinstance(channel, discord.StageChannel):
                 try:
-                    await channel.guild.me.edit(
-                        suppress=False, mute=False, deafen=self.config.self_deafen
+                    await channel.guild.me.edit(suppress=False)
+                    await channel.guild.change_voice_state(
+                        channel=channel,
+                        self_mute=False,
+                        self_deaf=self.config.self_deafen,
                     )
                 except Exception as e:
                     log.error(e)
@@ -2049,7 +2052,7 @@ class MusicBot(discord.Client):
     async def cmd_repeat(self, channel, option=None):
         """
         Usage:
-            {command_prefix}repeat [all | song]
+            {command_prefix}repeat [all | playlist | song | on | off]
 
         Toggles playlist or song looping.
         If no option is provided the current song will be repeated.
@@ -2058,6 +2061,7 @@ class MusicBot(discord.Client):
 
         player = self.get_player_in(channel.guild)
         option = option.lower() if option else ""
+        prefix = self._get_guild_cmd_prefix(channel.guild)
 
         if not player:
             raise exceptions.CommandError(
@@ -2079,7 +2083,16 @@ class MusicBot(discord.Client):
                 delete_after=30,
             )
 
-        if option == "all":
+        if option not in ["all", "playlist", "on", "off", "song", ""]:
+            raise exceptions.CommandError(
+                self.str.get(
+                    "cmd-repeat-invalid",
+                    "Invalid option, please run {}help repeat to a list of available options.",
+                ).format(prefix),
+                expire_in=30,
+            )
+
+        if option in ["all", "playlist"]:
             player.loopqueue = not player.loopqueue
             if player.loopqueue:
                 return Response(
@@ -2105,41 +2118,53 @@ class MusicBot(discord.Client):
                     self.str.get("cmd-repeat-song-looping", "Song is now repeating."),
                     delete_after=30,
                 )
-
             else:
                 return Response(
                     self.str.get(
                         "cmd-repeat-song-not-looping", "Song is no longer repeating."
+                    )
+                )
+
+        elif option == "on":
+            player.repeatsong = True
+            return Response(self.str.get("cmd-repeat-song-looping"), delete_after=30)
+            if player.repeatsong:
+                return Response(
+                    self.str.get(
+                        "cmd-repeat-already-looping", "Song is already looping!"
                     ),
                     delete_after=30,
                 )
+
+        elif option == "off":
+            player.repeatsong = False
+            player.loopqueue = False
+            if player.playlist.entries.__len__() > 0:
+                return Response(
+                    self.str.get("cmd-repeat-playlist-not-looping"), delete_after=30
+                )
+            else:
+                return Response(
+                    self.str.get("cmd-repeat-song-not-looping"), delete_after=30
+                )
+
         else:
             if player.repeatsong:
                 player.loopqueue = True
                 player.repeatsong = False
                 return Response(
-                    self.str.get(
-                        "cmd-repeat-noOption-playlist-looping",
-                        "Playlist is now repeating.",
-                    )
+                    self.str.get("cmd-repeat-playlist-looping"), delete_after=30
                 )
+
             elif player.loopqueue:
                 if player.playlist.entries.__len__() > 0:
-                    message = self.str.get(
-                        "cmd-repeat-noOption-playlist-not-looping",
-                        "Playlist is no longer repeating.",
-                    )
+                    message = self.str.get("cmd-repeat-playlist-not-looping")
                 else:
-                    message = self.str.get(
-                        "cmd-repeat-noOption-song-not-looping",
-                        "Song is no longer repeating.",
-                    )
+                    message = self.str.get("cmd-repeat-song-not-looping")
                 player.loopqueue = False
             else:
                 player.repeatsong = True
-                message = self.str.get(
-                    "cmd-repeat-noOption-song-looping", "Song is now repeating."
-                )
+                message = self.str.get("cmd-repeat-song-looping")
 
         return Response(message, delete_after=30)
 
@@ -3237,7 +3262,7 @@ class MusicBot(discord.Client):
             ) and player.current_entry.meta.get("author", False):
                 np_text = self.str.get(
                     "cmd-np-reply-author",
-                    "Now {action}: **{title}** added by **{author}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>",
+                    "Currently {action}: **{title}** added by **{author}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>",
                 ).format(
                     action=action_text,
                     title=player.current_entry.title,
@@ -3249,7 +3274,7 @@ class MusicBot(discord.Client):
             else:
                 np_text = self.str.get(
                     "cmd-np-reply-noauthor",
-                    "Now {action}: **{title}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>",
+                    "Currently {action}: **{title}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>",
                 ).format(
                     action=action_text,
                     title=player.current_entry.title,
@@ -3277,10 +3302,13 @@ class MusicBot(discord.Client):
                     np_text.replace("Now ", "")
                     .replace(action_text, "")
                     .replace(": ", "", 1)
+                    .replace("Currently ", "")
                 )
                 content = self._gen_embed()
                 content.title = action_text
-                content.add_field(name="** **", value=np_text, inline=True)
+                content.add_field(
+                    name=f"Currently {action_text}", value=np_text, inline=True
+                )
                 if thumb_url:
                     content.set_image(url=thumb_url)
 
