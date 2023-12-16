@@ -358,7 +358,9 @@ class MusicBot(discord.Client):
                 )
                 continue
 
-            if channel and isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
+            if channel and isinstance(
+                channel, (discord.VoiceChannel, discord.StageChannel)
+            ):
                 log.info("Attempting to join {0.guild.name}/{0.name}".format(channel))
 
                 chperms = channel.permissions_for(guild.me)
@@ -519,9 +521,7 @@ class MusicBot(discord.Client):
         if isinstance(channel, discord.Object):
             channel = self.get_channel(channel.id)
 
-        if not isinstance(
-            channel, (discord.VoiceChannel, discord.StageChannel)
-        ):
+        if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
             raise AttributeError("Channel passed must be a voice channel")
 
         if channel.guild.voice_client:
@@ -530,7 +530,9 @@ class MusicBot(discord.Client):
             client = await channel.connect(timeout=60, reconnect=True)
             if isinstance(channel, discord.StageChannel):
                 try:
-                    await channel.guild.me.edit(suppress=False, mute=False, deafen=self.config.self_deafen)
+                    await channel.guild.me.edit(
+                        suppress=False, mute=False, deafen=self.config.self_deafen
+                    )
                 except Exception as e:
                     log.error(e)
             else:
@@ -717,7 +719,9 @@ class MusicBot(discord.Client):
             content = self._gen_embed()
             if match:
                 videoID = match.group(1)
-                content.set_image(url=f"https://i1.ytimg.com/vi/{videoID}/hqdefault.jpg")
+                content.set_image(
+                    url=f"https://i1.ytimg.com/vi/{videoID}/hqdefault.jpg"
+                )
             else:
                 log.error("Unkknown link or unable to get video ID.")
 
