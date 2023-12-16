@@ -9,7 +9,6 @@ import pathlib
 import random
 import re
 import shlex
-import shutil
 import ssl
 import sys
 import time
