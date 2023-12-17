@@ -50,17 +50,12 @@ from .utils import (
     format_size_from_bytes,
 )
 
-load_opus_lib()
-
 log = logging.getLogger(__name__)
-
-intents = discord.Intents.all()
-intents.typing = False
-intents.presences = False
 
 
 class MusicBot(discord.Client):
     def __init__(self, config_file=None, perms_file=None, aliases_file=None):
+        load_opus_lib()
         try:
             sys.stdout.write("\x1b]2;MusicBot {}\x07".format(BOTVERSION))
         except Exception:
@@ -134,6 +129,9 @@ class MusicBot(discord.Client):
         }
         self.server_specific_data = defaultdict(ssd_defaults.copy)
 
+        intents = discord.Intents.all()
+        intents.typing = False
+        intents.presences = False
         super().__init__(intents=intents)
 
     async def _doBotInit(self, use_certifi: bool = False):
@@ -414,7 +412,8 @@ class MusicBot(discord.Client):
 
     async def _wait_delete_msg(self, message, after):
         await asyncio.sleep(after)
-        await self.safe_delete_message(message, quiet=True)
+        if not self.is_closed():
+            await self.safe_delete_message(message, quiet=True)
 
     async def _check_ignore_non_voice(self, msg):
         if msg.guild.me.voice:
@@ -1175,20 +1174,35 @@ class MusicBot(discord.Client):
         asyncio.run_coroutine_threadsafe(self.restart(), self.loop)
 
     async def _cleanup(self):
-        try:
+        try:  # make sure discord.Client is closed.
             await self.close()  # changed in d.py 2.0
         except Exception:
-            log.exception("Issue while closing discord client connection.")
+            log.exception("Issue while closing discord client session.")
             pass
-        try:
+
+        try:  # make sure discord.http.connector is closed.
+            # This may be a bug in aiohttp or within discord.py handling of it.
+            # Have read aiohttp 4.x is supposed to fix this, but have not verified.
+            if self.http.connector:
+                await self.http.connector.close()
+        except Exception:
+            log.exception("Issue while closing discord aiohttp connector.")
+            pass
+
+        try:  # make sure our aiohttp session is closed.
             await self.session.close()
         except Exception:
-            log.exception("Issue while cleaning up aiohttp session.")
+            log.exception("Issue while closing our aiohttp session.")
             pass
 
-        pending = asyncio.all_tasks(loop=self.loop)
+        # now cancel all pending tasks, except for run.py::main()
+        for task in asyncio.all_tasks(loop=self.loop):
+            if (
+                task.get_coro().__name__ == "main"
+                and task.get_name().lower() == "task-1"
+            ):
+                continue
 
-        for task in pending:
             task.cancel()
             try:
                 await task
@@ -4476,15 +4490,21 @@ class MusicBot(discord.Client):
         await self.disconnect_voice_client(guild)
         return Response("Disconnected from `{0.name}`".format(guild), delete_after=20)
 
-    async def cmd_restart(self, channel):
+    async def cmd_restart(self, channel, leftover_args, opt="soft"):
         """
         Usage:
-            {command_prefix}restart
+            {command_prefix}restart [soft|full]
 
-        Restarts the bot.
-        Will not properly load new dependencies or file updates unless fully shutdown
-        and restarted.
+        Restarts the bot, uses soft restart by default.
+        soft option reloads config without reloading source or dependencies.
+        full option will reload everything from disk again.
         """
+        opt = opt.strip().lower()
+        if opt not in ["soft", "full"]:
+            raise exceptions.CommandError(
+                "Invalid option given, use soft or full.", expire_in=30
+            )
+
         await self.safe_send_message(
             channel,
             "\N{WAVING HAND SIGN} Restarting. If you have updated your bot "
@@ -4496,7 +4516,10 @@ class MusicBot(discord.Client):
             player.resume()
 
         await self.disconnect_all_voice_clients()
-        raise exceptions.RestartSignal()
+        if opt == "soft":
+            raise exceptions.ReloadSignal()
+        elif opt == "full":
+            raise exceptions.RestartSignal()
 
     async def cmd_shutdown(self, channel):
         """
