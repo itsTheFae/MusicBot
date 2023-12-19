@@ -5252,6 +5252,22 @@ class MusicBot(discord.Client):
             self.server_specific_data[guild]["availability_paused"] = True
             player.pause()
 
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+        log.info(f"Guild update for:  {before}")
+        for name in set(before.__slotnames__):
+            a_val = getattr(after, name, None)
+            b_val = getattr(before, name, None)
+            if b_val != a_val:
+                log.everything(f"Guild attribute {name} is now: {a_val}  -- Was: {b_val}")
+
+    async def on_guild_channel_update(self, before, after):
+        log.info(f"Channel update for:  {before}")
+        for name in set(before.__slotnames__):
+            a_val = getattr(after, name, None)
+            b_val = getattr(before, name, None)
+            if b_val != a_val:
+                log.everything(f"Channel attribute {name} is now: {a_val}  -- Was: {b_val}")
+
     def voice_client_in(self, guild):
         for vc in self.voice_clients:
             if vc.guild == guild:
