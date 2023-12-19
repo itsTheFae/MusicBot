@@ -719,12 +719,13 @@ class MusicBot(discord.Client):
 
             content = self._gen_embed()
             if match:
+                # TODO: come up with a good way to extract thumbnails from ytdl data.
                 videoID = match.group(1)
                 content.set_image(
                     url=f"https://i1.ytimg.com/vi/{videoID}/hqdefault.jpg"
                 )
             else:
-                log.error("Unkknown link or unable to get video ID.")
+                log.error("Unknown link or unable to get video ID.")
 
             if self.config.now_playing_mentions:
                 content.title = None
@@ -3306,7 +3307,7 @@ class MusicBot(discord.Client):
 
                 thumb_url = None
                 if match:
-                    # this should probably be done in entry.py since it already handles extracted info.
+                    # TODO: come up with a good way to extract thumbnails from the ytdl data.
                     videoID = match.group(1)
                     thumb_url = f"https://i1.ytimg.com/vi/{videoID}/hqdefault.jpg"
                 else:
