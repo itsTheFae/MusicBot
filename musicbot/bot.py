@@ -734,7 +734,9 @@ class MusicBot(discord.Client):
                 content.title = newmsg
 
         # send it in specified channel
-        self.server_specific_data[guild.id]["last_np_msg"] = await self.safe_send_message(
+        self.server_specific_data[guild.id][
+            "last_np_msg"
+        ] = await self.safe_send_message(
             channel,
             content if self.config.embeds else newmsg,
             expire_in=30 if self.config.delete_nowplaying else 0,
@@ -1597,7 +1599,9 @@ class MusicBot(discord.Client):
             return
         channel = player.voice_client.channel
         guild = channel.guild
-        event, event_active = self.server_specific_data[guild.id]["inactive_player_timer"]
+        event, event_active = self.server_specific_data[guild.id][
+            "inactive_player_timer"
+        ]
 
         if str(channel.id) in str(self.config.autojoin_channels):
             log.debug(
@@ -1627,7 +1631,10 @@ class MusicBot(discord.Client):
                 f"Player activity timer canceled for: {channel.name} in {guild.name}"
             )
         finally:
-            self.server_specific_data[guild.id]["inactive_player_timer"] = (event, False)
+            self.server_specific_data[guild.id]["inactive_player_timer"] = (
+                event,
+                False,
+            )
             event.clear()
 
     async def reset_player_inactivity(self, player):
@@ -4423,7 +4430,9 @@ class MusicBot(discord.Client):
 
             old_prefix = self._get_guild_cmd_prefix(guild)
             self.server_specific_data[guild.id]["command_prefix"] = prefix
-            self.server_specific_data[guild.id]["session_prefix_history"].add(old_prefix)
+            self.server_specific_data[guild.id]["session_prefix_history"].add(
+                old_prefix
+            )
             if len(self.server_specific_data[guild.id]["session_prefix_history"]) > 3:
                 self.server_specific_data[guild.id]["session_prefix_history"].pop()
             await self._save_guild_options(guild)
@@ -5258,7 +5267,9 @@ class MusicBot(discord.Client):
             a_val = getattr(after, name, None)
             b_val = getattr(before, name, None)
             if b_val != a_val:
-                log.everything(f"Guild attribute {name} is now: {a_val}  -- Was: {b_val}")
+                log.everything(
+                    f"Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
+                )
 
     async def on_guild_channel_update(self, before, after):
         log.info(f"Channel update for:  {before}")
@@ -5266,7 +5277,9 @@ class MusicBot(discord.Client):
             a_val = getattr(after, name, None)
             b_val = getattr(before, name, None)
             if b_val != a_val:
-                log.everything(f"Channel attribute {name} is now: {a_val}  -- Was: {b_val}")
+                log.everything(
+                    f"Channel attribute {name} is now: {a_val}  -- Was: {b_val}"
+                )
 
     def voice_client_in(self, guild):
         for vc in self.voice_clients:
