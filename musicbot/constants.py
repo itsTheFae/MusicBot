@@ -2,7 +2,7 @@ import subprocess
 
 try:
     VERSION = (
-        subprocess.check_output(["git", "describe", "--tags", "--always"])
+        subprocess.check_output(["git", "describe", "--tags", "--always", "--dirty"])
         .decode("ascii")
         .strip()
     )
