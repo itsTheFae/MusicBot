@@ -491,7 +491,7 @@ class EnsurePip(SetupTask):
     def download(self):
         # Try and use ensurepip.
         try:
-            import ensurepip  # noqa:  F401
+            import ensurepip  # noqa: F401
 
             return False
         except ImportError:

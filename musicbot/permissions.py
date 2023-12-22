@@ -225,22 +225,22 @@ class PermissionGroup:
 
         try:
             self.max_songs = max(0, int(self.max_songs))
-        except Exception:
+        except ValueError:
             self.max_songs = PermissionsDefaults.MaxSongs
 
         try:
             self.max_song_length = max(0, int(self.max_song_length))
-        except Exception:
+        except ValueError:
             self.max_song_length = PermissionsDefaults.MaxSongLength
 
         try:
             self.max_playlist_length = max(0, int(self.max_playlist_length))
-        except Exception:
+        except ValueError:
             self.max_playlist_length = PermissionsDefaults.MaxPlaylistLength
 
         try:
             self.max_search_items = max(0, int(self.max_search_items))
-        except Exception:
+        except ValueError:
             self.max_search_items = PermissionsDefaults.MaxSearchItems
 
         if int(self.max_search_items) > 100:

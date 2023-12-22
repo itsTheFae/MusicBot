@@ -108,7 +108,6 @@ class PIP(object):
         except ImportError:
             return False
 
-    # noinspection PyTypeChecker
     @classmethod
     def get_module_version(cls, mod):
         try:

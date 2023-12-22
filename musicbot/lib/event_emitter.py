@@ -13,7 +13,6 @@ class EventEmitter:
             return
 
         for cb in list(self._events[event]):
-            # noinspection PyBroadException
             try:
                 if asyncio.iscoroutinefunction(cb):
                     asyncio.ensure_future(cb(*args, **kwargs), loop=self.loop)

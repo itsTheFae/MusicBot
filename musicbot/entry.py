@@ -80,7 +80,7 @@ class BasePlaylistEntry(Serializable):
                 cb(future)
 
             except Exception:
-                traceback.print_exc()
+                log.exception("Unhandled exception in _for_each_future callback.")
 
     def __eq__(self, other):
         return self is other
@@ -365,7 +365,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # Trigger ready callbacks.
             self._for_each_future(lambda future: future.set_result(self))
 
-        # Flake8 thinks 'e' is never used. The lambda is perhaps too much for Flake8 here.
+        # Flake8 thinks 'e' is never used, and later undefined. Maybe the lambda is too much.
         except Exception as e:  # noqa: F841
             traceback.print_exc()
             self._for_each_future(lambda future: future.set_exception(e))  # noqa: F821
@@ -390,10 +390,10 @@ class URLPlaylistEntry(BasePlaylistEntry):
         i_matches = re.findall(r'"input_i" : "(-?([0-9]*\.[0-9]+))",', output)
         if i_matches:
             log.debug("i_matches={}".format(i_matches[0][0]))
-            Ival = float(i_matches[0][0])
+            IVAL = float(i_matches[0][0])
         else:
             log.debug("Could not parse I in normalise json.")
-            Ival = float(0)
+            IVAL = float(0)
 
         lra_matches = re.findall(r'"input_lra" : "(-?([0-9]*\.[0-9]+))",', output)
         if lra_matches:
@@ -428,7 +428,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             offset = float(0)
 
         return "-af loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:measured_I={}:measured_LRA={}:measured_TP={}:measured_thresh={}:offset={}".format(
-            Ival, LRA, TP, thresh, offset
+            IVAL, LRA, TP, thresh, offset
         )
 
     # noinspection PyShadowingBuiltins

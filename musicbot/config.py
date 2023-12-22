@@ -394,7 +394,7 @@ class Config:
                 self.bot_exception_ids = set(
                     int(x) for x in self.bot_exception_ids.replace(",", " ").split()
                 )
-            except Exception:
+            except ValueError:
                 log.warning("BotExceptionIDs data is invalid, will ignore all bots")
                 self.bot_exception_ids = set()
         else:
@@ -405,7 +405,7 @@ class Config:
                 self.bound_channels = set(
                     int(x) for x in self.bound_channels.replace(",", " ").split() if x
                 )
-            except Exception:
+            except ValueError:
                 log.warning(
                     "BindToChannels data is invalid, will not bind to any channels"
                 )
@@ -418,7 +418,7 @@ class Config:
                     for x in self.autojoin_channels.replace(",", " ").split()
                     if x
                 )
-            except Exception:
+            except ValueError:
                 log.warning(
                     "AutojoinChannels data is invalid, will not autojoin any channels"
                 )
@@ -431,7 +431,7 @@ class Config:
                     for x in self.nowplaying_channels.replace(",", " ").split()
                     if x
                 )
-            except Exception:
+            except ValueError:
                 log.warning(
                     "NowPlayingChannels data is invalid, will use the default behavior for all servers"
                 )

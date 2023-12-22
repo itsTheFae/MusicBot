@@ -100,7 +100,7 @@ def objdiff(obj1, obj2, *, access_attr=None, depth=0):
     changes = {}
 
     if access_attr is None:
-        attrdir = lambda x: x  # noqa: E731  # ignore flake8 for these.
+        attrdir = lambda x: x  # noqa: E731
 
     elif access_attr == "auto":
         if hasattr(obj1, "__slots__") and hasattr(obj2, "__slots__"):
