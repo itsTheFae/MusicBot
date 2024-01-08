@@ -1955,7 +1955,7 @@ class MusicBot(discord.Client):
 
     def _handle_guild_auto_pause(self, player: MusicPlayer):
         """
-        Unified function to handle guild activity and availability pausing and unpausing.
+        function to handle guild activity pausing and unpausing.
         """
         if not self.config.auto_pause:
             return
