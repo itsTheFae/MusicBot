@@ -132,7 +132,10 @@ class PIP(object):
 
     @classmethod
     def get_requirements(cls, file="requirements.txt"):
-        from pip.req import parse_requirements
+        try:  # for pip >= 10
+            from pip._internal.req import parse_requirements
+        except ImportError:  # for pip <= 9.0.3
+            from pip.req import parse_requirements
 
         return list(parse_requirements(file))
 
@@ -175,6 +178,7 @@ log.addHandler(tfh)
 
 
 def finalize_logging():
+    # TODO:  include the discord.log file in this too.
     if os.path.isfile("logs/musicbot.log"):
         log.info("Moving old musicbot log")
         try:
@@ -225,11 +229,9 @@ def bugger_off(msg="Press enter to continue . . .", code=1):
     sys.exit(code)
 
 
-# TODO: all of this
 def sanity_checks(optional=True):
     log.info("Starting sanity checks")
-    ## Required
-
+    """Required Checks"""
     # Make sure we're on Python 3.8+
     req_ensure_py3()
 
@@ -247,7 +249,7 @@ def sanity_checks(optional=True):
 
     log.info("Required checks passed.")
 
-    ## Optional
+    """Optional Checks"""
     if not optional:
         return
 
