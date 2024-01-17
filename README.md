@@ -27,7 +27,7 @@ There are many commands that can be used with the bot. Most notably, the `play <
 
 This fork contains changes that may or may not be merged into upstream.  
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
-Here is a list of changes made so far, with most reccent first:
+Here is a list of changes made so far, with most recent first:
 
 - Ensure source code complies with mypy checks, and fix various bugs on the way. *[ongoing]*
 - Complete overhaul of ytdl information extraction and several player commands, performance focused.  
@@ -40,9 +40,9 @@ Here is a list of changes made so far, with most reccent first:
   - Adds playlist link support to autoplaylist entries. *(experimental)*
   - Asks if user wants to queue the playlist when using links with playlist and video IDs.
   - Include thumbnail in now-playing for any tracks that have it.
-  - Remove all extreneous calls to extract_info, and carry extracted info with entries.
+  - Remove all extraneous calls to extract_info, and carry extracted info with entries.
   - Rebuild of Spotify API to make it faster to enqueue Spotify playlists and albums.  
-- Non-important change of log colors to help set the levels appart.  
+- Non-important change of log colors to help set the levels apart.  
 - Fix `skip` command to properly tally votes of members.  **[merged]**
 - Clean up auto-pause logic to make it less of a mess to look at. **[merged]**
 - Automatically un-pause a paused player when using commands that should play something.  **[merged]**
