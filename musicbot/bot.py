@@ -4613,7 +4613,10 @@ class MusicBot(discord.Client):
 
     @dev_only
     async def cmd_objgraph(self, channel, func="most_common_types()"):
-        import objgraph
+        try:
+            import objgraph
+        except ImportError:
+            raise exceptions.CommandError("Could not import `objgraph`, is it installed?")
 
         await channel.typing()
 
