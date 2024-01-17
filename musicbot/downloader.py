@@ -3,15 +3,15 @@ import copy
 import hashlib
 import logging
 import functools
-import yt_dlp as youtube_dl  # type: ignore
+import yt_dlp as youtube_dl
 
 from collections import UserDict
 from concurrent.futures import ThreadPoolExecutor
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Optional, Any, List, Dict
 from pprint import pformat
-from yt_dlp.networking.exceptions import NoSupportingHandlers  # type: ignore
-from yt_dlp.utils import UnsupportedError, DownloadError  # type: ignore
+from yt_dlp.networking.exceptions import NoSupportingHandlers
+from yt_dlp.utils import UnsupportedError, DownloadError
 
 from .exceptions import ExtractionError
 from .spotify import Spotify

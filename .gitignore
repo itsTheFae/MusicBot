@@ -2,6 +2,8 @@
 *.pyc
 ~*/
 .vscode/
+.coverage
+out/
 
 audio_cache/
 dectalk/
@@ -14,10 +16,10 @@ config/permissions.ini
 config/aliases.json
 config/autoplaylist.txt
 config/autoplaylist_removed.txt
+config/autoplaylist.cachemap.json
 config/whitelist.txt
 config/blacklist.txt
 
 docker-compose.yml
-config/autoplaylist.cachemap.json
+
 test_cmds.py
-.coverage

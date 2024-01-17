@@ -6,7 +6,7 @@ import sys
 
 from discord.abc import GuildChannel
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Callable
-from yt_dlp.utils import ContentTooShortError  # type: ignore
+from yt_dlp.utils import ContentTooShortError
 
 from .constructs import Serializable
 from .exceptions import ExtractionError, InvalidDataError
@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 # optionally using pymediainfo instead of ffprobe if presents
 try:
-    import pymediainfo  # type: ignore
+    import pymediainfo
 except ImportError:
     log.debug("module 'pymediainfo' not found, will fall back to ffprobe.")
     pymediainfo = None

@@ -1,5 +1,5 @@
 import asyncio
-import certifi  # type: ignore
+import certifi
 import inspect
 import json
 import logging
