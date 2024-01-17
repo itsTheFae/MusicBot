@@ -31,9 +31,11 @@ Here is a list of changes made so far, with most reccent first:
 
 - Ensure source code complies with mypy checks, and fix various bugs on the way. *[ongoing]*
 - Complete overhaul of ytdl information extraction and several player commands, performance focused.  
+  - Updates `shuffleplay` to shuffle playlist entries before they are queued.
   - Adds playlist name and other details to `pldump` generated files.
   - Enable `pldump` command to send file to invoking channel if DM fails.
   - Updates Now Playing Status to use custom status and activity *(experimental)*.
+  - Adds stream support to autoplaylist entries, if they are detected as a stream.
   - Adds stream support to regular play command, if input is detected as a stream.
   - Adds playlist link support to autoplaylist entries. *(experimental)*
   - Asks if user wants to queue the playlist when using links with playlist and video IDs.
