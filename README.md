@@ -22,3 +22,36 @@ There are many commands that can be used with the bot. Most notably, the `play <
 
 * [Support Discord server](https://discord.gg/bots)
 * [Project license](LICENSE)
+
+# Fork Change Log
+
+This fork contains changes that may or may not be merged into upstream.  
+Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
+Here is a list of changes made so far, with most reccent first:
+
+- Ensure source code complies with mypy checks, and fix various bugs on the way. *[ongoing]*
+- Complete overhaul of ytdl information extraction and several player commands, performance focused.  
+  - Adds playlist name and other details to `pldump` generated files.
+  - Enable `pldump` command to send file to invoking channel if DM fails.
+  - Updates Now Playing Status to use custom status and activity *(experimental)*.
+  - Adds stream support to regular play command, if input is detected as a stream.
+  - Adds playlist link support to autoplaylist entries. *(experimental)*
+  - Asks if user wants to queue the playlist when using links with playlist and video IDs.
+  - Include thumbnail in now-playing for any tracks that have it.
+  - Remove all extreneous calls to extract_info, and carry extracted info with entries.
+  - Rebuild of Spotify API to make it faster to enqueue Spotify playlists and albums.  
+- Non-important change of log colors to help set the levels appart.  
+- Fix `skip` command to properly tally votes of members.  **[merged]**
+- Clean up auto-pause logic to make it less of a mess to look at. **[merged]**
+- Automatically un-pause a paused player when using commands that should play something.  **[merged]**
+- Attempt to clean up properly in shutdown and restart process.  **[merged]**
+- Ensured black and flake8 pass on the entire project source, even currently unused bits.   **[merged]**
+  - Cleans up bare except handling which was eating system interrupts and possible other exceptions.
+- Updates for `restart` command to enable full restarts and upgrades remotely. *(semi-experimental)*  **[merged]**  
+- Automatic fix using certifi when local SSL store is missing certs (mostly a windows bug).  **[merged]**
+- Allow use of `autoplaylist` command without a player in voice channel.  **[merged]**
+- Preserve autoplaylist.txt formatting and comments, enables "removing" links in-place.  **[merged]**
+- Additional option to retain autoplaylist downloads in cache regardless of other cache configs.  **[merged]**
+- Improved audio cache management, settings to limit storage use and `cache` command to see info or manually clear it. **[merged]**  
+- Per-Server command prefix settings available via new `setprefix` command. Allows almost anything to be a prefix! **[merged]**  
+- Player inactivity timer options to auto-disconnect when the player is not playing for a set period of time. **[merged]**  
