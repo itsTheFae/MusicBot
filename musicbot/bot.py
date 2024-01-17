@@ -4616,7 +4616,9 @@ class MusicBot(discord.Client):
         try:
             import objgraph
         except ImportError:
-            raise exceptions.CommandError("Could not import `objgraph`, is it installed?")
+            raise exceptions.CommandError(
+                "Could not import `objgraph`, is it installed?"
+            )
 
         await channel.typing()
 
