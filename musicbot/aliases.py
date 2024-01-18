@@ -2,15 +2,17 @@ import logging
 import shutil
 import json
 from pathlib import Path
+from typing import Any, Dict
 
+from .constants import DEFAULT_COMMAND_ALIAS_FILE
 from .exceptions import HelpfulError
 
 log = logging.getLogger(__name__)
 
 
 class Aliases:
-    def __init__(self, aliases_file):
-        self.aliases_file = Path(aliases_file)
+    def __init__(self, aliases_file: Path) -> None:
+        self.aliases_file = aliases_file
         self.aliases_seed = AliasesDefault.aliases_seed
         self.aliases = AliasesDefault.aliases
 
@@ -50,17 +52,14 @@ class Aliases:
                 )
             self.aliases.update({alias.lower(): cmd.lower() for alias in aliases})
 
-    def get(self, arg):
+    def get(self, alias: str) -> str:
         """
-        Return cmd name (string) that given arg points.
-        If arg is not registered as alias, empty string will be returned.
-        supposed to be called from bot.on_message
+        Return cmd name that given `alias` points to or an empty string.
         """
-        ret = self.aliases.get(arg)
-        return ret if ret else ""
+        return self.aliases.get(alias, "")
 
 
 class AliasesDefault:
-    aliases_file = "config/aliases.json"
-    aliases_seed = {}
-    aliases = {}
+    aliases_file: Path = Path(DEFAULT_COMMAND_ALIAS_FILE)
+    aliases_seed: Dict[str, Any] = {}
+    aliases: Dict[str, str] = {}
