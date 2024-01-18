@@ -14,6 +14,7 @@ from .constants import (
     DEFAULT_I18N_FILE,
     DEFAULT_BLACKLIST_FILE,
     DEFAULT_AUDIO_CACHE_PATH,
+    DEFAULT_AUTOPLAYLIST_FILE,
     BUNDLED_AUTOPLAYLIST_FILE,
     EXAMPLE_OPTIONS_FILE,
 )
@@ -558,7 +559,7 @@ class ConfigDefaults:
 
     options_file: pathlib.Path = pathlib.Path(DEFAULT_OPTIONS_FILE)
     blacklist_file: pathlib.Path = pathlib.Path(DEFAULT_BLACKLIST_FILE)
-    auto_playlist_file: pathlib.Path = pathlib.Path(DEFAULT_AUDIO_CACHE_PATH)
+    auto_playlist_file: pathlib.Path = pathlib.Path(DEFAULT_AUTOPLAYLIST_FILE)
     i18n_file: pathlib.Path = pathlib.Path(DEFAULT_I18N_FILE)
     audio_cache_path: pathlib.Path = pathlib.Path(
         os.path.join(os.getcwd(), DEFAULT_AUDIO_CACHE_PATH)
