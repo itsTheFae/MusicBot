@@ -5,15 +5,27 @@ import codecs
 import shutil
 import logging
 import configparser
+from typing import TYPE_CHECKING, Optional, Tuple, List, Set
 
 from .exceptions import HelpfulError
-from .constants import VERSION as BOTVERSION
+from .constants import (
+    DEFAULT_FOOTER_TEXT,
+    DEFAULT_OPTIONS_FILE,
+    DEFAULT_I18N_FILE,
+    DEFAULT_BLACKLIST_FILE,
+    DEFAULT_AUDIO_CACHE_PATH,
+    BUNDLED_AUTOPLAYLIST_FILE,
+    EXAMPLE_OPTIONS_FILE,
+)
 from .utils import format_size_to_bytes, format_time_to_seconds
+
+if TYPE_CHECKING:
+    from .bot import MusicBot
 
 log = logging.getLogger(__name__)
 
 
-def get_all_keys(conf):
+def get_all_keys(conf) -> List[str]:
     """Returns all config keys as a list"""
     sects = dict(conf.items())
     keys = []
@@ -23,19 +35,18 @@ def get_all_keys(conf):
     return keys
 
 
-def create_empty_file_ifnoexist(path):
-    if not os.path.isfile(path):
+def create_empty_file_ifnoexist(path: pathlib.Path) -> None:
+    if not path.is_file():
         open(path, "a").close()
         log.warning("Creating %s" % path)
 
 
 class Config:
-    # noinspection PyUnresolvedReferences
-    def __init__(self, config_file):
+    def __init__(self, config_file: pathlib.Path) -> None:
         self.config_file = config_file
         self.find_config()
 
-        config = configparser.ConfigParser(interpolation=None)
+        config = ExtendedConfigParser(interpolation=None)
         config.read(config_file, encoding="utf-8")
 
         confsections = {"Credentials", "Permissions", "Chat", "MusicBot"}.difference(
@@ -54,11 +65,11 @@ class Config:
         self._confpreface = "An error has occured reading the config:\n"
         self._confpreface2 = "An error has occured validating the config:\n"
 
-        self._login_token = config.get(
+        self._login_token: str = config.get(
             "Credentials", "Token", fallback=ConfigDefaults.token
         )
 
-        self.auth = ()
+        self.auth: Tuple[str] = ("",)
 
         self.spotify_clientid = config.get(
             "Credentials", "Spotify_ClientID", fallback=ConfigDefaults.spotify_clientid
@@ -69,26 +80,26 @@ class Config:
             fallback=ConfigDefaults.spotify_clientsecret,
         )
 
-        self.owner_id = config.get(
+        self.owner_id: int = config.getownerid(
             "Permissions", "OwnerID", fallback=ConfigDefaults.owner_id
         )
-        self.dev_ids = config.get(
+        self.dev_ids = config.getIDset(
             "Permissions", "DevIDs", fallback=ConfigDefaults.dev_ids
         )
-        self.bot_exception_ids = config.get(
+        self.bot_exception_ids = config.getIDset(
             "Permissions", "BotExceptionIDs", fallback=ConfigDefaults.bot_exception_ids
         )
 
         self.command_prefix = config.get(
             "Chat", "CommandPrefix", fallback=ConfigDefaults.command_prefix
         )
-        self.bound_channels = config.get(
+        self.bound_channels = config.getIDset(
             "Chat", "BindToChannels", fallback=ConfigDefaults.bound_channels
         )
         self.unbound_servers = config.getboolean(
             "Chat", "AllowUnboundServers", fallback=ConfigDefaults.unbound_servers
         )
-        self.autojoin_channels = config.get(
+        self.autojoin_channels = config.getIDset(
             "Chat", "AutojoinChannels", fallback=ConfigDefaults.autojoin_channels
         )
         self.dm_nowplaying = config.getboolean(
@@ -99,7 +110,7 @@ class Config:
             "DisableNowPlayingAutomatic",
             fallback=ConfigDefaults.no_nowplaying_auto,
         )
-        self.nowplaying_channels = config.get(
+        self.nowplaying_channels = config.getIDset(
             "Chat", "NowPlayingChannels", fallback=ConfigDefaults.nowplaying_channels
         )
         self.delete_nowplaying = config.getboolean(
@@ -118,7 +129,7 @@ class Config:
         self.save_videos = config.getboolean(
             "MusicBot", "SaveVideos", fallback=ConfigDefaults.save_videos
         )
-        self.storage_limit_bytes = config.get(
+        self.storage_limit_bytes = config.getdatasize(
             "MusicBot", "StorageLimitBytes", fallback=ConfigDefaults.storage_limit_bytes
         )
         self.storage_limit_days = config.getint(
@@ -243,37 +254,36 @@ class Config:
             fallback=ConfigDefaults.defaultround_robin_queue,
         )
 
-        self.debug_level = config.get(
-            "MusicBot", "DebugLevel", fallback=ConfigDefaults.debug_level
+        dbg_str, dbg_int = config.getDebugLevel(
+            "MusicBot", "DebugLevel", fallback=ConfigDefaults.debug_level_str
         )
-        self.debug_level_str = self.debug_level
-        self.debug_mode = False
+        self.debug_level_str: str = dbg_str
+        self.debug_level: int = dbg_int
+        self.debug_mode: bool = self.debug_level <= logging.DEBUG
 
-        self.blacklist_file = config.get(
+        self.blacklist_file = config.getpathlike(
             "Files", "BlacklistFile", fallback=ConfigDefaults.blacklist_file
         )
-        self.auto_playlist_file = config.get(
+        self.auto_playlist_file = config.getpathlike(
             "Files", "AutoPlaylistFile", fallback=ConfigDefaults.auto_playlist_file
         )
-        self.i18n_file = config.get(
+        self.i18n_file = config.getpathlike(
             "Files", "i18nFile", fallback=ConfigDefaults.i18n_file
         )
-        self.audio_cache_path = config.get(
+        self.audio_cache_path = config.getpathlike(
             "Files", "AudioCachePath", fallback=ConfigDefaults.audio_cache_path
         )
-        self.auto_playlist_removed_file = None
-        self.auto_playlist_cachemap_file = None
 
         self._spotify = False
 
         self.run_checks()
 
-        self.missing_keys = set()
+        self.missing_keys: Set[str] = set()
         self.check_changes(config)
 
-        self.find_autoplaylist()
+        self.setup_autoplaylist()
 
-    def check_changes(self, conf):
+    def check_changes(self, conf) -> None:
         exfile = "config/example_options.ini"
         if os.path.isfile(exfile):
             usr_keys = get_all_keys(conf)
@@ -286,7 +296,7 @@ class Config:
                     usr_keys
                 )  # to raise this as an issue in bot.py later
 
-    def run_checks(self):
+    def run_checks(self) -> None:
         """
         Validation logic for bot settings.
         """
@@ -310,10 +320,9 @@ class Config:
 
         log.info("Using i18n: {0}".format(self.i18n_file))
 
-        self.audio_cache_path = self.audio_cache_path.strip()
         if self.audio_cache_path:
             try:
-                acpath = pathlib.Path(self.audio_cache_path)
+                acpath = self.audio_cache_path
                 if acpath.is_file():
                     raise HelpfulError(
                         "AudioCachePath config option is a file path.",
@@ -341,15 +350,13 @@ class Config:
                 log.exception(
                     "Some other exception was thrown while validating AudioCachePath."
                 )
-        else:
-            self.audio_cache_path = ConfigDefaults.audio_cache_path
         log.info(f"Audio Cache will be stored in:  {self.audio_cache_path}")
 
         if not self._login_token:
             # Attempt to fallback to an environment variable.
-            token_env = os.environ.get("MUSICBOT_TOKEN")
-            if token_env:
-                self._login_token = token_env
+            env_token = os.environ.get("MUSICBOT_TOKEN")
+            if env_token:
+                self._login_token = env_token
                 self.auth = (self._login_token,)
             else:
                 raise HelpfulError(
@@ -362,126 +369,15 @@ class Config:
         else:
             self.auth = (self._login_token,)
 
-        if self.owner_id:
-            self.owner_id = self.owner_id.lower()
-
-            if self.owner_id.isdigit():
-                if int(self.owner_id) < 10000:
-                    raise HelpfulError(
-                        "An invalid OwnerID was set: {}".format(self.owner_id),
-                        "Correct your OwnerID. The ID should be just a number, approximately "
-                        "18 characters long, or 'auto'. If you don't know what your ID is, read the "
-                        "instructions in the options or ask in the help server.",
-                        preface=self._confpreface,
-                    )
-                self.owner_id = int(self.owner_id)
-
-            elif self.owner_id == "auto":
-                pass  # defer to async check
-
-            else:
-                self.owner_id = None
-
-        if not self.owner_id:
-            raise HelpfulError(
-                "No OwnerID was set.",
-                "Please set the OwnerID option in {}".format(self.config_file),
-                preface=self._confpreface,
-            )
-
-        if self.bot_exception_ids:
-            try:
-                self.bot_exception_ids = set(
-                    int(x) for x in self.bot_exception_ids.replace(",", " ").split()
-                )
-            except ValueError:
-                log.warning("BotExceptionIDs data is invalid, will ignore all bots")
-                self.bot_exception_ids = set()
-        else:
-            self.bot_exception_ids = set()
-
-        if self.bound_channels:
-            try:
-                self.bound_channels = set(
-                    int(x) for x in self.bound_channels.replace(",", " ").split() if x
-                )
-            except ValueError:
-                log.warning(
-                    "BindToChannels data is invalid, will not bind to any channels"
-                )
-                self.bound_channels = set()
-
-        if self.autojoin_channels:
-            try:
-                self.autojoin_channels = set(
-                    int(x)
-                    for x in self.autojoin_channels.replace(",", " ").split()
-                    if x
-                )
-            except ValueError:
-                log.warning(
-                    "AutojoinChannels data is invalid, will not autojoin any channels"
-                )
-                self.autojoin_channels = set()
-
-        if self.nowplaying_channels:
-            try:
-                self.nowplaying_channels = set(
-                    int(x)
-                    for x in self.nowplaying_channels.replace(",", " ").split()
-                    if x
-                )
-            except ValueError:
-                log.warning(
-                    "NowPlayingChannels data is invalid, will use the default behavior for all servers"
-                )
-                self.nowplaying_channels = set()
-
         if self.spotify_clientid and self.spotify_clientsecret:
             self._spotify = True
 
         self.delete_invoking = self.delete_invoking and self.delete_messages
 
-        ap_path, ap_name = os.path.split(self.auto_playlist_file)
-        apn_name, apn_ext = os.path.splitext(ap_name)
-        self.auto_playlist_removed_file = os.path.join(
-            ap_path, apn_name + "_removed" + apn_ext
-        )
-        self.auto_playlist_cachemap_file = os.path.join(
-            ap_path, f"{apn_name}.cachemap.json"
-        )
-
-        if hasattr(logging, self.debug_level.upper()):
-            self.debug_level = getattr(logging, self.debug_level.upper())
-        else:
-            log.warning(
-                'Invalid DebugLevel option "{}" given, falling back to INFO'.format(
-                    self.debug_level_str
-                )
-            )
-            self.debug_level = logging.INFO
-            self.debug_level_str = "INFO"
-
-        self.debug_mode = self.debug_level <= logging.DEBUG
-
-        create_empty_file_ifnoexist("config/blacklist.txt")
-        create_empty_file_ifnoexist("config/whitelist.txt")
+        create_empty_file_ifnoexist(self.blacklist_file)
 
         if not self.footer_text:
             self.footer_text = ConfigDefaults.footer_text
-
-        if self.storage_limit_bytes:
-            try:
-                self.storage_limit_bytes = format_size_to_bytes(
-                    self.storage_limit_bytes
-                )
-            except ValueError:
-                log.exception(
-                    "StorageLimitBytes has invalid config value '{}' using default instead.".format(
-                        self.storage_limit_bytes,
-                    ),
-                )
-                self.storage_limit_bytes = ConfigDefaults.storage_limit_bytes
 
         if self.leave_inactive_channel_timeout:
             self.leave_inactive_channel_timeout = format_time_to_seconds(
@@ -496,20 +392,17 @@ class Config:
     # TODO: Add save function for future editing of options with commands
     #       Maybe add warnings about fields missing from the config file
 
-    async def async_validate(self, bot):
+    async def async_validate(self, bot: "MusicBot") -> None:
         log.debug("Validating options...")
 
-        if self.owner_id == "auto":
-            if not bot.user.bot:
-                raise HelpfulError(
-                    'Invalid parameter "auto" for OwnerID option.',
-                    'Only bot accounts can use the "auto" option.  Please '
-                    "set the OwnerID in the config.",
-                    preface=self._confpreface2,
-                )
-
+        # attempt to get the owner ID from app-info.
+        if self.owner_id == 0:
             self.owner_id = bot.cached_app_info.owner.id
             log.debug("Acquired owner id via API")
+
+        if not bot.user:
+            log.critical("If we ended up here, something is not right.")
+            return
 
         if self.owner_id == bot.user.id:
             raise HelpfulError(
@@ -522,20 +415,21 @@ class Config:
                 preface=self._confpreface2,
             )
 
-    def find_config(self):
+    def find_config(self) -> None:
         config = configparser.ConfigParser(interpolation=None)
 
-        if not os.path.isfile(self.config_file):
-            if os.path.isfile(self.config_file + ".ini"):
-                shutil.move(self.config_file + ".ini", self.config_file)
+        if not self.config_file.is_file():
+            ini_file = self.config_file.with_suffix(".ini")
+            if ini_file.is_file():
+                shutil.move(ini_file, self.config_file)
                 log.info(
                     "Moving {0} to {1}, you should probably turn file extensions on.".format(
-                        self.config_file + ".ini", self.config_file
+                        ini_file, self.config_file
                     )
                 )
 
-            elif os.path.isfile("config/example_options.ini"):
-                shutil.copy("config/example_options.ini", self.config_file)
+            elif os.path.isfile(EXAMPLE_OPTIONS_FILE):
+                shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
                 log.warning("Options file not found, copying example_options.ini")
 
             else:
@@ -578,79 +472,184 @@ class Config:
                 )
                 sys.exit(2)
 
-    def find_autoplaylist(self):
-        if not os.path.exists(self.auto_playlist_file):
-            if os.path.exists("config/_autoplaylist.txt"):
-                shutil.copy("config/_autoplaylist.txt", self.auto_playlist_file)
-                log.debug("Copying _autoplaylist.txt to autoplaylist.txt")
+    def setup_autoplaylist(self) -> None:
+        # check for an copy the bundled playlist file if configured file is empty.
+        if not self.auto_playlist_file.is_file():
+            bundle_file = pathlib.Path(BUNDLED_AUTOPLAYLIST_FILE)
+            if bundle_file.is_file():
+                shutil.copy(bundle_file, self.auto_playlist_file)
+                log.debug(
+                    f"Copying bundled autoplaylist '{BUNDLED_AUTOPLAYLIST_FILE}' to '{self.auto_playlist_file}'"
+                )
             else:
-                log.warning("No autoplaylist file found.")
+                log.warning(
+                    "Missing bundled autoplaylist file, cannot pre-load playlist."
+                )
+
+        # ensure cache map and removed files have values based on the configured file.
+        path = self.auto_playlist_file.parent
+        stem = self.auto_playlist_file.stem
+        ext = self.auto_playlist_file.suffix
+
+        ap_removed_file = self.auto_playlist_file.with_name(f"{stem}_removed{ext}")
+        ap_cachemap_file = self.auto_playlist_file.with_name(f"{stem}.cachemap.json")
+
+        self.auto_playlist_removed_file = path.joinpath(ap_removed_file)
+        self.auto_playlist_cachemap_file = path.joinpath(ap_cachemap_file)
 
 
 class ConfigDefaults:
-    owner_id = None
+    owner_id: int = 0
 
-    token = None
-    dev_ids = set()
-    bot_exception_ids = set()
+    token: str = ""
+    dev_ids: Set[int] = set()
+    bot_exception_ids: Set[int] = set()
 
-    spotify_clientid = None
-    spotify_clientsecret = None
+    spotify_clientid: str = ""
+    spotify_clientsecret: str = ""
 
-    command_prefix = "!"
-    bound_channels = set()
-    unbound_servers = False
-    autojoin_channels = set()
-    dm_nowplaying = False
-    no_nowplaying_auto = False
-    nowplaying_channels = set()
-    delete_nowplaying = True
+    command_prefix: str = "!"
+    bound_channels: Set[int] = set()
+    unbound_servers: bool = False
+    autojoin_channels: Set[int] = set()
+    dm_nowplaying: bool = False
+    no_nowplaying_auto: bool = False
+    nowplaying_channels: Set[int] = set()
+    delete_nowplaying: bool = True
 
-    default_volume = 0.15
-    skips_required = 4
-    skip_ratio_required = 0.5
-    save_videos = True
-    storage_retain_autoplay = True
-    storage_limit_bytes = 0
-    storage_limit_days = 0
-    now_playing_mentions = False
-    auto_summon = True
-    auto_playlist = True
-    auto_playlist_random = True
-    auto_pause = True
-    delete_messages = True
-    delete_invoking = False
-    persistent_queue = True
-    debug_level = "INFO"
-    status_message = None
-    write_current_song = False
-    allow_author_skip = True
-    use_experimental_equalization = False
-    embeds = True
-    queue_length = 10
-    remove_ap = True
-    show_config_at_start = False
-    legacy_skip = False
-    leavenonowners = False
-    usealias = True
-    searchlist = False
-    self_deafen = True
-    leave_inactive_channel = False
-    leave_inactive_channel_timeout = 300
-    leave_after_queue_empty = False
-    leave_player_inactive_for = 0
-    defaultsearchresults = 3
-    enable_options_per_guild = False
-    footer_text = "Just-Some-Bots/MusicBot ({})".format(BOTVERSION)
-    defaultround_robin_queue = False
+    default_volume: float = 0.15
+    skips_required: int = 4
+    skip_ratio_required: float = 0.5
+    save_videos: bool = True
+    storage_retain_autoplay: bool = True
+    storage_limit_bytes: int = 0
+    storage_limit_days: int = 0
+    now_playing_mentions: bool = False
+    auto_summon: bool = True
+    auto_playlist: bool = True
+    auto_playlist_random: bool = True
+    auto_pause: bool = True
+    delete_messages: bool = True
+    delete_invoking: bool = False
+    persistent_queue: bool = True
+    debug_level: int = logging.INFO
+    debug_level_str: str = "INFO"
+    status_message: str = ""
+    write_current_song: bool = False
+    allow_author_skip: bool = True
+    use_experimental_equalization: bool = False
+    embeds: bool = True
+    queue_length: int = 10
+    remove_ap: bool = True
+    show_config_at_start: bool = False
+    legacy_skip: bool = False
+    leavenonowners: bool = False
+    usealias: bool = True
+    searchlist: bool = False
+    self_deafen: bool = True
+    leave_inactive_channel: bool = False
+    leave_inactive_channel_timeout: int = 300
+    leave_after_queue_empty: bool = False
+    leave_player_inactive_for: int = 0
+    defaultsearchresults: int = 3
+    enable_options_per_guild: bool = False
+    footer_text: str = DEFAULT_FOOTER_TEXT
+    defaultround_robin_queue: bool = False
 
-    options_file = "config/options.ini"
-    blacklist_file = "config/blacklist.txt"
-    auto_playlist_file = (
-        "config/autoplaylist.txt"  # this will change when I add playlists
+    options_file: pathlib.Path = pathlib.Path(DEFAULT_OPTIONS_FILE)
+    blacklist_file: pathlib.Path = pathlib.Path(DEFAULT_BLACKLIST_FILE)
+    auto_playlist_file: pathlib.Path = pathlib.Path(DEFAULT_AUDIO_CACHE_PATH)
+    i18n_file: pathlib.Path = pathlib.Path(DEFAULT_I18N_FILE)
+    audio_cache_path: pathlib.Path = pathlib.Path(
+        os.path.join(os.getcwd(), DEFAULT_AUDIO_CACHE_PATH)
     )
-    i18n_file = "config/i18n/en.json"
-    audio_cache_path = os.path.join(os.getcwd(), "audio_cache")
+
+
+class ExtendedConfigParser(configparser.ConfigParser):
+    """A collection of typed converters for ConfigParser."""
+
+    def getownerid(self, section: str, key: str, fallback: int = 0) -> int:
+        """get the owner ID or 0 for auto"""
+        val = self.get(section, key, fallback="").strip()
+        if not val:
+            return fallback
+        elif val.lower() == "auto":
+            return 0
+        else:
+            try:
+                return int(val)
+            except ValueError:
+                raise HelpfulError(
+                    f"OwnerID is not valid. Your setting:  {val}",
+                    "Set OwnerID to a numerical ID or set it to 'auto' to have the bot find it.",
+                    preface="Error while loading config:\n",
+                )
+
+    def getpathlike(
+        self, section: str, key: str, fallback: pathlib.Path
+    ) -> pathlib.Path:
+        """
+        get a config value and parse it as a Path object.
+        the `fallback` argument is required.
+        """
+        val = self.get(section, key, fallback="").strip()
+        if not val:
+            return fallback
+        else:
+            return pathlib.Path(val)
+
+    def getIDset(
+        self, section: str, key: str, fallback: Optional[Set] = None
+    ) -> Set[int]:
+        """get a config value and parse it as a set of ID values."""
+        val = self.get(section, key, fallback="").strip()
+        if not val and fallback:
+            return fallback
+        else:
+            str_ids = val.replace(",", " ").split()
+            try:
+                return set(int(i) for i in str_ids)
+            except ValueError:
+                raise HelpfulError(
+                    f"One of the IDs in your config `{key}` is invalid.",
+                    "Ensure all IDs are numerical, and separated only by spaces or commas.",
+                    preface="Error while loading config:\n",
+                )
+
+    def getDebugLevel(
+        self, section: str, key: str, fallback: str = ""
+    ) -> Tuple[str, int]:
+        """get a config value an parse it as a logger level."""
+        val = self.get(section, key, fallback="").strip().upper()
+        if not val and fallback:
+            val = fallback.upper()
+
+        int_level = 0
+        str_level = val
+        if hasattr(logging, val):
+            int_level = getattr(logging, val)
+            return (str_level, int_level)
+        else:
+            log.warning(
+                'Invalid DebugLevel option "{}" given, falling back to INFO'.format(val)
+            )
+            return ("INFO", logging.INFO)
+
+    def getdatasize(self, section: str, key: str, fallback: int = 0) -> int:
+        """get a config value and parse it as a human readable data size"""
+        val = self.get(section, key, fallback="").strip()
+        if not val and fallback:
+            return fallback
+        try:
+            return format_size_to_bytes(val)
+        except ValueError:
+            log.warning(
+                "{} has invalid config value '{}' using default instead.".format(
+                    key,
+                    val,
+                ),
+            )
+            return fallback
 
 
 setattr(
