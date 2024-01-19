@@ -97,7 +97,7 @@ class MusicBot(discord.Client):
         self.players = {}
         self.exit_signal = None
         self.init_ok = False
-        self.cached_app_info = None
+        self.cached_app_info: Optional[discord.AppInfo] = None
         self.last_status = None
 
         self.config = Config(config_file)
@@ -255,15 +255,6 @@ class MusicBot(discord.Client):
         wrapper.dev_cmd = True
         return wrapper
 
-    def ensure_appinfo(func):
-        @wraps(func)
-        async def wrapper(self, *args, **kwargs):
-            await self._cache_app_info()
-            # noinspection PyCallingNonCallable
-            return await func(self, *args, **kwargs)
-
-        return wrapper
-
     def _get_owner(self, *, server=None, voice=False):
         return discord.utils.find(
             lambda m: m.id == self.config.owner_id and (m.voice if voice else True),
@@ -385,13 +376,6 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
-    async def _cache_app_info(self, *, update=False):
-        if not self.cached_app_info and not update and self.user.bot:
-            log.debug("Caching app info")
-            self.cached_app_info = await self.application_info()
-
-        return self.cached_app_info
-
     async def remove_url_from_autoplaylist(
         self, song_url: str, *, ex: Exception = None, delete_from_ap=False
     ):
@@ -461,10 +445,13 @@ class MusicBot(discord.Client):
             except Exception:
                 log.exception("Failed to save autoplaylist file.")
 
-    @ensure_appinfo
     async def generate_invite_link(
         self, *, permissions=discord.Permissions(70380544), guild=discord.utils.MISSING
     ):
+        if not self.cached_app_info:
+            log.debug("Getting bot Application Info.")
+            self.cached_app_info = await self.application_info()
+
         return discord.utils.oauth_url(
             self.cached_app_info.id, permissions=permissions, guild=guild
         )
@@ -1034,8 +1021,12 @@ class MusicBot(discord.Client):
             with open(directory, "w", encoding="utf8") as f:
                 f.write(entry.title)
 
-    @ensure_appinfo
     async def _on_ready_sanity_checks(self):
+        # Ensure AppInfo is loaded.
+        if not self.cached_app_info:
+            log.debug("Getting application info.")
+            self.cached_app_info = await self.application_info()
+
         # Ensure folders exist
         await self._scheck_ensure_env()
 

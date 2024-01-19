@@ -399,8 +399,15 @@ class Config:
 
         # attempt to get the owner ID from app-info.
         if self.owner_id == 0:
-            self.owner_id = bot.cached_app_info.owner.id
-            log.debug("Acquired owner id via API")
+            if bot.cached_app_info:
+                self.owner_id = bot.cached_app_info.owner.id
+                log.debug("Acquired owner id via API")
+            else:
+                raise HelpfulError(
+                    "Discord app info is not available. (Probably a bug!)",
+                    "You may need to set OwnerID config manually, and report this.",
+                    preface="Error fetching OwnerID automatically:\n",
+                )
 
         if not bot.user:
             log.critical("If we ended up here, something is not right.")
