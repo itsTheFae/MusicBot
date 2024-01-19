@@ -1,7 +1,7 @@
 from discord import opus
 
 
-def load_opus_lib():
+def load_opus_lib() -> None:
     if opus.is_loaded():
         return
 
