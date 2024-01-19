@@ -9,12 +9,6 @@ from .utils import _get_variable
 log = logging.getLogger(__name__)
 
 
-class BetterLogRecord(logging.LogRecord):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.relativeCreated /= 1000
-
-
 class SkipState:
     __slots__ = ["skippers", "skip_msgs"]
 

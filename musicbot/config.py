@@ -18,7 +18,7 @@ from .constants import (
     BUNDLED_AUTOPLAYLIST_FILE,
     EXAMPLE_OPTIONS_FILE,
 )
-from .utils import format_size_to_bytes, format_time_to_seconds
+from .utils import format_size_to_bytes, format_time_to_seconds, set_logging_level
 
 if TYPE_CHECKING:
     from .bot import MusicBot
@@ -261,6 +261,7 @@ class Config:
         self.debug_level_str: str = dbg_str
         self.debug_level: int = dbg_int
         self.debug_mode: bool = self.debug_level <= logging.DEBUG
+        set_logging_level(self.debug_level)
 
         self.blacklist_file = config.getpathlike(
             "Files", "BlacklistFile", fallback=ConfigDefaults.blacklist_file

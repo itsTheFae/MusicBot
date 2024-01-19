@@ -1,17 +1,235 @@
 import re
 import sys
+import glob
+import pathlib
 import logging
 import aiohttp
 import inspect
+import colorlog
+import datetime
 import unicodedata
-from typing import TYPE_CHECKING, Union, Optional, Any, List, Dict
+from typing import TYPE_CHECKING, Union, Optional, Any, Set, Dict
 
-from .constants import DISCORD_MSG_CHAR_LIMIT
+from .constants import (
+    DEFAULT_MUSICBOT_LOG_FILE,
+    DEFAULT_DISCORD_LOG_FILE,
+    DISCORD_MSG_CHAR_LIMIT,
+)
 
 if TYPE_CHECKING:
     from discord import VoiceChannel, StageChannel
 
 log = logging.getLogger(__name__)
+
+
+def _add_logger_level(levelname: str, level: int, *, func_name: str = "") -> None:
+    """
+    Add a logging function and level to the musicbot logger.
+
+    :param: levelname:
+        The reference name of the level, e.g. DEBUG, WARNING, etc
+    :param: level:
+        Numeric logging level
+    :param: func_name:
+        The name of the logger function to log to a level, e.g. "info" for log.info(...)
+    """
+    _func_prototype = (
+        "def {logger_func_name}(self, message, *args, **kwargs):\n"
+        "    if self.isEnabledFor({levelname}):\n"
+        "        self._log({levelname}, message, args, **kwargs)"
+    )
+
+    func_name = func_name or levelname.lower()
+
+    setattr(logging, levelname, level)
+    logging.addLevelName(level, levelname)
+
+    exec(
+        _func_prototype.format(logger_func_name=func_name, levelname=levelname),
+        logging.__dict__,
+        locals(),
+    )
+    setattr(logging.Logger, func_name, eval(func_name))
+
+
+def setup_loggers() -> None:
+    """set up all logging handlers for musicbot and discord.py"""
+    if len(logging.getLogger("musicbot").handlers) > 1:
+        log.debug("Skipping logger setup, already set up")
+        return
+
+    _add_logger_level("EVERYTHING", 1)
+    _add_logger_level("NOISY", 4, func_name="noise")
+    _add_logger_level("FFMPEG", 5)
+    _add_logger_level("VOICEDEBUG", 6)
+
+    logger = logging.getLogger("musicbot")
+    # initially set logging to everything, it will be changed when config is loaded.
+    logger.setLevel(logging.EVERYTHING)  # type: ignore[attr-defined]
+
+    # Setup logging to file for musicbot.
+    fhandler = logging.FileHandler(
+        filename=DEFAULT_MUSICBOT_LOG_FILE, encoding="utf-8", mode="w"
+    )
+    fhandler.setFormatter(
+        logging.Formatter(
+            "[{asctime}] {levelname} - {name} | "
+            "In {filename}::{threadName}({thread}), line {lineno} in {funcName}: {message}",
+            style="{",
+        )
+    )
+    logger.addHandler(fhandler)
+
+    # Setup logging to console for musicbot.
+    shandler = logging.StreamHandler(stream=sys.stdout)
+    sformatter = colorlog.LevelFormatter(
+        fmt={
+            "DEBUG": "{log_color}[{levelname}:{module}] {message}",
+            "INFO": "{log_color}{message}",
+            "WARNING": "{log_color}{levelname}: {message}",
+            "ERROR": "{log_color}[{levelname}:{module}] {message}",
+            "CRITICAL": "{log_color}[{levelname}:{module}] {message}",
+            "EVERYTHING": "{log_color}[{levelname}:{module}] {message}",
+            "NOISY": "{log_color}[{levelname}:{module}] {message}",
+            "VOICEDEBUG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
+            "FFMPEG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
+        },
+        log_colors={
+            "DEBUG": "cyan",
+            "INFO": "white",
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "CRITICAL": "bold_red",
+            "EVERYTHING": "bold_cyan",
+            "NOISY": "bold_white",
+            "FFMPEG": "bold_purple",
+            "VOICEDEBUG": "purple",
+        },
+        style="{",
+        datefmt="",
+    )
+    shandler.setFormatter(sformatter)  # type: ignore[arg-type]
+    # shandler.setLevel(self.config.debug_level)
+    logger.addHandler(shandler)
+
+    # Setup logging for discord module.
+    dlogger = logging.getLogger("discord")
+    dhandler = logging.FileHandler(
+        filename=DEFAULT_DISCORD_LOG_FILE, encoding="utf-8", mode="w"
+    )
+    dhandler.setFormatter(
+        logging.Formatter("[{asctime}] {levelname} - {name}: {message}", style="{")
+    )
+    dlogger.addHandler(dhandler)
+    # initially set discord logging to debug, it will be changed when config is loaded.
+    dlogger.setLevel(logging.DEBUG)
+
+
+def muffle_discord_console_log() -> None:
+    """
+    Changes discord console logger output to periods only.
+    Kind of like a progress indicator.
+    """
+    dlog = logging.getLogger("discord")
+    dlh = logging.StreamHandler(stream=sys.stdout)
+    dlh.terminator = ""
+    try:
+        dlh.setFormatter(logging.Formatter("."))
+    except ValueError:
+        dlh.setFormatter(logging.Formatter(".", validate=False))
+    dlog.addHandler(dlh)
+
+
+def mute_discord_console_log() -> None:
+    """
+    Removes the discord console logger output handler added by muffle_discord_console_log()
+    """
+    dlogger = logging.getLogger("discord")
+    for h in dlogger.handlers:
+        if getattr(h, "terminator", None) == "":
+            dlogger.removeHandler(h)
+            print()
+
+
+def set_logging_level(level: int) -> None:
+    """sets the logging level for musicbot and discord.py"""
+    set_lvl_name = logging.getLevelName(level)
+    log.info(f"Changing log level to {set_lvl_name}")
+
+    logger = logging.getLogger("musicbot")
+    logger.setLevel(level)
+
+    dlogger = logging.getLogger("discord")
+    if level <= logging.DEBUG:
+        dlogger.setLevel(logging.DEBUG)
+    else:
+        dlogger.setLevel(level)
+
+
+def shutdown_loggers() -> None:
+    """Removes all musicbot and discord log handlers"""
+    # This is the last log line of the logger session.
+    log.info("MusicBot loggers have been called to shutdown.")
+
+    logger = logging.getLogger("musicbot")
+    for handler in logger.handlers:
+        handler.flush()
+        handler.close()
+    logger.handlers.clear()
+
+    dlogger = logging.getLogger("discord")
+    for handler in dlogger.handlers:
+        handler.flush()
+        handler.close()
+    dlogger.handlers.clear()
+
+
+def rotate_log_files(max_kept: int = 2, date_fmt: str = ".%Y-%j-%H%m%S") -> None:
+    """
+    Handles moving and pruning log files.
+    By default the last-run log file is always kept.
+    If `max_kept` is set to 0, no rotation is done.
+    If `max_kept` is set 1 or greater, up to this number of logs will be kept.
+    This should only be used before setup_loggers() or after shutdown_loggers()
+
+    :param: max_kept:  number of old logs to keep.
+    :param: date_fmt:  format compatible with datetime.strftime() for rotated filename.
+    """
+    if not max_kept:
+        return
+
+    # date that will be used for files rotated now.
+    before = datetime.datetime.now().strftime(date_fmt)
+
+    # rotate musicbot logs
+    logfile = pathlib.Path(DEFAULT_MUSICBOT_LOG_FILE)
+    logpath = logfile.parent
+    if logfile.is_file():
+        new_name = logpath.joinpath(f"{logfile.stem}{before}{logfile.suffix}")
+        logfile.rename(new_name)
+
+    # make sure we are in limits
+    logstem = glob.escape(logfile.stem)
+    logglob = sorted(logpath.glob(f"{logstem}*.log"), reverse=True)
+    if len(logglob) > max_kept:
+        for path in logglob[max_kept:]:
+            if path.is_file():
+                path.unlink()
+
+    # rotate discord.py logs
+    dlogfile = pathlib.Path(DEFAULT_DISCORD_LOG_FILE)
+    dlogpath = dlogfile.parent
+    if dlogfile.is_file():
+        new_name = dlogfile.parent.joinpath(f"{dlogfile.stem}{before}{dlogfile.suffix}")
+        dlogfile.rename(new_name)
+
+    # make sure we are in limits
+    logstem = glob.escape(dlogfile.stem)
+    logglob = sorted(dlogpath.glob(f"{logstem}*.log"), reverse=True)
+    if len(logglob) > max_kept:
+        for path in logglob[max_kept:]:
+            if path.is_file():
+                path.unlink()
 
 
 def load_file(filename, skip_commented_lines=True, comment_char="#"):

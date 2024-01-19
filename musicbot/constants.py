@@ -13,6 +13,9 @@ except Exception:
 # constant string exempt from i18n
 DEFAULT_FOOTER_TEXT: str = f"Just-Some-Bots/MusicBot ({VERSION})"
 
+DEFAULT_MUSICBOT_LOG_FILE: str = "logs/musicbot.log"
+DEFAULT_DISCORD_LOG_FILE: str = "logs/discord.log"
+
 DEFAULT_OPTIONS_FILE: str = "config/options.ini"
 DEFAULT_PERMS_FILE: str = "config/permissions.ini"
 DEFAULT_I18N_FILE: str = "config/i18n/en.json"

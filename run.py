@@ -6,13 +6,14 @@ import ssl
 import sys
 import time
 import logging
-import tempfile
 import traceback
 import subprocess
 
 from shutil import disk_usage, rmtree
 from base64 import b64decode
 
+from musicbot.constants import VERSION as BOTVERSION
+from musicbot.utils import setup_loggers, shutdown_loggers, rotate_log_files
 from musicbot.exceptions import (
     HelpfulError,
     TerminateSignal,
@@ -25,6 +26,13 @@ try:
     import importlib.util
 except ImportError:
     pass
+
+
+# take care of loggers right away
+log = logging.getLogger("musicbot.launcher")
+setup_loggers()
+log.info(f"Loading MusicBot version:  {BOTVERSION}")
+log.info(f"Log opened:  {time.ctime()}")
 
 
 class GIT(object):
@@ -155,75 +163,6 @@ class PIP(object):
             )
 
 
-# Setup initial loggers
-
-tmpfile = tempfile.TemporaryFile("w+", encoding="utf8")
-log = logging.getLogger("launcher")
-log.setLevel(logging.DEBUG)
-
-sh = logging.StreamHandler(stream=sys.stdout)
-sh.setFormatter(logging.Formatter(fmt="[%(levelname)s] %(name)s: %(message)s"))
-
-sh.setLevel(logging.INFO)
-log.addHandler(sh)
-
-tfh = logging.StreamHandler(stream=tmpfile)
-tfh.setFormatter(
-    logging.Formatter(
-        fmt="[%(relativeCreated).9f] %(asctime)s - %(levelname)s - %(name)s: %(message)s"
-    )
-)
-tfh.setLevel(logging.DEBUG)
-log.addHandler(tfh)
-
-
-def finalize_logging():
-    # TODO:  include the discord.log file in this too.
-    if os.path.isfile("logs/musicbot.log"):
-        log.info("Moving old musicbot log")
-        try:
-            if os.path.isfile("logs/musicbot.log.last"):
-                os.unlink("logs/musicbot.log.last")
-            os.rename("logs/musicbot.log", "logs/musicbot.log.last")
-        except Exception:
-            pass
-
-    with open("logs/musicbot.log", "w", encoding="utf8") as f:
-        tmpfile.seek(0)
-        f.write(tmpfile.read())
-        tmpfile.close()
-
-        f.write("\n")
-        f.write(" PRE-RUN SANITY CHECKS PASSED ".center(80, "#"))
-        f.write("\n\n")
-
-    global tfh
-    log.removeHandler(tfh)
-    del tfh
-
-    fh = logging.FileHandler("logs/musicbot.log", mode="a")
-    fh.setFormatter(
-        logging.Formatter(
-            fmt="[%(relativeCreated).9f] %(name)s-%(levelname)s: %(message)s"
-        )
-    )
-    fh.setLevel(logging.DEBUG)
-    log.addHandler(fh)
-
-    sh.setLevel(logging.INFO)
-
-    dlog = logging.getLogger("discord")
-    dlh = logging.StreamHandler(stream=sys.stdout)
-    dlh.terminator = ""
-    try:
-        dlh.setFormatter(logging.Formatter("."))
-    except ValueError:
-        dlh.setFormatter(
-            logging.Formatter(".", validate=False)
-        )  # pylint: disable=unexpected-keyword-arg
-    dlog.addHandler(dlh)
-
-
 def bugger_off(msg="Press enter to continue . . .", code=1):
     input(msg)
     sys.exit(code)
@@ -342,7 +281,8 @@ def req_ensure_encoding():
             sys.stdout.detach(), encoding="utf8", line_buffering=True
         )
         # only slightly evil
-        sys.__stdout__ = sh.stream = sys.stdout
+        # TODO: windows testing, is this needed?  Find a better way.
+        # sys.__stdout__ = sh.stream = sys.stdout
 
         if os.environ.get("PYCHARM_HOSTED", None) not in (None, "0"):
             log.info("Enabling colors in pycharm pseudoconsole")
@@ -409,6 +349,9 @@ def respawn_bot_process(pybin=None):
         pybin = os.path.basename(sys.executable)
     exec_args = [pybin] + sys.argv
 
+    shutdown_loggers()
+    rotate_log_files()
+
     sys.stdout.flush()
     sys.stderr.flush()
     logging.shutdown()
@@ -435,8 +378,6 @@ async def main():
 
     if "--no-checks" not in sys.argv:
         sanity_checks()
-
-    finalize_logging()
 
     exit_signal = None
     tried_requirementstxt = False
@@ -566,7 +507,16 @@ if __name__ == "__main__":
     # py3.8 made ProactorEventLoop default on windows.
     # Now we need to make adjustments for a bug in aiohttp :)
     loop = asyncio.get_event_loop_policy().get_event_loop()
-    exit_sig = loop.run_until_complete(main())
+    try:
+        exit_sig = loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        # TODO: later this will probably get more cleanup so we can
+        # close other things more proper like too.
+        log.info("Caught a keyboard interrupt signal.")
+        shutdown_loggers()
+        rotate_log_files()
+        raise
+
     if exit_sig:
         if isinstance(exit_sig, RestartSignal):
             if exit_sig.get_name() == "RESTART_FULL":
@@ -582,4 +532,6 @@ if __name__ == "__main__":
                 GIT.run_upgrade_pull()
                 respawn_bot_process()
         elif isinstance(exit_sig, TerminateSignal):
+            shutdown_loggers()
+            rotate_log_files()
             sys.exit(exit_sig.exit_code)

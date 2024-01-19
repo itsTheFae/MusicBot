@@ -18,10 +18,9 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO, StringIO
 from textwrap import dedent
-from typing import Optional, Union, List
+from typing import Callable, Optional, Union, List
 
 import aiohttp
-import colorlog
 import discord
 
 from . import downloader
@@ -45,6 +44,8 @@ from .player import MusicPlayer
 from .playlist import Playlist
 from .spotify import Spotify
 from .utils import (
+    muffle_discord_console_log,
+    mute_discord_console_log,
     load_file,
     write_file,
     slugify,
@@ -100,8 +101,6 @@ class MusicBot(discord.Client):
         self.last_status = None
 
         self.config = Config(config_file)
-
-        self._setup_logging()
 
         self.permissions = Permissions(perms_file, grant_all=[self.config.owner_id])
         self.str = I18nJson(self.config.i18n_file)
@@ -219,6 +218,10 @@ class MusicBot(discord.Client):
                 )
                 self.config._spotify = False
 
+        log.info("Initialized, now connecting to discord.")
+        # this creates an output similar to a progress indicator.
+        muffle_discord_console_log()
+
     # TODO: Add some sort of `denied` argument for a message to send when someone else tries to use it
     def owner_only(func):
         @wraps(func)
@@ -266,55 +269,6 @@ class MusicBot(discord.Client):
             lambda m: m.id == self.config.owner_id and (m.voice if voice else True),
             server.members if server else self.get_all_members(),
         )
-
-    def _setup_logging(self):
-        if len(logging.getLogger(__package__).handlers) > 1:
-            log.debug("Skipping logger setup, already set up")
-            return
-
-        shandler = logging.StreamHandler(stream=sys.stdout)
-        sformatter = colorlog.LevelFormatter(
-            fmt={
-                "DEBUG": "{log_color}[{levelname}:{module}] {message}",
-                "INFO": "{log_color}{message}",
-                "WARNING": "{log_color}{levelname}: {message}",
-                "ERROR": "{log_color}[{levelname}:{module}] {message}",
-                "CRITICAL": "{log_color}[{levelname}:{module}] {message}",
-                "EVERYTHING": "{log_color}[{levelname}:{module}] {message}",
-                "NOISY": "{log_color}[{levelname}:{module}] {message}",
-                "VOICEDEBUG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
-                "FFMPEG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
-            },
-            log_colors={
-                "DEBUG": "cyan",
-                "INFO": "white",
-                "WARNING": "yellow",
-                "ERROR": "red",
-                "CRITICAL": "bold_red",
-                "EVERYTHING": "bold_cyan",
-                "NOISY": "bold_white",
-                "FFMPEG": "bold_purple",
-                "VOICEDEBUG": "purple",
-            },
-            style="{",
-            datefmt="",
-        )
-        shandler.setFormatter(sformatter)
-        shandler.setLevel(self.config.debug_level)
-        logging.getLogger(__package__).addHandler(shandler)
-
-        log.debug("Set logging level to {}".format(self.config.debug_level_str))
-
-        if self.config.debug_mode:
-            dlogger = logging.getLogger("discord")
-            dlogger.setLevel(logging.DEBUG)
-            dhandler = logging.FileHandler(
-                filename="logs/discord.log", encoding="utf-8", mode="w"
-            )
-            dhandler.setFormatter(
-                logging.Formatter("{asctime}:{levelname}:{name}: {message}", style="{")
-            )
-            dlogger.addHandler(dhandler)
 
     async def _join_startup_channels(self, channels, *, autosummon=True):
         joined_servers = set()
@@ -1394,13 +1348,7 @@ class MusicBot(discord.Client):
 
     async def on_ready(self):
         self.is_ready_done = False
-        log.debug("Fire on_ready")
-        dlogger = logging.getLogger("discord")
-        for h in dlogger.handlers:
-            if getattr(h, "terminator", None) == "":
-                dlogger.removeHandler(h)
-                print()
-
+        mute_discord_console_log()
         log.debug("Connection established, ready to go.")
 
         self.ws._keep_alive.name = "Gateway Keepalive"
