@@ -3,6 +3,7 @@ import asyncio
 import logging
 import re
 import sys
+import datetime
 
 from discord.abc import GuildChannel
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Callable
@@ -43,6 +44,10 @@ class BasePlaylistEntry(Serializable):
 
     @property
     def title(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def duration_td(self) -> datetime.timedelta:
         raise NotImplementedError
 
     @property
@@ -178,6 +183,16 @@ class URLPlaylistEntry(BasePlaylistEntry):
     @duration.setter
     def duration(self, value: float) -> None:
         self.info["duration"] = value
+
+    @property
+    def duration_td(self) -> datetime.timedelta:
+        """
+        Returns duration as a datetime.timedelta object.
+        May contain 0 seconds duration.
+        Partial seconds are rounded away.
+        """
+        t = round(self.duration) or 0
+        return datetime.timedelta(seconds=t)
 
     @property
     def thumbnail_url(self) -> str:
@@ -546,6 +561,16 @@ class StreamPlaylistEntry(BasePlaylistEntry):
     @duration.setter
     def duration(self, value: float) -> None:
         self.info["duration"] = value
+
+    @property
+    def duration_td(self) -> datetime.timedelta:
+        """
+        Get timedelta object from any known duration data.
+        May contain a 0 second duration.
+        Microseconds are rounded away.
+        """
+        t = round(self.duration) or 0
+        return datetime.timedelta(seconds=t)
 
     @property
     def thumbnail_url(self) -> str:

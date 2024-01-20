@@ -8,7 +8,7 @@ import inspect
 import colorlog
 import datetime
 import unicodedata
-from typing import TYPE_CHECKING, Union, Optional, Any, Set, Dict
+from typing import TYPE_CHECKING, Callable, Union, Optional, Any, Set, List, Dict
 
 from .constants import (
     DEFAULT_MUSICBOT_LOG_FILE,
@@ -17,7 +17,8 @@ from .constants import (
 )
 
 if TYPE_CHECKING:
-    from discord import VoiceChannel, StageChannel
+    from discord import VoiceChannel, StageChannel, Member
+    from multidict import CIMultiDictProxy
 
 log = logging.getLogger(__name__)
 
@@ -184,7 +185,7 @@ def shutdown_loggers() -> None:
     dlogger.handlers.clear()
 
 
-def rotate_log_files(max_kept: int = 2, date_fmt: str = ".%Y-%j-%H%m%S") -> None:
+def rotate_log_files(max_kept: int = 2, date_fmt: str = ".ended-%Y-%j-%H%m%S") -> None:
     """
     Handles moving and pruning log files.
     By default the last-run log file is always kept.
@@ -195,6 +196,9 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".%Y-%j-%H%m%S") -> None
     :param: max_kept:  number of old logs to keep.
     :param: date_fmt:  format compatible with datetime.strftime() for rotated filename.
     """
+    # TODO: this needs to be more reliable. Extra or renamed files in the 
+    # log directory might break this implementation.
+    # We should probably use a method to read file times rather than using glob...
     if not max_kept:
         return
 
@@ -206,6 +210,8 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".%Y-%j-%H%m%S") -> None
     logpath = logfile.parent
     if logfile.is_file():
         new_name = logpath.joinpath(f"{logfile.stem}{before}{logfile.suffix}")
+        # Cannot use logging here, but some notice to console is OK.
+        print(f"Moving Log file to:  {new_name}")
         logfile.rename(new_name)
 
     # make sure we are in limits
@@ -232,7 +238,16 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".%Y-%j-%H%m%S") -> None
                 path.unlink()
 
 
-def load_file(filename, skip_commented_lines=True, comment_char="#"):
+def load_file(
+    filename: pathlib.Path,
+    skip_commented_lines: bool = True,
+    comment_char: str = "#"
+) -> List[str]:
+    """
+    Read `filename` into list of strings but ignore lines starting
+    with the given `comment_char` character.
+    Default comment character is #
+    """
     try:
         with open(filename, encoding="utf8") as f:
             results = []
@@ -251,14 +266,14 @@ def load_file(filename, skip_commented_lines=True, comment_char="#"):
         return []
 
 
-def write_file(filename, contents):
+def write_file(filename: pathlib.Path, contents: List[Any]) -> None:
     with open(filename, "w", encoding="utf8") as f:
         for item in contents:
             f.write(str(item))
             f.write("\n")
 
 
-def slugify(value, allow_unicode=False):
+def slugify(value: str, allow_unicode: bool = False) -> str:
     """
     Taken from https://github.com/django/django/blob/master/django/utils/text.py
     Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
@@ -279,7 +294,12 @@ def slugify(value, allow_unicode=False):
     return re.sub(r"[-\s]+", "-", value).strip("-_")
 
 
-def paginate(content, *, length=DISCORD_MSG_CHAR_LIMIT, reserve=0):
+def paginate(
+    content: Union[str, List[str]],
+    *,
+    length: int = DISCORD_MSG_CHAR_LIMIT,
+    reserve: int = 0
+) -> List[str]:
     """
     Split up a large string or list of strings into chunks for sending to discord.
     """
@@ -314,7 +334,15 @@ async def get_header(
     timeout: int = 5,
     allow_redirects: bool = True,
     req_headers: Dict[str, Any] = {},
-):
+) -> Union[str, "CIMultiDictProxy[str]", None]:
+    """
+    Uses given aiohttp `session` to make a HEAD request against given `url` to fetch headers only.
+    If `headerfield` is set, only the given header field is returned.
+    
+    :param: timeout:  Set a different timeout for the HEAD request.
+    :param: allow_redirect:  Follow "Location" headers through, on by default.
+    :param: req_headers:  Set a collection of headers to send with the HEAD request.
+    """
     req_timeout = aiohttp.ClientTimeout(total=timeout)
     async with session.head(
         url, timeout=req_timeout, allow_redirects=allow_redirects, headers=req_headers
@@ -325,23 +353,16 @@ async def get_header(
             return response.headers
 
 
-def fixg(x, dp=2):
-    return ("{:.%sf}" % dp).format(x).rstrip("0").rstrip(".")
-
-
-def ftimedelta(td):
-    p1, p2 = str(td).rsplit(":", 1)
-    return ":".join([p1, "{:02d}".format(int(float(p2)))])
-
-
-def safe_print(content, *, end="\n", flush=True):
-    sys.stdout.buffer.write((content + end).encode("utf-8", "replace"))
-    if flush:
-        sys.stdout.flush()
-
-
-def objdiff(obj1, obj2, *, access_attr=None, depth=0):
-    changes = {}
+def objdiff(
+    obj1: Any,
+    obj2: Any,
+    *,
+    access_attr: Optional[str] = None,
+    depth: int = 0
+) -> Dict[str, Any]:
+    """Compute changes between two objects of the same type."""
+    changes: Dict[str, Any] = {}
+    attrdir: Callable[..., Any]
 
     if access_attr is None:
         attrdir = lambda x: x  # noqa: E731
@@ -384,16 +405,19 @@ def objdiff(obj1, obj2, *, access_attr=None, depth=0):
     return changes
 
 
-def color_supported():
-    return hasattr(sys.stderr, "isatty") and sys.stderr.isatty()
+def _func_() -> str:
+    """
+    Gets the name of the calling frame code object.
+    Emulates __func__ from C++
+    """
+    frame = inspect.currentframe()
+    if not frame or not frame.f_back:
+        raise RuntimeError("Call to _func_() failed, may not be available in this context.")
+
+    return frame.f_back.f_code.co_name
 
 
-def _func_():
-    # emulate __func__ from C++
-    return inspect.currentframe().f_back.f_code.co_name
-
-
-def _get_variable(name):
+def _get_variable(name: str) -> Any:
     stack = inspect.stack()
     try:
         for frames in stack:
@@ -413,7 +437,7 @@ def is_empty_voice_channel(
     *,
     exclude_me: bool = True,
     exclude_deaf: bool = True,
-    include_bots: List[int] = [],
+    include_bots: Set[int] = set(),
 ) -> bool:
     """
     Check if the given `voice_channel` is figuratively or literally empty.
@@ -423,7 +447,7 @@ def is_empty_voice_channel(
     :param: `include_bots`: A list of bot IDs to include if they are present.
     """
 
-    def _check(member):
+    def _check(member: "Member") -> bool:
         if exclude_me and member == voice_channel.guild.me:
             return False
 
@@ -442,18 +466,20 @@ def is_empty_voice_channel(
     return not sum(1 for m in voice_channel.members if _check(m))
 
 
-def format_song_duration(ftd):
-    duration_array = ftd.split(":")
+def format_song_duration(time_delta: str) -> str:
+    """Conditionally remove hour component of timedelta string if it is 0."""
+    duration_array = time_delta.split(":")
     return (
-        ftd
+        time_delta
         if int(duration_array[0]) > 0
-        else "{0}:{1}".format(duration_array[1], duration_array[2])
+        else ":".join(duration_array[1:])
     )
 
 
-def format_size_from_bytes(size: int):
+def format_size_from_bytes(size_bytes: int) -> str:
     suffix = {0: "", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
     power = 1024
+    size = float(size_bytes)
     i = 0
     while size > power:
         size /= power
@@ -461,7 +487,7 @@ def format_size_from_bytes(size: int):
     return f"{size:.3f} {suffix[i]}B"
 
 
-def format_size_to_bytes(size_str: str, strict_si=False) -> int:
+def format_size_to_bytes(size_str: str, strict_si: bool = False) -> int:
     """Convert human-friendly *bytes notation into integer.
     Note: this function is not intended to convert Bits notation.
 

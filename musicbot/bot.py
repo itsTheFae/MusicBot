@@ -18,7 +18,7 @@ from datetime import timedelta
 from functools import wraps
 from io import BytesIO, StringIO
 from textwrap import dedent
-from typing import Callable, Optional, Union, List
+from typing import Optional, Union, List
 
 import aiohttp
 import discord
@@ -49,8 +49,6 @@ from .utils import (
     load_file,
     write_file,
     slugify,
-    fixg,
-    ftimedelta,
     _func_,
     _get_variable,
     is_empty_voice_channel,
@@ -1497,9 +1495,9 @@ class MusicBot(discord.Client):
                 "  Default volume: {}%".format(int(self.config.default_volume * 100))
             )
             log.info(
-                "  Skip threshold: {} votes or {}%".format(
+                "  Skip threshold: {0} votes or {1:.0f}%".format(
                     self.config.skips_required,
-                    fixg(self.config.skip_ratio_required * 100),
+                    (self.config.skip_ratio_required * 100),
                 )
             )
             log.info(
@@ -2697,7 +2695,7 @@ class MusicBot(discord.Client):
                     )
                     reply_text += self.str.get(
                         "cmd-play-eta", " - estimated time until playing: %s"
-                    ) % ftimedelta(time_until)
+                    ) % str(time_until)
                 except exceptions.InvalidDataError:
                     reply_text += self.str.get(
                         "cmd-play-eta-error", " - cannot estimate time until playing"
@@ -2971,7 +2969,8 @@ class MusicBot(discord.Client):
                         entries.index(entry) + 1,
                         entry["title"],
                         format_song_duration(
-                            ftimedelta(timedelta(seconds=entry["duration"]))
+                            str(entry.duration_td),
+                            #ftimedelta(timedelta(seconds=entry["duration"]))
                         ),
                     )
                 )
@@ -3122,9 +3121,9 @@ class MusicBot(discord.Client):
                 self.server_specific_data[guild.id]["last_np_msg"] = None
 
             # TODO: Fix timedelta garbage with util function
-            song_progress = ftimedelta(timedelta(seconds=player.progress))
+            song_progress = str(timedelta(seconds=player.progress))
             song_total = (
-                ftimedelta(timedelta(seconds=player.current_entry.duration))
+                str(player.current_entry.duration_td)
                 if player.current_entry.duration is not None
                 else "(no duration data)"
             )
@@ -3925,9 +3924,9 @@ class MusicBot(discord.Client):
 
         if player.is_playing:
             # TODO: Fix timedelta garbage with util function
-            song_progress = ftimedelta(timedelta(seconds=player.progress))
+            song_progress = str(timedelta(seconds=player.progress))
             song_total = (
-                ftimedelta(timedelta(seconds=player.current_entry.duration))
+                str(player.current_entry.duration_td)
                 if player.current_entry.duration is not None
                 else "(no duration data)"
             )
