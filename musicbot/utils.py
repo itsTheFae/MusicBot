@@ -326,19 +326,18 @@ def paginate(
     return chunks
 
 
-async def get_header(
+async def get_headers(
     session: aiohttp.ClientSession,
     url: str,
-    headerfield: Optional[str] = None,
     *,
     timeout: int = 5,
     allow_redirects: bool = True,
     req_headers: Dict[str, Any] = {},
-) -> Union[str, "CIMultiDictProxy[str]", None]:
+) -> Union["CIMultiDictProxy[str]", None]:
     """
     Uses given aiohttp `session` to make a HEAD request against given `url` to fetch headers only.
     If `headerfield` is set, only the given header field is returned.
-    
+
     :param: timeout:  Set a different timeout for the HEAD request.
     :param: allow_redirect:  Follow "Location" headers through, on by default.
     :param: req_headers:  Set a collection of headers to send with the HEAD request.
@@ -347,18 +346,11 @@ async def get_header(
     async with session.head(
         url, timeout=req_timeout, allow_redirects=allow_redirects, headers=req_headers
     ) as response:
-        if headerfield:
-            return response.headers.get(headerfield)
-        else:
-            return response.headers
+        return response.headers
 
 
 def objdiff(
-    obj1: Any,
-    obj2: Any,
-    *,
-    access_attr: Optional[str] = None,
-    depth: int = 0
+    obj1: Any, obj2: Any, *, access_attr: Optional[str] = None, depth: int = 0
 ) -> Dict[str, Any]:
     """Compute changes between two objects of the same type."""
     changes: Dict[str, Any] = {}
