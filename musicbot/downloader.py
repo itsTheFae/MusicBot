@@ -1,21 +1,22 @@
 import os
 import copy
 import hashlib
+import pathlib
 import logging
 import functools
-import yt_dlp as youtube_dl
+import yt_dlp as youtube_dl  # type: ignore[import-untyped]
 
 from collections import UserDict
 from concurrent.futures import ThreadPoolExecutor
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Optional, Any, List, Dict
 from pprint import pformat
-from yt_dlp.networking.exceptions import NoSupportingHandlers
-from yt_dlp.utils import UnsupportedError, DownloadError
+from yt_dlp.networking.exceptions import NoSupportingHandlers  # type: ignore[import-untyped]
+from yt_dlp.utils import UnsupportedError, DownloadError  # type: ignore[import-untyped]
 
 from .exceptions import ExtractionError
 from .spotify import Spotify
-from .utils import get_header
+from .utils import get_headers
 
 if TYPE_CHECKING:
     from .bot import MusicBot
@@ -58,9 +59,9 @@ youtube_dl.utils.bug_reports_message = lambda: ""
 
 
 class Downloader:
-    def __init__(self, bot: "MusicBot"):
+    def __init__(self, bot: "MusicBot") -> None:
         self.bot: "MusicBot" = bot
-        self.download_folder: str = bot.config.audio_cache_path
+        self.download_folder: pathlib.Path = bot.config.audio_cache_path
         self.thread_pool = ThreadPoolExecutor(max_workers=2)
 
         # force ytdlp and HEAD requests to use the same UA string.
@@ -84,15 +85,20 @@ class Downloader:
         )
 
     @property
-    def ytdl(self):
+    def ytdl(self) -> youtube_dl.YoutubeDL:
         return self.safe_ytdl
 
-    def get_url_or_none(self, url: str) -> str:
+    def get_url_or_none(self, url: str) -> Optional[str]:
         """Uses ytdl.utils.url_or_none() to validate a playable URL"""
         # Discord might add < and > to the URL, this strips them out if they exist.
         if url.startswith("<") and url.endswith(">"):
             url = url[1:-1]
-        return youtube_dl.utils.url_or_none(url)
+        u = youtube_dl.utils.url_or_none(url)
+
+        # Just in case ytdlp changes... also strict typing.
+        if type(u) is str:
+            return u
+        return None
 
     async def get_url_headers(self, url: str) -> Dict[str, str]:
         """
@@ -101,15 +107,18 @@ class Downloader:
         If `url` is not valid the header 'X-INVALID-URL' is set to its value.
         """
         test_url = self.get_url_or_none(url)
-        headers = {}
+        headers: Dict[str, Any] = {}
         # do a HEAD request and add the headers to extraction info.
         if test_url:
             try:
-                head_data = await get_header(
+                head_data = await get_headers(
                     self.bot.session,
                     test_url,
                     req_headers=self.http_req_headers,
                 )
+                if not head_data:
+                    raise Exception("HEAD seems to have no headers...")
+
                 # convert multidict headers to a serializable dict.
                 for key in set(head_data.keys()):
                     new_key = key.upper()
@@ -117,7 +126,7 @@ class Downloader:
                     if len(values) > 1:
                         headers[new_key] = values
                     else:
-                        headers[new_key] = values[0]
+                        headers[new_key] = values.pop()
             except Exception:
                 log.warning(f"Failed HEAD request for:  {test_url}")
                 log.exception("HEAD Request exception: ")
@@ -158,7 +167,7 @@ class Downloader:
             log.debug(f"Sanitized YTDL Extraction Info:  {data}")
 
     async def extract_info(
-        self, song_subject: str, *args, **kwargs
+        self, song_subject: str, *args: List[Any], **kwargs: Dict[str, Any]
     ) -> "YtdlpResponseDict":
         """
         Runs ytdlp.extract_info with all arguments passed to this function.
@@ -217,7 +226,7 @@ class Downloader:
         return YtdlpResponseDict(data)
 
     async def _filtered_extract_info(
-        self, song_subject: str, *args, **kwargs
+        self, song_subject: str, *args: List[Any], **kwargs: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         The real logic behind extract_info().
@@ -234,7 +243,7 @@ class Downloader:
             if not Spotify.is_url_supported(song_subject):
                 raise ExtractionError("Spotify URL is invalid or not supported.")
 
-            process = kwargs.get("process", True)
+            process = bool(kwargs.get("process", True))
             download = kwargs.get("download", True)
 
             # return only basic ytdl-flavored data from the Spotify API.
@@ -327,7 +336,9 @@ class Downloader:
 
         return data
 
-    async def safe_extract_info(self, *args, **kwargs) -> Dict[str, Any]:
+    async def safe_extract_info(
+        self, *args: List[Any], **kwargs: Dict[str, Any]
+    ) -> Dict[str, Any]:
         log.noise(f"Called safe_extract_info with:  {args}, {kwargs}")  # type: ignore[attr-defined]
         return await self.bot.loop.run_in_executor(
             self.thread_pool,
@@ -335,7 +346,7 @@ class Downloader:
         )
 
 
-class YtdlpResponseDict(UserDict):
+class YtdlpResponseDict(UserDict[str, Any]):
     """
     UserDict wrapper for ytdlp extraction data with helpers for easier data reuse.
 
@@ -343,7 +354,7 @@ class YtdlpResponseDict(UserDict):
     https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/common.py
     """
 
-    def __init__(self, data: Dict) -> None:
+    def __init__(self, data: Dict[str, Any]) -> None:
         super().__init__(data)
         self._propagate_entry_data()
 
@@ -364,7 +375,7 @@ class YtdlpResponseDict(UserDict):
             if "__input_subject" not in entry:
                 entry["__input_subject"] = subject
 
-    def get_entries_dicts(self) -> List[Dict]:
+    def get_entries_dicts(self) -> List[Dict[str, Any]]:
         """will return entries as-is from data or an empty list if no entries are set."""
         entries = self.data.get("entries", [])
         if type(entries) is list:
@@ -375,7 +386,7 @@ class YtdlpResponseDict(UserDict):
         """will iterate over entries and return list of YtdlpResponseDicts"""
         return [YtdlpResponseDict(e) for e in self.get_entries_dicts()]
 
-    def get_entry_dict_at(self, idx: int) -> Optional[Dict]:
+    def get_entry_dict_at(self, idx: int) -> Optional[Dict[str, Any]]:
         """Get a dict from "entries" at the given index or None."""
         entries = self.get_entries_dicts()
         if entries:
@@ -421,7 +432,10 @@ class YtdlpResponseDict(UserDict):
     @property
     def expected_filename(self) -> Optional[str]:
         """get expected filename for this info data, or None if not available"""
-        return self.data.get("__expected_filename", None)
+        fn = self.data.get("__expected_filename", None)
+        if type(fn) is str and fn:
+            return fn
+        return None
 
     @property
     def entry_count(self) -> int:
@@ -449,7 +463,7 @@ class YtdlpResponseDict(UserDict):
         # TODO: IF time-sensitive URLs are a problem; might get away with downloading and sending as an attachment?
         turl = self.data.get("thumbnail", None)
         # if we have a thumbnail url, clean it up if needed and return it.
-        if turl:
+        if type(turl) is str and turl:
             return turl
 
         # Check if we have a thumbnails key and pick a thumb from it.
@@ -466,7 +480,7 @@ class YtdlpResponseDict(UserDict):
             elif len(thumbs):
                 turl = thumbs[0].get("url")
 
-            if turl:
+            if type(turl) is str and turl:
                 return turl
 
         # if all else fails, try to make a URL on our own.
@@ -485,59 +499,92 @@ class YtdlpResponseDict(UserDict):
     @property
     def ytdl_type(self) -> str:
         """returns value for data key '_type' or empty string"""
-        return self.data.get("_type", "")
+        t = self.data.get("_type", "")
+        if type(t) is str and t:
+            return t
+        return ""
 
     @property
     def extractor(self) -> str:
         """returns value for data key 'extractor' or empty string"""
-        return self.data.get("extractor", "")
+        e = self.data.get("extractor", "")
+        if type(e) is str and e:
+            return e
+        return ""
 
     @property
     def extractor_key(self) -> str:
         """returns value for data key 'extractor_key' or empty string"""
-        return self.data.get("extractor_key", "")
+        ek = self.data.get("extractor_key", "")
+        if type(ek) is str and ek:
+            return ek
+        return ""
 
     @property
     def url(self) -> str:
         """returns value for data key 'url' or empty string"""
-        return self.data.get("url", "")
+        u = self.data.get("url", "")
+        if type(u) is str and u:
+            return u
+        return ""
 
     @property
     def webpage_url(self) -> str:
         """returns value for data key 'webpage_url' or None"""
-        return self.data.get("webpage_url", "")
+        u = self.data.get("webpage_url", "")
+        if type(u) is str and u:
+            return u
+        return ""
 
     @property
     def webpage_basename(self) -> Optional[str]:
         """returns value for data key 'webpage_url_basename' or None"""
-        return self.data.get("webpage_url_basename", None)
+        bn = self.data.get("webpage_url_basename", None)
+        if type(bn) is str and bn:
+            return bn
+        return None
 
     @property
     def webpage_domain(self) -> Optional[str]:
         """returns value for data key 'webpage_url_domain' or None"""
-        return self.data.get("webpage_url_domain", None)
+        d = self.data.get("webpage_url_domain", None)
+        if type(d) is str and d:
+            return d
+        return None
 
     @property
     def original_url(self) -> Optional[str]:
         """returns value for data key 'original_url' or None"""
-        return self.data.get("original_url", None)
+        u = self.data.get("original_url", None)
+        if type(u) is str and u:
+            return u
+        return None
 
     @property
     def video_id(self) -> str:
         """returns the id if it exists or empty string."""
-        return self.data.get("id", "")
+        i = self.data.get("id", "")
+        if type(i) is str and i:
+            return i
+        return ""
 
     @property
     def title(self) -> str:
         """returns title value if it exists, empty string otherwise."""
         # Note: seemingly all processed data should have "title" key
         # entries in data may also have "fulltitle" and "playlist_title" keys.
-        return self.data.get("title", "")
+        t = self.data.get("title", "")
+        if type(t) is str and t:
+            return t
+        return ""
 
     @property
     def playlist_count(self) -> int:
         """returns the playlist_count value if it exists, or 0"""
-        return self.data.get("playlist_count", 0)
+        c = self.data.get("playlist_count", 0)
+        if type(c) is int:
+            return c
+        return 0
 
     @property
     def duration(self) -> float:
@@ -545,7 +592,7 @@ class YtdlpResponseDict(UserDict):
         try:
             return float(self.data.get("duration", 0))
         except (ValueError, TypeError):
-            log.noise(
+            log.noise(  # type: ignore[attr-defined]
                 f"Warning, duration ValueEror/TypeError for: {self.original_url}",
                 exc_info=True,
             )
@@ -556,7 +603,10 @@ class YtdlpResponseDict(UserDict):
         """return is_live key status or False if not found."""
         # Can be true, false, or None if state is unknown.
         # Here we assume unknown is not live.
-        return self.data.get("is_live", False)
+        live = self.data.get("is_live", False)
+        if type(live) is bool:
+            return live
+        return False
 
     @property
     def is_stream(self) -> bool:
