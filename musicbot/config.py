@@ -5,7 +5,7 @@ import codecs
 import shutil
 import logging
 import configparser
-from typing import TYPE_CHECKING, Optional, Tuple, List, Set
+from typing import TYPE_CHECKING, Union, Optional, Tuple, List, Set
 
 from .exceptions import HelpfulError
 from .constants import (
@@ -26,7 +26,9 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-def get_all_keys(conf) -> List[str]:
+def get_all_keys(
+    conf: Union["ExtendedConfigParser", configparser.ConfigParser]
+) -> List[str]:
     """Returns all config keys as a list"""
     sects = dict(conf.items())
     keys = []
@@ -285,7 +287,7 @@ class Config:
 
         self.setup_autoplaylist()
 
-    def check_changes(self, conf) -> None:
+    def check_changes(self, conf: "ExtendedConfigParser") -> None:
         exfile = "config/example_options.ini"
         if os.path.isfile(exfile):
             usr_keys = get_all_keys(conf)
@@ -608,7 +610,7 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return pathlib.Path(val)
 
     def getIDset(
-        self, section: str, key: str, fallback: Optional[Set] = None
+        self, section: str, key: str, fallback: Optional[Set[int]] = None
     ) -> Set[int]:
         """get a config value and parse it as a set of ID values."""
         val = self.get(section, key, fallback="").strip()

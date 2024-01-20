@@ -2,9 +2,13 @@ import inspect
 import json
 import logging
 import pydoc
-from typing import Dict, Any, Optional, Type
+from typing import TYPE_CHECKING, Any, Union, Optional, Callable, Type, Dict, Set
 
 from .utils import _get_variable
+
+if TYPE_CHECKING:
+    from discord import Message, Embed
+    from discord.abc import User
 
 log = logging.getLogger(__name__)
 
@@ -12,19 +16,19 @@ log = logging.getLogger(__name__)
 class SkipState:
     __slots__ = ["skippers", "skip_msgs"]
 
-    def __init__(self):
-        self.skippers = set()
-        self.skip_msgs = set()
+    def __init__(self) -> None:
+        self.skippers: Set["User"] = set()
+        self.skip_msgs: Set["Message"] = set()
 
     @property
-    def skip_count(self):
+    def skip_count(self) -> int:
         return len(self.skippers)
 
-    def reset(self):
+    def reset(self) -> None:
         self.skippers.clear()
         self.skip_msgs.clear()
 
-    def add_skipper(self, skipper, msg):
+    def add_skipper(self, skipper: "User", msg: "Message") -> int:
         self.skippers.add(skipper)
         self.skip_msgs.add(msg)
         return self.skip_count
@@ -33,42 +37,41 @@ class SkipState:
 class Response:
     __slots__ = ["_content", "reply", "delete_after", "codeblock", "_codeblock"]
 
-    def __init__(self, content, reply=False, delete_after=0, codeblock=None):
+    def __init__(
+        self,
+        content: Union[str, "Embed"],
+        reply: bool = False,
+        delete_after: int = 0,
+        codeblock: str = "",
+    ) -> None:
         self._content = content
         self.reply = reply
         self.delete_after = delete_after
         self.codeblock = codeblock
         self._codeblock = "```{!s}\n{{}}\n```".format(
-            "" if codeblock is True else codeblock
+            "" if not codeblock else codeblock
         )
 
     @property
-    def content(self):
+    def content(self) -> Union[str, "Embed"]:
         if self.codeblock:
             return self._codeblock.format(self._content)
         else:
             return self._content
 
 
-# Alright this is going to take some actual thinking through
-class AnimatedResponse(Response):
-    def __init__(self, content, *sequence, delete_after=0):
-        super().__init__(content, delete_after=delete_after)
-        self.sequence = sequence
-
-
 class Serializer(json.JSONEncoder):
-    def default(self, o) -> Dict[str, Any]:
+    def default(self, o: "Serializable") -> Any:
         if hasattr(o, "__json__"):
             return o.__json__()
 
         return super().default(o)
 
     @classmethod
-    def deserialize(cls, data):
+    def deserialize(cls, data: Dict[str, Any]) -> Any:
         if all(x in data for x in Serializable._class_signature):
             # log.debug("Deserialization requested for %s", data)
-            factory = pydoc.locate(data["__module__"] + "." + data["__class__"])
+            factory = type(pydoc.locate(data["__module__"] + "." + data["__class__"]))
             # log.debug("Found object %s", factory)
             if factory and issubclass(factory, Serializable):
                 # log.debug("Deserializing %s object", factory)
@@ -79,7 +82,7 @@ class Serializer(json.JSONEncoder):
         return data
 
     @classmethod
-    def _get_vars(cls, func):
+    def _get_vars(cls, func: Callable[..., Any]) -> Dict[str, Any]:
         # log.debug("Getting vars for %s", func)
         params = inspect.signature(func).parameters.copy()
         args = {}
