@@ -27,7 +27,7 @@ BUNDLED_AUTOPLAYLIST_FILE: str = "config/_autoplaylist.txt"
 DEFAULT_AUDIO_CACHE_PATH: str = "audio_cache"
 
 EXAMPLE_OPTIONS_FILE: str = "config/example_options.ini"
-EXAMPLE_PERMISSIONS_FILE: str = ""
+EXAMPLE_PERMS_FILE: str = "config/example_permissions.ini"
 
 DISCORD_MSG_CHAR_LIMIT: int = 2000
 

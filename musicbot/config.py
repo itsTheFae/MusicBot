@@ -5,7 +5,7 @@ import codecs
 import shutil
 import logging
 import configparser
-from typing import TYPE_CHECKING, Union, Optional, Tuple, List, Set
+from typing import TYPE_CHECKING, Any, Union, Optional, Tuple, List, Set
 
 from .exceptions import HelpfulError
 from .constants import (
@@ -579,7 +579,14 @@ class ConfigDefaults:
 class ExtendedConfigParser(configparser.ConfigParser):
     """A collection of typed converters for ConfigParser."""
 
-    def getownerid(self, section: str, key: str, fallback: int = 0) -> int:
+    def getownerid(
+        self,
+        section: str,
+        key: str,
+        fallback: int = 0,
+        raw: bool = False,
+        vars: Any = None,
+    ) -> int:
         """get the owner ID or 0 for auto"""
         val = self.get(section, key, fallback="").strip()
         if not val:
@@ -597,7 +604,12 @@ class ExtendedConfigParser(configparser.ConfigParser):
                 )
 
     def getpathlike(
-        self, section: str, key: str, fallback: pathlib.Path
+        self,
+        section: str,
+        key: str,
+        fallback: pathlib.Path,
+        raw: bool = False,
+        vars: Any = None,
     ) -> pathlib.Path:
         """
         get a config value and parse it as a Path object.
@@ -610,7 +622,12 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return pathlib.Path(val)
 
     def getIDset(
-        self, section: str, key: str, fallback: Optional[Set[int]] = None
+        self,
+        section: str,
+        key: str,
+        fallback: Optional[Set[int]] = None,
+        raw: bool = False,
+        vars: Any = None,
     ) -> Set[int]:
         """get a config value and parse it as a set of ID values."""
         val = self.get(section, key, fallback="").strip()
@@ -628,7 +645,12 @@ class ExtendedConfigParser(configparser.ConfigParser):
                 )
 
     def getDebugLevel(
-        self, section: str, key: str, fallback: str = ""
+        self,
+        section: str,
+        key: str,
+        fallback: str = "",
+        raw: bool = False,
+        vars: Any = None,
     ) -> Tuple[str, int]:
         """get a config value an parse it as a logger level."""
         val = self.get(section, key, fallback="").strip().upper()
@@ -646,7 +668,14 @@ class ExtendedConfigParser(configparser.ConfigParser):
             )
             return ("INFO", logging.INFO)
 
-    def getdatasize(self, section: str, key: str, fallback: int = 0) -> int:
+    def getdatasize(
+        self,
+        section: str,
+        key: str,
+        fallback: int = 0,
+        raw: bool = False,
+        vars: Any = None,
+    ) -> int:
         """get a config value and parse it as a human readable data size"""
         val = self.get(section, key, fallback="").strip()
         if not val and fallback:
@@ -661,6 +690,20 @@ class ExtendedConfigParser(configparser.ConfigParser):
                 ),
             )
             return fallback
+
+    def getstrset(
+        self,
+        section: str,
+        key: str,
+        fallback: Set[str] = set(),
+        raw: bool = False,
+        vars: Any = None,
+    ) -> Set[str]:
+        """get a config value parsed as a set of string values."""
+        val = self.get(section, key, fallback="").strip()
+        if not val and fallback:
+            return fallback
+        return set(x for x in val.replace(",", " ").split())
 
 
 setattr(
