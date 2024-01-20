@@ -45,7 +45,7 @@ class Playlist(EventEmitter, Serializable):
         self.bot: "MusicBot" = bot
         self.loop: "asyncio.AbstractEventLoop" = bot.loop
         self.aiosession: "aiohttp.ClientSession" = bot.session
-        self.entries: Deque = deque()
+        self.entries: Deque[EntryTypes] = deque()
 
     def __iter__(self) -> Iterator[EntryTypes]:
         return iter(self.entries)
@@ -85,14 +85,16 @@ class Playlist(EventEmitter, Serializable):
         *,
         head: bool = False,
         defer_serialize: bool = False,
-        **meta,
+        **meta: Any,
     ) -> Tuple[StreamPlaylistEntry, int]:
         # TODO: A bit more validation, "~stream some_url" should not just say :ok_hand:
         # @Fae: about as much validation we can do is making sure the URL is playable.
         # Users are using stream to play without downloading, and enforcing a check
         # for "streaming" media here would break that use case.
 
-        log.noise(f"Adding stream entry for URL:  {info.url}")
+        log.noise(  # type: ignore[attr-defined]
+            f"Adding stream entry for URL:  {info.url}"
+        )
         entry = StreamPlaylistEntry(
             self,
             info,
@@ -107,7 +109,7 @@ class Playlist(EventEmitter, Serializable):
         *,
         head: bool = False,
         defer_serialize: bool = False,
-        **meta,
+        **meta: Any,
     ) -> Tuple[EntryTypes, int]:
         """
         Validates extracted info and adds media to be played.
@@ -165,14 +167,16 @@ class Playlist(EventEmitter, Serializable):
                         )
                     )
 
-        log.noise(f"Adding URLPlaylistEntry for: {info.get('__input_subject')}")
+        log.noise(  # type: ignore[attr-defined]
+            f"Adding URLPlaylistEntry for: {info.get('__input_subject')}"
+        )
         entry = URLPlaylistEntry(self, info, **meta)
         self._add_entry(entry, head=head, defer_serialize=defer_serialize)
         return entry, (1 if head else len(self.entries))
 
     async def import_from_info(
-        self, info: "YtdlpResponseDict", head: bool, **meta
-    ) -> Tuple[List, int]:
+        self, info: "YtdlpResponseDict", head: bool, **meta: Any
+    ) -> Tuple[List[EntryTypes], int]:
         """
         Imports the songs from `info` and queues them to be played.
 
@@ -261,16 +265,16 @@ class Playlist(EventEmitter, Serializable):
         """
         Reorders the queue for round-robin
         """
-        new_queue: Deque = deque()
+        new_queue: Deque[EntryTypes] = deque()
+        all_authors: List["discord.User"] = []
 
-        all_authors = []
-
-        for song in self.entries:
-            author = song.meta.get("author", None)
-            if author not in all_authors:
+        for entry in self.entries:
+            author = entry.meta.get("author", None)
+            if author and author not in all_authors:
                 all_authors.append(author)
 
         request_counter = 0
+        song: Optional[EntryTypes] = None
         while self.entries:
             if request_counter == len(all_authors):
                 request_counter = 0
@@ -307,7 +311,7 @@ class Playlist(EventEmitter, Serializable):
 
     async def _try_get_entry_future(
         self, entry: EntryTypes, predownload: bool = False
-    ) -> Optional["asyncio.Future"]:
+    ) -> Any:
         """gracefully try to get the entry ready future, or start pre-downloading one."""
         moving_on = " Moving to the next entry..."
         if predownload:
@@ -335,9 +339,7 @@ class Playlist(EventEmitter, Serializable):
 
         return None
 
-    async def get_next_entry(
-        self, predownload_next: bool = True
-    ) -> Optional["asyncio.Future"]:
+    async def get_next_entry(self, predownload_next: bool = True) -> Any:
         """
         A coroutine which will return the next song or None if no songs left to play.
 
@@ -373,7 +375,9 @@ class Playlist(EventEmitter, Serializable):
         if any(e.duration is None for e in islice(self.entries, position - 1)):
             raise InvalidDataError("no duration data")
         else:
-            estimated_time = sum(e.duration for e in islice(self.entries, position - 1))
+            estimated_time = sum(
+                e.duration_td.seconds for e in islice(self.entries, position - 1)
+            )
 
         # When the player plays a song, it eats the first playlist item, so we just have to add the time back
         if not player.is_stopped and player.current_entry:
@@ -392,7 +396,7 @@ class Playlist(EventEmitter, Serializable):
 
     @classmethod
     def _deserialize(
-        cls, raw_json: Dict[str, Any], bot: Optional["MusicBot"] = None, **kwargs
+        cls, raw_json: Dict[str, Any], bot: Optional["MusicBot"] = None, **kwargs: Any
     ) -> "Playlist":
         assert bot is not None, cls._bad("bot")
         # log.debug("Deserializing playlist")

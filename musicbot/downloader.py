@@ -167,7 +167,7 @@ class Downloader:
             log.debug(f"Sanitized YTDL Extraction Info:  {data}")
 
     async def extract_info(
-        self, song_subject: str, *args: List[Any], **kwargs: Dict[str, Any]
+        self, song_subject: str, *args: Any, **kwargs: Any
     ) -> "YtdlpResponseDict":
         """
         Runs ytdlp.extract_info with all arguments passed to this function.
@@ -226,7 +226,7 @@ class Downloader:
         return YtdlpResponseDict(data)
 
     async def _filtered_extract_info(
-        self, song_subject: str, *args: List[Any], **kwargs: Dict[str, Any]
+        self, song_subject: str, *args: Any, **kwargs: Any
     ) -> Dict[str, Any]:
         """
         The real logic behind extract_info().
@@ -336,9 +336,7 @@ class Downloader:
 
         return data
 
-    async def safe_extract_info(
-        self, *args: List[Any], **kwargs: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def safe_extract_info(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
         log.noise(f"Called safe_extract_info with:  {args}, {kwargs}")  # type: ignore[attr-defined]
         return await self.bot.loop.run_in_executor(
             self.thread_pool,
