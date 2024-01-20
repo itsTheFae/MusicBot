@@ -2,12 +2,12 @@ import os
 import asyncio
 import logging
 import re
-import sys
 import datetime
+import shutil
 
 from discord.abc import GuildChannel
 from typing import TYPE_CHECKING, Any, List, Dict, Optional, Callable
-from yt_dlp.utils import ContentTooShortError
+from yt_dlp.utils import ContentTooShortError  # type: ignore[import-untyped]
 
 from .constructs import Serializable
 from .exceptions import ExtractionError, InvalidDataError
@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 # optionally using pymediainfo instead of ffprobe if presents
 try:
-    import pymediainfo
+    import pymediainfo  # type: ignore[import-untyped]
 except ImportError:
     log.debug("module 'pymediainfo' not found, will fall back to ffprobe.")
     pymediainfo = None
@@ -36,7 +36,7 @@ class BasePlaylistEntry(Serializable):
         self.cache_busted: bool = False
         self._is_downloading: bool = False
         self._is_downloaded: bool = False
-        self._waiting_futures: List[asyncio.Future] = []
+        self._waiting_futures: List[asyncio.Future[Any]] = []
 
     @property
     def url(self) -> str:
@@ -60,13 +60,13 @@ class BasePlaylistEntry(Serializable):
     async def _download(self) -> None:
         raise NotImplementedError
 
-    def get_ready_future(self) -> asyncio.Future:
+    def get_ready_future(self) -> asyncio.Future[Any]:
         """
         Returns a future that will fire when the song is ready to be played.
         The future will either fire with the result (being the entry) or an exception
         as to why the song download failed.
         """
-        future = asyncio.Future()  # type: asyncio.Future
+        future = asyncio.Future()  # type: asyncio.Future[Any]
         if self.is_downloaded:
             # In the event that we're downloaded, we're already ready for playback.
             future.set_result(self)
@@ -80,7 +80,7 @@ class BasePlaylistEntry(Serializable):
         log.debug("Created future for {0}".format(name))
         return future
 
-    def _for_each_future(self, cb: Callable) -> None:
+    def _for_each_future(self, cb: Callable[..., Any]) -> None:
         """
         Calls `cb` for each future that is not cancelled. Absorbs and logs any errors that may have occurred.
         """
@@ -97,7 +97,7 @@ class BasePlaylistEntry(Serializable):
             except Exception:
                 log.exception("Unhandled exception in _for_each_future callback.")
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         return self is other
 
     def __hash__(self) -> int:
@@ -111,28 +111,6 @@ async def run_command(cmd: str) -> bytes:
     log.debug("Starting asyncio subprocess ({0}) with command: {1}".format(p, cmd))
     stdout, stderr = await p.communicate()
     return stdout + stderr
-
-
-def get(program: str) -> Optional[str]:
-    def is_exe(file_path):
-        found = os.path.isfile(file_path) and os.access(file_path, os.X_OK)
-        if not found and sys.platform == "win32":
-            file_path = file_path + ".exe"
-            found = os.path.isfile(file_path) and os.access(file_path, os.X_OK)
-        return found
-
-    fpath, __ = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            path = path.strip('"')
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
-
-    return None
 
 
 class URLPlaylistEntry(BasePlaylistEntry):
@@ -191,8 +169,8 @@ class URLPlaylistEntry(BasePlaylistEntry):
         May contain 0 seconds duration.
         Partial seconds are rounded away.
         """
-        t = round(self.duration) or 0
-        return datetime.timedelta(seconds=t)
+        t = self.duration or 0
+        return datetime.timedelta(seconds=round(t))
 
     @property
     def thumbnail_url(self) -> str:
@@ -230,7 +208,10 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
     @classmethod
     def _deserialize(
-        cls, raw_json: Dict[str, Any], playlist: Optional["Playlist"] = None, **kwargs
+        cls,
+        raw_json: Dict[str, Any],
+        playlist: Optional["Playlist"] = None,
+        **kwargs: Dict[str, Any],
     ) -> Optional["URLPlaylistEntry"]:
         """
         Handles converting from JSON to URLPlaylistEntry.
@@ -424,7 +405,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
     async def get_mean_volume(self, input_file: str) -> str:
         log.debug("Calculating mean volume of {0}".format(input_file))
-        exe = get("ffmpeg")
+        exe = shutil.which("ffmpeg")
         args = "-af loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:print_format=json -f null /dev/null"
 
         raw_output = await run_command(f'"{exe}" -i "{input_file}" {args}')
@@ -547,7 +528,7 @@ class StreamPlaylistEntry(BasePlaylistEntry):
         if self.info.extractor == "twitch:stream":
             dtitle = self.info.get("description", None)
             if dtitle and not self.info.title:
-                return dtitle
+                return str(dtitle)
 
         # TODO: i18n for this at some point.
         return self.info.title or "Unknown"
@@ -569,8 +550,8 @@ class StreamPlaylistEntry(BasePlaylistEntry):
         May contain a 0 second duration.
         Microseconds are rounded away.
         """
-        t = round(self.duration) or 0
-        return datetime.timedelta(seconds=t)
+        t = self.duration or 0
+        return datetime.timedelta(seconds=round(t))
 
     @property
     def thumbnail_url(self) -> str:
@@ -597,7 +578,10 @@ class StreamPlaylistEntry(BasePlaylistEntry):
 
     @classmethod
     def _deserialize(
-        cls, raw_json: Dict[str, Any], playlist: Optional["Playlist"] = None, **kwargs
+        cls,
+        raw_json: Dict[str, Any],
+        playlist: Optional["Playlist"] = None,
+        **kwargs: Any,
     ) -> Optional["StreamPlaylistEntry"]:
         assert playlist is not None, cls._bad("playlist")
 
