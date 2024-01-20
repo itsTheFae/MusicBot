@@ -1,3 +1,4 @@
+from __future__ import annotations
 import asyncio
 import io
 import json
@@ -6,11 +7,11 @@ import os
 import sys
 from enum import Enum
 from threading import Thread
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Union, Optional, List, Dict
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer, AudioSource, VoiceClient
 
-from .constructs import Serializable, Serializer
+from .constructs import Serializable, Serializer, SkipState
 from .entry import URLPlaylistEntry, StreamPlaylistEntry
 from .exceptions import FFmpegError, FFmpegWarning
 from .lib.event_emitter import EventEmitter
@@ -18,6 +19,9 @@ from .lib.event_emitter import EventEmitter
 if TYPE_CHECKING:
     from .bot import MusicBot
     from .playlist import Playlist
+
+# Type alias
+EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry]
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +42,7 @@ class MusicPlayerState(Enum):
 class SourcePlaybackCounter(AudioSource):
     def __init__(
         self,
-        source: PCMVolumeTransformer,
+        source: PCMVolumeTransformer[FFmpegPCMAudio],
         progress: int = 0,
     ) -> None:
         self._source = source
@@ -60,46 +64,48 @@ class SourcePlaybackCounter(AudioSource):
 class MusicPlayer(EventEmitter, Serializable):
     def __init__(
         self,
-        bot: "MusicBot",
+        bot: MusicBot,
         voice_client: VoiceClient,
-        playlist: "Playlist",
+        playlist: Playlist,
     ):
         super().__init__()
-        self.bot = bot
-        self.loop = bot.loop
-        self.loopqueue = False
-        self.repeatsong = False
-        self.voice_client = voice_client
-        self.playlist = playlist
-        self.autoplaylist = None
-        self.state = MusicPlayerState.STOPPED
-        self.skip_state = None
-        self.karaoke_mode = False
+        self.bot: MusicBot = bot
+        self.loop: asyncio.AbstractEventLoop = bot.loop
+        self.loopqueue: bool = False
+        self.repeatsong: bool = False
+        self.voice_client: VoiceClient = voice_client
+        self.playlist: Playlist = playlist
+        self.autoplaylist: List[str] = []
+        self.state: MusicPlayerState = MusicPlayerState.STOPPED
+        self.skip_state: SkipState = SkipState()
+        self.karaoke_mode: bool = False
 
         self._volume = bot.config.default_volume
         self._play_lock = asyncio.Lock()
-        self._current_player = None
-        self._current_entry = None
-        self._stderr_future = None
+        self._current_player: Optional[VoiceClient] = None
+        self._current_entry: Optional[EntryTypes] = None
+        self._stderr_future: Optional[asyncio.Future[Any]] = None
 
-        self._source = None
+        self._source: Optional[SourcePlaybackCounter] = None
 
         self.playlist.on("entry-added", self.on_entry_added)
         self.playlist.on("entry-failed", self.on_entry_failed)
 
     @property
-    def volume(self):
+    def volume(self) -> float:
         return self._volume
 
     @volume.setter
-    def volume(self, value):
+    def volume(self, value: float) -> None:
         self._volume = value
         if self._source:
             self._source._source.volume = value
 
-    def on_entry_added(self, playlist, entry, defer_serialize: bool = False):
+    def on_entry_added(
+        self, playlist: Playlist, entry: EntryTypes, defer_serialize: bool = False
+    ) -> None:
         if self.is_stopped:
-            log.noise("calling-later, self.play from player.")
+            log.noise("calling-later, self.play from player.")  # type: ignore[attr-defined]
             self.loop.call_later(2, self.play)
 
         self.emit(
@@ -110,19 +116,19 @@ class MusicPlayer(EventEmitter, Serializable):
             defer_serialize=defer_serialize,
         )
 
-    def on_entry_failed(self, entry, error):
+    def on_entry_failed(self, entry: EntryTypes, error: Exception) -> None:
         self.emit("error", player=self, entry=entry, ex=error)
 
-    def skip(self):
+    def skip(self) -> None:
         self._kill_current_player()
 
-    def stop(self):
+    def stop(self) -> None:
         self.state = MusicPlayerState.STOPPED
         self._kill_current_player()
 
         self.emit("stop", player=self)
 
-    def resume(self):
+    def resume(self) -> None:
         if self.is_paused and self._current_player:
             self._current_player.resume()
             self.state = MusicPlayerState.PLAYING
@@ -136,7 +142,7 @@ class MusicPlayer(EventEmitter, Serializable):
 
         raise ValueError("Cannot resume playback from state %s" % self.state)
 
-    def pause(self):
+    def pause(self) -> None:
         if self.is_playing:
             self.state = MusicPlayerState.PAUSED
 
@@ -151,14 +157,17 @@ class MusicPlayer(EventEmitter, Serializable):
 
         raise ValueError("Cannot pause a MusicPlayer in state %s" % self.state)
 
-    def kill(self):
+    def kill(self) -> None:
         self.state = MusicPlayerState.DEAD
         self.playlist.clear()
         self._events.clear()
         self._kill_current_player()
 
-    def _playback_finished(self, error=None):
+    def _playback_finished(self, error: Optional[Exception] = None) -> None:
         entry = self._current_entry
+        if entry is None:
+            log.debug("Playback finished, but _current_entry is None.")
+            return
 
         if self.repeatsong:
             self.playlist.entries.appendleft(entry)
@@ -166,7 +175,8 @@ class MusicPlayer(EventEmitter, Serializable):
             self.playlist.entries.append(entry)
 
         if self._current_player:
-            self._current_player.after = None
+            if hasattr(self._current_player, "after"):
+                self._current_player.after = None
             self._kill_current_player()
 
         self._current_entry = None
@@ -177,7 +187,11 @@ class MusicPlayer(EventEmitter, Serializable):
             self.emit("error", player=self, entry=entry, ex=error)
             return
 
-        if self._stderr_future.done() and self._stderr_future.exception():
+        if (
+            type(self._stderr_future) is asyncio.Future
+            and self._stderr_future.done()
+            and self._stderr_future.exception()
+        ):
             # I'm not sure that this would ever not be done if it gets to this point
             # unless ffmpeg is doing something highly questionable
             self.stop()
@@ -191,7 +205,7 @@ class MusicPlayer(EventEmitter, Serializable):
 
         self.emit("finished-playing", player=self, entry=entry)
 
-    def _kill_current_player(self):
+    def _kill_current_player(self) -> bool:
         if self._current_player:
             try:
                 self._current_player.stop()
@@ -202,10 +216,10 @@ class MusicPlayer(EventEmitter, Serializable):
 
         return False
 
-    def play(self, _continue=False):
+    def play(self, _continue: bool = False) -> None:
         self.loop.create_task(self._play(_continue=_continue))
 
-    async def _play(self, _continue=False):
+    async def _play(self, _continue: bool = False) -> None:
         """
         Plays the next entry from the playlist, or resumes playback of the current entry if paused.
         """
@@ -239,7 +253,7 @@ class MusicPlayer(EventEmitter, Serializable):
                 else:
                     aoptions = "-vn"
 
-                log.ffmpeg(
+                log.ffmpeg(  # type: ignore[attr-defined]
                     "Creating player with options: {} {} {}".format(
                         boptions, aoptions, entry.filename
                     )
@@ -281,7 +295,7 @@ class MusicPlayer(EventEmitter, Serializable):
 
                 self.emit("play", player=self, entry=entry)
 
-    async def _handle_file_cleanup(self, entry):
+    async def _handle_file_cleanup(self, entry: EntryTypes) -> None:
         if not isinstance(entry, StreamPlaylistEntry):
             if any([entry.filename == e.filename for e in self.playlist.entries]):
                 log.debug(
@@ -298,7 +312,7 @@ class MusicPlayer(EventEmitter, Serializable):
                         log.debug("File deleted: {0}".format(filename))
                         break
                     except PermissionError as e:
-                        if e.winerror == 32:  # File is in use
+                        if e.errno == 32:  # File is in use
                             log.error(
                                 "Can't delete file, it is currently in use: {0}".format(
                                     filename
@@ -325,37 +339,43 @@ class MusicPlayer(EventEmitter, Serializable):
                         )
                     )
 
-    def __json__(self):
+    def __json__(self) -> Dict[str, Any]:
+        progress_frames = None
+        if self._current_player and self._current_player._player:
+            if self.progress is not None:
+                progress_frames = self._current_player._player.loops
+
         return self._enclose_json(
             {
                 "current_entry": {
                     "entry": self.current_entry,
                     "progress": self.progress,
-                    "progress_frames": self._current_player._player.loops
-                    if self.progress is not None and self._current_player
-                    else None,
-                    # TODO: @Fae: Not sure if this just kicks the can or not.
-                    # I feel I need to read dpy guts to understand what this is supposed to do to start with.
-                    # At any rate, VoiceClient can be none here when:
-                    # auto-summon enabled, play command is used, deserialized queue has tracks already.
+                    "progress_frames": progress_frames,
                 },
                 "entries": self.playlist,
             }
         )
 
     @classmethod
-    def _deserialize(cls, data, bot=None, voice_client=None, playlist=None):
+    def _deserialize(
+        cls,
+        raw_json: Dict[str, Any],
+        bot: Optional[MusicBot] = None,
+        voice_client: Optional[VoiceClient] = None,
+        playlist: Optional[Playlist] = None,
+        **kwargs: Any,
+    ) -> MusicPlayer:
         assert bot is not None, cls._bad("bot")
         assert voice_client is not None, cls._bad("voice_client")
         assert playlist is not None, cls._bad("playlist")
 
         player = cls(bot, voice_client, playlist)
 
-        data_pl = data.get("entries")
+        data_pl = raw_json.get("entries")
         if data_pl and data_pl.entries:
             player.playlist.entries = data_pl.entries
 
-        current_entry_data = data["current_entry"]
+        current_entry_data = raw_json["current_entry"]
         if current_entry_data["entry"]:
             player.playlist.entries.appendleft(current_entry_data["entry"])
             # TODO: progress stuff
@@ -366,46 +386,53 @@ class MusicPlayer(EventEmitter, Serializable):
         return player
 
     @classmethod
-    def from_json(cls, raw_json, bot, voice_client, playlist):
+    def from_json(
+        cls, raw_json: str, bot: MusicBot, voice_client: VoiceClient, playlist: Playlist
+    ) -> Optional[MusicPlayer]:
         try:
-            return json.loads(raw_json, object_hook=Serializer.deserialize)
+            obj = json.loads(raw_json, object_hook=Serializer.deserialize)
+            if type(obj) is MusicPlayer:
+                return obj
+            return None
         except Exception as e:
             log.exception("Failed to deserialize player", e)
+            return None
 
     @property
-    def current_entry(self):
+    def current_entry(self) -> Optional[EntryTypes]:
         return self._current_entry
 
     @property
-    def is_playing(self):
+    def is_playing(self) -> bool:
         return self.state == MusicPlayerState.PLAYING
 
     @property
-    def is_paused(self):
+    def is_paused(self) -> bool:
         return self.state == MusicPlayerState.PAUSED
 
     @property
-    def is_stopped(self):
+    def is_stopped(self) -> bool:
         return self.state == MusicPlayerState.STOPPED
 
     @property
-    def is_dead(self):
+    def is_dead(self) -> bool:
         return self.state == MusicPlayerState.DEAD
 
     @property
-    def progress(self):
+    def progress(self) -> float:
         if self._source:
             return self._source.get_progress()
             # TODO: Properly implement this
             #       Correct calculation should be bytes_read/192k
             #       192k AKA sampleRate * (bitDepth / 8) * channelCount
             #       Change frame_count to bytes_read in the PatchedBuff
+        return 0
 
 
 # TODO: I need to add a check for if the eventloop is closed
 
 
-def filter_stderr(stderr: io.BytesIO, future: asyncio.Future):
+def filter_stderr(stderr: io.BytesIO, future: asyncio.Future[Any]) -> None:
     last_ex = None
 
     while True:
