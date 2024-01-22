@@ -221,7 +221,7 @@ class Config:
             "LeaveInactiveVC",
             fallback=ConfigDefaults.leave_inactive_channel,
         )
-        self.leave_inactive_channel_timeout = config.get(
+        self.leave_inactive_channel_timeout = config.getDuration(
             "MusicBot",
             "LeaveInactiveVCTimeOut",
             fallback=ConfigDefaults.leave_inactive_channel_timeout,
@@ -231,7 +231,7 @@ class Config:
             "LeaveAfterSong",
             fallback=ConfigDefaults.leave_after_queue_empty,
         )
-        self.leave_player_inactive_for = config.get(
+        self.leave_player_inactive_for = config.getDuration(
             "MusicBot",
             "LeavePlayerInactiveFor",
             fallback=ConfigDefaults.leave_player_inactive_for,
@@ -382,16 +382,6 @@ class Config:
 
         if not self.footer_text:
             self.footer_text = ConfigDefaults.footer_text
-
-        if self.leave_inactive_channel_timeout:
-            self.leave_inactive_channel_timeout = format_time_to_seconds(
-                self.leave_inactive_channel_timeout
-            )
-
-        if self.leave_player_inactive_for:
-            self.leave_player_inactive_for = format_time_to_seconds(
-                self.leave_player_inactive_for
-            )
 
     # TODO: Add save function for future editing of options with commands
     #       Maybe add warnings about fields missing from the config file
@@ -559,9 +549,9 @@ class ConfigDefaults:
     searchlist: bool = False
     self_deafen: bool = True
     leave_inactive_channel: bool = False
-    leave_inactive_channel_timeout: int = 300
+    leave_inactive_channel_timeout: float = 300.0
     leave_after_queue_empty: bool = False
-    leave_player_inactive_for: int = 0
+    leave_player_inactive_for: float = 0.0
     defaultsearchresults: int = 3
     enable_options_per_guild: bool = False
     footer_text: str = DEFAULT_FOOTER_TEXT
@@ -690,6 +680,21 @@ class ExtendedConfigParser(configparser.ConfigParser):
                 ),
             )
             return fallback
+
+    def getDuration(
+        self,
+        section: str,
+        key: str,
+        fallback: Union[int, float] = 0,
+        raw: bool = False,
+        vars: Any = None,
+    ) -> float:
+        """get a config value parsed as a time duration."""
+        val = self.get(section, key, fallback="").strip()
+        if not val and fallback:
+            return float(fallback)
+        seconds = format_time_to_seconds(val)
+        return float(seconds)
 
     def getstrset(
         self,
