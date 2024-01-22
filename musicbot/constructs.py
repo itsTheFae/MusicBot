@@ -8,7 +8,6 @@ from .utils import _get_variable
 
 if TYPE_CHECKING:
     from discord import Message, Embed
-    from discord.abc import User
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ class SkipState:
     __slots__ = ["skippers", "skip_msgs"]
 
     def __init__(self) -> None:
-        self.skippers: Set["User"] = set()
+        self.skippers: Set[int] = set()
         self.skip_msgs: Set["Message"] = set()
 
     @property
@@ -28,8 +27,8 @@ class SkipState:
         self.skippers.clear()
         self.skip_msgs.clear()
 
-    def add_skipper(self, skipper: "User", msg: "Message") -> int:
-        self.skippers.add(skipper)
+    def add_skipper(self, skipper_id: int, msg: "Message") -> int:
+        self.skippers.add(skipper_id)
         self.skip_msgs.add(msg)
         return self.skip_count
 
