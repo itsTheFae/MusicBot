@@ -3,7 +3,7 @@ import pathlib
 import logging
 import configparser
 import discord
-from typing import TYPE_CHECKING, Any, Dict, List, Set
+from typing import TYPE_CHECKING, Any, Union, Dict, List, Set
 
 from .config import ExtendedConfigParser
 from .constants import DEFAULT_PERMS_FILE, EXAMPLE_PERMS_FILE
@@ -150,7 +150,7 @@ class Permissions:
         with open(self.perms_file, "w") as f:
             self.config.write(f)
 
-    def for_user(self, user: discord.User) -> "PermissionGroup":
+    def for_user(self, user: Union[discord.Member, discord.User]) -> "PermissionGroup":
         """
         Returns the first PermissionGroup a user belongs to
         :param user: A discord User or Member object

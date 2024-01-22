@@ -8,8 +8,20 @@ import inspect
 import colorlog
 import datetime
 import unicodedata
-from typing import TYPE_CHECKING, Callable, Union, Optional, Any, Set, List, Dict
+from functools import wraps
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Iterable,
+    Union,
+    Optional,
+    Any,
+    Set,
+    List,
+    Dict,
+)
 
+from .exceptions import PermissionsError
 from .constants import (
     DEFAULT_MUSICBOT_LOG_FILE,
     DEFAULT_DISCORD_LOG_FILE,
@@ -19,6 +31,7 @@ from .constants import (
 if TYPE_CHECKING:
     from discord import VoiceChannel, StageChannel, Member
     from multidict import CIMultiDictProxy
+    from .bot import MusicBot
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +209,7 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".ended-%Y-%j-%H%m%S") -
     :param: max_kept:  number of old logs to keep.
     :param: date_fmt:  format compatible with datetime.strftime() for rotated filename.
     """
-    # TODO: this needs to be more reliable. Extra or renamed files in the 
+    # TODO: this needs to be more reliable. Extra or renamed files in the
     # log directory might break this implementation.
     # We should probably use a method to read file times rather than using glob...
     if not max_kept:
@@ -211,7 +224,7 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".ended-%Y-%j-%H%m%S") -
     if logfile.is_file():
         new_name = logpath.joinpath(f"{logfile.stem}{before}{logfile.suffix}")
         # Cannot use logging here, but some notice to console is OK.
-        print(f"Moving Log file to:  {new_name}")
+        print(f"Moving the log file from this run to:  {new_name}")
         logfile.rename(new_name)
 
     # make sure we are in limits
@@ -239,9 +252,7 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".ended-%Y-%j-%H%m%S") -
 
 
 def load_file(
-    filename: pathlib.Path,
-    skip_commented_lines: bool = True,
-    comment_char: str = "#"
+    filename: pathlib.Path, skip_commented_lines: bool = True, comment_char: str = "#"
 ) -> List[str]:
     """
     Read `filename` into list of strings but ignore lines starting
@@ -266,7 +277,7 @@ def load_file(
         return []
 
 
-def write_file(filename: pathlib.Path, contents: List[Any]) -> None:
+def write_file(filename: pathlib.Path, contents: Iterable[str]) -> None:
     with open(filename, "w", encoding="utf8") as f:
         for item in contents:
             f.write(str(item))
@@ -298,7 +309,7 @@ def paginate(
     content: Union[str, List[str]],
     *,
     length: int = DISCORD_MSG_CHAR_LIMIT,
-    reserve: int = 0
+    reserve: int = 0,
 ) -> List[str]:
     """
     Split up a large string or list of strings into chunks for sending to discord.
@@ -404,7 +415,9 @@ def _func_() -> str:
     """
     frame = inspect.currentframe()
     if not frame or not frame.f_back:
-        raise RuntimeError("Call to _func_() failed, may not be available in this context.")
+        raise RuntimeError(
+            "Call to _func_() failed, may not be available in this context."
+        )
 
     return frame.f_back.f_code.co_name
 
@@ -422,6 +435,35 @@ def _get_variable(name: str) -> Any:
                 del frame
     finally:
         del stack
+
+
+# TODO: Add some sort of `denied` argument for a message to send when someone else tries to use it
+def owner_only(func: Callable[..., Any]) -> Any:
+    @wraps(func)
+    async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:
+        # Only allow the owner to use these commands
+        orig_msg = _get_variable("message")
+
+        if not orig_msg or orig_msg.author.id == self.config.owner_id:
+            return await func(self, *args, **kwargs)
+        else:
+            raise PermissionsError("Only the owner can use this command.", expire_in=30)
+
+    return wrapper
+
+
+def dev_only(func: Callable[..., Any]) -> Any:
+    @wraps(func)
+    async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:
+        orig_msg = _get_variable("message")
+
+        if orig_msg.author.id in self.config.dev_ids:
+            return await func(self, *args, **kwargs)
+        else:
+            raise PermissionsError("Only dev users can use this command.", expire_in=30)
+
+    setattr(wrapper, "dev_cmd", True)
+    return wrapper
 
 
 def is_empty_voice_channel(
@@ -458,14 +500,61 @@ def is_empty_voice_channel(
     return not sum(1 for m in voice_channel.members if _check(m))
 
 
+def count_members_in_voice(
+    voice_channel: "VoiceChannel",
+    include_only: Iterable[int] = [],
+    include_bots: Iterable[int] = [],
+    exclude_ids: Iterable[int] = [],
+    exclude_me: bool = True,
+    exclude_deaf: bool = True,
+) -> int:
+    """
+    Counts the number of members in given voice channel.
+    By default it excludes all deaf users, all bots, and the MusicBot client itself.
+
+    :param: voice_channel:  A VoiceChannel to inspect.
+    :param: include_only:  A list of Member IDs to check for, only members in this list are counted if present.
+    :param: include_bots:  A list of Bot Member IDs to include.  By default all bots are excluded.
+    :param: exclude_ids:  A list of Member IDs to exclude from the count.
+    :param: exclude_me:  A switch to, by default, exclude the bot ClientUser.
+    :param: exclude_deaf:  A switch to, by default, exclude members who are deaf.
+    """
+    num_voice = 0
+    log.noise(  # type: ignore[attr-defined]
+        f"Channel Count Pre-Filter:  {len(voice_channel.members)}"
+    )
+    for member in voice_channel.members:
+        if not member:
+            continue
+
+        if member.bot and member.id not in include_bots:
+            continue
+
+        if exclude_me and member == voice_channel.guild.me:
+            continue
+
+        if exclude_ids and member.id in exclude_ids:
+            continue
+
+        voice = member.voice
+        if not voice:
+            continue
+
+        if exclude_deaf and (voice.deaf or voice.self_deaf):
+            continue
+
+        if include_only and member.id not in include_only:
+            continue
+
+        num_voice += 1
+    log.noise(f"Channel Count Post-Filter:  {num_voice}")  # type: ignore[attr-defined]
+    return num_voice
+
+
 def format_song_duration(time_delta: str) -> str:
     """Conditionally remove hour component of timedelta string if it is 0."""
     duration_array = time_delta.split(":")
-    return (
-        time_delta
-        if int(duration_array[0]) > 0
-        else ":".join(duration_array[1:])
-    )
+    return time_delta if int(duration_array[0]) > 0 else ":".join(duration_array[1:])
 
 
 def format_size_from_bytes(size_bytes: int) -> str:

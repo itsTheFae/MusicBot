@@ -25,7 +25,7 @@ class Json:
                 parsed = {}
         return parsed
 
-    def get(self, item: str , fallback: Any = None) -> Any:
+    def get(self, item: str, fallback: Any = None) -> Any:
         """Gets an item from a JSON file"""
         try:
             data = self.data[item]

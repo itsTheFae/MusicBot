@@ -4,6 +4,7 @@ import hashlib
 import pathlib
 import logging
 import functools
+import datetime
 import yt_dlp as youtube_dl  # type: ignore[import-untyped]
 
 from collections import UserDict
@@ -161,7 +162,7 @@ class Downloader:
             if field in data:
                 data[field] = redacted_str
 
-        if log.getEffectiveLevel() <= logging.NOISY:  # type: ignore[attr-defined]
+        if log.getEffectiveLevel() <= logging.EVERYTHING:  # type: ignore[attr-defined]
             log.noise(f"Sanitized YTDL Extraction Info:\n{pformat(data)}")  # type: ignore[attr-defined]
         else:
             log.debug(f"Sanitized YTDL Extraction Info:  {data}")
@@ -595,6 +596,15 @@ class YtdlpResponseDict(UserDict[str, Any]):
                 exc_info=True,
             )
             return 0.0
+
+    @property
+    def duration_td(self) -> datetime.timedelta:
+        """
+        Returns duration as a datetime.timedelta object.
+        May contain 0 seconds duration.
+        Partial seconds are rounded away.
+        """
+        return datetime.timedelta(seconds=round(self.duration))
 
     @property
     def is_live(self) -> bool:

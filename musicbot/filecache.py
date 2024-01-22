@@ -13,6 +13,7 @@ from .utils import format_size_from_bytes
 
 if TYPE_CHECKING:
     from .bot import MusicBot
+    from .config import Config
     from .entry import BasePlaylistEntry, URLPlaylistEntry, StreamPlaylistEntry
 
 log = logging.getLogger(__name__)
@@ -24,16 +25,16 @@ class AudioFileCache:
     """
 
     def __init__(self, bot: "MusicBot") -> None:
-        self.bot = bot
-        self.config = bot.config
-        self.cache_path = pathlib.Path(bot.config.audio_cache_path)
+        self.bot: "MusicBot" = bot
+        self.config: "Config" = bot.config
+        self.cache_path: pathlib.Path = bot.config.audio_cache_path
 
         self.size_bytes: int = 0
         self.file_count: int = 0
 
         # Stores filenames without extension associated to a playlist URL.
         self.auto_playlist_cachemap: Dict[str, str] = {}
-        self.cachemap_file_lock = asyncio.Lock()
+        self.cachemap_file_lock: asyncio.Lock = asyncio.Lock()
 
     @property
     def folder(self) -> pathlib.Path:
