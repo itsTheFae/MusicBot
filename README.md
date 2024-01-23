@@ -35,7 +35,6 @@ Here is a list of changes made so far, with most recent first:
   - Fixes possible issues with counting members in channel not respecting bot exceptions.
   - Updates ConfigParser to provide extra parser methods rather than relying on validation later.
   - Updates Permissions to also use extended ConfigParser methods, for consistency.
-  - Updates to requirements.txt to use certifi only on windows.
   - Adds requirements.dev.txt for all the bells and whistles, mostly for devs.
   - Refactored the decorator methods to live in utils.py or be removed.
 - Complete overhaul of ytdl information extraction and several player commands, performance focused.  
