@@ -352,6 +352,7 @@ class MusicBot(discord.Client):
             await self.safe_delete_message(message, quiet=True)
 
     async def _check_ignore_non_voice(self, msg: discord.Message) -> bool:
+        """Check used by on_message to determine if caller is in a VoiceChannel."""
         if msg.guild and msg.guild.me.voice:
             vc = msg.guild.me.voice.channel
         else:
@@ -465,6 +466,8 @@ class MusicBot(discord.Client):
         if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
             raise AttributeError("Channel passed must be a voice channel")
 
+        # TODO: await for ready here
+
         # check for and return bots VoiceClient if we already have one.
         vc = channel.guild.voice_client
         if vc and isinstance(vc, discord.VoiceClient):
@@ -483,7 +486,7 @@ class MusicBot(discord.Client):
                         self_mute=False,
                         self_deaf=self.config.self_deafen,
                     )
-                except Exception as e:
+                except Exception:
                     log.exception("Something broke in StageChannel handling.")
             else:
                 await channel.guild.change_voice_state(
@@ -523,6 +526,7 @@ class MusicBot(discord.Client):
                 )
 
     def get_player_in(self, guild: discord.Guild) -> Optional[MusicPlayer]:
+        """Get a MusicPlayer in the given guild, but do not create a new player."""
         return self.players.get(guild.id)
 
     async def get_player(
@@ -532,6 +536,7 @@ class MusicBot(discord.Client):
         *,
         deserialize: bool = False,
     ) -> MusicPlayer:
+        """Get a MusicPlayer in the given guild, creating one if needed."""
         guild = channel.guild
 
         async with self.aiolocks[_func_() + ":" + str(guild.id)]:
@@ -5009,6 +5014,7 @@ class MusicBot(discord.Client):
             else:
                 return  # if I want to log this I just move it under the prefix check
 
+        # check for user id in blacklist.
         if (
             # TODO: fix this when blacklist(s) get updated
             str(message.author.id) in self.blacklist
@@ -5055,9 +5061,25 @@ class MusicBot(discord.Client):
             if params.pop("guild", None):
                 handler_kwargs["guild"] = message.guild
 
+            # this is the player-required arg, it prompts to be summoned if not already in voice.
             if params.pop("player", None):
-                handler_kwargs["player"] = await self.get_player(message.channel)
+                # however, it needs a voice channel to connect to.
+                if (
+                    isinstance(message.author, discord.Member)
+                    and message.author.voice
+                    and message.author.voice.channel
+                ):
+                    handler_kwargs["player"] = await self.get_player(
+                        message.author.voice.channel
+                    )
+                else:
+                    # TODO: enable ignore-non-voice commands to work here
+                    # by looking for the first available VC if author has none.
+                    raise exceptions.CommandError(
+                        "This command requires you to be in a Voice channel."
+                    )
 
+            # this is the optional-player arg.
             if params.pop("_player", None):
                 handler_kwargs["_player"] = self.get_player_in(message.guild)
 
@@ -5163,26 +5185,35 @@ class MusicBot(discord.Client):
                     content = self._gen_embed()
                     content.title = command
                     content.description = response.content
-                else:
-                    content = response.content
 
-                if response.reply:
-                    if isinstance(content, discord.Embed):
+                    if response.reply:
                         content.description = "{} {}".format(
                             message.author.mention,
                             content.description,
                         )
-                    else:
-                        content = "{}: {}".format(message.author.mention, content)
 
-                sentmsg = await self.safe_send_message(
-                    message.channel,
-                    content,
-                    expire_in=response.delete_after
-                    if self.config.delete_messages
-                    else 0,
-                    also_delete=message if self.config.delete_invoking else None,
-                )
+                    sentmsg = await self.safe_send_message(
+                        message.channel,
+                        content,
+                        expire_in=response.delete_after
+                        if self.config.delete_messages
+                        else 0,
+                        also_delete=message if self.config.delete_invoking else None,
+                    )
+
+                else:
+                    contents = response.content
+                    if response.reply:
+                        contents = "{}: {}".format(message.author.mention, contents)
+
+                    sentmsg = await self.safe_send_message(
+                        message.channel,
+                        contents,
+                        expire_in=response.delete_after
+                        if self.config.delete_messages
+                        else 0,
+                        also_delete=message if self.config.delete_invoking else None,
+                    )
 
         except (
             exceptions.CommandError,
@@ -5200,13 +5231,21 @@ class MusicBot(discord.Client):
             if self.config.embeds:
                 content = self._gen_embed()
                 content.add_field(name="Error", value=e.message, inline=False)
-                content.colour = 13369344
-            else:
-                content = "```\n{}\n```".format(e.message)
+                content.colour = discord.Colour(13369344)
 
-            await self.safe_send_message(
-                message.channel, content, expire_in=expirein, also_delete=alsodelete
-            )
+                await self.safe_send_message(
+                    message.channel, content, expire_in=expirein, also_delete=alsodelete
+                )
+
+            else:
+                contents = "```\n{}\n```".format(e.message)
+
+                await self.safe_send_message(
+                    message.channel,
+                    contents,
+                    expire_in=expirein,
+                    also_delete=alsodelete,
+                )
 
         except exceptions.Signal:
             raise
@@ -5342,7 +5381,7 @@ class MusicBot(discord.Client):
                         event.set()
 
         if (
-            member == self.user and not after.channel
+            member == self.user and not after.channel and before.channel
         ):  # if bot was disconnected from channel
             await self.disconnect_voice_client(before.channel.guild)
             return
@@ -5358,20 +5397,25 @@ class MusicBot(discord.Client):
 
     async def on_guild_join(self, guild: discord.Guild) -> None:
         log.info("Bot has been added to guild: {}".format(guild.name))
-        owner = self._get_owner(voice=True) or self._get_owner()
+
+        # Leave guilds if the owner is not a member and configured to do so.
         if self.config.leavenonowners:
-            check = guild.get_member(owner.id)
-            if check is None:
-                await guild.leave()
-                log.info("Left {} due to bot owner not found.".format(guild.name))
-                await owner.send(
-                    self.str.get(
-                        "left-no-owner-guilds",
-                        "Left `{}` due to bot owner not being found in it.".format(
-                            guild.name
-                        ),
+            # Get the owner so we can notify them of the leave via DM.
+            owner = self._get_owner(voice=True) or self._get_owner()
+            if owner:
+                # check for the owner in the guild.
+                check = guild.get_member(owner.id)
+                if check is None:
+                    await guild.leave()
+                    log.info("Left {} due to bot owner not found.".format(guild.name))
+                    await owner.send(
+                        self.str.get(
+                            "left-no-owner-guilds",
+                            "Left `{}` due to bot owner not being found in it.".format(
+                                guild.name
+                            ),
+                        )
                     )
-                )
 
         log.debug("Creating data folder for guild %s", guild.id)
         pathlib.Path("data/%s/" % guild.id).mkdir(exist_ok=True)
@@ -5379,7 +5423,8 @@ class MusicBot(discord.Client):
     async def on_guild_remove(self, guild: discord.Guild) -> None:
         log.info("Bot has been removed from guild: {}".format(guild.name))
         log.debug("Updated guild list:")
-        [log.debug(" - " + s.name) for s in self.guilds]
+        for s in self.guilds:
+            log.debug(f" - {s.name}")
 
         if guild.id in self.players:
             self.players.pop(guild.id).kill()
@@ -5421,7 +5466,8 @@ class MusicBot(discord.Client):
         self, before: discord.Guild, after: discord.Guild
     ) -> None:
         log.info(f"Guild update for:  {before}")
-        for name in set(before.__slotnames__):
+        # TODO: replace this with utils.objdiff() or remove both
+        for name in set(getattr(before, "__slotnames__")):
             a_val = getattr(after, name, None)
             b_val = getattr(before, name, None)
             if b_val != a_val:
@@ -5433,7 +5479,8 @@ class MusicBot(discord.Client):
         self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel
     ) -> None:
         log.info(f"Channel update for:  {before}")
-        for name in set(before.__slotnames__):
+        # TODO: replace this with objdiff() or remove both.
+        for name in set(getattr(before, "__slotnames__")):
             a_val = getattr(after, name, None)
             b_val = getattr(before, name, None)
             if b_val != a_val:
