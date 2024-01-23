@@ -350,7 +350,7 @@ class Downloader:
         )
 
 
-class YtdlpResponseDict(UserDict[str, Any]):
+class YtdlpResponseDict(YUserDict):
     """
     UserDict wrapper for ytdlp extraction data with helpers for easier data reuse.
 
