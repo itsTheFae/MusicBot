@@ -72,6 +72,25 @@ def setup_loggers() -> None:
         log.debug("Skipping logger setup, already set up")
         return
 
+    # Do some pre-flight checking...
+    log_file = pathlib.Path(DEFAULT_MUSICBOT_LOG_FILE)
+    if not log_file.parent.is_dir():
+        try:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            raise RuntimeError(
+                f"Cannot create log file directory due to an error:\n{str(e)}"
+            ) from e
+
+    if not log_file.is_file():
+        try:
+            log_file.touch(exist_ok=True)
+        except Exception as e:
+            raise RuntimeError(
+                f"Cannot create log file due to an error:\n{str(e)}"
+            ) from e
+
+    # logging checks done, we should be able to take off.
     _add_logger_level("EVERYTHING", 1)
     _add_logger_level("NOISY", 4, func_name="noise")
     _add_logger_level("FFMPEG", 5)
@@ -82,9 +101,13 @@ def setup_loggers() -> None:
     logger.setLevel(logging.EVERYTHING)  # type: ignore[attr-defined]
 
     # Setup logging to file for musicbot.
-    fhandler = logging.FileHandler(
-        filename=DEFAULT_MUSICBOT_LOG_FILE, encoding="utf-8", mode="w"
-    )
+    try:
+        fhandler = logging.FileHandler(filename=log_file, encoding="utf-8", mode="w")
+    except Exception as e:
+        raise RuntimeError(
+            f"Could not create or use the log file due to an error:\n{str(e)}"
+        ) from e
+
     fhandler.setFormatter(
         logging.Formatter(
             "[{asctime}] {levelname} - {name} | "
