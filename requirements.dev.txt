@@ -7,3 +7,7 @@ cffi --only-binary all; sys_platform == 'win32'
 certifi; sys_platform == 'win32'
 objgraph
 pymediainfo  # included for coverage, could be removed later.
+flake8
+flake8-type-checking
+black
+mypy

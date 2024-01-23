@@ -30,6 +30,14 @@ Cherry-picking (or otherwise copying) is welcome should you feel inclined.
 Here is a list of changes made so far, with most recent first:
 
 - Ensure source code complies with mypy checks, and fix various bugs on the way. *[ongoing]*
+  - Updates MusicBot logging to enable time-based log files and safely close the logs in most cases.
+  - Removes `shlex` from the `search` command, search engines now handle quotes directly.
+  - Fixes possible issues with counting members in channel not respecting bot exceptions.
+  - Updates ConfigParser to provide extra parser methods rather than relying on validation later.
+  - Updates Permissions to also use extended ConfigParser methods, for consistency.
+  - Updates to requirements.txt to use certifi only on windows.
+  - Adds requirements.dev.txt for all the bells and whistles, mostly for devs.
+  - Refactored the decorator methods to live in utils.py or be removed.
 - Complete overhaul of ytdl information extraction and several player commands, performance focused.  
   - Updates `shuffleplay` to shuffle playlist entries before they are queued.
   - Adds playlist name and other details to `pldump` generated files.
