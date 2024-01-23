@@ -22,6 +22,11 @@ from .utils import get_headers
 if TYPE_CHECKING:
     from .bot import MusicBot
 
+    # Excplicit compat with python 3.8
+    YUserDict = UserDict[str, Any]
+else:
+    YUserDict = UserDict
+
 
 log = logging.getLogger(__name__)
 

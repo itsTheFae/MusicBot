@@ -19,6 +19,12 @@ if TYPE_CHECKING:
     from .filecache import AudioFileCache
     from .downloader import Downloader
 
+    # Excplicit compat with python 3.8
+    AsyncFuture = asyncio.Future[Any]
+else:
+    AsyncFuture = asyncio.Future
+
+
 log = logging.getLogger(__name__)
 
 # optionally using pymediainfo instead of ffprobe if presents
@@ -36,7 +42,7 @@ class BasePlaylistEntry(Serializable):
         self.cache_busted: bool = False
         self._is_downloading: bool = False
         self._is_downloaded: bool = False
-        self._waiting_futures: List[asyncio.Future[Any]] = []
+        self._waiting_futures: List[AsyncFuture] = []
 
     @property
     def url(self) -> str:
@@ -60,13 +66,13 @@ class BasePlaylistEntry(Serializable):
     async def _download(self) -> None:
         raise NotImplementedError
 
-    def get_ready_future(self) -> asyncio.Future[Any]:
+    def get_ready_future(self) -> AsyncFuture:
         """
         Returns a future that will fire when the song is ready to be played.
         The future will either fire with the result (being the entry) or an exception
         as to why the song download failed.
         """
-        future = asyncio.Future()  # type: asyncio.Future[Any]
+        future = asyncio.Future()  # type: AsyncFuture
         if self.is_downloaded:
             # In the event that we're downloaded, we're already ready for playback.
             future.set_result(self)

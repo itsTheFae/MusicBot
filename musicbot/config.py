@@ -422,7 +422,12 @@ class Config:
         if not self.config_file.is_file():
             ini_file = self.config_file.with_suffix(".ini")
             if ini_file.is_file():
-                shutil.move(ini_file, self.config_file)
+                # Excplicit compat with python 3.8
+                if sys.version_info >= (3, 9):
+                    shutil.move(ini_file, self.config_file)
+                else:
+                    # shutil.move in 3.8 expects str and not path-like.
+                    shutil.move(str(ini_file), str(self.config_file))
                 log.info(
                     "Moving {0} to {1}, you should probably turn file extensions on.".format(
                         ini_file, self.config_file
