@@ -11,6 +11,7 @@ import subprocess
 
 from shutil import disk_usage, rmtree
 from base64 import b64decode
+from typing import Any, Union
 
 from musicbot.constants import VERSION as BOTVERSION
 from musicbot.utils import setup_loggers, shutdown_loggers, rotate_log_files
@@ -37,18 +38,18 @@ log.info(f"Log opened:  {time.ctime()}")
 
 class GIT(object):
     @classmethod
-    def works(cls):
+    def works(cls) -> bool:
         try:
             return bool(subprocess.check_output("git --version", shell=True))
         except Exception:
             return False
 
     @classmethod
-    def run_upgrade_pull(cls):
+    def run_upgrade_pull(cls) -> None:
         log.info("Attempting to upgrade with `git pull` on current path.")
         try:
-            git_data = subprocess.check_output("git pull", shell=True)
-            git_data = git_data.decode("utf8").strip()
+            raw_data = subprocess.check_output("git pull", shell=True)
+            git_data = raw_data.decode("utf8").strip()
             log.info(f"Result of git pull:  {git_data}")
         except Exception:
             log.exception("Upgrade failed, you need to run `git pull` manually.")
@@ -56,7 +57,7 @@ class GIT(object):
 
 class PIP(object):
     @classmethod
-    def run(cls, command, check_output=False):
+    def run(cls, command: str, check_output: bool = False) -> Union[bytes, int]:
         if not cls.works():
             raise RuntimeError("Could not import pip.")
 
@@ -65,54 +66,25 @@ class PIP(object):
         except subprocess.CalledProcessError as e:
             return e.returncode
         except Exception:
-            traceback.print_exc()
-            print("Error using -m method")
+            log.exception("Error using -m method")
+        return 0
 
     @classmethod
-    def run_python_m(cls, *args, **kwargs):
+    def run_python_m(cls, *args: Any, **kwargs: Any) -> Union[bytes, int]:
         check_output = kwargs.pop("check_output", False)
-        check = subprocess.check_output if check_output else subprocess.check_call
-        return check([sys.executable, "-m", "pip"] + list(args))
-
-    @classmethod
-    def run_pip_main(cls, *args, **kwargs):
-        import pip
-
-        args = list(args)
-        check_output = kwargs.pop("check_output", False)
-
         if check_output:
-            from io import StringIO
-
-            out = StringIO()
-            sys.stdout = out
-
-            try:
-                pip.main(args)
-            except Exception:
-                traceback.print_exc()
-            finally:
-                sys.stdout = sys.__stdout__
-
-                out.seek(0)
-                pipdata = out.read()
-                out.close()
-
-                print(pipdata)
-                return pipdata
+            return subprocess.check_output([sys.executable, "-m", "pip"] + list(args))
         else:
-            return pip.main(args)
+            return subprocess.check_call([sys.executable, "-m", "pip"] + list(args))
 
     @classmethod
-    def run_install(cls, cmd, quiet=False, check_output=False):
+    def run_install(
+        cls, cmd: str, quiet: bool = False, check_output: bool = False
+    ) -> Union[bytes, int]:
         return cls.run("install %s%s" % ("-q " if quiet else "", cmd), check_output)
 
     @classmethod
-    def run_show(cls, cmd, check_output=False):
-        return cls.run("show %s" % cmd, check_output)
-
-    @classmethod
-    def works(cls):
+    def works(cls) -> bool:
         try:
             import pip  # noqa: F401
 
@@ -121,41 +93,14 @@ class PIP(object):
             return False
 
     @classmethod
-    def get_module_version(cls, mod):
-        try:
-            out = cls.run_show(mod, check_output=True)
-
-            if isinstance(out, bytes):
-                out = out.decode()
-
-            datas = out.replace("\r\n", "\n").split("\n")
-            expectedversion = datas[3]
-
-            if expectedversion.startswith("Version: "):
-                return expectedversion.split()[1]
-            else:
-                return [x.split()[1] for x in datas if x.startswith("Version: ")][0]
-        except Exception:
-            pass
-
-    @classmethod
-    def get_requirements(cls, file="requirements.txt"):
-        try:  # for pip >= 10
-            from pip._internal.req import parse_requirements
-        except ImportError:  # for pip <= 9.0.3
-            from pip.req import parse_requirements
-
-        return list(parse_requirements(file))
-
-    @classmethod
-    def run_upgrade_requirements(cls):
+    def run_upgrade_requirements(cls) -> None:
         log.info(
             "Attempting to upgrade with `pip install --upgrade -r requirements.txt` on current path."
         )
         cmd = [sys.executable] + "-m pip install --upgrade -r requirements.txt".split()
         try:
-            pip_data = subprocess.check_output(cmd)
-            pip_data = pip_data.decode("utf8").strip()
+            raw_data = subprocess.check_output(cmd)
+            pip_data = raw_data.decode("utf8").strip()
             log.info(f"Result of pip upgrade:  {pip_data}")
         except Exception:
             log.exception(
@@ -163,19 +108,16 @@ class PIP(object):
             )
 
 
-def bugger_off(msg="Press enter to continue . . .", code=1):
+def bugger_off(msg: str = "Press enter to continue . . .", code: int = 1) -> None:
     input(msg)
     sys.exit(code)
 
 
-def sanity_checks(optional=True):
+def sanity_checks(optional: bool = True) -> None:
     log.info("Starting sanity checks")
     """Required Checks"""
     # Make sure we're on Python 3.8+
     req_ensure_py3()
-
-    # Fix windows encoding fuckery
-    req_ensure_encoding()
 
     # Make sure we're in a writeable env
     req_ensure_env()
@@ -198,7 +140,7 @@ def sanity_checks(optional=True):
     log.info("Optional checks passed.")
 
 
-def req_ensure_py3():
+def req_ensure_py3() -> None:
     log.info("Checking for Python 3.8+")
 
     if sys.version_info < (3, 8):
@@ -250,7 +192,7 @@ def req_ensure_py3():
         bugger_off()
 
 
-def req_check_deps():
+def req_check_deps() -> None:
     try:
         import discord
 
@@ -266,30 +208,7 @@ def req_check_deps():
         pass
 
 
-def req_ensure_encoding():
-    log.info("Checking console encoding")
-
-    if (
-        sys.platform.startswith("win")
-        or sys.stdout.encoding.replace("-", "").lower() != "utf8"
-    ):
-        log.info("Setting console encoding to UTF-8")
-
-        import io
-
-        sys.stdout = io.TextIOWrapper(
-            sys.stdout.detach(), encoding="utf8", line_buffering=True
-        )
-        # only slightly evil
-        # TODO: windows testing, is this needed?  Find a better way.
-        # sys.__stdout__ = sh.stream = sys.stdout
-
-        if os.environ.get("PYCHARM_HOSTED", None) not in (None, "0"):
-            log.info("Enabling colors in pycharm pseudoconsole")
-            sys.stdout.isatty = lambda: True
-
-
-def req_ensure_env():
+def req_ensure_env() -> None:
     log.info("Ensuring we're in the right environment")
 
     if os.environ.get("APP_ENV") != "docker" and not os.path.isdir(
@@ -329,12 +248,12 @@ def req_ensure_env():
         sys.path.append(os.path.abspath("bin/"))  # might as well
 
 
-def req_ensure_folders():
+def req_ensure_folders() -> None:
     pathlib.Path("logs").mkdir(exist_ok=True)
     pathlib.Path("data").mkdir(exist_ok=True)
 
 
-def opt_check_disk_space(warnlimit_mb=200):
+def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
     if disk_usage(".").free < warnlimit_mb * 1024 * 2:
         log.warning(
             "Less than %sMB of free space remains on this device" % warnlimit_mb
@@ -344,7 +263,7 @@ def opt_check_disk_space(warnlimit_mb=200):
 #################################################
 
 
-def respawn_bot_process(pybin=None):
+def respawn_bot_process(pybin: str = "") -> None:
     if not pybin:
         pybin = os.path.basename(sys.executable)
     exec_args = [pybin] + sys.argv
@@ -363,7 +282,8 @@ def respawn_bot_process(pybin=None):
         # The moment we end this instance of the process, control is returned to the starting shell.
         subprocess.Popen(
             exec_args,
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
+            # creationflags is only available under windows, so mypy may complain here.
+            creationflags=subprocess.CREATE_NEW_CONSOLE,  # type: ignore[attr-defined]
         )
         sys.exit(0)
     else:
@@ -373,13 +293,13 @@ def respawn_bot_process(pybin=None):
         os.execlp(exec_args[0], *exec_args)
 
 
-async def main():
+async def main() -> Union[RestartSignal, TerminateSignal, None]:
     # TODO: *actual* argparsing
 
     if "--no-checks" not in sys.argv:
         sanity_checks()
 
-    exit_signal = None
+    exit_signal: Union[RestartSignal, TerminateSignal, None] = None
     tried_requirementstxt = False
     use_certifi = False
     tryagain = True
