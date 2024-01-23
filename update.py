@@ -5,16 +5,16 @@ import subprocess
 import sys
 
 
-def y_n(q):
+def yes_or_no_input(question: str) -> bool:
     while True:
-        ri = input("{} (y/n): ".format(q))
+        ri = input("{} (y/n): ".format(question))
         if ri.lower() in ["yes", "y"]:
             return True
         elif ri.lower() in ["no", "n"]:
             return False
 
 
-def update_deps():
+def update_deps() -> None:
     print("Attempting to update dependencies...")
 
     try:
@@ -32,7 +32,7 @@ def update_deps():
         )
 
 
-def finalize():
+def finalize() -> None:
     try:
         from musicbot.constants import VERSION
 
@@ -45,7 +45,7 @@ def finalize():
     print("Done!")
 
 
-def main():
+def main() -> None:
     print("Starting...")
 
     # Make sure that we're in a Git repository
@@ -68,7 +68,7 @@ def main():
         "git status --porcelain", shell=True, universal_newlines=True
     )
     if sp:
-        oshit = y_n(
+        oshit = yes_or_no_input(
             "You have modified files that are tracked by Git (e.g the bot's source files).\n"
             "Should we try resetting the repo? You will lose local modifications."
         )
@@ -78,7 +78,7 @@ def main():
             except subprocess.CalledProcessError:
                 raise OSError("Could not reset the directory to a clean state.")
         else:
-            wowee = y_n(
+            wowee = yes_or_no_input(
                 "OK, skipping bot update. Do you still want to update dependencies?"
             )
             if wowee:
