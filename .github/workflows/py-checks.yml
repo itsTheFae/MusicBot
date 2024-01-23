@@ -30,4 +30,4 @@ jobs:
         python -m flake8 ./
     - name: Check with MyPy
       run: |
-        mypy --python-version 3.8 --warn-unused-ignores ./run.py
+        mypy --python-version 3.8 --warn-unused-ignores ./*.py
