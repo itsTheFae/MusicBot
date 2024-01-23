@@ -120,9 +120,9 @@ class AudioFileCache:
             log.debug("Audio cache directory has been removed.")
             return True
         except Exception:
-            new_name = self.cache_path.stem + "__"
+            new_name = self.cache_path.parent.joinpath(self.cache_path.stem + "__")
             try:
-                new_path = self.cache_path.rename(self.cache_path.with_stem(new_name))
+                new_path = self.cache_path.rename(new_name)
             except Exception:
                 log.debug("Audio cache directory could not be removed or renamed.")
                 return False
