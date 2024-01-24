@@ -4934,8 +4934,9 @@ class MusicBot(discord.Client):
     async def on_message(self, message: discord.Message) -> None:
         await self.wait_until_ready()
 
-        if not message.channel or not message.guild:
-            raise exceptions.MusicbotException("Something is exceptionally wrong")
+        if not message.channel:
+            log.debug(f"Got a message with no channel, somehow:  {message}")
+            return
 
         command_prefix = self._get_guild_cmd_prefix(message.channel.guild)
         message_content = message.content.strip()
