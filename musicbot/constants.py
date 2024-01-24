@@ -33,6 +33,6 @@ DISCORD_MSG_CHAR_LIMIT: int = 2000
 
 EMOJI_CHECK_MARK_BUTTON: str = "\u2705"
 EMOJI_CROSS_MARK_BUTTON: str = "\u274E"
-EMOJI_IDLE_ICON: str = "\u23FE"  # same as \N{POWER SLEEP SYMBOL}
+EMOJI_IDLE_ICON: str = "\U0001f634"  # same as \N{SLEEPING FACE}
 EMOJI_PLAY_ICON: str = "\u25B6"  # add \uFE0F to make button
 EMOJI_PAUSE_ICON: str = "\u23F8\uFE0F"  # add \uFE0F to make button
