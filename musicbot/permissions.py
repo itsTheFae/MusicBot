@@ -142,7 +142,7 @@ class Permissions:
         if not og:
             raise RuntimeError("Owner permissions group is missing!")
 
-        if "auto" in og.user_list:
+        if 0 in og.user_list:
             log.debug("Fixing automatic owner group")
             og.user_list = {bot.config.owner_id}
 
