@@ -1726,7 +1726,9 @@ class MusicBot(discord.Client):
         )
         return e
 
-    def _get_song_url_or_none(self, url: str, player: MusicPlayer) -> Optional[str]:
+    def _get_song_url_or_none(
+        self, url: str, player: Optional[MusicPlayer]
+    ) -> Optional[str]:
         """Return song url if provided or one is currently playing, else returns None"""
         url_or_none = self.downloader.get_url_or_none(url)
         if url_or_none:
@@ -2055,7 +2057,7 @@ class MusicBot(discord.Client):
             )
 
     async def cmd_autoplaylist(
-        self, _player: MusicPlayer, option: str, opt_url: str = ""
+        self, _player: Optional[MusicPlayer], option: str, opt_url: str = ""
     ) -> CommandResponse:
         """
         Usage:
@@ -2233,7 +2235,7 @@ class MusicBot(discord.Client):
             self.server_specific_data[guild.id]["auto_paused"] = False
 
     async def _do_cmd_unpause_check(
-        self, player: MusicPlayer, channel: MessageableChannel
+        self, player: Optional[MusicPlayer], channel: MessageableChannel
     ) -> None:
         """
         Checks for paused player and resumes it while sending a notice.
@@ -2254,7 +2256,7 @@ class MusicBot(discord.Client):
     async def cmd_play(
         self,
         message: discord.Message,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         channel: MessageableChannel,
         guild: discord.Guild,
         author: discord.Member,
@@ -2292,7 +2294,7 @@ class MusicBot(discord.Client):
     async def cmd_shuffleplay(
         self,
         message: discord.Message,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         channel: MessageableChannel,
         guild: discord.Guild,
         author: discord.Member,
@@ -2331,7 +2333,7 @@ class MusicBot(discord.Client):
     async def cmd_playnext(
         self,
         message: discord.Message,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         channel: MessageableChannel,
         guild: discord.Guild,
         author: discord.Member,
@@ -2635,7 +2637,7 @@ class MusicBot(discord.Client):
     async def _cmd_play(
         self,
         message: discord.Message,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         channel: MessageableChannel,
         guild: discord.Guild,
         author: discord.Member,
@@ -2898,7 +2900,7 @@ class MusicBot(discord.Client):
 
     async def cmd_stream(
         self,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         channel: MessageableChannel,
         guild: discord.Guild,
         author: discord.Member,
@@ -3721,7 +3723,7 @@ class MusicBot(discord.Client):
         author: discord.Member,
         message: discord.Message,
         permissions: PermissionGroup,
-        voice_channel: discord.VoiceChannel,
+        voice_channel: Optional[VoiceableChannel],
         param: str = "",
     ) -> CommandResponse:
         """
@@ -4693,7 +4695,7 @@ class MusicBot(discord.Client):
 
     async def cmd_restart(
         self,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         channel: MessageableChannel,
         leftover_args: List[str],
         opt: str = "soft",
@@ -4897,7 +4899,7 @@ class MusicBot(discord.Client):
 
     @dev_only
     async def cmd_debug(
-        self, message: discord.Message, _player: MusicPlayer, *, data: str
+        self, message: discord.Message, _player: Optional[MusicPlayer], *, data: str
     ) -> CommandResponse:
         codeblock = "```py\n{}\n```"
         result = None
@@ -5000,6 +5002,7 @@ class MusicBot(discord.Client):
 
         if (
             self.config.bound_channels
+            and message.guild
             and message.channel.id not in self.config.bound_channels
         ):
             if self.config.unbound_servers:
@@ -5042,7 +5045,10 @@ class MusicBot(discord.Client):
             ):
                 await self._check_ignore_non_voice(message)
 
-            # TODO: typed object here instead.
+            # TODO: typing here is mostly a suggestion.
+            # a proper solution will require more substantial rework into cogs. Later.
+
+            # populate the existing command signature args.
             handler_kwargs: Dict[str, Any] = {}
             if params.pop("message", None):
                 handler_kwargs["message"] = message
@@ -5057,10 +5063,12 @@ class MusicBot(discord.Client):
                 handler_kwargs["guild"] = message.guild
 
             # this is the player-required arg, it prompts to be summoned if not already in voice.
+            # or otherwise denies use if non-guild voice is used.
             if params.pop("player", None):
                 # however, it needs a voice channel to connect to.
                 if (
                     isinstance(message.author, discord.Member)
+                    and message.guild
                     and message.author.voice
                     and message.author.voice.channel
                 ):
@@ -5071,30 +5079,46 @@ class MusicBot(discord.Client):
                     # TODO: enable ignore-non-voice commands to work here
                     # by looking for the first available VC if author has none.
                     raise exceptions.CommandError(
-                        "This command requires you to be in a Voice channel."
+                        "This command requires you to be in a Guild Voice channel."
                     )
 
             # this is the optional-player arg.
             if params.pop("_player", None):
-                handler_kwargs["_player"] = self.get_player_in(message.guild)
+                if message.guild:
+                    handler_kwargs["_player"] = self.get_player_in(message.guild)
+                else:
+                    handler_kwargs["_player"] = None
 
             if params.pop("permissions", None):
                 handler_kwargs["permissions"] = user_permissions
 
+            # this arg only works in guilds.
             if params.pop("user_mentions", None):
-                handler_kwargs["user_mentions"] = list(
-                    map(message.guild.get_member, message.raw_mentions)
-                )
+                if message.guild:
+                    handler_kwargs["user_mentions"] = list(
+                        map(message.guild.get_member, message.raw_mentions)
+                    )
+                else:
+                    handler_kwargs["user_mentions"] = []
 
+            # this arg only works in guilds.
             if params.pop("channel_mentions", None):
-                handler_kwargs["channel_mentions"] = list(
-                    map(message.guild.get_channel, message.raw_channel_mentions)
-                )
+                if message.guild:
+                    handler_kwargs["channel_mentions"] = list(
+                        map(message.guild.get_channel, message.raw_channel_mentions)
+                    )
+                else:
+                    handler_kwargs["channel_mentions"] = []
 
             if params.pop("voice_channel", None):
-                handler_kwargs["voice_channel"] = (
-                    message.guild.me.voice.channel if message.guild.me.voice else None
-                )
+                if message.guild:
+                    handler_kwargs["voice_channel"] = (
+                        message.guild.me.voice.channel
+                        if message.guild.me.voice
+                        else None
+                    )
+                else:
+                    handler_kwargs["voice_channel"] = None
 
             if params.pop("leftover_args", None):
                 handler_kwargs["leftover_args"] = args
@@ -5103,6 +5127,7 @@ class MusicBot(discord.Client):
             for key, param in list(params.items()):
                 # parse (*args) as a list of args
                 if param.kind == param.VAR_POSITIONAL:
+                    log.debug(f"parsed key: {key} as list of args positional.")
                     handler_kwargs[key] = args
                     params.pop(key)
                     continue
@@ -5110,6 +5135,7 @@ class MusicBot(discord.Client):
                 # parse (*, args) as args rejoined as a string
                 # multiple of these arguments will have the same value
                 if param.kind == param.KEYWORD_ONLY and param.default == param.empty:
+                    log.debug(f"parsed key as rejoined args: {key}")
                     handler_kwargs[key] = " ".join(args)
                     params.pop(key)
                     continue
@@ -5123,11 +5149,13 @@ class MusicBot(discord.Client):
 
                 # Ignore keyword args with default values when the command had no arguments
                 if not args and param.default is not param.empty:
+                    log.debug(f"ignored key {key} with a default value.")
                     params.pop(key)
                     continue
 
                 # Assign given values to positional arguments
                 if args:
+                    log.debug(f"arg '{key}' give an args value.")
                     arg_value = args.pop(0)
                     handler_kwargs[key] = arg_value
                     params.pop(key)
