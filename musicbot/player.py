@@ -10,8 +10,7 @@ from enum import Enum
 from threading import Thread
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from discord import (AudioSource, FFmpegPCMAudio, PCMVolumeTransformer,
-                     VoiceClient)
+from discord import AudioSource, FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 
 from .constructs import Serializable, Serializer, SkipState
 from .entry import StreamPlaylistEntry, URLPlaylistEntry

@@ -25,8 +25,12 @@ import yt_dlp as youtube_dl  # type: ignore[import-untyped]
 from . import downloader, exceptions
 from .aliases import Aliases, AliasesDefault
 from .config import Config, ConfigDefaults
-from .constants import (DISCORD_MSG_CHAR_LIMIT, EMOJI_CHECK_MARK_BUTTON,
-                        EMOJI_CROSS_MARK_BUTTON, EMOJI_IDLE_ICON)
+from .constants import (
+    DISCORD_MSG_CHAR_LIMIT,
+    EMOJI_CHECK_MARK_BUTTON,
+    EMOJI_CROSS_MARK_BUTTON,
+    EMOJI_IDLE_ICON,
+)
 from .constants import VERSION as BOTVERSION
 from .constructs import Response
 from .entry import StreamPlaylistEntry, URLPlaylistEntry
@@ -37,11 +41,20 @@ from .permissions import PermissionGroup, Permissions, PermissionsDefaults
 from .player import MusicPlayer
 from .playlist import Playlist
 from .spotify import Spotify
-from .utils import (_func_, count_members_in_voice, dev_only,
-                    format_size_from_bytes, format_song_duration,
-                    is_empty_voice_channel, load_file,
-                    muffle_discord_console_log, mute_discord_console_log,
-                    owner_only, slugify, write_file)
+from .utils import (
+    _func_,
+    count_members_in_voice,
+    dev_only,
+    format_size_from_bytes,
+    format_song_duration,
+    is_empty_voice_channel,
+    load_file,
+    muffle_discord_console_log,
+    mute_discord_console_log,
+    owner_only,
+    slugify,
+    write_file,
+)
 
 # Type aliases
 ExitSignals = Union[None, exceptions.RestartSignal, exceptions.TerminateSignal]

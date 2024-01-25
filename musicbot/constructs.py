@@ -2,8 +2,7 @@ import inspect
 import json
 import logging
 import pydoc
-from typing import (TYPE_CHECKING, Any, Callable, Dict, Optional, Set, Type,
-                    Union)
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Set, Type, Union
 
 from .utils import _get_variable
 

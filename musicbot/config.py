@@ -7,13 +7,18 @@ import shutil
 import sys
 from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, Union
 
-from .constants import (BUNDLED_AUTOPLAYLIST_FILE, DEFAULT_AUDIO_CACHE_PATH,
-                        DEFAULT_AUTOPLAYLIST_FILE, DEFAULT_BLACKLIST_FILE,
-                        DEFAULT_FOOTER_TEXT, DEFAULT_I18N_FILE,
-                        DEFAULT_OPTIONS_FILE, EXAMPLE_OPTIONS_FILE)
+from .constants import (
+    BUNDLED_AUTOPLAYLIST_FILE,
+    DEFAULT_AUDIO_CACHE_PATH,
+    DEFAULT_AUTOPLAYLIST_FILE,
+    DEFAULT_BLACKLIST_FILE,
+    DEFAULT_FOOTER_TEXT,
+    DEFAULT_I18N_FILE,
+    DEFAULT_OPTIONS_FILE,
+    EXAMPLE_OPTIONS_FILE,
+)
 from .exceptions import HelpfulError
-from .utils import (format_size_to_bytes, format_time_to_seconds,
-                    set_logging_level)
+from .utils import format_size_to_bytes, format_time_to_seconds, set_logging_level
 
 if TYPE_CHECKING:
     from .bot import MusicBot

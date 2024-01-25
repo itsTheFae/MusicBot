@@ -3,8 +3,17 @@ import logging
 from collections import deque
 from itertools import islice
 from random import shuffle
-from typing import (TYPE_CHECKING, Any, Deque, Dict, Iterator, List, Optional,
-                    Tuple, Union)
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Deque,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from .constructs import Serializable
 from .entry import StreamPlaylistEntry, URLPlaylistEntry

@@ -7,14 +7,26 @@ import re
 import sys
 import unicodedata
 from functools import wraps
-from typing import (TYPE_CHECKING, Any, Callable, Dict, Iterable, List,
-                    Optional, Set, Union)
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Union,
+)
 
 import aiohttp
 import colorlog
 
-from .constants import (DEFAULT_DISCORD_LOG_FILE, DEFAULT_MUSICBOT_LOG_FILE,
-                        DISCORD_MSG_CHAR_LIMIT)
+from .constants import (
+    DEFAULT_DISCORD_LOG_FILE,
+    DEFAULT_MUSICBOT_LOG_FILE,
+    DISCORD_MSG_CHAR_LIMIT,
+)
 from .exceptions import PermissionsError
 
 if TYPE_CHECKING:
