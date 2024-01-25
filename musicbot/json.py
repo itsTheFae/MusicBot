@@ -1,6 +1,6 @@
 import json
-import pathlib
 import logging
+import pathlib
 from typing import Any, Dict
 
 log = logging.getLogger(__name__)

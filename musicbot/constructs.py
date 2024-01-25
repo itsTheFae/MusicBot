@@ -2,12 +2,13 @@ import inspect
 import json
 import logging
 import pydoc
-from typing import TYPE_CHECKING, Any, Union, Optional, Callable, Type, Dict, Set
+from typing import (TYPE_CHECKING, Any, Callable, Dict, Optional, Set, Type,
+                    Union)
 
 from .utils import _get_variable
 
 if TYPE_CHECKING:
-    from discord import Message, Embed
+    from discord import Embed, Message
 
 log = logging.getLogger(__name__)
 

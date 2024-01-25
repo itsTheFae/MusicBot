@@ -1,7 +1,7 @@
 import asyncio
-import traceback
 import collections
-from typing import Callable, DefaultDict, List, Any
+import traceback
+from typing import Any, Callable, DefaultDict, List
 
 EventCallback = Callable[..., Any]
 EventList = List[EventCallback]

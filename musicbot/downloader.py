@@ -1,19 +1,21 @@
-import os
 import copy
-import hashlib
-import pathlib
-import logging
-import functools
 import datetime
-import yt_dlp as youtube_dl  # type: ignore[import-untyped]
-
+import functools
+import hashlib
+import logging
+import os
+import pathlib
 from collections import UserDict
 from concurrent.futures import ThreadPoolExecutor
-from types import MappingProxyType
-from typing import TYPE_CHECKING, Optional, Any, List, Dict
 from pprint import pformat
-from yt_dlp.networking.exceptions import NoSupportingHandlers  # type: ignore[import-untyped]
-from yt_dlp.utils import UnsupportedError, DownloadError  # type: ignore[import-untyped]
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
+import yt_dlp as youtube_dl  # type: ignore[import-untyped]
+from yt_dlp.networking.exceptions import \
+    NoSupportingHandlers  # type: ignore[import-untyped]
+from yt_dlp.utils import (DownloadError,  # type: ignore[import-untyped]
+                          UnsupportedError)
 
 from .exceptions import ExtractionError
 from .spotify import Spotify

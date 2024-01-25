@@ -1,36 +1,26 @@
+import datetime
+import glob
+import inspect
+import logging
+import pathlib
 import re
 import sys
-import glob
-import pathlib
-import logging
-import aiohttp
-import inspect
-import colorlog
-import datetime
 import unicodedata
 from functools import wraps
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Iterable,
-    Union,
-    Optional,
-    Any,
-    Set,
-    List,
-    Dict,
-)
+from typing import (TYPE_CHECKING, Any, Callable, Dict, Iterable, List,
+                    Optional, Set, Union)
 
+import aiohttp
+import colorlog
+
+from .constants import (DEFAULT_DISCORD_LOG_FILE, DEFAULT_MUSICBOT_LOG_FILE,
+                        DISCORD_MSG_CHAR_LIMIT)
 from .exceptions import PermissionsError
-from .constants import (
-    DEFAULT_MUSICBOT_LOG_FILE,
-    DEFAULT_DISCORD_LOG_FILE,
-    DISCORD_MSG_CHAR_LIMIT,
-)
 
 if TYPE_CHECKING:
-    from discord import VoiceChannel, StageChannel, Member
+    from discord import Member, StageChannel, VoiceChannel
     from multidict import CIMultiDictProxy
+
     from .bot import MusicBot
 
 log = logging.getLogger(__name__)

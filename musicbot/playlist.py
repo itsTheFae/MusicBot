@@ -3,31 +3,23 @@ import logging
 from collections import deque
 from itertools import islice
 from random import shuffle
-from typing import (
-    TYPE_CHECKING,
-    Union,
-    Optional,
-    Any,
-    Iterator,
-    Deque,
-    Tuple,
-    Dict,
-    List,
-)
+from typing import (TYPE_CHECKING, Any, Deque, Dict, Iterator, List, Optional,
+                    Tuple, Union)
 
 from .constructs import Serializable
-from .exceptions import ExtractionError, WrongEntryTypeError, InvalidDataError
+from .entry import StreamPlaylistEntry, URLPlaylistEntry
+from .exceptions import ExtractionError, InvalidDataError, WrongEntryTypeError
 from .lib.event_emitter import EventEmitter
 
-from .entry import URLPlaylistEntry, StreamPlaylistEntry
-
 if TYPE_CHECKING:
-    from .bot import MusicBot
-    from .player import MusicPlayer
-    from .downloader import YtdlpResponseDict
-    import discord
     import asyncio
+
     import aiohttp
+    import discord
+
+    from .bot import MusicBot
+    from .downloader import YtdlpResponseDict
+    from .player import MusicPlayer
 
 # type aliases
 EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry]

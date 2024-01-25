@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
 
 import asyncio
+import logging
 import os
 import ssl
+import subprocess
 import sys
 import time
-import logging
 import traceback
-import subprocess
-
-from shutil import disk_usage, rmtree
 from base64 import b64decode
+from shutil import disk_usage, rmtree
 from typing import Any, Union
 
 from musicbot.constants import VERSION as BOTVERSION
-from musicbot.utils import setup_loggers, shutdown_loggers, rotate_log_files
-from musicbot.exceptions import (
-    HelpfulError,
-    TerminateSignal,
-    RestartSignal,
-)
+from musicbot.exceptions import HelpfulError, RestartSignal, TerminateSignal
+from musicbot.utils import rotate_log_files, setup_loggers, shutdown_loggers
 
 try:
-    import aiohttp
-    import pathlib
     import importlib.util
+    import pathlib
+
+    import aiohttp
 except ImportError:
     pass
 

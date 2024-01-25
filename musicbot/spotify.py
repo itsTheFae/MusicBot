@@ -1,13 +1,13 @@
-import aiohttp
 import asyncio
 import asyncio.exceptions
 import base64
 import logging
 import re
 import time
-
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
+
+import aiohttp
 
 from .exceptions import SpotifyError
 

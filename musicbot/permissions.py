@@ -1,9 +1,10 @@
-import shutil
-import pathlib
-import logging
 import configparser
+import logging
+import pathlib
+import shutil
+from typing import TYPE_CHECKING, Any, Dict, List, Set, Union
+
 import discord
-from typing import TYPE_CHECKING, Any, Union, Dict, List, Set
 
 from .config import ExtendedConfigParser
 from .constants import DEFAULT_PERMS_FILE, EXAMPLE_PERMS_FILE

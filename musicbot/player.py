@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import asyncio
 import io
 import json
@@ -7,12 +8,13 @@ import os
 import sys
 from enum import Enum
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Union, Optional, List, Dict
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from discord import FFmpegPCMAudio, PCMVolumeTransformer, AudioSource, VoiceClient
+from discord import (AudioSource, FFmpegPCMAudio, PCMVolumeTransformer,
+                     VoiceClient)
 
 from .constructs import Serializable, Serializer, SkipState
-from .entry import URLPlaylistEntry, StreamPlaylistEntry
+from .entry import StreamPlaylistEntry, URLPlaylistEntry
 from .exceptions import FFmpegError, FFmpegWarning
 from .lib.event_emitter import EventEmitter
 

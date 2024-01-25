@@ -1,23 +1,23 @@
-import os
 import asyncio
-import logging
-import re
 import datetime
+import logging
+import os
+import re
 import shutil
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
 from discord.abc import GuildChannel
-from typing import TYPE_CHECKING, Any, List, Dict, Optional, Callable
 from yt_dlp.utils import ContentTooShortError  # type: ignore[import-untyped]
 
 from .constructs import Serializable
+from .downloader import YtdlpResponseDict
 from .exceptions import ExtractionError, InvalidDataError
 from .spotify import Spotify
-from .downloader import YtdlpResponseDict
 
 if TYPE_CHECKING:
-    from .playlist import Playlist
-    from .filecache import AudioFileCache
     from .downloader import Downloader
+    from .filecache import AudioFileCache
+    from .playlist import Playlist
 
     # Excplicit compat with python 3.8
     AsyncFuture = asyncio.Future[Any]

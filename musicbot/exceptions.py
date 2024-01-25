@@ -1,7 +1,7 @@
 import shutil
 import textwrap
-from typing import Optional
 from enum import Enum
+from typing import Optional
 
 
 # Base class for exceptions

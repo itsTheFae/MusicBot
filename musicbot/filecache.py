@@ -6,15 +6,14 @@ import os
 import pathlib
 import shutil
 import time
-
-from typing import TYPE_CHECKING, Union, Dict, Tuple
+from typing import TYPE_CHECKING, Dict, Tuple, Union
 
 from .utils import format_size_from_bytes
 
 if TYPE_CHECKING:
     from .bot import MusicBot
     from .config import Config
-    from .entry import BasePlaylistEntry, URLPlaylistEntry, StreamPlaylistEntry
+    from .entry import BasePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
 
 log = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 import asyncio
-import certifi  # type: ignore[import-untyped, unused-ignore]
 import inspect
 import json
 import logging
@@ -12,50 +11,37 @@ import ssl
 import sys
 import time
 import traceback
-import yt_dlp as youtube_dl  # type: ignore[import-untyped]
 from collections import defaultdict
 from datetime import timedelta
 from io import BytesIO, StringIO
 from textwrap import dedent
-from typing import Any, Dict, DefaultDict, List, Set, Optional, Union
+from typing import Any, DefaultDict, Dict, List, Optional, Set, Union
 
 import aiohttp
+import certifi  # type: ignore[import-untyped, unused-ignore]
 import discord
+import yt_dlp as youtube_dl  # type: ignore[import-untyped]
 
-from . import downloader
-from . import exceptions
+from . import downloader, exceptions
 from .aliases import Aliases, AliasesDefault
 from .config import Config, ConfigDefaults
-from .constants import (
-    DISCORD_MSG_CHAR_LIMIT,
-    EMOJI_CHECK_MARK_BUTTON,
-    EMOJI_CROSS_MARK_BUTTON,
-    EMOJI_IDLE_ICON,
-)
+from .constants import (DISCORD_MSG_CHAR_LIMIT, EMOJI_CHECK_MARK_BUTTON,
+                        EMOJI_CROSS_MARK_BUTTON, EMOJI_IDLE_ICON)
 from .constants import VERSION as BOTVERSION
 from .constructs import Response
-from .entry import URLPlaylistEntry, StreamPlaylistEntry
+from .entry import StreamPlaylistEntry, URLPlaylistEntry
 from .filecache import AudioFileCache
-from .json import Json, I18nJson
+from .json import I18nJson, Json
 from .opus_loader import load_opus_lib
-from .permissions import Permissions, PermissionsDefaults, PermissionGroup
+from .permissions import PermissionGroup, Permissions, PermissionsDefaults
 from .player import MusicPlayer
 from .playlist import Playlist
 from .spotify import Spotify
-from .utils import (
-    muffle_discord_console_log,
-    mute_discord_console_log,
-    load_file,
-    write_file,
-    slugify,
-    _func_,
-    dev_only,
-    owner_only,
-    is_empty_voice_channel,
-    count_members_in_voice,
-    format_song_duration,
-    format_size_from_bytes,
-)
+from .utils import (_func_, count_members_in_voice, dev_only,
+                    format_size_from_bytes, format_song_duration,
+                    is_empty_voice_channel, load_file,
+                    muffle_discord_console_log, mute_discord_console_log,
+                    owner_only, slugify, write_file)
 
 # Type aliases
 ExitSignals = Union[None, exceptions.RestartSignal, exceptions.TerminateSignal]

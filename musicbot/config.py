@@ -1,24 +1,19 @@
+import codecs
+import configparser
+import logging
 import os
 import pathlib
-import sys
-import codecs
 import shutil
-import logging
-import configparser
-from typing import TYPE_CHECKING, Any, Union, Optional, Tuple, List, Set
+import sys
+from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, Union
 
+from .constants import (BUNDLED_AUTOPLAYLIST_FILE, DEFAULT_AUDIO_CACHE_PATH,
+                        DEFAULT_AUTOPLAYLIST_FILE, DEFAULT_BLACKLIST_FILE,
+                        DEFAULT_FOOTER_TEXT, DEFAULT_I18N_FILE,
+                        DEFAULT_OPTIONS_FILE, EXAMPLE_OPTIONS_FILE)
 from .exceptions import HelpfulError
-from .constants import (
-    DEFAULT_FOOTER_TEXT,
-    DEFAULT_OPTIONS_FILE,
-    DEFAULT_I18N_FILE,
-    DEFAULT_BLACKLIST_FILE,
-    DEFAULT_AUDIO_CACHE_PATH,
-    DEFAULT_AUTOPLAYLIST_FILE,
-    BUNDLED_AUTOPLAYLIST_FILE,
-    EXAMPLE_OPTIONS_FILE,
-)
-from .utils import format_size_to_bytes, format_time_to_seconds, set_logging_level
+from .utils import (format_size_to_bytes, format_time_to_seconds,
+                    set_logging_level)
 
 if TYPE_CHECKING:
     from .bot import MusicBot
