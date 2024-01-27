@@ -83,8 +83,9 @@ class HelpfulError(MusicbotException):
         self.solution = solution
         self.preface = preface
         self.footnote = footnote
-        self.expire_in = expire_in
         self._message_fmt = "\n{preface}\n{problem}\n\n{solution}\n\n{footnote}"
+
+        super().__init__(self.message_no_format, expire_in=expire_in)
 
     @property
     def message(self) -> str:
@@ -108,7 +109,8 @@ class HelpfulError(MusicbotException):
     def _pretty_wrap(text: str, pretext: str, *, width: Optional[int] = -1) -> str:
         if width is None:
             return "\n".join((pretext.strip(), text))
-        elif width == -1:
+
+        if width == -1:
             pretext = pretext.rstrip() + "\n"
             width = shutil.get_terminal_size().columns
 

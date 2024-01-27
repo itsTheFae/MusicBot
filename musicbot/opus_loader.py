@@ -6,7 +6,7 @@ def load_opus_lib() -> None:
         return
 
     try:
-        opus._load_default()
+        opus._load_default()  # pylint: disable=protected-access
         return
     except OSError:
         pass

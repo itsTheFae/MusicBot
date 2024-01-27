@@ -24,7 +24,7 @@ class EventEmitter:
                 else:
                     cb(*args, **kwargs)
 
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 traceback.print_exc()
 
     def on(self, event: str, cb: EventCallback) -> Any:

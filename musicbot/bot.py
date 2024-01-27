@@ -47,6 +47,7 @@ from .utils import (
     dev_only,
     format_size_from_bytes,
     format_song_duration,
+    instance_diff,
     is_empty_voice_channel,
     load_file,
     muffle_discord_console_log,
@@ -193,7 +194,7 @@ class MusicBot(discord.Client):
             )
 
         self.spotify: Spotify
-        if self.config._spotify:
+        if self.config.spotify_enabled:
             try:
                 self.spotify = Spotify(
                     self.config.spotify_clientid,
@@ -203,7 +204,7 @@ class MusicBot(discord.Client):
                 )
                 if not await self.spotify.has_token():
                     log.warning("Spotify did not provide us with a token. Disabling.")
-                    self.config._spotify = False
+                    self.config.spotify_enabled = False
                 else:
                     log.info(
                         "Authenticated with Spotify successfully using client ID and secret."
@@ -214,7 +215,7 @@ class MusicBot(discord.Client):
                         e
                     )
                 )
-                self.config._spotify = False
+                self.config.spotify_enabled = False
                 time.sleep(5)  # make sure they see the problem
         else:
             try:
@@ -226,19 +227,19 @@ class MusicBot(discord.Client):
                 )
                 if not await self.spotify.has_token():
                     log.warning("Spotify did not provide us with a token. Disabling.")
-                    self.config._spotify = False
+                    self.config.spotify_enabled = False
                 else:
                     log.info(
                         "Authenticated with Spotify successfully using guest mode."
                     )
-                    self.config._spotify = True
+                    self.config.spotify_enabled = True
             except exceptions.SpotifyError as e:
                 log.warning(
                     "There was a problem initialising the connection to Spotify using guest mode. Details: {0}.".format(
                         e
                     )
                 )
-                self.config._spotify = False
+                self.config.spotify_enabled = False
 
         log.info("Initialized, now connecting to discord.")
         # this creates an output similar to a progress indicator.
@@ -1640,7 +1641,7 @@ class MusicBot(discord.Client):
             log.info("  Embeds: " + ["Disabled", "Enabled"][self.config.embeds])
             log.info(
                 "  Spotify integration: "
-                + ["Disabled", "Enabled"][self.config._spotify]
+                + ["Disabled", "Enabled"][self.config.spotify_enabled]
             )
             log.info(
                 "  Legacy skip: " + ["Disabled", "Enabled"][self.config.legacy_skip]
@@ -2729,7 +2730,7 @@ class MusicBot(discord.Client):
 
         # Validate spotify links are supported before we try them.
         if "open.spotify.com" in song_url.lower():
-            if self.config._spotify:
+            if self.config.spotify_enabled:
                 if not Spotify.is_url_supported(song_url):
                     raise exceptions.CommandError(
                         "Spotify URL is invalid or not currently supported."
@@ -5488,6 +5489,15 @@ class MusicBot(discord.Client):
         self, before: discord.Guild, after: discord.Guild
     ) -> None:
         log.info(f"Guild update for:  {before}")
+        diff = instance_diff(before, after)
+        for attr, vals in diff.items():
+            log.everythinng(
+                "Guild Update - attribute '%s' is now:  %s  -- was:  %s",
+                attr,
+                vals[0],
+                vals[1],
+            )
+
         # TODO: replace this with utils.objdiff() or remove both
         for name in set(getattr(before, "__slotnames__")):
             a_val = getattr(after, name, None)
@@ -5501,6 +5511,15 @@ class MusicBot(discord.Client):
         self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel
     ) -> None:
         log.info(f"Channel update for:  {before}")
+        diff = instance_diff(before, after)
+        for attr, vals in diff.items():
+            log.everythinng(
+                "Guild Channel Update - attribute '%s' is now:  %s  -- was:  %s",
+                attr,
+                vals[0],
+                vals[1],
+            )
+
         # TODO: replace this with objdiff() or remove both.
         for name in set(getattr(before, "__slotnames__")):
             a_val = getattr(after, name, None)

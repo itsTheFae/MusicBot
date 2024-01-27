@@ -278,7 +278,8 @@ class Config:
             "Files", "AudioCachePath", fallback=ConfigDefaults.audio_cache_path
         )
 
-        self._spotify = False
+        # This value gets set dynamically, based on success with API authentication.
+        self.spotify_enabled = False
 
         self.run_checks()
 
@@ -374,7 +375,7 @@ class Config:
             self.auth = (self._login_token,)
 
         if self.spotify_clientid and self.spotify_clientsecret:
-            self._spotify = True
+            self.spotify_enabled = True
 
         self.delete_invoking = self.delete_invoking and self.delete_messages
 
