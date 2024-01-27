@@ -14,11 +14,11 @@ from typing import (
     Callable,
     Iterable,
     Union,
-    Optional,
     Any,
     Set,
     List,
     Dict,
+    Tuple,
 )
 
 from .exceptions import PermissionsError
