@@ -699,12 +699,12 @@ class MusicBot(discord.Client):
                 content.title = newmsg
 
         # send it in specified channel
-        self.server_specific_data[guild.id][
-            "last_np_msg"
-        ] = await self.safe_send_message(
-            channel,
-            content if self.config.embeds else newmsg,
-            expire_in=30 if self.config.delete_nowplaying else 0,
+        self.server_specific_data[guild.id]["last_np_msg"] = (
+            await self.safe_send_message(
+                channel,
+                content if self.config.embeds else newmsg,
+                expire_in=30 if self.config.delete_nowplaying else 0,
+            )
         )
 
         # TODO: Check channel voice state?
@@ -1895,12 +1895,14 @@ class MusicBot(discord.Client):
                     return Response(
                         "```\n{0}```{1}".format(
                             dedent(cmd.__doc__),
-                            self.str.get(
-                                "cmd-help-prefix-required",
-                                "\n**Prefix required for use:**\n{example_cmd}\n",
-                            ).format(example_cmd=f"{prefix}`{command} ...`")
-                            if is_emoji
-                            else "",
+                            (
+                                self.str.get(
+                                    "cmd-help-prefix-required",
+                                    "\n**Prefix required for use:**\n{example_cmd}\n",
+                                ).format(example_cmd=f"{prefix}`{command} ...`")
+                                if is_emoji
+                                else ""
+                            ),
                         ).format(
                             command_prefix=prefix if not is_emoji else "",
                         ),
@@ -1928,9 +1930,11 @@ class MusicBot(discord.Client):
                     "For information about a particular command, run {example_cmd}\n"
                     "For further help, see https://just-some-bots.github.io/MusicBot/",
                 ).format(
-                    example_cmd=f"{prefix}`help [command]`"
-                    if is_emoji
-                    else f"`{prefix}help [command]`",
+                    example_cmd=(
+                        f"{prefix}`help [command]`"
+                        if is_emoji
+                        else f"`{prefix}help [command]`"
+                    ),
                 )
             )
         else:
@@ -1943,9 +1947,11 @@ class MusicBot(discord.Client):
                     "For information about a particular command, run {example_cmd}\n"
                     "For further help, see https://just-some-bots.github.io/MusicBot/",
                 ).format(
-                    example_cmd=f"{prefix}`help [command]`"
-                    if is_emoji
-                    else f"`{prefix}help [command]`",
+                    example_cmd=(
+                        f"{prefix}`help [command]`"
+                        if is_emoji
+                        else f"`{prefix}help [command]`"
+                    ),
                 )
             )
         if not is_all:
@@ -1953,9 +1959,9 @@ class MusicBot(discord.Client):
                 "cmd-help-all",
                 "\nOnly showing commands you can use, for a list of all commands, run {example_cmd}",
             ).format(
-                example_cmd=f"{prefix}`help all`"
-                if is_emoji
-                else f"`{prefix}help all`",
+                example_cmd=(
+                    f"{prefix}`help all`" if is_emoji else f"`{prefix}help all`"
+                ),
             )
 
         return Response(desc, reply=True, delete_after=60)
@@ -2685,17 +2691,17 @@ class MusicBot(discord.Client):
                     await self.safe_send_message(
                         channel,
                         content,
-                        expire_in=response.delete_after
-                        if self.config.delete_messages
-                        else 0,
+                        expire_in=(
+                            response.delete_after if self.config.delete_messages else 0
+                        ),
                     )
                 else:
                     await self.safe_send_message(
                         channel,
                         str(response.content),
-                        expire_in=response.delete_after
-                        if self.config.delete_messages
-                        else 0,
+                        expire_in=(
+                            response.delete_after if self.config.delete_messages else 0
+                        ),
                     )
                 player = self.get_player_in(channel.guild)
 
@@ -2932,17 +2938,17 @@ class MusicBot(discord.Client):
                     await self.safe_send_message(
                         channel,
                         content,
-                        expire_in=response.delete_after
-                        if self.config.delete_messages
-                        else 0,
+                        expire_in=(
+                            response.delete_after if self.config.delete_messages else 0
+                        ),
                     )
                 else:
                     await self.safe_send_message(
                         channel,
                         str(response.content),
-                        expire_in=response.delete_after
-                        if self.config.delete_messages
-                        else 0,
+                        expire_in=(
+                            response.delete_after if self.config.delete_messages else 0
+                        ),
                     )
                 p = self.get_player_in(guild)
                 if p:
@@ -3411,10 +3417,10 @@ class MusicBot(discord.Client):
                 else:
                     log.warning(f"No thumbnail set for entry with url: {entry.url}")
 
-            self.server_specific_data[guild.id][
-                "last_np_msg"
-            ] = await self.safe_send_message(
-                channel, content if self.config.embeds else np_text, expire_in=30
+            self.server_specific_data[guild.id]["last_np_msg"] = (
+                await self.safe_send_message(
+                    channel, content if self.config.embeds else np_text, expire_in=30
+                )
             )
             return None
         else:
@@ -3862,9 +3868,13 @@ class MusicBot(discord.Client):
                     "Your skip for `{0}` was acknowledged.\nThe vote to skip has been passed.{1}",
                 ).format(
                     current_entry.title,
-                    self.str.get("cmd-skip-reply-skipped-2", " Next song coming up!")
-                    if player.playlist.peek()
-                    else "",
+                    (
+                        self.str.get(
+                            "cmd-skip-reply-skipped-2", " Next song coming up!"
+                        )
+                        if player.playlist.peek()
+                        else ""
+                    ),
                 ),
                 reply=True,
                 delete_after=20,
@@ -3889,9 +3899,11 @@ class MusicBot(discord.Client):
                     ).format(
                         current_entry.title,
                         skips_remaining,
-                        self.str.get("cmd-skip-reply-voted-2", "person is")
-                        if skips_remaining == 1
-                        else self.str.get("cmd-skip-reply-voted-3", "people are"),
+                        (
+                            self.str.get("cmd-skip-reply-voted-2", "person is")
+                            if skips_remaining == 1
+                            else self.str.get("cmd-skip-reply-voted-3", "people are")
+                        ),
                     ),
                     reply=True,
                     delete_after=20,
@@ -5219,9 +5231,9 @@ class MusicBot(discord.Client):
                     sentmsg = await self.safe_send_message(
                         message.channel,
                         content,
-                        expire_in=response.delete_after
-                        if self.config.delete_messages
-                        else 0,
+                        expire_in=(
+                            response.delete_after if self.config.delete_messages else 0
+                        ),
                         also_delete=message if self.config.delete_invoking else None,
                     )
 
@@ -5233,9 +5245,9 @@ class MusicBot(discord.Client):
                     sentmsg = await self.safe_send_message(
                         message.channel,
                         contents,
-                        expire_in=response.delete_after
-                        if self.config.delete_messages
-                        else 0,
+                        expire_in=(
+                            response.delete_after if self.config.delete_messages else 0
+                        ),
                         also_delete=message if self.config.delete_invoking else None,
                     )
 
