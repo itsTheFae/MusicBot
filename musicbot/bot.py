@@ -5504,7 +5504,7 @@ class MusicBot(discord.Client):
         log.info(f"Guild update for:  {before}")
         diff = instance_diff(before, after)
         for attr, vals in diff.items():
-            log.everythinng(
+            log.everythinng(  # type: ignore[attr-defined]
                 "Guild Update - attribute '%s' is now:  %s  -- was:  %s",
                 attr,
                 vals[0],
@@ -5526,7 +5526,7 @@ class MusicBot(discord.Client):
         log.info(f"Channel update for:  {before}")
         diff = instance_diff(before, after)
         for attr, vals in diff.items():
-            log.everythinng(
+            log.everythinng(  # type: ignore[attr-defined]
                 "Guild Channel Update - attribute '%s' is now:  %s  -- was:  %s",
                 attr,
                 vals[0],
