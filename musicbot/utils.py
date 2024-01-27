@@ -383,51 +383,36 @@ async def get_headers(
         return response.headers
 
 
-def objdiff(
-    obj1: Any, obj2: Any, *, access_attr: Optional[str] = None, depth: int = 0
-) -> Dict[str, Any]:
-    """Compute changes between two objects of the same type."""
-    changes: Dict[str, Any] = {}
-    attrdir: Callable[..., Any]
+def instance_diff(obj1: Any, obj2: Any) -> Dict[str, Tuple[Any, Any]]:
+    """
+    Compute a dict showing which attributes have changed between two given objects.
+    Objects must be of the same type and have __slots__ or __dict__.
+    """
+    if type(obj1) is not type(obj2):
+        raise ValueError("Objects must be of the same type to get differences.")
 
-    if access_attr is None:
-        attrdir = lambda x: x  # noqa: E731
-
-    elif access_attr == "auto":
-        if hasattr(obj1, "__slots__") and hasattr(obj2, "__slots__"):
-            attrdir = lambda x: getattr(x, "__slots__")  # noqa: E731
-
-        elif hasattr(obj1, "__dict__") and hasattr(obj2, "__dict__"):
-            attrdir = lambda x: getattr(x, "__dict__")  # noqa: E731
-
-        else:
-            attrdir = dir
-
-    elif isinstance(access_attr, str):
-        attrdir = lambda x: list(getattr(x, access_attr))  # noqa: E731
-
+    changes: Dict[str, Tuple[Any, Any]] = {}
+    keys = set()
+    if hasattr(obj1, "__slots__") and hasattr(obj2, "__slots__"):
+        vars1 = getattr(obj1, "__slots__", [])
+        vars2 = getattr(obj2, "__slots__", [])
+        if isinstance(vars1, list) and isinstance(vars2, list):
+            keys = set(vars1 + vars2)
+    elif hasattr(obj1, "__dict__") and hasattr(obj2, "__dict__"):
+        vars1 = getattr(obj1, "__dict__", {})
+        vars2 = getattr(obj2, "__dict__", {})
+        if isinstance(vars1, dict) and isinstance(vars2, dict):
+            keys = set(list(vars1.keys()) + list(vars2.keys()))
     else:
-        attrdir = dir
+        raise ValueError(
+            f"Objects don't have __slots__ or __dict__ attribute: ({type(obj1)}, {type(obj2)})"
+        )
 
-    for item in set(attrdir(obj1) + attrdir(obj2)):
-        try:
-            iobj1 = getattr(obj1, item, AttributeError("No such attr " + item))
-            iobj2 = getattr(obj2, item, AttributeError("No such attr " + item))
-
-            if depth:
-                idiff = objdiff(iobj1, iobj2, access_attr="auto", depth=depth - 1)
-                if idiff:
-                    changes[item] = idiff
-
-            elif iobj1 is not iobj2:
-                changes[item] = (iobj1, iobj2)
-
-            else:
-                pass
-
-        except Exception:
-            continue
-
+    for key in keys:
+        val1 = getattr(obj1, key, None)
+        val2 = getattr(obj2, key, None)
+        if val1 != val2:
+            changes[key] = (val1, val2)
     return changes
 
 

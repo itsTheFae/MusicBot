@@ -55,6 +55,7 @@ from .utils import (
     count_members_in_voice,
     format_song_duration,
     format_size_from_bytes,
+    instance_diff,
 )
 
 # Type aliases
@@ -5489,6 +5490,15 @@ class MusicBot(discord.Client):
         self, before: discord.Guild, after: discord.Guild
     ) -> None:
         log.info(f"Guild update for:  {before}")
+        diff = instance_diff(before, after)
+        for attr, vals in diff.items():
+            log.everythinng(
+                "Guild Update - attribute '%s' is now:  %s  -- was:  %s",
+                attr,
+                vals[0],
+                vals[1],
+            )
+
         # TODO: replace this with utils.objdiff() or remove both
         for name in set(getattr(before, "__slotnames__")):
             a_val = getattr(after, name, None)
@@ -5502,6 +5512,15 @@ class MusicBot(discord.Client):
         self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel
     ) -> None:
         log.info(f"Channel update for:  {before}")
+        diff = instance_diff(before, after)
+        for attr, vals in diff.items():
+            log.everythinng(
+                "Guild Channel Update - attribute '%s' is now:  %s  -- was:  %s",
+                attr,
+                vals[0],
+                vals[1],
+            )
+
         # TODO: replace this with objdiff() or remove both.
         for name in set(getattr(before, "__slotnames__")):
             a_val = getattr(after, name, None)
