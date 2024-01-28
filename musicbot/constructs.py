@@ -47,16 +47,13 @@ class Response:
         self.reply = reply
         self.delete_after = delete_after
         self.codeblock = codeblock
-        self._codeblock = "```{!s}\n{{}}\n```".format(
-            "" if not codeblock else codeblock
-        )
+        self._codeblock = f"```{codeblock}\n{{}}\n```"
 
     @property
     def content(self) -> Union[str, "Embed"]:
         if self.codeblock:
             return self._codeblock.format(self._content)
-        else:
-            return self._content
+        return self._content
 
 
 class Serializer(json.JSONEncoder):
@@ -68,7 +65,7 @@ class Serializer(json.JSONEncoder):
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]) -> Any:
-        if all(x in data for x in Serializable._class_signature):
+        if all(x in data for x in Serializable.CLASS_SIGNATURE):
             # log.debug("Deserialization requested for %s", data)
             factory = type(pydoc.locate(data["__module__"] + "." + data["__class__"]))
             # log.debug("Found object %s", factory)
@@ -98,7 +95,7 @@ class Serializer(json.JSONEncoder):
 
 
 class Serializable:
-    _class_signature = ("__class__", "__module__", "data")
+    CLASS_SIGNATURE = ("__class__", "__module__", "data")
 
     def _enclose_json(self, data: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -110,7 +107,7 @@ class Serializable:
     # Perhaps convert this into some sort of decorator
     @staticmethod
     def _bad(arg: str) -> None:
-        raise TypeError('Argument "%s" must not be None' % arg)
+        raise TypeError(f"Argument '{arg}' must not be None")
 
     def serialize(self, *, cls: Type[Serializer] = Serializer, **kwargs: Any) -> str:
         return json.dumps(self, cls=cls, **kwargs)

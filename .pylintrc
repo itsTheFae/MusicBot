@@ -265,7 +265,7 @@ defining-attr-methods=__init__,
 
 # List of member names, which should be excluded from the protected access
 # warning.
-exclude-protected=_asdict,_fields,_replace,_source,_make,os._exit
+exclude-protected=_asdict,_fields,_replace,_source,_make,os._exit,_deserialize
 
 # List of valid names for the first argument in a class method.
 valid-classmethod-first-arg=cls
@@ -435,15 +435,17 @@ disable=raw-checker-failed,
         trailing-whitespace,
         trailing-newlines,
         line-too-long,
+        too-many-statements,
         too-many-instance-attributes,
         too-many-public-methods,
+        too-few-public-methods,
         too-many-arguments,
         too-many-branches,
+        too-many-locals,
         
         missing-module-docstring,
         missing-function-docstring,
         missing-class-docstring,
-        
         
         fixme
 

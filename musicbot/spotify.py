@@ -4,6 +4,7 @@ import base64
 import logging
 import re
 import time
+from json import JSONDecodeError
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
@@ -38,7 +39,9 @@ class SpotifyObject:
     def is_type(data: Dict[str, Any], spotify_type: str) -> bool:
         """Verify if data has a 'type' key matching spotify_type value"""
         type_str = data.get("type", None)
-        return True if type_str == spotify_type else False
+        if type_str == spotify_type:
+            return True
+        return False
 
     @staticmethod
     def is_track_data(data: Dict[str, Any]) -> bool:
@@ -310,6 +313,7 @@ class SpotifyPlaylist(SpotifyObject):
 
 
 class Spotify:
+    WEB_TOKEN_URL = "https://open.spotify.com/get_access_token?reason=transport&productType=web_player"
     OAUTH_TOKEN_URL = "https://accounts.spotify.com/api/token"
     API_BASE = "https://api.spotify.com/v1/"
     # URL_REGEX allows missing protocol scheme intentionally.
@@ -356,8 +360,7 @@ class Spotify:
         uri = Spotify.url_to_uri(url)
         if uri.startswith("spotify:"):
             return uri.split(":")
-        else:
-            return []
+        return []
 
     @staticmethod
     def is_url_supported(url: str) -> bool:
@@ -423,22 +426,23 @@ class Spotify:
         next_url = aldata.get("tracks", {}).get("next", None)
 
         total_tracks = aldata["tracks"]["total"]  # total tracks in playlist.
-        log.debug(f"Spotify Album total tacks: {total_tracks}  --  {next_url}")
+        log.debug("Spotify Album total tacks: %s --  %s", total_tracks, next_url)
         while True:
             if next_url:
-                log.debug(f"Getting Spofity Album Next URL:  {next_url}")
+                log.debug("Getting Spofity Album Next URL:  %s", next_url)
                 next_data = await self.make_api_req(self.api_safe_url(next_url))
                 next_tracks = next_data.get("items", None)
                 if next_tracks:
                     tracks.extend(next_tracks)
                 next_url = next_data.get("next", None)
                 continue
-            else:
-                break
+            break
 
         if total_tracks > len(tracks):
             log.warning(
-                f"Spotify Album Object may not be complete, expected {total_tracks} tracks but got {len(tracks)}"
+                "Spotify Album Object may not be complete, expected %s tracks but got %s",
+                total_tracks,
+                len(tracks),
             )
         elif total_tracks < len(tracks):
             log.warning("Spotify Album has more tracks than initial total.")
@@ -463,22 +467,23 @@ class Spotify:
         next_url = pldata.get("tracks", {}).get("next", None)
 
         total_tracks = pldata["tracks"]["total"]  # total tracks in playlist.
-        log.debug(f"Spotify Playlist total tacks: {total_tracks}  --  {next_url}")
+        log.debug("Spotify Playlist total tacks: %s  --  %s", total_tracks, next_url)
         while True:
             if next_url:
-                log.debug(f"Getting Spofity Playlist Next URL:  {next_url}")
+                log.debug("Getting Spofity Playlist Next URL:  %s", next_url)
                 next_data = await self.make_api_req(self.api_safe_url(next_url))
                 next_tracks = next_data.get("items", None)
                 if next_tracks:
                     tracks.extend(next_tracks)
                 next_url = next_data.get("next", None)
                 continue
-            else:
-                break
+            break
 
         if total_tracks > len(tracks):
             log.warning(
-                f"Spotify Playlist Object may not be complete, expected {total_tracks} tracks but got {len(tracks)}"
+                "Spotify Playlist Object may not be complete, expected %s tracks but got %s",
+                total_tracks,
+                len(tracks),
             )
         elif total_tracks < len(tracks):
             log.warning("Spotify Playlist has more tracks than initial total.")
@@ -506,21 +511,27 @@ class Spotify:
         self, url: str, headers: Optional[Dict[str, str]] = None
     ) -> Dict[str, Any]:
         """Makes a GET request and returns the results"""
-        async with self.aiosession.get(url, headers=headers) as r:
-            try:
-                data = await r.json()  # type: Dict[str, Any]
-                if type(data) is not dict:
-                    raise SpotifyError("Response JSON did not decode to a dict!")
-            except Exception:
-                data = {}
-
-            if r.status != 200:
-                raise SpotifyError(
-                    "Issue making GET request to {0}: [{1.status}] {2}".format(
-                        url, r, data
+        try:
+            async with self.aiosession.get(url, headers=headers) as r:
+                if r.status != 200:
+                    raise SpotifyError(
+                        f"Response status is not OK: [{r.status}] {r.reason}"
                     )
-                )
-            return data
+                data = await r.json()  # type: Dict[str, Any]
+                if not isinstance(data, dict):
+                    raise SpotifyError("Response JSON did not decode to a dict!")
+
+                return data
+        except (
+            aiohttp.ClientError,
+            aiohttp.ContentTypeError,
+            JSONDecodeError,
+            SpotifyError,
+        ) as e:
+            log.exception("Failed making GET request to url:  %s", url)
+            raise SpotifyError(
+                f"Could not make GET to URL:  {url}  Reason:  {str(e)}"
+            ) from e
 
     async def _make_post(
         self,
@@ -529,27 +540,34 @@ class Spotify:
         headers: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         """Makes a POST request and returns the results"""
-        async with self.aiosession.post(url, data=payload, headers=headers) as r:
-            try:
-                data = await r.json()  # type: Dict[str, Any]
-                if type(data) is not dict:
-                    raise SpotifyError("Response JSON did not decode to a dict!")
-            except Exception:
-                data = {}
-
-            if r.status != 200:
-                raise SpotifyError(
-                    "Issue making POST request to {0}: [{1.status}] {2}".format(
-                        url, r, data
+        try:
+            async with self.aiosession.post(url, data=payload, headers=headers) as r:
+                if r.status != 200:
+                    raise SpotifyError(
+                        f"Response status is not OK: [{r.status}] {r.reason}"
                     )
-                )
-            return data
+
+                data = await r.json()  # type: Dict[str, Any]
+                if not isinstance(data, dict):
+                    raise SpotifyError("Response JSON did not decode to a dict!")
+
+                return data
+        except (
+            aiohttp.ClientError,
+            aiohttp.ContentTypeError,
+            JSONDecodeError,
+            SpotifyError,
+        ) as e:
+            log.exception("Failed making POST request to url:  %s", url)
+            raise SpotifyError(
+                f"Could not make POST to URL:  {url}  Reason:  {str(e)}"
+            ) from e
 
     def _make_token_auth(self, client_id: str, client_secret: str) -> Dict[str, Any]:
         auth_header = base64.b64encode(
-            (client_id + ":" + client_secret).encode("ascii")
-        )
-        return {"Authorization": "Basic %s" % auth_header.decode("ascii")}
+            f"{client_id}:{client_secret}".encode("ascii")
+        ).decode("ascii")
+        return {"Authorization": f"Basic {auth_header}"}
 
     def _is_token_valid(self) -> bool:
         """Checks if the token is valid"""
@@ -578,6 +596,7 @@ class Spotify:
                 "access_token": token["accessToken"],
                 "expires_at": int(token["accessTokenExpirationTimestampMs"]) / 1000,
             }
+            log.debug("Created a new Guest Mode access token.")
         else:
             token = await self._request_token()
             if token is None:
@@ -586,11 +605,7 @@ class Spotify:
                 )
             token["expires_at"] = int(time.time()) + token["expires_in"]
             self._token = token
-        log.debug(
-            "Created a new {0}access token: {1}".format(
-                "guest " if self.guest_mode else "", self._token
-            )
-        )
+            log.debug("Created a new Client Mode access token.")
         return str(self._token["access_token"])
 
     async def _request_token(self) -> Dict[str, Any]:
@@ -612,37 +627,22 @@ class Spotify:
     async def _request_guest_token(self) -> Dict[str, Any]:
         """Obtains a web player token from Spotify and returns it"""
         try:
-            async with self.aiosession.get(
-                "https://open.spotify.com/get_access_token?reason=transport&productType=web_player",
-            ) as r:
-                try:
-                    data = await r.json()  # type: Dict[str, Any]
-                    if type(data) is not dict:
-                        raise SpotifyError("Response JSON did not decode to a dict!")
-                except Exception:
-                    data = {}
-
+            async with self.aiosession.get(self.WEB_TOKEN_URL) as r:
                 if r.status != 200:
-                    try:
-                        raise SpotifyError(
-                            "Issue generating guest token: [{0.status}] {1}".format(
-                                r, data
-                            )
-                        )
-                    except aiohttp.ContentTypeError as e:
-                        raise SpotifyError(
-                            "Issue generating guest token: [{0.status}] {1}".format(
-                                r, e
-                            )
-                        )
+                    raise SpotifyError(
+                        f"Response status is not OK: [{r.status}]  {r.reason}"
+                    )
+
+                data = await r.json()  # type: Dict[str, Any]
+                if not isinstance(data, dict):
+                    raise SpotifyError("Response JSON did not decode to a dict!")
+
                 return data
         except (
-            asyncio.exceptions.CancelledError
-        ) as e:  # fails to generate after a restart, but succeeds if you just try again
-            if (
-                self.max_token_tries == 0
-            ):  # Unfortunately this logic has to be here, because if just tried
-                raise e  # to get a token in get_token() again it fails for some reason
-
-            self.max_token_tries -= 1
-            return await self._request_guest_token()
+            aiohttp.ClientError,
+            aiohttp.ContentTypeError,
+            JSONDecodeError,
+            SpotifyError,
+        ):
+            log.exception("Failed to get Spotify Guest Token.")
+            return {}
