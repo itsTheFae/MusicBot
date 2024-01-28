@@ -90,9 +90,8 @@ class Permissions:
         if not self.config.read(self.perms_file, encoding="utf-8"):
             example_file = PermissionsDefaults.example_perms_file
             log.info(
-                "Permissions file not found, copying from:  {}".format(
-                    example_file,
-                )
+                "Permissions file not found, copying from:  %s",
+                example_file,
             )
 
             try:

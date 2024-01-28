@@ -443,10 +443,12 @@ class Config:
                     FileExistsError,
                     PermissionError,
                 ) as e:
-                    log.exception("Something went wrong while trying to move .ini to config file path.")
+                    log.exception(
+                        "Something went wrong while trying to move .ini to config file path."
+                    )
                     raise HelpfulError(
                         f"Config file move failed due to error:  {str(e)}",
-                        "Verify your config folder and files exist, and can be read by the bot."
+                        "Verify your config folder and files exist, and can be read by the bot.",
                     ) from e
 
             elif os.path.isfile(EXAMPLE_OPTIONS_FILE):
