@@ -34,14 +34,15 @@ def get_all_keys(
     keys = []
     for k in sects:
         s = sects[k]
-        keys += [key for key in s.keys()]
+        keys += list(s.keys())
     return keys
 
 
 def create_empty_file_ifnoexist(path: pathlib.Path) -> None:
     if not path.is_file():
-        open(path, "a").close()
-        log.warning("Creating %s" % path)
+        with open(path, "a", encoding="utf8") as fh:
+            fh.close()
+            log.warning("Creating %s", path)
 
 
 class Config:
@@ -56,12 +57,11 @@ class Config:
             config.sections()
         )
         if confsections:
+            sections_str = ", ".join([f"[{s}]" for s in confsections])
             raise HelpfulError(
                 "One or more required config sections are missing.",
                 "Fix your config.  Each [Section] should be on its own line with "
-                "nothing else on it.  The following sections are missing: {}".format(
-                    ", ".join(["[%s]" % s for s in confsections])
-                ),
+                f"nothing else on it.  The following sections are missing: {sections_str}",
                 preface="An error has occured parsing the config:\n",
             )
 
@@ -86,23 +86,23 @@ class Config:
         self.owner_id: int = config.getownerid(
             "Permissions", "OwnerID", fallback=ConfigDefaults.owner_id
         )
-        self.dev_ids = config.getIDset(
+        self.dev_ids = config.getidset(
             "Permissions", "DevIDs", fallback=ConfigDefaults.dev_ids
         )
-        self.bot_exception_ids = config.getIDset(
+        self.bot_exception_ids = config.getidset(
             "Permissions", "BotExceptionIDs", fallback=ConfigDefaults.bot_exception_ids
         )
 
         self.command_prefix = config.get(
             "Chat", "CommandPrefix", fallback=ConfigDefaults.command_prefix
         )
-        self.bound_channels = config.getIDset(
+        self.bound_channels = config.getidset(
             "Chat", "BindToChannels", fallback=ConfigDefaults.bound_channels
         )
         self.unbound_servers = config.getboolean(
             "Chat", "AllowUnboundServers", fallback=ConfigDefaults.unbound_servers
         )
-        self.autojoin_channels = config.getIDset(
+        self.autojoin_channels = config.getidset(
             "Chat", "AutojoinChannels", fallback=ConfigDefaults.autojoin_channels
         )
         self.dm_nowplaying = config.getboolean(
@@ -113,7 +113,7 @@ class Config:
             "DisableNowPlayingAutomatic",
             fallback=ConfigDefaults.no_nowplaying_auto,
         )
-        self.nowplaying_channels = config.getIDset(
+        self.nowplaying_channels = config.getidset(
             "Chat", "NowPlayingChannels", fallback=ConfigDefaults.nowplaying_channels
         )
         self.delete_nowplaying = config.getboolean(
@@ -221,7 +221,7 @@ class Config:
             "LeaveInactiveVC",
             fallback=ConfigDefaults.leave_inactive_channel,
         )
-        self.leave_inactive_channel_timeout = config.getDuration(
+        self.leave_inactive_channel_timeout = config.getduration(
             "MusicBot",
             "LeaveInactiveVCTimeOut",
             fallback=ConfigDefaults.leave_inactive_channel_timeout,
@@ -231,7 +231,7 @@ class Config:
             "LeaveAfterSong",
             fallback=ConfigDefaults.leave_after_queue_empty,
         )
-        self.leave_player_inactive_for = config.getDuration(
+        self.leave_player_inactive_for = config.getduration(
             "MusicBot",
             "LeavePlayerInactiveFor",
             fallback=ConfigDefaults.leave_player_inactive_for,
@@ -257,7 +257,7 @@ class Config:
             fallback=ConfigDefaults.defaultround_robin_queue,
         )
 
-        dbg_str, dbg_int = config.getDebugLevel(
+        dbg_str, dbg_int = config.getdebuglevel(
             "MusicBot", "DebugLevel", fallback=ConfigDefaults.debug_level_str
         )
         self.debug_level_str: str = dbg_str
@@ -309,9 +309,8 @@ class Config:
             self.i18n_file
         ):
             log.warning(
-                "i18n file does not exist. Trying to fallback to {0}.".format(
-                    ConfigDefaults.i18n_file
-                )
+                "i18n file does not exist. Trying to fallback to: %s",
+                ConfigDefaults.i18n_file,
             )
             self.i18n_file = ConfigDefaults.i18n_file
 
@@ -323,7 +322,7 @@ class Config:
                 preface=self._confpreface,
             )
 
-        log.info("Using i18n: {0}".format(self.i18n_file))
+        log.info("Using i18n: %s", self.i18n_file)
 
         if self.audio_cache_path:
             try:
@@ -340,22 +339,23 @@ class Config:
                 actest = acpath.joinpath(".bot-test-write")
                 actest.touch(exist_ok=True)
                 actest.unlink(missing_ok=True)
-            except PermissionError:
+            except PermissionError as e:
                 raise HelpfulError(
                     "AudioCachePath config option cannot be used due to invalid permissions.",
                     "Check that directory permissions and ownership are correct.",
                     preface=self._confpreface2,
+                ) from e
+            except Exception as e:
+                log.exception(
+                    "Some other exception was thrown while validating AudioCachePath."
                 )
-            except Exception:
                 raise HelpfulError(
                     "AudioCachePath config option could not be set due to some exception we did not expect.",
                     "Double check the setting and maybe report an issue.",
                     preface=self._confpreface2,
-                )
-                log.exception(
-                    "Some other exception was thrown while validating AudioCachePath."
-                )
-        log.info(f"Audio Cache will be stored in:  {self.audio_cache_path}")
+                ) from e
+
+        log.info("Audio Cache will be stored in:  %s", self.audio_cache_path)
 
         if not self._login_token:
             # Attempt to fallback to an environment variable.
@@ -420,20 +420,34 @@ class Config:
     def find_config(self) -> None:
         config = configparser.ConfigParser(interpolation=None)
 
+        # Check for options.ini and copy example ini if missing.
         if not self.config_file.is_file():
             ini_file = self.config_file.with_suffix(".ini")
             if ini_file.is_file():
-                # Excplicit compat with python 3.8
-                if sys.version_info >= (3, 9):
-                    shutil.move(ini_file, self.config_file)
-                else:
-                    # shutil.move in 3.8 expects str and not path-like.
-                    shutil.move(str(ini_file), str(self.config_file))
-                log.info(
-                    "Moving {0} to {1}, you should probably turn file extensions on.".format(
-                        ini_file, self.config_file
+                try:
+                    # Excplicit compat with python 3.8
+                    if sys.version_info >= (3, 9):
+                        shutil.move(ini_file, self.config_file)
+                    else:
+                        # shutil.move in 3.8 expects str and not path-like.
+                        shutil.move(str(ini_file), str(self.config_file))
+                    log.info(
+                        "Moving %s to %s, you should probably turn file extensions on.",
+                        ini_file,
+                        self.config_file,
                     )
-                )
+                except (
+                    OSError,
+                    IsADirectoryError,
+                    NotADirectoryError,
+                    FileExistsError,
+                    PermissionError,
+                ) as e:
+                    log.exception("Something went wrong while trying to move .ini to config file path.")
+                    raise HelpfulError(
+                        f"Config file move failed due to error:  {str(e)}",
+                        "Verify your config folder and files exist, and can be read by the bot."
+                    ) from e
 
             elif os.path.isfile(EXAMPLE_OPTIONS_FILE):
                 shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
@@ -446,38 +460,26 @@ class Config:
                     "from the repo. Stop removing important files!",
                 )
 
+        # load the config and check if settings are configured.
         if not config.read(self.config_file, encoding="utf-8"):
             c = configparser.ConfigParser()
+            owner_id = ""
             try:
-                # load the config again and check to see if the user edited that one
                 c.read(self.config_file, encoding="utf-8")
+                owner_id = c.get("Permissions", "OwnerID", fallback="").strip().lower()
 
-                if not int(
-                    c.get("Permissions", "OwnerID", fallback=0)
-                ):  # jake pls no flame
-                    print(flush=True)
+                if not owner_id.isdigit() and owner_id != "auto":
                     log.critical(
-                        "Please configure config/options.ini and re-run the bot."
+                        "Please configure settings in '%s' and re-run the bot.",
+                        DEFAULT_OPTIONS_FILE,
                     )
                     sys.exit(1)
 
-            except ValueError:  # Config id value was changed but its not valid
+            except ValueError as e:  # Config id value was changed but its not valid
                 raise HelpfulError(
-                    'Invalid value "{}" for OwnerID, config cannot be loaded. '.format(
-                        c.get("Permissions", "OwnerID", fallback=None)
-                    ),
-                    "The OwnerID option requires a user ID or 'auto'.",
-                )
-
-            except Exception as e:
-                print(flush=True)
-                log.critical(
-                    "Unable to copy config/example_options.ini to {}".format(
-                        self.config_file
-                    ),
-                    exc_info=e,
-                )
-                sys.exit(2)
+                    "Invalid config value for OwnerID",
+                    "The OwnerID option requires a user ID number or 'auto'.",
+                ) from e
 
     def setup_autoplaylist(self) -> None:
         # check for an copy the bundled playlist file if configured file is empty.
@@ -486,7 +488,9 @@ class Config:
             if bundle_file.is_file():
                 shutil.copy(bundle_file, self.auto_playlist_file)
                 log.debug(
-                    f"Copying bundled autoplaylist '{BUNDLED_AUTOPLAYLIST_FILE}' to '{self.auto_playlist_file}'"
+                    "Copying bundled autoplaylist '%s' to '%s'",
+                    BUNDLED_AUTOPLAYLIST_FILE,
+                    self.auto_playlist_file,
                 )
             else:
                 log.warning(
@@ -580,32 +584,32 @@ class ExtendedConfigParser(configparser.ConfigParser):
         section: str,
         key: str,
         fallback: int = 0,
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> int:
         """get the owner ID or 0 for auto"""
         val = self.get(section, key, fallback="").strip()
         if not val:
             return fallback
-        elif val.lower() == "auto":
+        if val.lower() == "auto":
             return 0
-        else:
-            try:
-                return int(val)
-            except ValueError:
-                raise HelpfulError(
-                    f"OwnerID is not valid. Your setting:  {val}",
-                    "Set OwnerID to a numerical ID or set it to 'auto' to have the bot find it.",
-                    preface="Error while loading config:\n",
-                )
+
+        try:
+            return int(val)
+        except ValueError as e:
+            raise HelpfulError(
+                f"OwnerID is not valid. Your setting:  {val}",
+                "Set OwnerID to a numerical ID or set it to 'auto' to have the bot find it.",
+                preface="Error while loading config:\n",
+            ) from e
 
     def getpathlike(
         self,
         section: str,
         key: str,
         fallback: pathlib.Path,
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> pathlib.Path:
         """
         get a config value and parse it as a Path object.
@@ -614,39 +618,38 @@ class ExtendedConfigParser(configparser.ConfigParser):
         val = self.get(section, key, fallback="").strip()
         if not val:
             return fallback
-        else:
-            return pathlib.Path(val)
+        return pathlib.Path(val)
 
-    def getIDset(
+    def getidset(
         self,
         section: str,
         key: str,
         fallback: Optional[Set[int]] = None,
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> Set[int]:
         """get a config value and parse it as a set of ID values."""
         val = self.get(section, key, fallback="").strip()
         if not val and fallback:
-            return fallback
-        else:
-            str_ids = val.replace(",", " ").split()
-            try:
-                return set(int(i) for i in str_ids)
-            except ValueError:
-                raise HelpfulError(
-                    f"One of the IDs in your config `{key}` is invalid.",
-                    "Ensure all IDs are numerical, and separated only by spaces or commas.",
-                    preface="Error while loading config:\n",
-                )
+            return set(fallback)
 
-    def getDebugLevel(
+        str_ids = val.replace(",", " ").split()
+        try:
+            return set(int(i) for i in str_ids)
+        except ValueError as e:
+            raise HelpfulError(
+                f"One of the IDs in your config `{key}` is invalid.",
+                "Ensure all IDs are numerical, and separated only by spaces or commas.",
+                preface="Error while loading config:\n",
+            ) from e
+
+    def getdebuglevel(
         self,
         section: str,
         key: str,
         fallback: str = "",
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> Tuple[str, int]:
         """get a config value an parse it as a logger level."""
         val = self.get(section, key, fallback="").strip().upper()
@@ -658,19 +661,20 @@ class ExtendedConfigParser(configparser.ConfigParser):
         if hasattr(logging, val):
             int_level = getattr(logging, val)
             return (str_level, int_level)
-        else:
-            log.warning(
-                'Invalid DebugLevel option "{}" given, falling back to INFO'.format(val)
-            )
-            return ("INFO", logging.INFO)
+
+        log.warning(
+            'Invalid DebugLevel option "%s" given, falling back to INFO',
+            val,
+        )
+        return ("INFO", logging.INFO)
 
     def getdatasize(
         self,
         section: str,
         key: str,
         fallback: int = 0,
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> int:
         """get a config value and parse it as a human readable data size"""
         val = self.get(section, key, fallback="").strip()
@@ -680,20 +684,19 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return format_size_to_bytes(val)
         except ValueError:
             log.warning(
-                "{} has invalid config value '{}' using default instead.".format(
-                    key,
-                    val,
-                ),
+                "Config '%s' has invalid config value '%s' using default instead.",
+                key,
+                val,
             )
             return fallback
 
-    def getDuration(
+    def getduration(
         self,
         section: str,
         key: str,
         fallback: Union[int, float] = 0,
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument,
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> float:
         """get a config value parsed as a time duration."""
         val = self.get(section, key, fallback="").strip()
@@ -702,18 +705,18 @@ class ExtendedConfigParser(configparser.ConfigParser):
         seconds = format_time_to_seconds(val)
         return float(seconds)
 
-    def getstrset(
+    def getstrset(  # pylint: disable=dangerous-default-value
         self,
         section: str,
         key: str,
         fallback: Set[str] = set(),
-        raw: bool = False,
-        vars: Any = None,
+        raw: bool = False,  # pylint: disable=unused-argument
+        vars: Any = None,  # pylint: disable=unused-argument,redefined-builtin
     ) -> Set[str]:
         """get a config value parsed as a set of string values."""
         val = self.get(section, key, fallback="").strip()
         if not val and fallback:
-            return fallback
+            return set(fallback)
         return set(x for x in val.replace(",", " ").split())
 
 

@@ -100,11 +100,11 @@ class Permissions:
                 self.config.read(self.perms_file, encoding="utf-8")
 
             except Exception as e:
-                # traceback.print_exc()
+                log.exception(
+                    "Error copying example permissions file:  %s", example_file
+                )
                 raise RuntimeError(
-                    "Unable to copy {} to {}:  {}".format(
-                        example_file, self.perms_file, e
-                    )
+                    f"Unable to copy {example_file} to {self.perms_file}:  {str(e)}"
                 ) from e
 
         self.default_group = PermissionGroup("Default", self.config["Default"])
@@ -148,7 +148,7 @@ class Permissions:
             og.user_list = {bot.config.owner_id}
 
     def save(self) -> None:
-        with open(self.perms_file, "w") as f:
+        with open(self.perms_file, "w", encoding="utf8") as f:
             self.config.write(f)
 
     def for_user(self, user: Union[discord.Member, discord.User]) -> "PermissionGroup":
@@ -254,7 +254,7 @@ class PermissionGroup:
             self.user_list.remove(uid)
 
     def __repr__(self) -> str:
-        return "<PermissionGroup: %s>" % self.name
+        return f"<PermissionGroup: {self.name}>"
 
     def __str__(self) -> str:
-        return "<PermissionGroup: %s: %s>" % (self.name, self.__dict__)
+        return f"<PermissionGroup: {self.name}: {self.__dict__}>"

@@ -36,7 +36,7 @@ class Aliases:
             except json.JSONDecodeError as e:
                 raise HelpfulError(
                     f"Failed to parse aliases file:  {str(self.aliases_file)}",
-                    "Ensure your alias file contains valid JSON and restart the bot."
+                    "Ensure your alias file contains valid JSON and restart the bot.",
                 ) from e
 
         # construct
