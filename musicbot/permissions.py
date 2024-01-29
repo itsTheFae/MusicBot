@@ -196,10 +196,10 @@ class PermissionGroup:
         self.ignore_non_voice = section_data.getstrset(
             "IgnoreNonVoice", fallback=fallback.IgnoreNonVoice
         )
-        self.granted_to_roles = section_data.getIDset(
+        self.granted_to_roles = section_data.getidset(
             "GrantToRoles", fallback=fallback.GrantToRoles
         )
-        self.user_list = section_data.getIDset("UserList", fallback=fallback.UserList)
+        self.user_list = section_data.getidset("UserList", fallback=fallback.UserList)
 
         self.max_songs = section_data.getint("MaxSongs", fallback=fallback.MaxSongs)
         self.max_song_length = section_data.getint(
