@@ -340,12 +340,13 @@ class MusicPlayer(EventEmitter, Serializable):
     def __json__(self) -> Dict[str, Any]:
         progress_frames = None
         if (
-            self._current_player and self._current_player._player
-        ):  # pylint: disable=protected-access
+            self._current_player
+            and self._current_player._player  # pylint: disable=protected-access
+        ):
             if self.progress is not None:
                 progress_frames = (
-                    self._current_player._player.loops
-                )  # pylint: disable=protected-access
+                    self._current_player._player.loops  # pylint: disable=protected-access
+                )
 
         return self._enclose_json(
             {

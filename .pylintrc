@@ -432,6 +432,7 @@ disable=raw-checker-failed,
         use-implicit-booleaness-not-comparison-to-string,
         use-implicit-booleaness-not-comparison-to-zero,
         
+        pointless-string-statement,
         trailing-whitespace,
         trailing-newlines,
         line-too-long,
