@@ -2622,7 +2622,9 @@ class MusicBot(discord.Client):
                 await self.safe_delete_message(msg)
 
         # Check for playlist in youtube watch link.
-        playlist_regex = r"watch\?v=.+&(list=[^&]+)"
+        # https://youtu.be/VID?list=PLID
+        # https://www.youtube.com/watch?v=VID&list=PLID
+        playlist_regex = r"(?:/watch\?v=.+&(list=[^&]+)|be/[^?&]{6,}\?(list=PL[^&]+))"
         matches = re.search(playlist_regex, song_url)
         if matches:
             pl_url = "https://www.youtube.com/playlist?" + matches.group(1)
