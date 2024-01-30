@@ -108,7 +108,8 @@ class MusicBot(discord.Client):
         load_opus_lib()
         try:
             sys.stdout.write(f"\x1b]2;MusicBot {BOTVERSION}\x07")
-        except Exception:
+        # TODO: what does this raise and when would it raise it?
+        except Exception:  # pylint: disable=broad-exception-caught
             log.warning(
                 "Failed to set terminal Title via escape sequences.", exc_info=True
             )
@@ -341,7 +342,9 @@ class MusicBot(discord.Client):
                         if not player.playlist.entries:
                             await self.on_player_finished_playing(player)
 
-                except Exception:
+                # TODO: drill down through the above code and find what exceptions
+                # we actually want to be handling here.
+                except Exception:  # pylint: disable=broad-exception-caught
                     log.debug(
                         "Error joining %s/%s",
                         channel.guild.name,
@@ -1410,9 +1413,10 @@ class MusicBot(discord.Client):
         mute_discord_console_log()
         log.debug("Connection established, ready to go.")
 
+        # Set the handler name if we have it.  I don't know why, but we do.
         if self.ws._keep_alive:  # pylint: disable=protected-access
-            self.ws._keep_alive.name = (
-                "Gateway Keepalive"  # pylint: disable=protected-access
+            self.ws._keep_alive.name = (  # pylint: disable=protected-access
+                "Gateway Keepalive"
             )
         else:
             log.error(
@@ -3274,6 +3278,8 @@ class MusicBot(discord.Client):
                     delete_after=30,
                 )
         else:
+            # patch for loop-defined cell variable.
+            res_msg_ids = []
             # Original code
             for entry in entries:
                 result_message = await self.safe_send_message(
@@ -3287,12 +3293,13 @@ class MusicBot(discord.Client):
                 if not result_message:
                     continue
 
+                res_msg_ids.append(result_message.id)
+
                 def check_react(
                     reaction: discord.Reaction, user: discord.Member
                 ) -> bool:
                     return (
-                        user == message.author
-                        and reaction.message.id == result_message.id
+                        user == message.author and reaction.message.id in res_msg_ids
                     )  # why can't these objs be compared directly?
 
                 reactions = ["\u2705", "\U0001F6AB", "\U0001F3C1"]
