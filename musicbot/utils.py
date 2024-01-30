@@ -1,36 +1,29 @@
+import datetime
+import glob
+import inspect
+import logging
+import pathlib
 import re
 import sys
-import glob
-import pathlib
-import logging
-import aiohttp
-import inspect
-import colorlog
-import datetime
 import unicodedata
 from functools import wraps
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Iterable,
-    Union,
-    Any,
-    Set,
-    List,
-    Dict,
-    Tuple,
-)
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Set, Tuple, Union
 
-from .exceptions import PermissionsError
+# TODO:  remove all utils with module deps to their own utils file.
+import aiohttp
+import colorlog
+
 from .constants import (
-    DEFAULT_MUSICBOT_LOG_FILE,
     DEFAULT_DISCORD_LOG_FILE,
+    DEFAULT_MUSICBOT_LOG_FILE,
     DISCORD_MSG_CHAR_LIMIT,
 )
+from .exceptions import PermissionsError
 
 if TYPE_CHECKING:
-    from discord import VoiceChannel, StageChannel, Member
+    from discord import Member, StageChannel, VoiceChannel
     from multidict import CIMultiDictProxy
+
     from .bot import MusicBot
 
 log = logging.getLogger(__name__)
@@ -58,12 +51,14 @@ def _add_logger_level(levelname: str, level: int, *, func_name: str = "") -> Non
     setattr(logging, levelname, level)
     logging.addLevelName(level, levelname)
 
-    exec(
+    # TODO: this is cool and all, but there is likely a better way to do this.
+    # we should probably be extending logging.getLoggerClass() instead
+    exec(  # pylint: disable=exec-used
         _func_prototype.format(logger_func_name=func_name, levelname=levelname),
         logging.__dict__,
         locals(),
     )
-    setattr(logging.Logger, func_name, eval(func_name))
+    setattr(logging.Logger, func_name, eval(func_name))  # pylint: disable=eval-used
 
 
 def setup_loggers() -> None:
@@ -191,7 +186,7 @@ def mute_discord_console_log() -> None:
 def set_logging_level(level: int) -> None:
     """sets the logging level for musicbot and discord.py"""
     set_lvl_name = logging.getLevelName(level)
-    log.info(f"Changing log level to {set_lvl_name}")
+    log.info("Changing log level to:  %s", set_lvl_name)
 
     logger = logging.getLogger("musicbot")
     logger.setLevel(level)
@@ -342,7 +337,7 @@ def paginate(
     elif isinstance(content, list):
         contentlist = content
     else:
-        raise ValueError("Content must be str or list, not %s" % type(content))
+        raise ValueError(f"Content must be str or list, not {type(content)}")
 
     chunks = []
     currentchunk = ""
@@ -360,7 +355,7 @@ def paginate(
     return chunks
 
 
-async def get_headers(
+async def get_headers(  # pylint: disable=dangerous-default-value
     session: aiohttp.ClientSession,
     url: str,
     *,
@@ -444,6 +439,8 @@ def _get_variable(name: str) -> Any:
     finally:
         del stack
 
+    return None
+
 
 # TODO: Add some sort of `denied` argument for a message to send when someone else tries to use it
 def owner_only(func: Callable[..., Any]) -> Any:
@@ -454,8 +451,7 @@ def owner_only(func: Callable[..., Any]) -> Any:
 
         if not orig_msg or orig_msg.author.id == self.config.owner_id:
             return await func(self, *args, **kwargs)
-        else:
-            raise PermissionsError("Only the owner can use this command.", expire_in=30)
+        raise PermissionsError("Only the owner can use this command.", expire_in=30)
 
     return wrapper
 
@@ -467,14 +463,13 @@ def dev_only(func: Callable[..., Any]) -> Any:
 
         if orig_msg.author.id in self.config.dev_ids:
             return await func(self, *args, **kwargs)
-        else:
-            raise PermissionsError("Only dev users can use this command.", expire_in=30)
+        raise PermissionsError("Only dev users can use this command.", expire_in=30)
 
     setattr(wrapper, "dev_cmd", True)
     return wrapper
 
 
-def is_empty_voice_channel(
+def is_empty_voice_channel(  # pylint: disable=dangerous-default-value
     voice_channel: Union["VoiceChannel", "StageChannel", None],
     *,
     exclude_me: bool = True,
@@ -511,7 +506,7 @@ def is_empty_voice_channel(
     return not sum(1 for m in voice_channel.members if _check(m))
 
 
-def count_members_in_voice(
+def count_members_in_voice(  # pylint: disable=dangerous-default-value
     voice_channel: Union["VoiceChannel", "StageChannel", None],
     include_only: Iterable[int] = [],
     include_bots: Iterable[int] = [],
@@ -627,14 +622,15 @@ def format_size_to_bytes(size_str: str, strict_si: bool = False) -> int:
         "yib": 1024**8,
     }
     size_str = size_str.lower().strip().strip("s")
-    for suffix in suffix_list:
+    for suffix, conversion in suffix_list.items():
         if size_str.endswith(suffix):
-            return int(float(size_str[0 : -len(suffix)]) * suffix_list[suffix])
-    else:
-        if size_str.endswith("b"):
-            size_str = size_str[0:-1]
-        elif size_str.endswith("byte"):
-            size_str = size_str[0:-4]
+            return int(float(size_str[0 : -len(suffix)]) * conversion)
+
+    if size_str.endswith("b"):
+        size_str = size_str[0:-1]
+    elif size_str.endswith("byte"):
+        size_str = size_str[0:-4]
+
     return int(size_str)
 
 

@@ -1,9 +1,10 @@
-import shutil
-import pathlib
-import logging
 import configparser
+import logging
+import pathlib
+import shutil
+from typing import TYPE_CHECKING, Any, Dict, List, Set, Union
+
 import discord
-from typing import TYPE_CHECKING, Any, Union, Dict, List, Set
 
 from .config import ExtendedConfigParser
 from .constants import DEFAULT_PERMS_FILE, EXAMPLE_PERMS_FILE
@@ -89,9 +90,8 @@ class Permissions:
         if not self.config.read(self.perms_file, encoding="utf-8"):
             example_file = PermissionsDefaults.example_perms_file
             log.info(
-                "Permissions file not found, copying from:  {}".format(
-                    example_file,
-                )
+                "Permissions file not found, copying from:  %s",
+                example_file,
             )
 
             try:
@@ -99,11 +99,11 @@ class Permissions:
                 self.config.read(self.perms_file, encoding="utf-8")
 
             except Exception as e:
-                # traceback.print_exc()
+                log.exception(
+                    "Error copying example permissions file:  %s", example_file
+                )
                 raise RuntimeError(
-                    "Unable to copy {} to {}:  {}".format(
-                        example_file, self.perms_file, e
-                    )
+                    f"Unable to copy {example_file} to {self.perms_file}:  {str(e)}"
                 ) from e
 
         self.default_group = PermissionGroup("Default", self.config["Default"])
@@ -147,7 +147,7 @@ class Permissions:
             og.user_list = {bot.config.owner_id}
 
     def save(self) -> None:
-        with open(self.perms_file, "w") as f:
+        with open(self.perms_file, "w", encoding="utf8") as f:
             self.config.write(f)
 
     def for_user(self, user: Union[discord.Member, discord.User]) -> "PermissionGroup":
@@ -196,10 +196,10 @@ class PermissionGroup:
         self.ignore_non_voice = section_data.getstrset(
             "IgnoreNonVoice", fallback=fallback.IgnoreNonVoice
         )
-        self.granted_to_roles = section_data.getIDset(
+        self.granted_to_roles = section_data.getidset(
             "GrantToRoles", fallback=fallback.GrantToRoles
         )
-        self.user_list = section_data.getIDset("UserList", fallback=fallback.UserList)
+        self.user_list = section_data.getidset("UserList", fallback=fallback.UserList)
 
         self.max_songs = section_data.getint("MaxSongs", fallback=fallback.MaxSongs)
         self.max_song_length = section_data.getint(
@@ -253,7 +253,7 @@ class PermissionGroup:
             self.user_list.remove(uid)
 
     def __repr__(self) -> str:
-        return "<PermissionGroup: %s>" % self.name
+        return f"<PermissionGroup: {self.name}>"
 
     def __str__(self) -> str:
-        return "<PermissionGroup: %s: %s>" % (self.name, self.__dict__)
+        return f"<PermissionGroup: {self.name}: {self.__dict__}>"

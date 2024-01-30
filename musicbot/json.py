@@ -1,6 +1,6 @@
 import json
-import pathlib
 import logging
+import pathlib
 from typing import Any, Dict
 
 log = logging.getLogger(__name__)
@@ -8,7 +8,7 @@ log = logging.getLogger(__name__)
 
 class Json:
     def __init__(self, json_file: pathlib.Path) -> None:
-        log.debug("Init JSON obj with {0}".format(json_file))
+        log.debug("Init JSON obj from file: %s", json_file)
         self.file = json_file
         self.data = self.parse()
 
@@ -18,10 +18,10 @@ class Json:
         with open(self.file, encoding="utf-8") as data:
             try:
                 parsed = json.load(data)
-                if type(parsed) is not dict:
+                if not isinstance(parsed, dict):
                     raise TypeError("Parsed information must be of type Dict[str, Any]")
-            except Exception:
-                log.error("Error parsing {0} as JSON".format(self.file), exc_info=True)
+            except (json.JSONDecodeError, TypeError):
+                log.error("Error parsing %s as JSON", self.file, exc_info=True)
                 parsed = {}
         return parsed
 
@@ -30,7 +30,7 @@ class Json:
         try:
             data = self.data[item]
         except KeyError:
-            log.warning("Could not grab data from JSON key {0}.".format(item))
+            log.warning("Could not grab data from JSON key: %s", item)
             data = fallback
         return data
 
@@ -40,6 +40,6 @@ class I18nJson(Json):
         try:
             data = self.data[item]
         except KeyError:
-            log.warning(f"Could not grab data from i18n key {item}.")
+            log.warning("Could not grab data from i18n key: %s", item)
             data = fallback
         return data

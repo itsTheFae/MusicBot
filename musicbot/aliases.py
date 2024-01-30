@@ -1,10 +1,10 @@
+import json
 import logging
 import shutil
-import json
 from pathlib import Path
 from typing import Any, Dict
 
-from .constants import DEFAULT_COMMAND_ALIAS_FILE
+from .constants import DEFAULT_COMMAND_ALIAS_FILE, EXAMPLE_COMMAND_ALIAS_FILE
 from .exceptions import HelpfulError
 
 log = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class Aliases:
 
         # find aliases file
         if not self.aliases_file.is_file():
-            example_aliases = Path("config/example_aliases.json")
+            example_aliases = Path(EXAMPLE_COMMAND_ALIAS_FILE)
             if example_aliases.is_file():
                 shutil.copy(str(example_aliases), str(self.aliases_file))
                 log.warning("Aliases file not found, copying example_aliases.json")
@@ -33,22 +33,18 @@ class Aliases:
         with self.aliases_file.open() as f:
             try:
                 self.aliases_seed = json.load(f)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
                 raise HelpfulError(
-                    "Failed to parse aliases file.",
-                    "Ensure your {} is a valid json file and restart the bot.".format(
-                        str(self.aliases_file)
-                    ),
-                )
+                    f"Failed to parse aliases file:  {str(self.aliases_file)}",
+                    "Ensure your alias file contains valid JSON and restart the bot.",
+                ) from e
 
         # construct
         for cmd, aliases in self.aliases_seed.items():
             if not isinstance(cmd, str) or not isinstance(aliases, list):
                 raise HelpfulError(
-                    "Failed to parse aliases file.",
-                    "See documents and config {} properly!".format(
-                        str(self.aliases_file)
-                    ),
+                    "Failed to load aliases file due to invalid format.",
+                    "Make sure your aliases conform to the format given in the example file.",
                 )
             self.aliases.update({alias.lower(): cmd.lower() for alias in aliases})
 

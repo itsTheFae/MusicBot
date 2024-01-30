@@ -5,29 +5,30 @@ from itertools import islice
 from random import shuffle
 from typing import (
     TYPE_CHECKING,
-    Union,
-    Optional,
     Any,
-    Iterator,
     Deque,
-    Tuple,
     Dict,
+    Iterator,
     List,
+    Optional,
+    Tuple,
+    Union,
 )
 
 from .constructs import Serializable
-from .exceptions import ExtractionError, WrongEntryTypeError, InvalidDataError
+from .entry import StreamPlaylistEntry, URLPlaylistEntry
+from .exceptions import ExtractionError, InvalidDataError, WrongEntryTypeError
 from .lib.event_emitter import EventEmitter
 
-from .entry import URLPlaylistEntry, StreamPlaylistEntry
-
 if TYPE_CHECKING:
-    from .bot import MusicBot
-    from .player import MusicPlayer
-    from .downloader import YtdlpResponseDict
-    import discord
     import asyncio
+
     import aiohttp
+    import discord
+
+    from .bot import MusicBot
+    from .downloader import YtdlpResponseDict
+    from .player import MusicPlayer
 
 # type aliases
 EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry]
@@ -41,6 +42,11 @@ class Playlist(EventEmitter, Serializable):
     """
 
     def __init__(self, bot: "MusicBot") -> None:
+        if bot.session is None:
+            raise RuntimeError(
+                "Attempt to make Playlist object without aiohttp session. This should never happen..."
+            )
+
         super().__init__()
         self.bot: "MusicBot" = bot
         self.loop: "asyncio.AbstractEventLoop" = bot.loop
@@ -147,8 +153,7 @@ class Playlist(EventEmitter, Serializable):
                     if not any(x in content_type for x in ("/ogg", "/octet-stream")):
                         # How does a server say `application/ogg` what the actual fuck
                         raise ExtractionError(
-                            'Invalid content type "%s" for url %s'
-                            % (content_type, info.url)
+                            f'Invalid content type "{content_type}" for url: {info.url}'
                         )
 
                 elif (
@@ -162,9 +167,9 @@ class Playlist(EventEmitter, Serializable):
 
                 elif not content_type.startswith(("audio/", "video/")):
                     log.warning(
-                        'Questionable content-type "{}" for url {}'.format(
-                            content_type, info.url
-                        )
+                        'Questionable content-type "%s" for url:  %s',
+                        content_type,
+                        info.url,
                     )
 
         log.noise(  # type: ignore[attr-defined]
@@ -211,7 +216,8 @@ class Playlist(EventEmitter, Serializable):
                 and item.duration > author_perms.max_song_length
             ):
                 log.debug(
-                    f"Ignoring song in entries by '{author}', duration longer than permitted maximum."
+                    "Ignoring song in entries by '%s', duration longer than permitted maximum.",
+                    author,
                 )
                 baditems += 1
                 continue
@@ -222,7 +228,8 @@ class Playlist(EventEmitter, Serializable):
                 or "[deleted video]" == item.get("title", "").lower()
             ):
                 log.warning(
-                    f"Not adding youtube video because it is marked private or deleted:  {item.get_playable_url()}"
+                    "Not adding youtube video because it is marked private or deleted:  %s",
+                    item.get_playable_url(),
                 )
                 baditems += 1
                 continue
@@ -236,17 +243,17 @@ class Playlist(EventEmitter, Serializable):
                 defer_serialize = False
 
             try:
-                entry, pos = await self.add_entry_from_info(
+                entry, _pos = await self.add_entry_from_info(
                     item, head=head, defer_serialize=defer_serialize, **meta
                 )
                 entry_list.append(entry)
-            except Exception as e:
+            except (WrongEntryTypeError, ExtractionError):
                 baditems += 1
-                log.warning("Could not add item", exc_info=e)
-                log.debug("Item: {}".format(item), exc_info=True)
+                log.warning("Could not add item")
+                log.debug("Item: %s", item, exc_info=True)
 
         if baditems:
-            log.info("Skipped {} bad entries".format(baditems))
+            log.info("Skipped %s bad entries", baditems)
 
         if head:
             entry_list.reverse()
@@ -324,14 +331,15 @@ class Playlist(EventEmitter, Serializable):
                 return await entry.get_ready_future()
 
         except ExtractionError as e:
-            log.warning("Extraction failed for a playlist entry.{}".format(moving_on))
+            log.warning("Extraction failed for a playlist entry.%s", moving_on)
             self.emit("entry-failed", entry=entry, error=e)
             if not predownload:
                 return await self.get_next_entry()
 
         except AttributeError as e:
             log.warning(
-                "Deserialize probably failed for a playlist entry.{}".format(moving_on)
+                "Deserialize probably failed for a playlist entry.%s",
+                moving_on,
             )
             self.emit("entry-failed", entry=entry, error=e)
             if not predownload:
@@ -370,21 +378,29 @@ class Playlist(EventEmitter, Serializable):
         self, position: int, player: "MusicPlayer"
     ) -> datetime.timedelta:
         """
-        (very) Roughly estimates the time till the queue will 'position'
+        (very) Roughly estimates the time till the queue will reach given `position`.
+
+        :param: position:  The index in the queue to reach.
+        :param: player:  MusicPlayer instance this playlist should belong to.
+
+        :returns: A datetime.timedelta object with the estimated time.
+
+        :raises: musicbot.exceptions.InvalidDataError  if duration data cannot be calculated.
         """
+        # TODO: double check the way we deal with time again.  I've messed something up.
         if any(e.duration is None for e in islice(self.entries, position - 1)):
             raise InvalidDataError("no duration data")
-        else:
-            estimated_time = sum(
-                float(e.duration_td.seconds) for e in islice(self.entries, position - 1)
-            )
+
+        estimated_time = sum(
+            float(e.duration_td.seconds) for e in islice(self.entries, position - 1)
+        )
 
         # When the player plays a song, it eats the first playlist item, so we just have to add the time back
         if not player.is_stopped and player.current_entry:
             if player.current_entry.duration is None:  # duration can be 0
                 raise InvalidDataError("no duration data in current entry")
-            else:
-                estimated_time += player.current_entry.duration - player.progress
+
+            estimated_time += player.current_entry.duration - player.progress
 
         return datetime.timedelta(seconds=estimated_time)
 

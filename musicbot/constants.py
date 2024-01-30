@@ -7,7 +7,8 @@ try:
         .decode("ascii")
         .strip()
     )
-except Exception:
+except (subprocess.SubprocessError, OSError, ValueError) as e:
+    print(f"Failed setting version constant, reason:  {str(e)}")
     VERSION = "version_unknown"
 
 # constant string exempt from i18n
@@ -28,6 +29,7 @@ DEFAULT_AUDIO_CACHE_PATH: str = "audio_cache"
 
 EXAMPLE_OPTIONS_FILE: str = "config/example_options.ini"
 EXAMPLE_PERMS_FILE: str = "config/example_permissions.ini"
+EXAMPLE_COMMAND_ALIAS_FILE: str = "config/example_aliases.json"
 
 DISCORD_MSG_CHAR_LIMIT: int = 2000
 

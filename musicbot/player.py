@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import asyncio
 import io
 import json
@@ -7,12 +8,12 @@ import os
 import sys
 from enum import Enum
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Union, Optional, List, Dict
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from discord import FFmpegPCMAudio, PCMVolumeTransformer, AudioSource, VoiceClient
+from discord import AudioSource, FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 
 from .constructs import Serializable, Serializer, SkipState
-from .entry import URLPlaylistEntry, StreamPlaylistEntry
+from .entry import StreamPlaylistEntry, URLPlaylistEntry
 from .exceptions import FFmpegError, FFmpegWarning
 from .lib.event_emitter import EventEmitter
 
@@ -140,7 +141,7 @@ class MusicPlayer(EventEmitter, Serializable):
             self._kill_current_player()
             return
 
-        raise ValueError("Cannot resume playback from state %s" % self.state)
+        raise ValueError(f"Cannot resume playback from state {self.state}")
 
     def pause(self) -> None:
         if self.is_playing:
@@ -152,10 +153,10 @@ class MusicPlayer(EventEmitter, Serializable):
             self.emit("pause", player=self, entry=self.current_entry)
             return
 
-        elif self.is_paused:
+        if self.is_paused:
             return
 
-        raise ValueError("Cannot pause a MusicPlayer in state %s" % self.state)
+        raise ValueError(f"Cannot pause a MusicPlayer in state {self.state}")
 
     def kill(self) -> None:
         self.state = MusicPlayerState.DEAD
@@ -188,7 +189,7 @@ class MusicPlayer(EventEmitter, Serializable):
             return
 
         if (
-            type(self._stderr_future) is asyncio.Future
+            isinstance(self._stderr_future, asyncio.Future)
             and self._stderr_future.done()
             and self._stderr_future.exception()
         ):
@@ -254,9 +255,10 @@ class MusicPlayer(EventEmitter, Serializable):
                     aoptions = "-vn"
 
                 log.ffmpeg(  # type: ignore[attr-defined]
-                    "Creating player with options: {} {} {}".format(
-                        boptions, aoptions, entry.filename
-                    )
+                    "Creating player with options: %s %s %s",
+                    boptions,
+                    aoptions,
+                    entry.filename,
                 )
 
                 stderr_io = io.BytesIO()
@@ -273,7 +275,7 @@ class MusicPlayer(EventEmitter, Serializable):
                     )
                 )
                 log.debug(
-                    "Playing {0} using {1}".format(self._source, self.voice_client)
+                    "Playing %s using %s", repr(self._source), repr(self.voice_client)
                 )
                 self.voice_client.play(self._source, after=self._playback_finished)
 
@@ -297,53 +299,54 @@ class MusicPlayer(EventEmitter, Serializable):
 
     async def _handle_file_cleanup(self, entry: EntryTypes) -> None:
         if not isinstance(entry, StreamPlaylistEntry):
-            if any([entry.filename == e.filename for e in self.playlist.entries]):
+            if any(entry.filename == e.filename for e in self.playlist.entries):
                 log.debug(
-                    'Skipping deletion of "{}", found song in queue'.format(
-                        entry.filename
-                    )
+                    "Skipping deletion of '%s', found song in queue",
+                    entry.filename,
                 )
             else:
-                log.debug("Deleting file: {}".format(os.path.relpath(entry.filename)))
+                log.debug("Deleting file:  %s", os.path.relpath(entry.filename))
                 filename = entry.filename
-                for x in range(30):
+                for _ in range(3):
                     try:
                         os.unlink(filename)
-                        log.debug("File deleted: {0}".format(filename))
+                        log.debug("File deleted:  %s", filename)
                         break
                     except PermissionError as e:
                         if e.errno == 32:  # File is in use
-                            log.error(
-                                "Can't delete file, it is currently in use: {0}".format(
-                                    filename
-                                )
+                            log.warning("Cannot delete file, it is currently in use.")
+                        else:
+                            log.warning(
+                                "Cannot delete file due to a permissions error.",
+                                exc_info=True,
                             )
                     except FileNotFoundError:
-                        log.debug(
-                            "Could not find delete {} as it was not found. Skipping.".format(
-                                filename
-                            ),
+                        log.warning(
+                            "Cannot delete file, it was not found.",
                             exc_info=True,
                         )
                         break
-                    except Exception:
-                        log.error(
-                            "Error trying to delete {}".format(filename),
+                    except (OSError, IsADirectoryError):
+                        log.warning(
+                            "Error while trying to delete file.",
                             exc_info=True,
                         )
                         break
                 else:
-                    print(
-                        "[Config:SaveVideos] Could not delete file {}, giving up and moving on".format(
-                            os.path.relpath(filename)
-                        )
+                    log.debug(
+                        "[Config:SaveVideos] Could not delete file, giving up and moving on"
                     )
 
     def __json__(self) -> Dict[str, Any]:
         progress_frames = None
-        if self._current_player and self._current_player._player:
+        if (
+            self._current_player
+            and self._current_player._player  # pylint: disable=protected-access
+        ):
             if self.progress is not None:
-                progress_frames = self._current_player._player.loops
+                progress_frames = (
+                    self._current_player._player.loops  # pylint: disable=protected-access
+                )
 
         return self._enclose_json(
             {
@@ -387,15 +390,19 @@ class MusicPlayer(EventEmitter, Serializable):
 
     @classmethod
     def from_json(
-        cls, raw_json: str, bot: MusicBot, voice_client: VoiceClient, playlist: Playlist
+        cls,
+        raw_json: str,
+        bot: MusicBot,  # pylint: disable=unused-argument
+        voice_client: VoiceClient,  # pylint: disable=unused-argument
+        playlist: Playlist,  # pylint: disable=unused-argument
     ) -> Optional[MusicPlayer]:
         try:
             obj = json.loads(raw_json, object_hook=Serializer.deserialize)
-            if type(obj) is MusicPlayer:
+            if isinstance(obj, MusicPlayer):
                 return obj
             return None
-        except Exception as e:
-            log.exception("Failed to deserialize player", e)
+        except json.JSONDecodeError:
+            log.exception("Failed to deserialize player")
             return None
 
     @property
@@ -439,7 +446,8 @@ def filter_stderr(stderr: io.BytesIO, future: asyncio.Future[Any]) -> None:
         data = stderr.readline()
         if data:
             log.ffmpeg(  # type: ignore[attr-defined]
-                "Data from ffmpeg: {0!r}".format(data)
+                "Data from ffmpeg: %s",
+                repr(data),
             )
             try:
                 if check_stderr(data):

@@ -1,7 +1,7 @@
 import asyncio
-import traceback
 import collections
-from typing import Callable, DefaultDict, List, Any
+import traceback
+from typing import Any, Callable, DefaultDict, List
 
 EventCallback = Callable[..., Any]
 EventList = List[EventCallback]
@@ -24,7 +24,7 @@ class EventEmitter:
                 else:
                     cb(*args, **kwargs)
 
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 traceback.print_exc()
 
     def on(self, event: str, cb: EventCallback) -> Any:
