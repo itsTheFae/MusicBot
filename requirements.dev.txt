@@ -11,6 +11,6 @@ objgraph
 flake8
 flake8-type-checking
 black
-isort
+isort[colors]
 mypy
 pylint
