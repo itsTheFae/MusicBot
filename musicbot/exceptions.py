@@ -1,7 +1,6 @@
 import shutil
 import textwrap
 from enum import Enum
-from typing import Optional
 
 
 # Base class for exceptions
@@ -100,13 +99,13 @@ class HelpfulError(MusicbotException):
     def message_no_format(self) -> str:
         return self._message_fmt.format(
             preface=self.preface,
-            problem=self._pretty_wrap(self.issue, "  Problem:", width=0),
-            solution=self._pretty_wrap(self.solution, "  Solution:", width=0),
+            problem=self._pretty_wrap(self.issue, "  Problem:", width=-1),
+            solution=self._pretty_wrap(self.solution, "  Solution:", width=-1),
             footnote=self.footnote,
         )
 
     @staticmethod
-    def _pretty_wrap(text: str, pretext: str, *, width: Optional[int] = -1) -> str:
+    def _pretty_wrap(text: str, pretext: str, *, width: int = -1) -> str:
         if width is None:
             return "\n".join((pretext.strip(), text))
 
