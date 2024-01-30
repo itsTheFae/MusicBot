@@ -735,14 +735,20 @@ class MusicBot(discord.Client):
         # TODO: Check channel voice state?
 
     async def on_player_resume(
-        self, player: MusicPlayer, _entry: EntryTypes, **_: Any
+        self,
+        player: MusicPlayer,
+        entry: EntryTypes,  # pylint: disable=unused-argument
+        **_: Any,
     ) -> None:
         log.debug("Running on_player_resume")
         await self.reset_player_inactivity(player)
         await self.update_now_playing_status()
 
     async def on_player_pause(
-        self, player: MusicPlayer, _entry: EntryTypes, **_: Any
+        self,
+        player: MusicPlayer,
+        entry: EntryTypes,  # pylint: disable=unused-argument
+        **_: Any,
     ) -> None:
         log.debug("Running on_player_pause")
         await self.update_now_playing_status()
@@ -902,7 +908,7 @@ class MusicBot(discord.Client):
     async def on_player_entry_added(
         self,
         player: MusicPlayer,
-        _playlist: Playlist,
+        playlist: Playlist,  # pylint: disable=unused-argument
         entry: EntryTypes,
         defer_serialize: bool = False,
         **_: Any,
@@ -916,7 +922,11 @@ class MusicBot(discord.Client):
             await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_error(
-        self, _player: MusicPlayer, entry: EntryTypes, ex: Optional[Exception], **_: Any
+        self,
+        player: MusicPlayer,  # pylint: disable=unused-argument
+        entry: EntryTypes,
+        ex: Optional[Exception],
+        **_: Any,
     ) -> None:
         author = entry.meta.get("author", None)
         channel = entry.meta.get("channel", None)
