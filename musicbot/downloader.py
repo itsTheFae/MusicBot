@@ -119,7 +119,7 @@ class Downloader:
         test_url = self.get_url_or_none(url)
         headers: Dict[str, Any] = {}
         # do a HEAD request and add the headers to extraction info.
-        if test_url:
+        if test_url and self.bot.session:
             try:
                 head_data = await get_headers(
                     self.bot.session,
@@ -181,16 +181,22 @@ class Downloader:
     ) -> "YtdlpResponseDict":
         """
         Runs ytdlp.extract_info with all arguments passed to this function.
+        If `song_subject` is a valid URL, extraction will add HEAD request headers.
         Resulting data is passed through ytdlp's sanitize_info and returned
-        inside of a YtdlpResponseDict.
+        inside of a YtdlpResponseDict wrapper.
 
         Single-entry search results are returned as if they were top-level extractions.
         Links for spotify tracks, albums, and playlists also get special filters.
 
         :param: song_subject: a song url or search subject.
         :kwparam: as_stream: If we should try to queue the URL anyway and let ffmpeg figure it out.
+
         :returns: YtdlpResponseDict containing sanitized extraction data.
-        :raises: ExtractionError as well as YoutubeDLError based exceptions.
+
+        :raises: musicbot.exceptions.ExtractionError  for errors in MusicBot's internal filtering and pre-processing of extraction queries.
+        :raises: musicbot.exceptions.SpotifyError  for issues with Musicbot's Spotify API request and data handling.
+        :raises: yt_dlp.utils.YoutubeDLError  as a base exception for any exceptions raised by yt_dlp.
+        :raises: yt_dlp.networking.exceptions.RequestError  as a base exception for any networking errors raised by yt_dlp.
         """
         # Hash the URL for use as a unique ID in file paths.
         md5 = hashlib.md5()
@@ -247,6 +253,7 @@ class Downloader:
         if (
             "open.spotify.com" in song_subject.lower()
             and self.bot.config.spotify_enabled
+            and self.bot.spotify is not None
         ):
             if not Spotify.is_url_supported(song_subject):
                 raise ExtractionError("Spotify URL is invalid or not supported.")
@@ -279,11 +286,6 @@ class Downloader:
                     self.unsafe_ytdl.extract_info, song_subject, *args, **kwargs
                 ),
             )
-        # TODO:  handle streaming cases:
-        # - DownloadError / UnsupportedError = Assume direct stream?
-        # - DownloadError / URLError = Do we allow file paths??
-        # - DownloadError / * = invalid anyway.
-        # - Exception  = Could not extract information from {song_url} ({err}), falling back to direct
         except DownloadError as e:
             if not as_stream_url:
                 raise ExtractionError(str(e)) from e
@@ -312,6 +314,7 @@ class Downloader:
                 "Caught NoSupportingHandlers, trying again after replacing colon with space."
             )
             song_subject = song_subject.replace(":", " ")
+            # TODO: maybe this also needs some exception handling...
             data = await self.bot.loop.run_in_executor(
                 self.thread_pool,
                 functools.partial(
@@ -355,6 +358,10 @@ class Downloader:
 class YtdlpResponseDict(YUserDict):
     """
     UserDict wrapper for ytdlp extraction data with helpers for easier data reuse.
+    The dict features are available only for compat with existing code.
+    Use of the dict subscript notation is not advised and could/should be
+    removed in the future, in favor of typed properties and processing
+    made available herein.
 
     See ytdlp doc string in InfoExtractor for info on data:
     https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/common.py

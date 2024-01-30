@@ -63,6 +63,10 @@ class BasePlaylistEntry(Serializable):
 
         return bool(self.filename) and self._is_downloaded
 
+    @property
+    def is_downloading(self) -> bool:
+        return self._is_downloading
+
     async def _download(self) -> None:
         raise NotImplementedError
 

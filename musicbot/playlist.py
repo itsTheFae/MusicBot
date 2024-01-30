@@ -42,6 +42,11 @@ class Playlist(EventEmitter, Serializable):
     """
 
     def __init__(self, bot: "MusicBot") -> None:
+        if bot.session is None:
+            raise RuntimeError(
+                "Attempt to make Playlist object without aiohttp session. This should never happen..."
+            )
+
         super().__init__()
         self.bot: "MusicBot" = bot
         self.loop: "asyncio.AbstractEventLoop" = bot.loop
@@ -373,8 +378,16 @@ class Playlist(EventEmitter, Serializable):
         self, position: int, player: "MusicPlayer"
     ) -> datetime.timedelta:
         """
-        (very) Roughly estimates the time till the queue will 'position'
+        (very) Roughly estimates the time till the queue will reach given `position`.
+
+        :param: position:  The index in the queue to reach.
+        :param: player:  MusicPlayer instance this playlist should belong to.
+
+        :returns: A datetime.timedelta object with the estimated time.
+
+        :raises: musicbot.exceptions.InvalidDataError  if duration data cannot be calculated.
         """
+        # TODO: double check the way we deal with time again.  I've messed something up.
         if any(e.duration is None for e in islice(self.entries, position - 1)):
             raise InvalidDataError("no duration data")
 
