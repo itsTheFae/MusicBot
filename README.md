@@ -29,7 +29,8 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
-- Ensure source code complies with mypy checks, and fix various bugs on the way. *[ongoing]*
+- Enforce code checks using `Pylint` and `isort` to reduce inconsistency and clean up code.
+- Ensure source code complies with mypy checks, and fix various bugs on the way.
   - Updates MusicBot logging to enable time-based log files and safely close the logs in most cases.
   - Removes `shlex` from the `search` command, search engines now handle quotes directly.
   - Fixes possible issues with counting members in channel not respecting bot exceptions.
