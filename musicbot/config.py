@@ -500,15 +500,14 @@ class Config:
                 )
 
         # ensure cache map and removed files have values based on the configured file.
-        path = self.auto_playlist_file.parent
         stem = self.auto_playlist_file.stem
         ext = self.auto_playlist_file.suffix
 
         ap_removed_file = self.auto_playlist_file.with_name(f"{stem}_removed{ext}")
         ap_cachemap_file = self.auto_playlist_file.with_name(f"{stem}.cachemap.json")
 
-        self.auto_playlist_removed_file = path.joinpath(ap_removed_file)
-        self.auto_playlist_cachemap_file = path.joinpath(ap_cachemap_file)
+        self.auto_playlist_removed_file = ap_removed_file
+        self.auto_playlist_cachemap_file = ap_cachemap_file
 
 
 class ConfigDefaults:

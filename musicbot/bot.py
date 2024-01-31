@@ -95,6 +95,8 @@ log = logging.getLogger(__name__)
 # TODO: fix perms command to send in channel if DM fails.
 # TODO: fix current blacklist to be more clear.
 # TODO: add a proper blacklist for song-related data, not just users.
+# TODO: review duration related code, make it less spamy if nothing else.
+# TODO: review timedelta usage to make sure time is formated as desired. no MS, no empty hours.
 
 
 class MusicBot(discord.Client):
@@ -421,20 +423,28 @@ class MusicBot(discord.Client):
                 song_url,
             )
 
-            with open(
-                self.config.auto_playlist_removed_file, "a", encoding="utf8"
-            ) as f:
-                ctime = time.ctime()
-                # add 10 spaces to line up with # Reason:
-                e_str = str(ex).replace("\n", "\n#" + " " * 10)
-                url = (song_url,)
-                sep = ("#" * 32,)
-                f.write(
-                    f"# Entry removed {ctime}\n"
-                    f"# URL:  {url}\n"
-                    f"# Reason: {e_str}\n"
-                    f"\n{sep}\n\n"
-                )
+            if not self.config.auto_playlist_removed_file.is_file():
+                self.config.auto_playlist_removed_file.touch(exist_ok=True)
+
+            try:
+                with open(
+                    self.config.auto_playlist_removed_file, "a", encoding="utf8"
+                ) as f:
+                    ctime = time.ctime()
+                    # add 10 spaces to line up with # Reason:
+                    e_str = str(ex).replace("\n", "\n#" + " " * 10)
+                    url = song_url
+                    sep = "#" * 32
+                    f.write(
+                        f"# Entry removed {ctime}\n"
+                        f"# URL:  {url}\n"
+                        f"# Reason: {e_str}\n"
+                        f"\n{sep}\n\n"
+                    )
+            except (
+                OSError, PermissionError, FileNotFoundError, IsADirectoryError
+            ):
+                log.exception("Could not log information about the playlist URL removal.")
 
             if delete_from_ap:
                 log.info("Updating autoplaylist file...")
@@ -1765,16 +1775,6 @@ class MusicBot(discord.Client):
 
         return None
 
-    def _add_url_to_autoplaylist(self, url: str) -> None:
-        self.autoplaylist.append(url)
-        write_file(self.config.auto_playlist_file, self.autoplaylist)
-        log.debug("Appended %s to autoplaylist", url)
-
-    def _remove_url_from_autoplaylist(self, url: str) -> None:
-        self.autoplaylist.remove(url)
-        write_file(self.config.auto_playlist_file, self.autoplaylist)
-        log.debug("Removed %s from autoplaylist", url)
-
     async def handle_vc_inactivity(self, guild: discord.Guild) -> None:
         if not guild.me.voice or not guild.me.voice.channel:
             log.warning(
@@ -2093,7 +2093,7 @@ class MusicBot(discord.Client):
         )
 
     async def cmd_autoplaylist(
-        self, _player: Optional[MusicPlayer], option: str, opt_url: str = ""
+        self, author: discord.Member, _player: Optional[MusicPlayer], option: str, opt_url: str = ""
     ) -> CommandResponse:
         """
         Usage:
@@ -2130,7 +2130,13 @@ class MusicBot(discord.Client):
 
         if option in ["-", "remove"]:
             if url in self.autoplaylist:
-                await self.remove_url_from_autoplaylist(url, delete_from_ap=True)
+                await self.remove_url_from_autoplaylist(
+                    url,
+                    ex=UserWarning(
+                        f"Removed by command from user:  {author.id}/{author.name}#{author.discriminator}"
+                    ),
+                    delete_from_ap=True
+                )
                 return Response(
                     self.str.get(
                         "cmd-unsave-success", "Removed <{0}> from the autoplaylist."
