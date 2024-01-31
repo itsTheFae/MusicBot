@@ -588,15 +588,26 @@ class Spotify:
 
         if self.guest_mode:
             token = await self._request_guest_token()
-            if token is None:
+            if not token:
                 raise SpotifyError(
                     "Failed to get a guest token from Spotify, please try specifying client id and client secret"
                 )
-            self._token = {
-                "access_token": token["accessToken"],
-                "expires_at": int(token["accessTokenExpirationTimestampMs"]) / 1000,
-            }
-            log.debug("Created a new Guest Mode access token.")
+            try:
+                self._token = {
+                    "access_token": token["accessToken"],
+                    "expires_at": int(token["accessTokenExpirationTimestampMs"]) / 1000,
+                }
+                log.debug("Created a new Guest Mode access token.")
+            except KeyError as e:
+                self._token = None
+                raise SpotifyError(
+                    f"API response did not contain the expected data. Missing: {str(e)}"
+                ) from e
+            except (ValueError, TypeError) as e:
+                self._token = None
+                raise SpotifyError(
+                    f"API response contained unexpected data.  {str(e)}"
+                ) from e
         else:
             token = await self._request_token()
             if token is None:
@@ -629,8 +640,11 @@ class Spotify:
         try:
             async with self.aiosession.get(self.WEB_TOKEN_URL) as r:
                 if r.status != 200:
+                    # Note:  when status == 429 we could check for "Retry*" headers.
+                    # however, this isn't an API endpoint, so we don't get Retry data.
+                    # TODO: check if changing UA string would work around 429.
                     raise SpotifyError(
-                        f"Response status is not OK: [{r.status}]  {r.reason}"
+                        f"API response status is not OK: [{r.status}]  {r.reason}"
                     )
 
                 data = await r.json()  # type: Dict[str, Any]
@@ -643,6 +657,9 @@ class Spotify:
             aiohttp.ContentTypeError,
             JSONDecodeError,
             SpotifyError,
-        ):
-            log.exception("Failed to get Spotify Guest Token.")
+        ) as e:
+            if log.getEffectiveLevel() <= logging.DEBUG:
+                log.exception("Failed to get Spotify Guest Token.")
+            else:
+                log.error("Failed to get Guest Token due to: %s", str(e))
             return {}
