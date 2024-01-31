@@ -400,6 +400,10 @@ class MusicPlayer(EventEmitter, Serializable):
             obj = json.loads(raw_json, object_hook=Serializer.deserialize)
             if isinstance(obj, MusicPlayer):
                 return obj
+            log.error(
+                "Deserialize returned a non-MusicPlayer:  %s",
+                type(obj),
+            )
             return None
         except json.JSONDecodeError:
             log.exception("Failed to deserialize player")
