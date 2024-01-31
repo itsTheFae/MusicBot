@@ -60,6 +60,9 @@ class SpotifyError(MusicbotException):
 
 # The user doesn't have permission to use a command
 class PermissionsError(CommandError):
+    def __init__(self, msg: str, expire_in: int = 0) -> None:
+        super().__init__(msg, expire_in=expire_in)
+
     @property
     def message(self) -> str:
         return (
