@@ -67,12 +67,12 @@ class Serializer(json.JSONEncoder):
     def deserialize(cls, data: Dict[str, Any]) -> Any:
         if all(x in data for x in Serializable.CLASS_SIGNATURE):
             # log.debug("Deserialization requested for %s", data)
-            factory = type(pydoc.locate(data["__module__"] + "." + data["__class__"]))
+            factory = pydoc.locate(data["__module__"] + "." + data["__class__"])
             # log.debug("Found object %s", factory)
-            if factory and issubclass(factory, Serializable):
+            if factory and issubclass(factory, Serializable):  # type: ignore[arg-type]
                 # log.debug("Deserializing %s object", factory)
-                return factory._deserialize(
-                    data["data"], **cls._get_vars(factory._deserialize)
+                return factory._deserialize(  # type: ignore[attr-defined]
+                    data["data"], **cls._get_vars(factory._deserialize)  # type: ignore[attr-defined]
                 )
 
         return data
