@@ -441,10 +441,10 @@ class MusicBot(discord.Client):
                         f"# Reason: {e_str}\n"
                         f"\n{sep}\n\n"
                     )
-            except (
-                OSError, PermissionError, FileNotFoundError, IsADirectoryError
-            ):
-                log.exception("Could not log information about the playlist URL removal.")
+            except (OSError, PermissionError, FileNotFoundError, IsADirectoryError):
+                log.exception(
+                    "Could not log information about the playlist URL removal."
+                )
 
             if delete_from_ap:
                 log.info("Updating autoplaylist file...")
@@ -2093,7 +2093,11 @@ class MusicBot(discord.Client):
         )
 
     async def cmd_autoplaylist(
-        self, author: discord.Member, _player: Optional[MusicPlayer], option: str, opt_url: str = ""
+        self,
+        author: discord.Member,
+        _player: Optional[MusicPlayer],
+        option: str,
+        opt_url: str = "",
     ) -> CommandResponse:
         """
         Usage:
@@ -2135,7 +2139,7 @@ class MusicBot(discord.Client):
                     ex=UserWarning(
                         f"Removed by command from user:  {author.id}/{author.name}#{author.discriminator}"
                     ),
-                    delete_from_ap=True
+                    delete_from_ap=True,
                 )
                 return Response(
                     self.str.get(
