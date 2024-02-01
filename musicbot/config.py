@@ -55,6 +55,15 @@ def create_empty_file_ifnoexist(path: pathlib.Path) -> None:
 
 class Config:
     def __init__(self, config_file: pathlib.Path) -> None:
+        """
+        Handles locating, initializing, loading, and validating config data.
+        Immediately validates all data which can be without async facilities.
+
+        :param: config_file:  a configuration file path to load.
+
+        :raises: musicbot.exceptions.HelpfulError
+            if configuration fails to load for some typically known reason.
+        """
         log.info("Loading config from:  %s", config_file)
         self.config_file = config_file
         self.find_config()
