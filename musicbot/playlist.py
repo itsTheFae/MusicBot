@@ -23,7 +23,6 @@ from .lib.event_emitter import EventEmitter
 if TYPE_CHECKING:
     import asyncio
 
-    import aiohttp
     import discord
 
     from .bot import MusicBot
@@ -42,15 +41,13 @@ class Playlist(EventEmitter, Serializable):
     """
 
     def __init__(self, bot: "MusicBot") -> None:
-        if bot.session is None:
-            raise RuntimeError(
-                "Attempt to make Playlist object without aiohttp session. This should never happen..."
-            )
-
+        """
+        Manage a serializable, event-capable playlist of entries made up
+        of validated extraction information.
+        """
         super().__init__()
         self.bot: "MusicBot" = bot
         self.loop: "asyncio.AbstractEventLoop" = bot.loop
-        self.aiosession: "aiohttp.ClientSession" = bot.session
         self.entries: Deque[EntryTypes] = deque()
 
     def __iter__(self) -> Iterator[EntryTypes]:
@@ -60,12 +57,18 @@ class Playlist(EventEmitter, Serializable):
         return len(self.entries)
 
     def shuffle(self) -> None:
+        """Shuffle the deque of entries, in place."""
         shuffle(self.entries)
 
     def clear(self) -> None:
+        """Clears the deque of entries."""
         self.entries.clear()
 
     def get_entry_at_index(self, index: int) -> EntryTypes:
+        """
+        Uses deque rotate to seek to the given `index` and reference the
+        entry at that position.
+        """
         self.entries.rotate(-index)
         entry = self.entries[0]
         self.entries.rotate(index)
@@ -93,6 +96,20 @@ class Playlist(EventEmitter, Serializable):
         defer_serialize: bool = False,
         **meta: Any,
     ) -> Tuple[StreamPlaylistEntry, int]:
+        """
+        Use the given `info` to create a StreamPlaylistEntry and add it
+        to the queue.
+        If the entry is the first in the queue, it will be called to ready
+        for playback.
+
+        :param: info:  Extracted info for this entry, even fudged.
+        :param: head:  Toggle adding to the front of the queue.
+        :param: defer_serialize:  Signal to defer serialization steps.
+            Useful if many entries are added at once
+        :param: meta:  Any additional info to add to the entry.
+
+        :returns:  A tuple with the entry object, and its position in the queue.
+        """
         # TODO: A bit more validation, "~stream some_url" should not just say :ok_hand:
         # @Fae: about as much validation we can do is making sure the URL is playable.
         # Users are using stream to play without downloading, and enforcing a check
@@ -118,14 +135,20 @@ class Playlist(EventEmitter, Serializable):
         **meta: Any,
     ) -> Tuple[EntryTypes, int]:
         """
-        Validates extracted info and adds media to be played.
-        This does not start the download of the song.
+        Checks given `info` to determine if media is streaming or has a
+        stream-able content type, then adds the resulting entry to the queue.
+        If the entry is the first entry in the queue, it will be called
+        to ready for playback.
 
         :param info: The extraction data of the song to add to the playlist.
-        :param head: Add to front of queue instead.
+        :param head: Add to front of queue instead of the end.
+        :param defer_serialize:  Signal that serialization steps should be deferred.
         :param meta: Any additional metadata to add to the playlist entry.
-        :returns: the entry & the position it is in the queue.
-        :raises: ExtractionError, WrongEntryTypeError
+
+        :returns: the entry & it's position in the queue.
+
+        :raises: ExtractionError  If data is missing or the content type is invalid.
+        :raises: WrongEntryTypeError  If the info is identified as a playlist.
         """
 
         if not info:
@@ -183,12 +206,14 @@ class Playlist(EventEmitter, Serializable):
         self, info: "YtdlpResponseDict", head: bool, **meta: Any
     ) -> Tuple[List[EntryTypes], int]:
         """
-        Imports the songs from `info` and queues them to be played.
+        Validates the songs from `info` and queues them to be played.
 
-        Returns a list of `entries` that have been enqueued.
+        Returns a list of entries that have been queued, and the queue
+        position where the first entry was added.
 
-        :param playlist_url: The playlist url to be cut into individual urls and added to the playlist
-        :param meta: Any additional metadata to add to the playlist entry
+        :param: info:  YoutubeDL extraction data containing multiple entries.
+        :param: head:  Toggle adding the entries to the front of the queue.
+        :param: meta:  Any additional metadata to add to the playlist entries.
         """
         position = 1 if head else len(self.entries) + 1
         entry_list = []
@@ -222,7 +247,7 @@ class Playlist(EventEmitter, Serializable):
                 baditems += 1
                 continue
 
-            # Check youtube data to pre-emptively avoid adding Private or Deleted videos to the queue.
+            # Check youtube data to preemptively avoid adding Private or Deleted videos to the queue.
             if info.extractor.startswith("youtube") and (
                 "[private video]" == item.get("title", "").lower()
                 or "[deleted video]" == item.get("title", "").lower()
@@ -262,6 +287,9 @@ class Playlist(EventEmitter, Serializable):
     def get_next_song_from_author(
         self, author: "discord.abc.User"
     ) -> Optional[EntryTypes]:
+        """
+        Get the next song in the queue that was added by the given `author`
+        """
         for entry in self.entries:
             if entry.meta.get("author", None) == author:
                 return entry
@@ -301,6 +329,13 @@ class Playlist(EventEmitter, Serializable):
     def _add_entry(
         self, entry: EntryTypes, *, head: bool = False, defer_serialize: bool = False
     ) -> None:
+        """
+        Handle appending the `entry` to the queue. If the entry is he first,
+        the entry will create a future to download itself.
+
+        :param: head:  Toggle adding to the front of the queue.
+        :param: defer_serialize:  Signal to events that serialization should be deferred.
+        """
         if head:
             self.entries.appendleft(entry)
         else:
@@ -405,6 +440,7 @@ class Playlist(EventEmitter, Serializable):
         return datetime.timedelta(seconds=estimated_time)
 
     def count_for_user(self, user: "discord.abc.User") -> int:
+        """Get a sum of entries added to the playlist by the given `user`"""
         return sum(1 for e in self.entries if e.meta.get("author", None) == user)
 
     def __json__(self) -> Dict[str, Any]:

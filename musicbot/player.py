@@ -46,6 +46,10 @@ class SourcePlaybackCounter(AudioSource):
         source: PCMVolumeTransformer[FFmpegPCMAudio],
         progress: int = 0,
     ) -> None:
+        """
+        Manage playback source and attempt to count progress frames used
+        to measure playback progress.
+        """
         self._source = source
         self.progress = progress
 
@@ -56,6 +60,7 @@ class SourcePlaybackCounter(AudioSource):
         return res
 
     def get_progress(self) -> float:
+        """Get an approximate playback progress."""
         return self.progress * 0.02
 
     def cleanup(self) -> None:
@@ -69,6 +74,13 @@ class MusicPlayer(EventEmitter, Serializable):
         voice_client: VoiceClient,
         playlist: Playlist,
     ):
+        """
+        Manage a MusicPlayer with all its bits and bolts.
+
+        :param: bot:  A MusicBot discord client instance.
+        :param: voice_client:  a discord.VoiceClient object used for playback.
+        :param: playlist:  a collection of playable entries to be played.
+        """
         super().__init__()
         self.bot: MusicBot = bot
         self.loop: asyncio.AbstractEventLoop = bot.loop
@@ -94,10 +106,15 @@ class MusicPlayer(EventEmitter, Serializable):
 
     @property
     def volume(self) -> float:
+        """Get the volume level as last set by config or command."""
         return self._volume
 
     @volume.setter
     def volume(self, value: float) -> None:
+        """
+        Set volume to the given `value` and immediately apply it to any
+        active playback source.
+        """
         self._volume = value
         if self._source:
             self._source._source.volume = value
@@ -105,6 +122,9 @@ class MusicPlayer(EventEmitter, Serializable):
     def on_entry_added(
         self, playlist: Playlist, entry: EntryTypes, defer_serialize: bool = False
     ) -> None:
+        """
+        Event dispatched by Playlist when an entry is added to the queue.
+        """
         if self.is_stopped:
             log.noise("calling-later, self.play from player.")  # type: ignore[attr-defined]
             self.loop.call_later(2, self.play)
@@ -118,18 +138,32 @@ class MusicPlayer(EventEmitter, Serializable):
         )
 
     def on_entry_failed(self, entry: EntryTypes, error: Exception) -> None:
+        """
+        Event dispatched by Playlist when an entry failed to ready or play.
+        """
         self.emit("error", player=self, entry=entry, ex=error)
 
     def skip(self) -> None:
+        """Skip the current playing entry but just killing playback."""
         self._kill_current_player()
 
     def stop(self) -> None:
+        """
+        Immediately halt playback, killing current player source, setting
+        state to stopped and emitting an event.
+        """
         self.state = MusicPlayerState.STOPPED
         self._kill_current_player()
 
         self.emit("stop", player=self)
 
     def resume(self) -> None:
+        """
+        Resume the player audio playback if it was paused and we have a
+        VoiceClient playback source.
+        If MusicPlayer was paused but the VoiceClient player is missing,
+        do something odd and set state to playing but kill the player...
+        """
         if self.is_paused and self._current_player:
             self._current_player.resume()
             self.state = MusicPlayerState.PLAYING
@@ -144,6 +178,9 @@ class MusicPlayer(EventEmitter, Serializable):
         raise ValueError(f"Cannot resume playback from state {self.state}")
 
     def pause(self) -> None:
+        """
+        Suspend player audio playback and emit an event, if the player was playing.
+        """
         if self.is_playing:
             self.state = MusicPlayerState.PAUSED
 
@@ -159,12 +196,25 @@ class MusicPlayer(EventEmitter, Serializable):
         raise ValueError(f"Cannot pause a MusicPlayer in state {self.state}")
 
     def kill(self) -> None:
+        """
+        Set the state of the bot to Dead, clear all events and playlists,
+        then kill the current VoiceClient source player.
+        """
         self.state = MusicPlayerState.DEAD
         self.playlist.clear()
         self._events.clear()
         self._kill_current_player()
 
     def _playback_finished(self, error: Optional[Exception] = None) -> None:
+        """
+        Event fired by discord.VoiceClient after playback has finished
+        or when playback stops due to an error.
+        This function is responsible tidying the queue post-playback,
+        propagating player error or finished-playing events, and
+        triggering the media file cleanup task.
+
+        :param: error:  An exception, if any, raised by playback.
+        """
         entry = self._current_entry
         if entry is None:
             log.debug("Playback finished, but _current_entry is None.")
@@ -207,17 +257,31 @@ class MusicPlayer(EventEmitter, Serializable):
         self.emit("finished-playing", player=self, entry=entry)
 
     def _kill_current_player(self) -> bool:
+        """
+        If there is a current player source, attempt to stop it, then
+        say "Garbage day!" and set it to None anyway.
+        """
         if self._current_player:
             try:
                 self._current_player.stop()
             except OSError:
-                pass
+                log.noise("Possible Warning from kill_current_player()", exc_info=True)
+
             self._current_player = None
             return True
 
         return False
 
     def play(self, _continue: bool = False) -> None:
+        """
+        Immediately try to gracefully play the next entry in the queue.
+        If there is already an entry, but player is paused, playback will
+        resume instead of playing a new entry.
+        If the player is dead, this will silently return.
+
+        :param: _continue:  Force a player that is not dead or stopped to
+            start a new playback source anyway.
+        """
         self.loop.create_task(self._play(_continue=_continue))
 
     async def _play(self, _continue: bool = False) -> None:
@@ -298,6 +362,10 @@ class MusicPlayer(EventEmitter, Serializable):
                 self.emit("play", player=self, entry=entry)
 
     async def _handle_file_cleanup(self, entry: EntryTypes) -> None:
+        """
+        A helper used to clean up media files via call-later, when file
+        cache is not enabled.
+        """
         if not isinstance(entry, StreamPlaylistEntry):
             if any(entry.filename == e.filename for e in self.playlist.entries):
                 log.debug(
@@ -396,6 +464,11 @@ class MusicPlayer(EventEmitter, Serializable):
         voice_client: VoiceClient,  # pylint: disable=unused-argument
         playlist: Playlist,  # pylint: disable=unused-argument
     ) -> Optional[MusicPlayer]:
+        """
+        Create a MusicPlayer instance from serialized `raw_json` string data.
+        The remaining arguments are made available to the MusicPlayer
+        and other serialized instances via call frame inspection.
+        """
         try:
             obj = json.loads(raw_json, object_hook=Serializer.deserialize)
             if isinstance(obj, MusicPlayer):
@@ -411,26 +484,34 @@ class MusicPlayer(EventEmitter, Serializable):
 
     @property
     def current_entry(self) -> Optional[EntryTypes]:
+        """Get the currently playing entry if there is one."""
         return self._current_entry
 
     @property
     def is_playing(self) -> bool:
+        """Test if MusicPlayer is in a playing state"""
         return self.state == MusicPlayerState.PLAYING
 
     @property
     def is_paused(self) -> bool:
+        """Test if MusicPlayer is in a paused state"""
         return self.state == MusicPlayerState.PAUSED
 
     @property
     def is_stopped(self) -> bool:
+        """Test if MusicPlayer is in a stopped state"""
         return self.state == MusicPlayerState.STOPPED
 
     @property
     def is_dead(self) -> bool:
+        """Test if MusicPlayer is in a dead state"""
         return self.state == MusicPlayerState.DEAD
 
     @property
     def progress(self) -> float:
+        """
+        Return a progress value for the media playback.
+        """
         if self._source:
             return self._source.get_progress()
             # TODO: Properly implement this
@@ -440,10 +521,15 @@ class MusicPlayer(EventEmitter, Serializable):
         return 0
 
 
-# TODO: I need to add a check for if the eventloop is closed
+# TODO: I need to add a check if the event loop is closed?
 
 
 def filter_stderr(stderr: io.BytesIO, future: asyncio.Future[Any]) -> None:
+    """
+    Consume a `stderr` bytes stream and check it for errors or warnings.
+    Set the given `future` with either an error found in the stream or
+    set the future with a successful result.
+    """
     last_ex = None
 
     while True:
@@ -464,8 +550,8 @@ def filter_stderr(stderr: io.BytesIO, future: asyncio.Future[Any]) -> None:
                 )
                 last_ex = e
 
-            except FFmpegWarning:
-                pass  # useless message
+            except FFmpegWarning as e:
+                log.ffmpeg("Warning from ffmpeg:  %s", str(e).strip())
         else:
             break
 
@@ -476,6 +562,17 @@ def filter_stderr(stderr: io.BytesIO, future: asyncio.Future[Any]) -> None:
 
 
 def check_stderr(data: bytes) -> bool:
+    """
+    Inspect `data` from a subprocess call's stderr output for specific
+    messages and raise them as a suitable exception.
+
+    :returns:  True if nothing was detected or nothing could be detected.
+
+    :raises: musicbot.exceptions.FFmpegWarning
+        If a warning level message was detected in the `data`
+    :raises: musicbot.exceptions.FFmpegError
+        If an error message was detected in the `data`
+    """
     ddata = ""
     try:
         ddata = data.decode("utf8")
@@ -485,7 +582,7 @@ def check_stderr(data: bytes) -> bool:
         )
         return True  # fuck it
 
-    # log.ffmpeg("Decoded data from ffmpeg: {}".format(ddata))
+    log.ffmpeg("Decoded data from ffmpeg: %s", ddata)  # type: ignore[attr-defined]
 
     # TODO: Regex
     warnings = [
