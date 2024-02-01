@@ -26,7 +26,7 @@ from .utils import get_headers
 if TYPE_CHECKING:
     from .bot import MusicBot
 
-    # Excplicit compat with python 3.8
+    # Explicit compat with python 3.8
     YUserDict = UserDict[str, Any]
 else:
     YUserDict = UserDict
@@ -70,8 +70,13 @@ youtube_dl.utils.bug_reports_message = lambda: ""
 
 class Downloader:
     def __init__(self, bot: "MusicBot") -> None:
+        """
+        Set up YoutubeDL and related config as well as a thread pool executor
+        to run concurrent extractions.
+        """
         self.bot: "MusicBot" = bot
         self.download_folder: pathlib.Path = bot.config.audio_cache_path
+        # TODO: this should probably be configurable.  Perhaps via CLI args.
         self.thread_pool = ThreadPoolExecutor(max_workers=2)
 
         # force ytdlp and HEAD requests to use the same UA string.
@@ -96,10 +101,14 @@ class Downloader:
 
     @property
     def ytdl(self) -> youtube_dl.YoutubeDL:
+        """Get the Safe (errors ignored) instance of YoutubeDL."""
         return self.safe_ytdl
 
     def get_url_or_none(self, url: str) -> Optional[str]:
-        """Uses ytdl.utils.url_or_none() to validate a playable URL"""
+        """
+        Uses ytdl.utils.url_or_none() to validate a playable URL.
+        Will also strip < and > if they are found at the start and end of a URL.
+        """
         # Discord might add < and > to the URL, this strips them out if they exist.
         if url.startswith("<") and url.endswith(">"):
             url = url[1:-1]
@@ -152,7 +161,7 @@ class Downloader:
     ) -> None:
         """
         Debug helper function.
-        Copies data, removes some long-winded entires and logs the result data for inspection.
+        Copies data, removes some long-winded entries and logs the result data for inspection.
         """
         if log.getEffectiveLevel() > logging.DEBUG:
             return
@@ -191,12 +200,19 @@ class Downloader:
         :param: song_subject: a song url or search subject.
         :kwparam: as_stream: If we should try to queue the URL anyway and let ffmpeg figure it out.
 
-        :returns: YtdlpResponseDict containing sanitized extraction data.
+        :returns: YtdlpResponseDict object containing sanitized extraction data.
 
-        :raises: musicbot.exceptions.ExtractionError  for errors in MusicBot's internal filtering and pre-processing of extraction queries.
-        :raises: musicbot.exceptions.SpotifyError  for issues with Musicbot's Spotify API request and data handling.
-        :raises: yt_dlp.utils.YoutubeDLError  as a base exception for any exceptions raised by yt_dlp.
-        :raises: yt_dlp.networking.exceptions.RequestError  as a base exception for any networking errors raised by yt_dlp.
+        :raises: musicbot.exceptions.ExtractionError
+            for errors in MusicBot's internal filtering and pre-processing of extraction queries.
+
+        :raises: musicbot.exceptions.SpotifyError
+            for issues with Musicbot's Spotify API request and data handling.
+
+        :raises: yt_dlp.utils.YoutubeDLError
+            as a base exception for any exceptions raised by yt_dlp.
+
+        :raises: yt_dlp.networking.exceptions.RequestError
+            as a base exception for any networking errors raised by yt_dlp.
         """
         # Hash the URL for use as a unique ID in file paths.
         md5 = hashlib.md5()
@@ -204,7 +220,7 @@ class Downloader:
         # we only use the last 8 characters of md5.  Its probably good enough.
         song_subject_hash = md5.hexdigest()[-8:]
 
-        # Use ytdl or one of our custom integrations to get info.
+        # Use ytdl or one of our custom integration to get info.
         data = await self._filtered_extract_info(
             song_subject,
             *args,
@@ -240,16 +256,32 @@ class Downloader:
         self, song_subject: str, *args: Any, **kwargs: Any
     ) -> Dict[str, Any]:
         """
-        The real logic behind extract_info().
+        The real logic behind Downloader.extract_info()
+        This function uses an event loop executor to make the call to
+        YoutubeDL.extract_info() via the unsafe instance, which will issue errors.
 
-        :param: song_subject: a song_url or search subject.
-        :returns: YtdlpResponseDict containing sanitized extraction data.
-        :raises: YoutubeDLError as base exception.
+        :param: song_subject: a song url or search subject.
+        :kwparam: as_stream: If we should try to queue the URL anyway and let ffmpeg figure it out.
+
+        :returns: Dictionary of data returned from extract_info() or other
+            integration. Serialization ready.
+
+        :raises: musicbot.exceptions.ExtractionError
+            for errors in MusicBot's internal filtering and pre-processing of extraction queries.
+
+        :raises: musicbot.exceptions.SpotifyError
+            for issues with Musicbot's Spotify API request and data handling.
+
+        :raises: yt_dlp.utils.YoutubeDLError
+            as a base exception for any exceptions raised by yt_dlp.
+
+        :raises: yt_dlp.networking.exceptions.RequestError
+            as a base exception for any networking errors raised by yt_dlp.
         """
         log.noise(f"Called extract_info with:  '{song_subject}', {args}, {kwargs}")  # type: ignore[attr-defined]
         as_stream_url = kwargs.pop("as_stream", False)
 
-        # handle extracting spotify links before ytdl get ahold of them.
+        # handle extracting spotify links before ytdl get a hold of them.
         if (
             "open.spotify.com" in song_subject.lower()
             and self.bot.config.spotify_enabled
@@ -292,7 +324,7 @@ class Downloader:
 
             log.exception("Download Error with stream URL")
             if e.exc_info[0] == UnsupportedError:
-                # ytdl doesn't support it but it could be streamable...
+                # ytdl doesn't support it but it could be stream-able...
                 song_url = self.get_url_or_none(song_subject)
                 if song_url:
                     log.debug("Assuming content is a direct stream")
@@ -329,7 +361,7 @@ class Downloader:
         # when searching via a play command.
         # Combine the entry dict with the info dict as if it was a top-level extraction.
         # This prevents single-entry searches being processed like a playlist later.
-        # However we must preserve the list behaviour when using cmd_search.
+        # However we must preserve the list behavior when using cmd_search.
         if (
             data.get("extractor", "") == "youtube:search"
             and len(data.get("entries", [])) == 1
@@ -348,6 +380,11 @@ class Downloader:
         return data
 
     async def safe_extract_info(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Awaits an event loop executor to call extract_info in a thread pool.
+        Uses an instance of YoutubeDL with errors explicitly ignored to
+        call extract_info with all arguments passed to this function.
+        """
         log.noise(f"Called safe_extract_info with:  {args}, {kwargs}")  # type: ignore[attr-defined]
         return await self.bot.loop.run_in_executor(
             self.thread_pool,
@@ -485,9 +522,7 @@ class YtdlpResponseDict(YUserDict):
                 # youtube seems to set the last list entry to the largest.
                 turl = thumbs[-1].get("url")
 
-            # spotify images are in size desending order. though we don't use them at the moment.
-            # elif self.extractor == "spotify:musicbot":
-            # turl = thumbs[0].get("url")
+            # spotify images are in size descending order, reverse of youtube.
             elif len(thumbs):
                 turl = thumbs[0].get("url")
 
@@ -499,7 +534,7 @@ class YtdlpResponseDict(YUserDict):
             if self.video_id:
                 return f"https://i.ytimg.com/vi/{self.video_id}/maxresdefault.jpg"
 
-        # Extractor Bandcamp:album unfortunately does not give us thumbail(s)
+        # Extractor Bandcamp:album unfortunately does not give us thumbnail(s)
         # tracks do have thumbs, but process does not return them while "extract_flat" is enabled.
         # we don't get enough data with albums to make a thumbnail URL either.
         # really this is an upstream issue with ytdlp, and should be patched there.
