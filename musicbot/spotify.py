@@ -26,6 +26,9 @@ class SpotifyObject:
     """Base class for parsed spotify response objects."""
 
     def __init__(self, data: Dict[str, Any], origin_url: Optional[str] = None) -> None:
+        """
+        Manage basic data container properties common to all SpotifyObject types.
+        """
         self.origin_url: Optional[str]
 
         self.data: Dict[str, Any] = data
@@ -45,14 +48,17 @@ class SpotifyObject:
 
     @staticmethod
     def is_track_data(data: Dict[str, Any]) -> bool:
+        """Check if given Spotify API response `data` has 'track' type."""
         return SpotifyObject.is_type(data, "track")
 
     @staticmethod
     def is_playlist_data(data: Dict[str, Any]) -> bool:
+        """Check if given Spotify API response `data` has 'playlist' type."""
         return SpotifyObject.is_type(data, "playlist")
 
     @staticmethod
     def is_album_data(data: Dict[str, Any]) -> bool:
+        """Check if given Spotify API response `data` has 'album' type."""
         return SpotifyObject.is_type(data, "album")
 
     @property
@@ -192,6 +198,12 @@ class SpotifyAlbum(SpotifyObject):
         self._create_track_objects()
 
     def _create_track_objects(self) -> None:
+        """
+        Method used to massage Spotify API data into individual
+        SpotifyTrack objects, or throw a fit if it fails.
+
+        :raises: ValueError  if tracks are invalid or tracks data is missing.
+        """
         tracks_data = self.data.get("tracks", None)
         if not tracks_data:
             raise ValueError("Invalid album_data, missing tracks key")
@@ -212,7 +224,7 @@ class SpotifyAlbum(SpotifyObject):
 
     @property
     def track_urls(self) -> List[str]:
-        """List of spotify URLs for all tracks in ths playlist data."""
+        """List of spotify URLs for all tracks in this playlist data."""
         return [x.spotify_url for x in self.track_objects]
 
     @property
@@ -258,6 +270,12 @@ class SpotifyPlaylist(SpotifyObject):
         self._create_track_objects()
 
     def _create_track_objects(self) -> None:
+        """
+        Method used to massage Spotify API data into individual
+        SpotifyTrack objects, or throw a fit if it fails.
+
+        :raises: ValueError  if tracks are invalid or tracks data is missing.
+        """
         tracks_data = self.data.get("tracks", None)
         if not tracks_data:
             raise ValueError("Invalid playlist_data, missing tracks key")
@@ -280,7 +298,7 @@ class SpotifyPlaylist(SpotifyObject):
 
     @property
     def track_urls(self) -> List[str]:
-        """List of spotify URLs for all tracks in ths playlist data."""
+        """List of spotify URLs for all tracks in this playlist data."""
         return [x.spotify_url for x in self.track_objects]
 
     @property
@@ -326,6 +344,9 @@ class Spotify:
         aiosession: aiohttp.ClientSession,
         loop: Optional[asyncio.AbstractEventLoop] = None,
     ) -> None:
+        """
+        Manage data and state for this Spotify API session.
+        """
         self.client_id: str = client_id or ""
         self.client_secret: str = client_secret or ""
         self.guest_mode: bool = client_id is None or client_secret is None
@@ -364,6 +385,9 @@ class Spotify:
 
     @staticmethod
     def is_url_supported(url: str) -> bool:
+        """
+        Check if the given `url` is a supported Spotify URL.
+        """
         parts = Spotify.url_to_parts(url)
         if not parts:
             return False
@@ -376,11 +400,28 @@ class Spotify:
         return True
 
     def api_safe_url(self, url: str) -> str:
+        """
+        Makes Spotify API URLs in response date "safe" for use in this API.
+        Assuming all API URLs in the API response data will begin with the
+        API_BASE that we already use, this removes the base URL, so the
+        remainder of the URL can then be appended to the API_BASE.
+
+        This prevents data in a Spotify response from sending our API to
+        a totally different domain than what API_BASE is set to.
+        """
         return url.replace(self.API_BASE, "")
 
     async def get_spotify_ytdl_data(
         self, spotify_url: str, process: bool = False
     ) -> Dict[str, Any]:
+        """
+        Uses an `spotify_url` to determine if information can be requested
+        and returns a dictionary of data similar in format to that of
+        YoutubeDL.extract_info()
+
+        :param: spotify_url:  a URL assumed to be a spotify URL.
+        :param: process:  Enable subsequent API calls to fetch all data about the object.
+        """
         data: SpotifyObject
         parts = Spotify.url_to_parts(spotify_url)
         obj_type = parts[1]
@@ -502,7 +543,7 @@ class Spotify:
         return await self.make_api_req(f"playlists/{list_id}")
 
     async def make_api_req(self, endpoint: str) -> Dict[str, Any]:
-        """Proxy method for making a Spotify req using the correct Auth headers"""
+        """Proxy method for making a Spotify request using the correct Auth headers"""
         url = self.API_BASE + endpoint
         token = await self._get_token()
         return await self._make_get(url, headers={"Authorization": f"Bearer {token}"})
@@ -564,6 +605,9 @@ class Spotify:
             ) from e
 
     def _make_token_auth(self, client_id: str, client_secret: str) -> Dict[str, Any]:
+        """
+        Create a dictionary with suitable Authorization header for HTTP request.
+        """
         auth_header = base64.b64encode(
             f"{client_id}:{client_secret}".encode("ascii")
         ).decode("ascii")

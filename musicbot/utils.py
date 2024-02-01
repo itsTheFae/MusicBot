@@ -296,6 +296,11 @@ def load_file(
 
 
 def write_file(filename: pathlib.Path, contents: Iterable[str]) -> None:
+    """
+    Open the given `filename` for writing in utf8 and write each item in
+    `contents` to the file as a single line.
+    Shorthand function that is now outmoded by pathlib, and could/should be replaced.
+    """
     with open(filename, "w", encoding="utf8") as f:
         for item in contents:
             f.write(str(item))
@@ -306,9 +311,9 @@ def slugify(value: str, allow_unicode: bool = False) -> str:
     """
     Taken from https://github.com/django/django/blob/master/django/utils/text.py
     Convert to ASCII if 'allow_unicode' is False. Convert spaces or repeated
-    dashes to single dashes. Remove characters that aren't alphanumerics,
+    dashes to single dashes. Remove characters that aren't letters, numbers,
     underscores, or hyphens. Convert to lowercase. Also strip leading and
-    trailing whitespace, dashes, and underscores.
+    trailing spaces, dashes, and underscores.
     """
     value = str(value)
     if allow_unicode:
@@ -426,6 +431,10 @@ def _func_() -> str:
 
 
 def _get_variable(name: str) -> Any:
+    """
+    Inspect each frame in the call stack for local variables with the
+    `name` given then return that variable's value or None if not found.
+    """
     stack = inspect.stack()
     try:
         for frames in stack:
@@ -444,6 +453,12 @@ def _get_variable(name: str) -> Any:
 
 # TODO: Add some sort of `denied` argument for a message to send when someone else tries to use it
 def owner_only(func: Callable[..., Any]) -> Any:
+    """
+    Decorator function that checks the invoking message author ID matches
+    the Owner ID which MusicBot has determined either via Config or
+    Discord AppInfo.
+    """
+
     @wraps(func)
     async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:
         # Only allow the owner to use these commands
@@ -457,6 +472,13 @@ def owner_only(func: Callable[..., Any]) -> Any:
 
 
 def dev_only(func: Callable[..., Any]) -> Any:
+    """
+    Decorator function that sets `dev_cmd` as an attribute to the function
+    it decorates.
+    This is then checked in MusicBot.on_message to ensure the protected
+    commands are not executed by non "dev" users.
+    """
+
     @wraps(func)
     async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:
         orig_msg = _get_variable("message")
@@ -562,12 +584,18 @@ def count_members_in_voice(  # pylint: disable=dangerous-default-value
 
 
 def format_song_duration(time_delta: str) -> str:
-    """Conditionally remove hour component of timedelta string if it is 0."""
+    """
+    Conditionally remove hour component of timedelta string if it is 0.
+    """
+    # TODO: fix this to take in a timedelta object instead of a string.
     duration_array = time_delta.split(":")
     return time_delta if int(duration_array[0]) > 0 else ":".join(duration_array[1:])
 
 
 def format_size_from_bytes(size_bytes: int) -> str:
+    """
+    Format a given `size_bytes` into an approximate short-hand notation.
+    """
     suffix = {0: "", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
     power = 1024
     size = float(size_bytes)
@@ -579,10 +607,12 @@ def format_size_from_bytes(size_bytes: int) -> str:
 
 
 def format_size_to_bytes(size_str: str, strict_si: bool = False) -> int:
-    """Convert human-friendly *bytes notation into integer.
+    """
+    Convert human-friendly data-size notation into integer.
     Note: this function is not intended to convert Bits notation.
 
-    Option `strict_si` will use 1000 rather than 1024 for SI suffixes.
+    :param: size_str:  A size notation like: 20MB or "12.3 kb"
+    :param: strict_si:  Toggles use of 1000 rather than 1024 for SI suffixes.
     """
     si_units = 1024
     if strict_si:
@@ -635,8 +665,9 @@ def format_size_to_bytes(size_str: str, strict_si: bool = False) -> int:
 
 
 def format_time_to_seconds(time_str: Union[str, int]) -> int:
-    """Convert a phrase containing time duration(s) to seconds as int
-    This function allows for intresting/sloppy time notations like:
+    """
+    Convert a phrase containing time duration(s) to seconds as int
+    This function allows for interesting/sloppy time notations like:
     - 1yearand2seconds  = 31556954
     - 8s 1d             = 86408
     - .5 hours          = 1800
@@ -644,8 +675,9 @@ def format_time_to_seconds(time_str: Union[str, int]) -> int:
     - 3600              = 3600
     Only partial seconds are not supported, thus ".5s + 1.5s" will be 1 not 2.
 
-    Param `time_str` is assumed to contain a time duration as str or int.
-    Returns 0 if no time value is recognised, rather than raise a ValueError.
+    :param: time_str:  is assumed to contain a time duration as str or int.
+
+    :returns:  0 if no time value is recognized, rather than raise a ValueError.
     """
     if isinstance(time_str, int):
         return time_str
