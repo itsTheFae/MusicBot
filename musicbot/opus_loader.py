@@ -2,6 +2,9 @@ from discord import opus
 
 
 def load_opus_lib() -> None:
+    """
+    Take steps needed to load opus library through discord.py
+    """
     if opus.is_loaded():
         return
 

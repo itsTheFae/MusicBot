@@ -12,10 +12,12 @@ class MusicbotException(Exception):
 
     @property
     def message(self) -> str:
+        """Get message text with additional formatting as needed."""
         return self._message
 
     @property
     def message_no_format(self) -> str:
+        """Get raw message text with no formatting."""
         return self._message
 
 
@@ -109,6 +111,12 @@ class HelpfulError(MusicbotException):
 
     @staticmethod
     def _pretty_wrap(text: str, pretext: str, *, width: int = -1) -> str:
+        """
+        Format given `text` and `pretext` using an optional `width` to
+        constrain the text and indent it for better readability.
+        If `width` is not set, or set -1, the current size of the terminal
+        in columns will be used as a default.
+        """
         if width is None:
             return "\n".join((pretext.strip(), text))
 
@@ -148,9 +156,11 @@ class RestartSignal(Signal):
         self.restart_code = code
 
     def get_code(self) -> int:
+        """Get the int value of the code contained in this signal"""
         return self.restart_code.value
 
     def get_name(self) -> str:
+        """Get the name of the restart code contained in this signal"""
         return self.restart_code.name
 
 

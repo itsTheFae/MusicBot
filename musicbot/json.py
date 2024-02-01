@@ -8,6 +8,9 @@ log = logging.getLogger(__name__)
 
 class Json:
     def __init__(self, json_file: pathlib.Path) -> None:
+        """
+        Managed JSON data, where some structure is expected.
+        """
         log.debug("Init JSON obj from file: %s", json_file)
         self.file = json_file
         self.data = self.parse()

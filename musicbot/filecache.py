@@ -24,6 +24,10 @@ class AudioFileCache:
     """
 
     def __init__(self, bot: "MusicBot") -> None:
+        """
+        Manage data related to the audio cache, such as its current size,
+        file count, file paths, and synchronization locks.
+        """
         self.bot: "MusicBot" = bot
         self.config: "Config" = bot.config
         self.cache_path: pathlib.Path = bot.config.audio_cache_path
@@ -45,7 +49,7 @@ class AudioFileCache:
         Check for an existing cache file by the given name, and return the matched path.
         The `filename` will be reduced to its basename and joined with the current cache_path.
         If `ignore_ext` is set, the filename will be matched without its last suffix / extension.
-        An exact match is prefered, but only the first of many possible matches will be returned.
+        An exact match is preferred, but only the first of many possible matches will be returned.
 
         :returns: a path string or empty string if not found.
         """
@@ -226,7 +230,7 @@ class AudioFileCache:
         """
         Handle deletion of cache data according to settings and return bool status.
         Will return False if no cache directory exists, and error prevented deletion.
-        Param `remove_dir` is intened only to be used in bot-startup.
+        Parameter `remove_dir` is intended only to be used in bot-startup.
         """
 
         if not os.path.isdir(self.cache_path):

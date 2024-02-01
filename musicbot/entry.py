@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from .filecache import AudioFileCache
     from .playlist import Playlist
 
-    # Excplicit compat with python 3.8
+    # Explicit compat with python 3.8
     AsyncFuture = asyncio.Future[Any]
 else:
     AsyncFuture = asyncio.Future
@@ -37,6 +37,10 @@ except ImportError:
 
 class BasePlaylistEntry(Serializable):
     def __init__(self) -> None:
+        """
+        Manage a playable media reference and its meta data.
+        Either a URL or a local file path that ffmpeg can use.
+        """
         self.filename: str = ""
         self.downloaded_bytes: int = 0
         self.cache_busted: bool = False
@@ -46,18 +50,32 @@ class BasePlaylistEntry(Serializable):
 
     @property
     def url(self) -> str:
+        """
+        Get a URL suitable for YoutubeDL to download, or likewise
+        suitable for ffmpeg to stream or directly play back.
+        """
         raise NotImplementedError
 
     @property
     def title(self) -> str:
+        """
+        Get a title suitable for display using any extracted info.
+        """
         raise NotImplementedError
 
     @property
     def duration_td(self) -> datetime.timedelta:
+        """
+        Get this entry's duration as a timedelta object.
+        """
         raise NotImplementedError
 
     @property
     def is_downloaded(self) -> bool:
+        """
+        Get the entry's downloaded status.
+        Typically set by _download function.
+        """
         if self._is_downloading:
             return False
 
@@ -65,9 +83,14 @@ class BasePlaylistEntry(Serializable):
 
     @property
     def is_downloading(self) -> bool:
+        """Get the entry's downloading status. Usually False."""
         return self._is_downloading
 
     async def _download(self) -> None:
+        """
+        Take any steps needed to download the media and make it ready for playback.
+        If the media already exists, this function can return early.
+        """
         raise NotImplementedError
 
     def get_ready_future(self) -> AsyncFuture:
@@ -92,7 +115,8 @@ class BasePlaylistEntry(Serializable):
 
     def _for_each_future(self, cb: Callable[..., Any]) -> None:
         """
-        Calls `cb` for each future that is not cancelled. Absorbs and logs any errors that may have occurred.
+        Calls `cb` for each future that is not canceled.
+        Absorbs and logs any errors that may have occurred.
         """
         futures = self._waiting_futures
         self._waiting_futures = []
@@ -115,6 +139,11 @@ class BasePlaylistEntry(Serializable):
 
 
 async def run_command(cmd: str) -> bytes:
+    """
+    Use an async subprocess shell to execute the command given in `cmd`
+    and wait for then return its output.
+    """
+    # TODO: this should probably be the _exec version, for just a touch more security.
     p = await asyncio.create_subprocess_shell(
         cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
@@ -419,8 +448,14 @@ class URLPlaylistEntry(BasePlaylistEntry):
             self._is_downloading = False
 
     async def get_mean_volume(self, input_file: str) -> str:
+        """
+        Attempt to calculate the mean volume of the `input_file` by using
+        output from ffmpeg to provide values which can be used by command
+        arguments sent to ffmpeg during playback.
+        """
         log.debug("Calculating mean volume of:  %s", input_file)
         exe = shutil.which("ffmpeg")
+        # TODO:  if this is printing JSON, we should really not use regex to parse it...
         args = "-af loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:print_format=json -f null /dev/null"
 
         raw_output = await run_command(f'"{exe}" -i "{input_file}" {args}')
@@ -478,6 +513,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
         return loudnorm_opts
 
     async def _really_download(self) -> None:
+        """
+        Actually download the media in this entry into cache.
+        """
         log.info("Download started:  %s", self.url)
 
         retry = 2
@@ -487,8 +525,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 info = await self.downloader.extract_info(self.url, download=True)
                 break
             except ContentTooShortError as e:
-                # this typically means connection was interupted, any download is probably partial.
-                # we should definitely do something about it to prevent broken cached files.
+                # this typically means connection was interrupted, any
+                # download is probably partial. we should definitely do
+                # something about it to prevent broken cached files.
                 if retry > 0:
                     log.warning(
                         "Download may have failed, retrying.  Reason: %s", str(e)
