@@ -12,6 +12,13 @@ log = logging.getLogger(__name__)
 
 class Aliases:
     def __init__(self, aliases_file: Path) -> None:
+        """
+        Handle locating, initializing, loading, and validation of command aliases.
+        If given `aliases_file` is not found, examples will be copied to the location.
+
+        :raises: musicbot.exceptions.HelpfulError
+            if loading fails in some known way.
+        """
         self.aliases_file = aliases_file
         self.aliases_seed = AliasesDefault.aliases_seed
         self.aliases = AliasesDefault.aliases
