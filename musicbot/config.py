@@ -39,14 +39,15 @@ def get_all_keys(
 
 
 def create_empty_file_ifnoexist(path: pathlib.Path) -> None:
-    if not path.is_file():
-        with open(path, "a", encoding="utf8") as fh:
+    if not path.exists():
+        with open(path, "w", encoding="utf8") as fh:
             fh.close()
             log.warning("Creating %s", path)
 
 
 class Config:
     def __init__(self, config_file: pathlib.Path) -> None:
+        log.info("Loading config from:  %s", config_file)
         self.config_file = config_file
         self.find_config()
 
@@ -289,8 +290,8 @@ class Config:
         self.setup_autoplaylist()
 
     def check_changes(self, conf: "ExtendedConfigParser") -> None:
-        exfile = "config/example_options.ini"
-        if os.path.isfile(exfile):
+        exfile = pathlib.Path(EXAMPLE_OPTIONS_FILE)
+        if exfile.is_file():
             usr_keys = get_all_keys(conf)
             exconf = configparser.ConfigParser(interpolation=None)
             if not exconf.read(exfile, encoding="utf-8"):
@@ -388,7 +389,7 @@ class Config:
     #       Maybe add warnings about fields missing from the config file
 
     async def async_validate(self, bot: "MusicBot") -> None:
-        log.debug("Validating options...")
+        log.debug("Validating options with service data...")
 
         # attempt to get the owner ID from app-info.
         if self.owner_id == 0:
@@ -403,8 +404,8 @@ class Config:
                 )
 
         if not bot.user:
-            log.critical("If we ended up here, something is not right.")
-            return
+            log.critical("MusicBot does not have a user instance, cannot proceed.")
+            raise RuntimeError("This cannot continue.")
 
         if self.owner_id == bot.user.id:
             raise HelpfulError(
@@ -453,7 +454,10 @@ class Config:
 
             elif os.path.isfile(EXAMPLE_OPTIONS_FILE):
                 shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
-                log.warning("Options file not found, copying example_options.ini")
+                log.warning(
+                    "Options file not found, copying example file:  %s",
+                    EXAMPLE_OPTIONS_FILE,
+                )
 
             else:
                 raise HelpfulError(
