@@ -29,7 +29,12 @@ log = logging.getLogger(__name__)
 def get_all_keys(
     conf: Union["ExtendedConfigParser", configparser.ConfigParser]
 ) -> List[str]:
-    """Returns all config keys as a list"""
+    """
+    Gather all config keys for all sections of a ConfigParser into a list.
+    This -will- return duplicate keys if they happen to exist in config.
+
+    :param: conf:  A loaded config parser object.
+    """
     sects = dict(conf.items())
     keys = []
     for k in sects:
@@ -39,6 +44,9 @@ def get_all_keys(
 
 
 def create_empty_file_ifnoexist(path: pathlib.Path) -> None:
+    """
+    Creates an empty UTF8 text file at given `path` if it does not exist.
+    """
     if not path.exists():
         with open(path, "w", encoding="utf8") as fh:
             fh.close()
@@ -290,6 +298,17 @@ class Config:
         self.setup_autoplaylist()
 
     def check_changes(self, conf: "ExtendedConfigParser") -> None:
+        """
+        Load the example options file and use it to detect missing config.
+        The results are stored in self.missing_keys as a set difference.
+
+        Note that keys from all sections are stored in one list, which is
+        then reduced to a set.  If sections contain overlapping key names,
+        this logic will not detect a key missing from one section that was
+        present in another.
+
+        :param: conf:  the currently loaded config file parser object.
+        """
         exfile = pathlib.Path(EXAMPLE_OPTIONS_FILE)
         if exfile.is_file():
             usr_keys = get_all_keys(conf)
@@ -304,7 +323,10 @@ class Config:
 
     def run_checks(self) -> None:
         """
-        Validation logic for bot settings.
+        Validation and some sanity check logic for bot settings.
+
+        :raises: musicbot.exceptions.HelpfulError
+            if some validation failed that the user needs to correct.
         """
         if self.i18n_file != ConfigDefaults.i18n_file and not os.path.isfile(
             self.i18n_file
@@ -389,6 +411,14 @@ class Config:
     #       Maybe add warnings about fields missing from the config file
 
     async def async_validate(self, bot: "MusicBot") -> None:
+        """
+        Validation logic for bot settings that depends on data from async services.
+
+        :raises: musicbot.exceptions.HelpfulError
+            if some validation failed that the user needs to correct.
+
+        :raises: RuntimeError if there is a failure in async service data.
+        """
         log.debug("Validating options with service data...")
 
         # attempt to get the owner ID from app-info.
@@ -419,6 +449,15 @@ class Config:
             )
 
     def find_config(self) -> None:
+        """
+        Handle locating or initializing a config file, using a previously set
+        config file path.
+        If the config file is not found, this will check for a file with `.ini` suffix.
+        If neither of the above are found, this will attempt to copy the example config.
+
+        :raises: musicbot.exceptions.HelpfulError
+            if config fails to be located or has not been configured.
+        """
         config = configparser.ConfigParser(interpolation=None)
 
         # Check for options.ini and copy example ini if missing.
@@ -426,7 +465,7 @@ class Config:
             ini_file = self.config_file.with_suffix(".ini")
             if ini_file.is_file():
                 try:
-                    # Excplicit compat with python 3.8
+                    # Explicit compat with python 3.8
                     if sys.version_info >= (3, 9):
                         shutil.move(ini_file, self.config_file)
                     else:
@@ -488,7 +527,10 @@ class Config:
                 ) from e
 
     def setup_autoplaylist(self) -> None:
-        # check for an copy the bundled playlist file if configured file is empty.
+        """
+        Check for and copy the bundled playlist file if the configured file is empty.
+        Also set up file paths for playlist removal audits and for cache-map data.
+        """
         if not self.auto_playlist_file.is_file():
             bundle_file = pathlib.Path(BUNDLED_AUTOPLAYLIST_FILE)
             if bundle_file.is_file():
