@@ -8,6 +8,10 @@ from typing import Any, List
 
 
 def yes_or_no_input(question: str) -> bool:
+    """
+    Prompt the user for a yes or no response to given `question`
+    As many times as it takes to get yes or no.
+    """
     while True:
         ri = input(f"{question} (y/n): ")
 
@@ -19,7 +23,11 @@ def yes_or_no_input(question: str) -> bool:
 
 
 def run_or_raise_error(cmd: List[str], message: str, **kws: Any) -> None:
-    """Wrapper for subprocess.check_call"""
+    """
+    Wrapper for subprocess.check_call that avoids shell=True
+
+    :raises: RuntimeError  with given `message` as exception text.
+    """
     try:
         subprocess.check_call(cmd, **kws)
     except (  # pylint: disable=duplicate-code
@@ -32,6 +40,10 @@ def run_or_raise_error(cmd: List[str], message: str, **kws: Any) -> None:
 
 
 def update_deps() -> None:
+    """
+    Tries to upgrade MusicBot dependencies using pip module.
+    This will use the same exe/bin as is running this code without version checks.
+    """
     print("Attempting to update dependencies...")
 
     run_or_raise_error(
@@ -52,6 +64,7 @@ def update_deps() -> None:
 
 
 def finalize() -> None:
+    """Attempt to fetch the bot version constant and print it."""
     try:
         from musicbot.constants import (  # pylint: disable=import-outside-toplevel
             VERSION,
@@ -68,6 +81,12 @@ def finalize() -> None:
 
 
 def main() -> None:
+    """
+    Runs several checks, starting with making sure there is a .git folder
+    in the current working path.
+    Attempt to detect a git executable and use it to run git pull.
+    Later, we try to use pip module to upgrade dependency modules.
+    """
     print("Starting...")
 
     # Make sure that we're in a Git repository

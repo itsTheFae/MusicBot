@@ -92,6 +92,13 @@ class PIP:
 
     @classmethod
     def run_python_m(cls, *args: Any, **kwargs: Any) -> Union[bytes, int]:
+        """
+        Use subprocess check_call or check_output to run a pip module
+        command using the `args` as additional arguments to pip.
+        The returned value of the call is returned from this method.
+
+        :param: check_output:  Use check_output rather than check_call.
+        """
         check_output = kwargs.pop("check_output", False)
         if check_output:
             return subprocess.check_output([sys.executable, "-m", "pip"] + list(args))
@@ -126,6 +133,10 @@ class PIP:
 
     @classmethod
     def run_upgrade_requirements(cls) -> None:
+        """
+        Uses a subprocess call to run python using sys.executable.
+        Runs `pip install --upgrade -r ./requirements.txt`
+        """
         if not cls.works():
             raise RuntimeError("Cannot locate or execute python -m pip")
 
@@ -153,21 +164,26 @@ class PIP:
 
 
 def bugger_off(msg: str = "Press enter to continue . . .", code: int = 1) -> None:
+    """Make the console wait for the user to press enter/return."""
     input(msg)
     sys.exit(code)
 
 
 def sanity_checks(optional: bool = True) -> None:
+    """
+    Run a collection of pre-startup checks to either automatically correct
+    issues or inform the user of how to correct them.
+    """
     log.info("Starting sanity checks")
     """Required Checks"""
     # Make sure we're on Python 3.8+
     req_ensure_py3()
 
-    # Make sure we're in a writeable env
+    # Make sure we're in a writable env
     req_ensure_env()
 
     # Make our folders if needed
-    req_ensure_folders()
+    pathlib.Path("data").mkdir(exist_ok=True)
 
     # For rewrite only
     req_check_deps()
@@ -185,6 +201,10 @@ def sanity_checks(optional: bool = True) -> None:
 
 
 def req_ensure_py3() -> None:
+    """
+    Verify the current running version of Python and attempt to find a
+    suitable minimum version in the system if the running version is too old.
+    """
     log.info("Checking for Python 3.8+")
 
     if sys.version_info < (3, 8):
@@ -247,6 +267,9 @@ def req_ensure_py3() -> None:
 
 
 def req_check_deps() -> None:
+    """
+    Check that we have the required dependency modules at the right versions.
+    """
     try:
         import discord  # pylint: disable=import-outside-toplevel
 
@@ -263,6 +286,9 @@ def req_check_deps() -> None:
 
 
 def req_ensure_env() -> None:
+    """
+    Inspect the environment variables, validating and updating values where needed.
+    """
     log.info("Ensuring we're in the right environment")
 
     if os.environ.get("APP_ENV") != "docker" and not os.path.isdir(
@@ -308,12 +334,11 @@ def req_ensure_env() -> None:
         sys.path.append(os.path.abspath("bin/"))  # might as well
 
 
-def req_ensure_folders() -> None:
-    pathlib.Path("logs").mkdir(exist_ok=True)
-    pathlib.Path("data").mkdir(exist_ok=True)
-
-
 def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
+    """
+    Performs and optional check of system disk storage space to warn the
+    user if the bot might gobble that remaining space with downloads later.
+    """
     if shutil.disk_usage(".").free < warnlimit_mb * 1024 * 2:
         log.warning(
             "Less than %sMB of free space remains on this device",
@@ -325,6 +350,21 @@ def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
 
 
 def respawn_bot_process(pybin: str = "") -> None:
+    """
+    Use a platform dependent method to restart the bot process, without
+    an external process/service manager.
+    This uses either the given `pybin` executable path or sys.executable
+    to run the bot using the arguments currently in sys.argv
+
+    This function attempts to make sure all buffers are flushed and logging
+    is shut down before restarting the new process.
+
+    On Linux/Unix-style OS this will use sys.execlp to replace the process
+    while keeping the existing PID.
+
+    On Windows OS this will use subprocess.Popen to create a new console
+    where the new bot is started, with a new PID, and exit this instance.
+    """
     if not pybin:
         pybin = os.path.basename(sys.executable)
     exec_args = [pybin] + sys.argv
@@ -356,7 +396,8 @@ def respawn_bot_process(pybin: str = "") -> None:
 
 
 async def main() -> Union[RestartSignal, TerminateSignal, None]:
-    # TODO: *actual* argparsing
+    """All of the MusicBot starts here."""
+    # TODO: *actual* CLI arg parsing
 
     if "--no-checks" not in sys.argv:
         sanity_checks()
