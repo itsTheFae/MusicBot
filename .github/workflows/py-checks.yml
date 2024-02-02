@@ -35,4 +35,4 @@ jobs:
         mypy --python-version 3.8 --warn-unused-ignores ./*.py
     - name: Check with Pylint
       run: |
-        pylint --recursive=y .
+        pylint --spelling-dict='' --recursive=y .
