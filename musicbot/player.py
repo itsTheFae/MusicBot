@@ -265,7 +265,9 @@ class MusicPlayer(EventEmitter, Serializable):
             try:
                 self._current_player.stop()
             except OSError:
-                log.noise("Possible Warning from kill_current_player()", exc_info=True)
+                log.noise(  # type: ignore[attr-defined]
+                    "Possible Warning from kill_current_player()", exc_info=True
+                )
 
             self._current_player = None
             return True
@@ -551,7 +553,9 @@ def filter_stderr(stderr: io.BytesIO, future: asyncio.Future[Any]) -> None:
                 last_ex = e
 
             except FFmpegWarning as e:
-                log.ffmpeg("Warning from ffmpeg:  %s", str(e).strip())
+                log.ffmpeg(  # type: ignore[attr-defined]
+                    "Warning from ffmpeg:  %s", str(e).strip()
+                )
         else:
             break
 

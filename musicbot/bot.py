@@ -66,7 +66,7 @@ except ImportError:
 
 # Type aliases
 ExitSignals = Union[None, exceptions.RestartSignal, exceptions.TerminateSignal]
-# Channels that MusicBot Can messaage.
+# Channels that MusicBot Can message.
 MessageableChannel = Union[
     discord.VoiceChannel,
     discord.StageChannel,
@@ -96,7 +96,7 @@ log = logging.getLogger(__name__)
 # TODO: fix current blacklist to be more clear.
 # TODO: add a proper blacklist for song-related data, not just users.
 # TODO: review duration related code, make it less spamy if nothing else.
-# TODO: review timedelta usage to make sure time is formated as desired. no MS, no empty hours.
+# TODO: review timedelta usage to make sure time is formatted as desired. no MS, no empty hours.
 
 
 class MusicBot(discord.Client):
@@ -263,6 +263,13 @@ class MusicBot(discord.Client):
     def _get_owner(
         self, *, server: Optional[discord.Guild] = None, voice: bool = False
     ) -> Optional[discord.Member]:
+        """
+        Get the discord Member object that has a user ID which matches
+        the configured OwnerID.
+
+        :param: server:  The discord Guild in which to expect the member.
+        :param: voice:  Require the owner to be in a voice channel.
+        """
         return discord.utils.find(
             lambda m: m.id == self.config.owner_id and (m.voice if voice else True),
             server.members if server else self.get_all_members(),
@@ -271,6 +278,11 @@ class MusicBot(discord.Client):
     async def _join_startup_channels(
         self, channels: Set[VoiceableChannel], *, autosummon: bool = True
     ) -> None:
+        """
+        Attempt to join voice channels that have been configured in options.
+        Also checks for existing voice sessions and attempts to resume
+        connection and playback.
+        """
         joined_servers = set()
         channel_map = {c.guild: c for c in channels}
 
@@ -372,6 +384,11 @@ class MusicBot(discord.Client):
     async def _wait_delete_msg(
         self, message: discord.Message, after: Union[int, float]
     ) -> None:
+        """
+        Uses asyncio.sleep to delay a call to safe_delete_message but
+        does not check if the bot can delete a message or if it has
+        already been deleted before trying to delete it anyway.
+        """
         try:
             await asyncio.sleep(after)
         except asyncio.CancelledError:
@@ -411,6 +428,13 @@ class MusicBot(discord.Client):
         ex: Optional[Exception] = None,
         delete_from_ap: bool = False,
     ) -> None:
+        """
+        Handle clearing the given `song_url` from the autoplaylist queue,
+        and optionally from the configured autoplaylist file.
+
+        :param: ex:  an exception that is given as the reason for removal.
+        :param: delete_from_ap:  should the configured list file be updated?
+        """
         if song_url not in self.autoplaylist:
             log.debug('URL "%s" not in autoplaylist, ignoring', song_url)
             return
@@ -460,6 +484,10 @@ class MusicBot(discord.Client):
                 self.filecache.remove_autoplay_cachemap_entry_by_url(song_url)
 
     async def add_url_to_autoplaylist(self, song_url: str) -> None:
+        """
+        Add the given `song_url` to the auto playlist file and in-memory
+        list.  Does not update the player's current autoplaylist queue.
+        """
         if song_url in self.autoplaylist:
             log.debug("URL already in autoplaylist, ignoring")
             return
@@ -488,6 +516,11 @@ class MusicBot(discord.Client):
         permissions: discord.Permissions = discord.Permissions(70380544),
         guild: discord.Guild = discord.utils.MISSING,
     ) -> str:
+        """
+        Fetch Application Info from discord and generate an OAuth invite
+        URL for MusicBot.
+        """
+        # TODO: can we get a guild from another invite URL?
         if not self.cached_app_info:
             log.debug("Getting bot Application Info.")
             self.cached_app_info = await self.application_info()
@@ -497,10 +530,17 @@ class MusicBot(discord.Client):
         )
 
     async def get_voice_client(self, channel: VoiceableChannel) -> discord.VoiceClient:
-        if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
-            raise AttributeError("Channel passed must be a voice channel")
+        """
+        Use the given `channel` either return an existing VoiceClient or
+        create a new VoiceClient by connecting to the `channel` object.
 
-        # TODO: await for ready here
+        :raises: TypeError
+            If `channel` is not a discord.VoiceChannel or discord.StageChannel
+        """
+        if not isinstance(channel, (discord.VoiceChannel, discord.StageChannel)):
+            raise TypeError("Channel passed must be a voice channel")
+
+        # TODO: await for ready here?
 
         # check for and return bots VoiceClient if we already have one.
         vc = channel.guild.voice_client
@@ -508,7 +548,6 @@ class MusicBot(discord.Client):
             return vc
 
         # otherwise we need to connect to the given channel.
-
         client: discord.VoiceClient = await channel.connect(timeout=30, reconnect=True)
         if isinstance(channel, discord.StageChannel):
             try:
@@ -529,6 +568,11 @@ class MusicBot(discord.Client):
         return client
 
     async def disconnect_voice_client(self, guild: discord.Guild) -> None:
+        """
+        Check for a client in the given `guild` and disconnect it gracefully.
+        The player will be removed to MusicBot.players list, and associated
+        event timers will be reset.
+        """
         vc = self.voice_client_in(guild)
         if not vc:
             return
@@ -549,6 +593,10 @@ class MusicBot(discord.Client):
         await vc.disconnect()
 
     async def disconnect_all_voice_clients(self) -> None:
+        """
+        Loop over all available self.voice_clients and use their guild id
+        to disconnect their VoiceClient...
+        """
         for vc in self.voice_clients:
             if isinstance(vc, discord.VoiceClient):
                 await self.disconnect_voice_client(vc.guild)
@@ -609,6 +657,12 @@ class MusicBot(discord.Client):
     def _init_player(
         self, player: MusicPlayer, *, guild: Optional[discord.Guild] = None
     ) -> MusicPlayer:
+        """
+        Connect a brand-new MusicPlayer instance with the MusicBot event
+        handler functions, and store the player reference for reuse.
+
+        :returns: The player with it's event connections.
+        """
         player = (
             player.on("play", self.on_player_play)
             .on("resume", self.on_player_resume)
@@ -625,6 +679,9 @@ class MusicBot(discord.Client):
         return player
 
     async def on_player_play(self, player: MusicPlayer, entry: EntryTypes) -> None:
+        """
+        Event called by MusicPlayer when playback of an entry is started.
+        """
         log.debug("Running on_player_play")
         self._handle_guild_auto_pause(player)
         await self.reset_player_inactivity(player)
@@ -678,7 +735,7 @@ class MusicBot(discord.Client):
                 )
 
         else:
-            # no author (and channel), it's an autoplaylist (or autostream from my other PR) entry.
+            # no author (and channel), it's an auto playlist entry.
             newmsg = self.str.get(
                 "on_player_play-onChannel_noAuthor_autoplaylist",
                 "Now playing automatically added entry {title} in {channel}!",
@@ -750,6 +807,9 @@ class MusicBot(discord.Client):
         entry: EntryTypes,  # pylint: disable=unused-argument
         **_: Any,
     ) -> None:
+        """
+        Event called by MusicPlayer when the player is resumed from pause.
+        """
         log.debug("Running on_player_resume")
         await self.reset_player_inactivity(player)
         await self.update_now_playing_status()
@@ -760,6 +820,9 @@ class MusicBot(discord.Client):
         entry: EntryTypes,  # pylint: disable=unused-argument
         **_: Any,
     ) -> None:
+        """
+        Event called by MusicPlayer when the player enters paused state.
+        """
         log.debug("Running on_player_pause")
         await self.update_now_playing_status()
         self.loop.create_task(self.handle_player_inactivity(player))
@@ -767,11 +830,18 @@ class MusicBot(discord.Client):
         # await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_stop(self, player: MusicPlayer, **_: Any) -> None:
+        """
+        Event called by MusicPlayer any time the player is stopped.
+        Typically after queue is empty or an error stopped playback.
+        """
         log.debug("Running on_player_stop")
         await self.update_now_playing_status()
         self.loop.create_task(self.handle_player_inactivity(player))
 
     async def on_player_finished_playing(self, player: MusicPlayer, **_: Any) -> None:
+        """
+        Event called by MusicPlayer when playback has finished without error.
+        """
         log.debug("Running on_player_finished_playing")
         if self.config.leave_after_queue_empty:
             guild = player.voice_client.guild
@@ -923,6 +993,9 @@ class MusicBot(discord.Client):
         defer_serialize: bool = False,
         **_: Any,
     ) -> None:
+        """
+        Event called by MusicPlayer when an entry is added to the playlist.
+        """
         log.debug("Running on_player_entry_added")
         if (
             entry.meta.get("author")
@@ -938,6 +1011,9 @@ class MusicBot(discord.Client):
         ex: Optional[Exception],
         **_: Any,
     ) -> None:
+        """
+        Event called by MusicPlayer when an entry throws an error.
+        """
         author = entry.meta.get("author", None)
         channel = entry.meta.get("channel", None)
         if channel and author:
@@ -1033,10 +1109,6 @@ class MusicBot(discord.Client):
             with open(path, "w", encoding="utf8") as f:
                 f.write(player.serialize(sort_keys=True))
 
-    async def serialize_all_queues(self, *, path: Optional[str] = None) -> None:
-        coros = [self.serialize_queue(s, path=path) for s in self.guilds]
-        await asyncio.gather(*coros, return_exceptions=True)
-
     async def deserialize_queue(
         self,
         guild: discord.Guild,
@@ -1086,6 +1158,9 @@ class MusicBot(discord.Client):
                 f.write(entry.title)
 
     async def _on_ready_sanity_checks(self) -> None:
+        """
+        Run all sanity checks that should be run in/just after on_ready event.
+        """
         # Ensure AppInfo is loaded.
         if not self.cached_app_info:
             log.debug("Getting application info.")
@@ -1101,6 +1176,11 @@ class MusicBot(discord.Client):
         await self._scheck_configs()
 
     async def _scheck_ensure_env(self) -> None:
+        """
+        Startup check to make sure guild/server specific directories are
+        available in the data directory.
+        Additionally populate a text file to map guild ID to their names.
+        """
         log.debug("Ensuring data folders exist")
         for guild in self.guilds:
             pathlib.Path(f"data/{guild.id}/").mkdir(exist_ok=True)
@@ -1112,6 +1192,9 @@ class MusicBot(discord.Client):
         self.filecache.delete_old_audiocache(remove_dir=True)
 
     async def _scheck_configs(self) -> None:
+        """
+        Startup check to handle late validation of config and permissions.
+        """
         log.debug("Validating config")
         await self.config.async_validate(self)
 
@@ -1119,6 +1202,11 @@ class MusicBot(discord.Client):
         await self.permissions.async_validate(self)
 
     async def _load_guild_options(self, guild: discord.Guild) -> None:
+        """
+        Load a JSON file from the server's data directory that contains
+        server-specific options intended to persist through shutdowns.
+        This method only supports per-server command prefix currently.
+        """
         # TODO: do server specifics properly.
         opt_file = pathlib.Path(f"data/{guild.id}/options.json")
         if not opt_file.is_file():
@@ -1134,6 +1222,10 @@ class MusicBot(discord.Client):
             )
 
     async def _save_guild_options(self, guild: discord.Guild) -> None:
+        """
+        Save server-specific options, like the command prefix, to a JSON
+        file in the server's data directory.
+        """
         # TODO: do server specifics properly.
         opt_file = pathlib.Path(f"data/{guild.id}/options.json")
         opt_dict = {
@@ -1143,6 +1235,11 @@ class MusicBot(discord.Client):
             fh.write(json.dumps(opt_dict))
 
     def _get_guild_cmd_prefix(self, guild: Optional[discord.Guild]) -> str:
+        """
+        If per-server prefix is enabled, and the server has a specific
+        command prefix, it will be returned.  Return configured command
+        prefix if no per-server prefix is set.
+        """
         # TODO: do server specifics properly.
         if self.config.enable_options_per_guild:
             if guild:
@@ -1159,6 +1256,20 @@ class MusicBot(discord.Client):
         content: Union[str, discord.Embed],
         **kwargs: Any,
     ) -> Optional[discord.Message]:
+        """
+        Safely send a message with given `content` to the message-able
+        object in `dest`
+        This method should handle all raised exceptions so callers will
+        not need to handle them locally.
+
+        :param: tts:  set the Text-to-Speech flag on the message.
+        :param: quiet:  Toggle using log.debug or log.warning.
+        :param: expire_in:  time in seconds to wait before auto deleting this message
+        :param: allow_none:  Allow sending a message with empty `content`
+        :param: also_delete:  Optional discord.Message to delete when `expire_in` is set.
+
+        :returns:  May return a discord.Message object if a message was sent.
+        """
         tts = kwargs.pop("tts", False)
         quiet = kwargs.pop("quiet", False)
         expire_in = int(kwargs.pop("expire_in", 0))
@@ -1241,7 +1352,14 @@ class MusicBot(discord.Client):
 
     async def safe_delete_message(
         self, message: discord.Message, *, quiet: bool = False
-    ) -> Optional[discord.Message]:
+    ) -> None:
+        """
+        Safely delete the given `message` from discord.
+        This method should handle all raised exceptions so callers will
+        not need to handle them locally.
+
+        :param: quiet:  Toggle using log.debug or log.warning
+        """
         # TODO: this could use a queue and some other handling.
         lfunc = log.debug if quiet else log.warning
 
@@ -1294,6 +1412,16 @@ class MusicBot(discord.Client):
         send_if_fail: bool = False,
         quiet: bool = False,
     ) -> Optional[discord.Message]:
+        """
+        Safely update the given `message` with the `new` content.
+        This function should handle all raised exceptions so callers
+        will not need to handle them locally.
+
+        :param: send_if_fail:  Toggle sending a new message if edit fails.
+        :param: quiet:  Use log.debug if quiet otherwise use log.warning
+
+        :returns:  May return a discord.Message object if edit/send did not fail.
+        """
         lfunc = log.debug if quiet else log.warning
 
         try:
@@ -1347,6 +1475,11 @@ class MusicBot(discord.Client):
         return None
 
     async def shutdown_cleanup(self) -> None:
+        """
+        Function which forces closure on connections and pending tasks.
+        Much scrutiny required herein.
+        Probably due for further refactoring.
+        """
         try:  # make sure discord.Client is closed.
             await self.close()  # changed in d.py 2.0
         except Exception:  # pylint: disable=broad-exception-caught
@@ -1406,6 +1539,9 @@ class MusicBot(discord.Client):
                 raise self.exit_signal  # pylint: disable=E0702
 
     async def logout(self) -> None:
+        """
+        Disconnect all voice clients and signal MusicBot to close it's connections to discord.
+        """
         await self.disconnect_all_voice_clients()
         return await super().close()
 
@@ -1427,9 +1563,19 @@ class MusicBot(discord.Client):
             log.error("Exception in %s", event, exc_info=True)
 
     async def on_resumed(self) -> None:
+        """
+        Event called by discord.py when the client resumed an existing session.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_resume
+        """
         log.info("\nReconnected to discord.\n")
 
     async def on_ready(self) -> None:
+        """
+        Event called by discord.py typically when MusicBot has finished login.
+        May be called multiple times, and may not be the first event dispatched!
+        See documentations for specifics:
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_ready
+        """
         mute_discord_console_log()
         log.debug("Connection established, ready to go.")
 
@@ -1736,7 +1882,6 @@ class MusicBot(discord.Client):
             )
             print(flush=True)
 
-        # t-t-th-th-that's all folks!
         log.debug("Finish on_ready")
         self.is_ready_done = True
 
@@ -1776,6 +1921,10 @@ class MusicBot(discord.Client):
         return None
 
     async def handle_vc_inactivity(self, guild: discord.Guild) -> None:
+        """
+        Manage a server-specific event timer when MusicBot's voice channel becomes idle,
+        if the bot is configured to do so.
+        """
         if not guild.me.voice or not guild.me.voice.channel:
             log.warning(
                 "Attempted to handle Voice Channel inactivity, but Bot is not in voice..."
@@ -1821,6 +1970,10 @@ class MusicBot(discord.Client):
             event.clear()
 
     async def handle_player_inactivity(self, player: MusicPlayer) -> None:
+        """
+        Manage a server-specific event timer when it's MusicPlayer becomes idle,
+        if the bot is configured to do so.
+        """
         if not self.config.leave_player_inactive_for:
             return
         channel = player.voice_client.channel
@@ -1873,6 +2026,9 @@ class MusicBot(discord.Client):
             event.clear()
 
     async def reset_player_inactivity(self, player: MusicPlayer) -> None:
+        """
+        Handle reset of the server-specific inactive player timer if it is enabled.
+        """
         if not self.config.leave_player_inactive_for:
             return
         guild = player.voice_client.channel.guild
@@ -2203,6 +2359,13 @@ class MusicBot(discord.Client):
         author: discord.Member,
         result_info: "downloader.YtdlpResponseDict",
     ) -> bool:
+        """
+        Check if the given `author` has permissions to play the entries
+        in `result_info` or not.
+
+        :returns:  True is allowed to continue.
+        :raises:  PermissionsError  if permissions deny the playlist.
+        """
         num_songs = result_info.playlist_count or result_info.entry_count
         permissions = self.permissions.for_user(author)
 
@@ -2248,7 +2411,10 @@ class MusicBot(discord.Client):
 
     def _handle_guild_auto_pause(self, player: MusicPlayer) -> None:
         """
-        function to handle guild activity pausing and unpausing.
+        Check the current voice client channel for members and determine
+        if the player should be paused automatically.
+        This is distinct from Guild availability pausing, which happens
+        when Discord has outages.
         """
         if not self.config.auto_pause:
             return
@@ -2622,7 +2788,7 @@ class MusicBot(discord.Client):
         head: bool,
     ) -> None:
         """
-        Helper function to check for playlist IDs embeded in video links.
+        Helper function to check for playlist IDs embedded in video links.
         If a "compound" URL is detected, ask the user if they want the
         associated playlist to be queued as well.
         """
@@ -2959,7 +3125,7 @@ class MusicBot(discord.Client):
 
         Enqueue a media stream.
         This could mean an actual stream like Twitch or shoutcast, or simply streaming
-        media without predownloading it.  Note: FFmpeg is notoriously bad at handling
+        media without pre-downloading it.  Note: FFmpeg is notoriously bad at handling
         streams, especially on poor connections.  You have been warned.
         """
 
@@ -3143,7 +3309,7 @@ class MusicBot(discord.Client):
                 )
 
         # Look jake, if you see this and go "what the fuck are you doing"
-        # and have a better idea on how to do this, i'd be delighted to know.
+        # and have a better idea on how to do this, I'd be delighted to know.
         # I don't want to just do ' '.join(leftover_args).strip("\"'")
         # Because that eats both quotes if they're there
         # where I only want to eat the outermost ones
@@ -3241,7 +3407,7 @@ class MusicBot(discord.Client):
                     ),
                 )
 
-            # Check to verify that recived message is valid.
+            # Check to verify that received message is valid.
             def check(reply: discord.Message) -> bool:
                 return (
                     reply.channel.id == channel.id
@@ -3869,8 +4035,9 @@ class MusicBot(discord.Client):
             # make sure we include bot exceptions.
             include_bots=self.config.bot_exception_ids,
         )
+        # If all users are deaf, avoid ZeroDivisionError
         if num_voice == 0:
-            num_voice = 1  # incase all users are deafened, to avoid divison by zero
+            num_voice = 1
 
         # add the current skipper id so we can count it.
         player.skip_state.add_skipper(author.id, message)
@@ -4906,6 +5073,9 @@ class MusicBot(discord.Client):
 
     @dev_only
     async def cmd_breakpoint(self) -> CommandResponse:
+        """
+        Do nothing but print a critical level error to the log.
+        """
         log.critical("Activating debug breakpoint")
         return None
 
@@ -4913,6 +5083,9 @@ class MusicBot(discord.Client):
     async def cmd_objgraph(
         self, channel: MessageableChannel, func: str = "most_common_types()"
     ) -> CommandResponse:
+        """
+        Interact with objgraph to make it spill the beans.
+        """
         if not objgraph:
             raise exceptions.CommandError(
                 "Could not import `objgraph`, is it installed?"
@@ -4948,6 +5121,9 @@ class MusicBot(discord.Client):
     async def cmd_debug(
         self, _player: Optional[MusicPlayer], *, data: str
     ) -> CommandResponse:
+        """
+        Evaluate or otherwise execute the python code in `data`
+        """
         codeblock = "```py\n{}\n```"
         result = None
 
@@ -4975,11 +5151,17 @@ class MusicBot(discord.Client):
         return Response(codeblock.format(result))
 
     async def cmd_testready(self, channel: MessageableChannel) -> CommandResponse:
-        # pointedly undocumented command that just echos text :)
+        """
+        Not a real command, and will be removed in the future.
+        """
         await self.safe_send_message(channel, "!!RUN_TESTS!!", expire_in=30)
         return None
 
     async def on_message(self, message: discord.Message) -> None:
+        """
+        Event called by discord.py when any message is sent to/around the bot.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_message
+        """
         await self.wait_until_ready()
 
         if not message.channel:
@@ -5089,7 +5271,6 @@ class MusicBot(discord.Client):
 
         sentmsg = response = None
 
-        # noinspection PyBroadException
         try:
             if (
                 user_permissions.ignore_non_voice
@@ -5358,6 +5539,10 @@ class MusicBot(discord.Client):
     async def on_inactivity_timeout_expired(
         self, voice_channel: VoiceableChannel
     ) -> None:
+        """
+        A generic event called by MusicBot when configured channel or player
+        activity timers reach their end.
+        """
         guild = voice_channel.guild
 
         if voice_channel:
@@ -5391,6 +5576,10 @@ class MusicBot(discord.Client):
         before: discord.VoiceState,
         after: discord.VoiceState,
     ) -> None:
+        """
+        Event called by discord.py when a VoiceClient changes state in any way.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_voice_state_update
+        """
         if not self.init_ok:
             log.warning("before init_ok")  # TODO: remove after coverage testing
             return  # Ignore stuff before ready
@@ -5411,7 +5600,6 @@ class MusicBot(discord.Client):
                         before.channel.guild,
                     )
 
-                # elif not any(not user.bot for user in before.channel.members):
                 elif is_empty_voice_channel(
                     before.channel, include_bots=self.config.bot_exception_ids
                 ):
@@ -5467,6 +5655,10 @@ class MusicBot(discord.Client):
                 self._handle_guild_auto_pause(player)
 
     async def on_guild_join(self, guild: discord.Guild) -> None:
+        """
+        Event called by discord.py when the bot joins a new guild.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_join
+        """
         log.info("Bot has been added to guild: %s", guild.name)
 
         # Leave guilds if the owner is not a member and configured to do so.
@@ -5493,6 +5685,10 @@ class MusicBot(discord.Client):
         pathlib.Path(f"data/{guild.id}/").mkdir(exist_ok=True)
 
     async def on_guild_remove(self, guild: discord.Guild) -> None:
+        """
+        Event called by discord.py when the bot is removed from a guild or a guild is deleted.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_remove
+        """
         log.info("Bot has been removed from guild: %s", guild.name)
         log.debug("Updated guild list:")
         for s in self.guilds:
@@ -5502,6 +5698,10 @@ class MusicBot(discord.Client):
             self.players.pop(guild.id).kill()
 
     async def on_guild_available(self, guild: discord.Guild) -> None:
+        """
+        Event called by discord.py when a guild becomes available.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_available
+        """
         if not self.init_ok:
             return  # Ignore pre-ready events
 
@@ -5521,6 +5721,10 @@ class MusicBot(discord.Client):
                 player.resume()
 
     async def on_guild_unavailable(self, guild: discord.Guild) -> None:
+        """
+        Event called by discord.py when a guild becomes unavailable.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_unavailable
+        """
         if not self.init_ok:
             return  # Ignore pre-ready events.
 
@@ -5539,6 +5743,10 @@ class MusicBot(discord.Client):
     async def on_guild_update(
         self, before: discord.Guild, after: discord.Guild
     ) -> None:
+        """
+        Event called by discord.py when guild properties are updated.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_update
+        """
         log.info("Guild update for:  %s", before)
         diff = instance_diff(before, after)
         for attr, vals in diff.items():
@@ -5561,6 +5769,10 @@ class MusicBot(discord.Client):
     async def on_guild_channel_update(
         self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel
     ) -> None:
+        """
+        Event called by discord.py when a guild channel is updated.
+        https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_channel_update
+        """
         log.info("Channel update for:  %s", before)
         diff = instance_diff(before, after)
         for attr, vals in diff.items():
@@ -5581,6 +5793,9 @@ class MusicBot(discord.Client):
                 )
 
     def voice_client_in(self, guild: discord.Guild) -> Optional[discord.VoiceClient]:
+        """
+        Check for and return discord.VoiceClient object if one exists for the given `guild`.
+        """
         for vc in self.voice_clients:
             if isinstance(vc, discord.VoiceClient) and vc.guild == guild:
                 return vc

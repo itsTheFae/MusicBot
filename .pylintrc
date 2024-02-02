@@ -72,7 +72,7 @@ ignored-modules=
 # Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
 # number of processors available to use, and will cap the count on Windows to
 # avoid hangs.
-jobs=1
+jobs=0
 
 # Control the amount of potential inferred values when inferring a single
 # object. This can help the performance when dealing with large functions or
@@ -88,7 +88,7 @@ persistent=yes
 
 # Minimum Python version to use for version dependent checks. Will default to
 # the version used to run pylint.
-py-version=3.10
+py-version=3.8
 
 # Discover python modules and packages in the file system subtree.
 recursive=yes
@@ -227,7 +227,8 @@ name-group=
 
 # Regular expression which should only match function or class names that do
 # not require a docstring.
-no-docstring-rgx=^_
+#no-docstring-rgx=^_
+no-docstring-rgx=(__(hash|iter|repr|str|len|eq)__|_nodoc)$
 
 # List of decorators that produce properties, such as abc.abstractproperty. Add
 # to this list to register other decorators that produce valid properties.
@@ -368,16 +369,16 @@ deprecated-modules=
 
 # Output a graph (.gv or any supported image format) of external dependencies
 # to the given file (report RP0402 must not be disabled).
-ext-import-graph=
+ext-import-graph=imports-ext.png
 
 # Output a graph (.gv or any supported image format) of all (i.e. internal and
 # external) dependencies to the given file (report RP0402 must not be
 # disabled).
-import-graph=
+import-graph=imports.png
 
 # Output a graph (.gv or any supported image format) of internal dependencies
 # to the given file (report RP0402 must not be disabled).
-int-import-graph=
+int-import-graph=imports-int.png
 
 # Force import order to recognize a module as part of the standard
 # compatibility libraries.
@@ -448,7 +449,6 @@ disable=raw-checker-failed,
         too-many-locals,
         
         missing-module-docstring,
-        missing-function-docstring,
         missing-class-docstring,
         
         fixme
@@ -583,7 +583,7 @@ generated-members=logging\.(EVERYTHING|NOISY|FFMPEG|VOICEDEBUG)|log\.(everything
 
 # Tells whether to warn about missing members when the owner of the attribute
 # is inferred to be None.
-ignore-none=yes
+ignore-none=no
 
 # This flag controls whether pylint should warn about no-member and similar
 # checks whenever an opaque object is returned when inferring. The inference
