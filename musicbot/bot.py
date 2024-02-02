@@ -2795,7 +2795,9 @@ class MusicBot(discord.Client):
         # TODO: maybe add config to auto yes or no and bypass this.
         # TODO: this currently will queue the original video twice.
 
-        async def _prompt_for_playing(prompt: str, next_url: str) -> None:
+        async def _prompt_for_playing(
+            prompt: str, next_url: str, ignore_vid: str = ""
+        ) -> None:
             msg = await self.safe_send_message(channel, prompt)
             if not msg:
                 log.warning(
@@ -2824,6 +2826,7 @@ class MusicBot(discord.Client):
                         leftover_args,
                         next_url,
                         head,
+                        ignore_video_id=ignore_vid,
                     )
                     await self.safe_delete_message(msg)
                 elif reaction.emoji == EMOJI_CROSS_MARK_BUTTON:
@@ -2834,15 +2837,20 @@ class MusicBot(discord.Client):
         # Check for playlist in youtube watch link.
         # https://youtu.be/VID?list=PLID
         # https://www.youtube.com/watch?v=VID&list=PLID
-        playlist_regex = r"(?:/watch\?v=.+&(list=[^&]+)|be/[^?&]{6,}\?(list=PL[^&]+))"
-        matches = re.search(playlist_regex, song_url)
+        playlist_regex = re.compile(
+            r"(?:youtube.com/watch\?v=|youtu\.be/)([^?&]{6,})[&?]{1}(list=PL[^&]+)",
+            re.I | re.X,
+        )
+        matches = playlist_regex.search(song_url)
         if matches:
-            pl_url = "https://www.youtube.com/playlist?" + matches.group(1)
+            pl_url = "https://www.youtube.com/playlist?" + matches.group(2)
+            ignore_vid = matches.group(1)
             asyncio.ensure_future(
                 _prompt_for_playing(
                     # TODO: i18n / UI stuff
                     f"This link contains a Playlist ID:\n`{song_url}`\n\nDo you want to queue the playlist too?",
                     pl_url,
+                    ignore_vid,
                 )
             )
 
@@ -2858,6 +2866,7 @@ class MusicBot(discord.Client):
         song_url: str,
         head: bool,
         shuffle_entries: bool = False,
+        ignore_video_id: str = "",
     ) -> CommandResponse:
         """
         This function handles actually playing any given URL or song subject.
@@ -3026,7 +3035,11 @@ class MusicBot(discord.Client):
                 # Also have a "verify_entry" hook with the entry as an arg and returns the entry if its ok
                 start_time = time.time()
                 entry_list, position = await player.playlist.import_from_info(
-                    info, channel=channel, author=author, head=False
+                    info,
+                    channel=channel,
+                    author=author,
+                    head=False,
+                    ignore_video_id=ignore_video_id,
                 )
 
                 time_taken = time.time() - start_time
