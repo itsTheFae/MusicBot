@@ -110,8 +110,7 @@ class MusicBot(discord.Client):
         load_opus_lib()
         try:
             sys.stdout.write(f"\x1b]2;MusicBot {BOTVERSION}\x07")
-        # TODO: what does this raise and when would it raise it?
-        except Exception:  # pylint: disable=broad-exception-caught
+        except (TypeError, OSError):
             log.warning(
                 "Failed to set terminal Title via escape sequences.", exc_info=True
             )
@@ -1536,7 +1535,7 @@ class MusicBot(discord.Client):
                 log.error("Error in cleanup", exc_info=True)
 
             if self.exit_signal:
-                raise self.exit_signal  # pylint: disable=E0702
+                raise self.exit_signal
 
     async def logout(self) -> None:
         """
