@@ -366,7 +366,7 @@ def respawn_bot_process(pybin: str = "") -> None:
     where the new bot is started, with a new PID, and exit this instance.
     """
     if not pybin:
-        pybin = os.path.basename(sys.executable)
+        pybin = sys.executable
     exec_args = [pybin] + sys.argv
 
     shutdown_loggers()
@@ -383,7 +383,6 @@ def respawn_bot_process(pybin: str = "") -> None:
         # The moment we end our existing instance, control is returned to the starting shell.
         with subprocess.Popen(
             exec_args,
-            # creationflags is only available under windows, so mypy may complain here.
             creationflags=subprocess.CREATE_NEW_CONSOLE,  # type: ignore[attr-defined]
         ):
             log.debug("Opened new MusicBot instance.  This terminal can now be closed!")
