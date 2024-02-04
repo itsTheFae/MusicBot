@@ -2,6 +2,7 @@ import datetime
 import glob
 import inspect
 import logging
+import os
 import pathlib
 import re
 import sys
@@ -15,6 +16,8 @@ import colorlog
 
 from .constants import (
     DEFAULT_DISCORD_LOG_FILE,
+    DEFAULT_LOGS_KEPT,
+    DEFAULT_LOGS_ROTATE_FORMAT,
     DEFAULT_MUSICBOT_LOG_FILE,
     DISCORD_MSG_CHAR_LIMIT,
 )
@@ -97,7 +100,16 @@ def setup_loggers() -> None:
 
     # Setup logging to file for musicbot.
     try:
-        fhandler = logging.FileHandler(filename=log_file, encoding="utf-8", mode="w")
+        # We could use a RotatingFileHandler or TimedRotatingFileHandler
+        # however, these require more options than we currently consider
+        # such as file size or fixed rotation time.
+        # For now, out local implementation should be fine...
+        fhandler = logging.FileHandler(
+            filename=log_file,
+            encoding="utf-8",
+            mode="w",
+            delay=True,
+        )
     except Exception as e:
         raise RuntimeError(
             f"Could not create or use the log file due to an error:\n{str(e)}"
@@ -147,7 +159,10 @@ def setup_loggers() -> None:
     # Setup logging for discord module.
     dlogger = logging.getLogger("discord")
     dhandler = logging.FileHandler(
-        filename=DEFAULT_DISCORD_LOG_FILE, encoding="utf-8", mode="w"
+        filename=DEFAULT_DISCORD_LOG_FILE,
+        encoding="utf-8",
+        mode="w",
+        delay=True,
     )
     dhandler.setFormatter(
         logging.Formatter("[{asctime}] {levelname} - {name}: {message}", style="{")
@@ -183,8 +198,24 @@ def mute_discord_console_log() -> None:
             print()
 
 
-def set_logging_level(level: int) -> None:
-    """sets the logging level for musicbot and discord.py"""
+def set_logging_level(level: int, override: bool = False) -> None:
+    """
+    Sets the logging level for musicbot and discord.py loggers.
+    If `override` is set True, the log level will be set and future calls
+    to this function must also use `override` to set a new level.
+    This allows log-level to be set by CLI arguments, overriding the
+    setting used in configuration file.
+    """
+    if hasattr(logging, "mb_level_override") and not override:
+        log.debug(
+            "Log level was previously set via override to: %s",
+            getattr(logging, "mb_level_override"),
+        )
+        return
+
+    if override:
+        setattr(logging, "mb_level_override", logging.getLevelName(level))
+
     set_lvl_name = logging.getLevelName(level)
     log.info("Changing log level to:  %s", set_lvl_name)
 
@@ -196,6 +227,18 @@ def set_logging_level(level: int) -> None:
         dlogger.setLevel(logging.DEBUG)
     else:
         dlogger.setLevel(level)
+
+
+# TODO: perhaps add config file option for max logs kept.
+def set_logging_max_kept_logs(number: int) -> None:
+    """Inform the logger how many logs it should keep."""
+    setattr(logging, "mb_max_logs_kept", number)
+
+
+# TODO: perhaps add a config file option for date format.
+def set_logging_rotate_date_format(sftime: str) -> None:
+    """Inform the logger how it should format rotated file date strings."""
+    setattr(logging, "mb_rot_date_fmt", sftime)
 
 
 def shutdown_loggers() -> None:
@@ -216,27 +259,41 @@ def shutdown_loggers() -> None:
     dlogger.handlers.clear()
 
 
-def rotate_log_files(max_kept: int = 2, date_fmt: str = ".ended-%Y-%j-%H%m%S") -> None:
+def rotate_log_files(max_kept: int = -1, date_fmt: str = "") -> None:
     """
     Handles moving and pruning log files.
-    By default the last-run log file is always kept.
+    By default the primary log file is always kept, and never rotated.
     If `max_kept` is set to 0, no rotation is done.
     If `max_kept` is set 1 or greater, up to this number of logs will be kept.
     This should only be used before setup_loggers() or after shutdown_loggers()
 
+    Note: this implementation uses file glob to select then sort files based
+    on their modification time.
+    The glob uses the following pattern: `{stem}*.{suffix}`
+    Where `stem` and `suffix` are take from the configured log file name.
+
     :param: max_kept:  number of old logs to keep.
     :param: date_fmt:  format compatible with datetime.strftime() for rotated filename.
     """
-    # TODO: this needs to be more reliable. Extra or renamed files in the
-    # log directory might break this implementation.
-    # We should probably use a method to read file times rather than using glob...
+    # Use the input arguments or fall back to settings or defaults.
+    if max_kept <= -1:
+        max_kept = getattr(logging, "mb_max_logs_kept", DEFAULT_LOGS_KEPT)
+        if max_kept <= -1:
+            max_kept = DEFAULT_LOGS_KEPT
+
+    if date_fmt == "":
+        date_fmt = getattr(logging, "mb_rot_date_fmt", DEFAULT_LOGS_ROTATE_FORMAT)
+        if date_fmt == "":
+            date_fmt = DEFAULT_LOGS_ROTATE_FORMAT
+
+    # Rotation can be disabled by setting 0.
     if not max_kept:
         return
 
-    # date that will be used for files rotated now.
+    # Format a date that will be used for files rotated now.
     before = datetime.datetime.now().strftime(date_fmt)
 
-    # rotate musicbot logs
+    # Rotate musicbot logs
     logfile = pathlib.Path(DEFAULT_MUSICBOT_LOG_FILE)
     logpath = logfile.parent
     if logfile.is_file():
@@ -245,24 +302,30 @@ def rotate_log_files(max_kept: int = 2, date_fmt: str = ".ended-%Y-%j-%H%m%S") -
         print(f"Moving the log file from this run to:  {new_name}")
         logfile.rename(new_name)
 
-    # make sure we are in limits
+    # Clean up old, out-of-limits, musicbot log files
     logstem = glob.escape(logfile.stem)
-    logglob = sorted(logpath.glob(f"{logstem}*.log"), reverse=True)
+    logglob = sorted(
+        logpath.glob(f"{logstem}*.log"),
+        key=os.path.getmtime,
+        reverse=True,
+    )
     if len(logglob) > max_kept:
         for path in logglob[max_kept:]:
             if path.is_file():
                 path.unlink()
 
-    # rotate discord.py logs
+    # Rotate discord.py logs
     dlogfile = pathlib.Path(DEFAULT_DISCORD_LOG_FILE)
     dlogpath = dlogfile.parent
     if dlogfile.is_file():
         new_name = dlogfile.parent.joinpath(f"{dlogfile.stem}{before}{dlogfile.suffix}")
         dlogfile.rename(new_name)
 
-    # make sure we are in limits
+    # Clean up old, out-of-limits, discord log files
     logstem = glob.escape(dlogfile.stem)
-    logglob = sorted(dlogpath.glob(f"{logstem}*.log"), reverse=True)
+    logglob = sorted(
+        dlogpath.glob(f"{logstem}*.log"), key=os.path.getmtime, reverse=True
+    )
     if len(logglob) > max_kept:
         for path in logglob[max_kept:]:
             if path.is_file():

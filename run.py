@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import asyncio
 import importlib.util
 import logging
@@ -9,26 +10,34 @@ import shutil
 import ssl
 import subprocess
 import sys
+import textwrap
 import time
 import traceback
 from base64 import b64decode
 from typing import Any, Union
 
+from musicbot.constants import (
+    DEFAULT_LOGS_KEPT,
+    DEFAULT_LOGS_ROTATE_FORMAT,
+    MAXIMUM_LOGS_LIMIT,
+)
 from musicbot.constants import VERSION as BOTVERSION
 from musicbot.exceptions import HelpfulError, RestartSignal, TerminateSignal
-from musicbot.utils import rotate_log_files, setup_loggers, shutdown_loggers
-
-# take care of loggers right away
-log = logging.getLogger("musicbot.launcher")
-setup_loggers()
-log.info("Loading MusicBot version:  %s", BOTVERSION)
-log.info("Log opened:  %s", time.ctime())
-
+from musicbot.utils import (
+    rotate_log_files,
+    set_logging_level,
+    set_logging_max_kept_logs,
+    set_logging_rotate_date_format,
+    setup_loggers,
+    shutdown_loggers,
+)
 
 try:
     import aiohttp
 except ImportError:
     pass
+
+log = logging.getLogger("musicbot.launcher")
 
 
 class GIT:
@@ -173,6 +182,8 @@ def sanity_checks(optional: bool = True) -> None:
     """
     Run a collection of pre-startup checks to either automatically correct
     issues or inform the user of how to correct them.
+
+    :param: optional:  Toggle optional start up checks.
     """
     log.info("Starting sanity checks")
     """Required Checks"""
@@ -302,7 +313,7 @@ def req_ensure_env() -> None:
         bugger_off()
 
     try:
-        # TODO: change these perhaps.
+        # TODO: change these perhaps.  Assert is removed in bytecode.
         assert os.path.isdir("config"), 'folder "config" not found'
         assert os.path.isdir("musicbot"), 'folder "musicbot" not found'
         assert os.path.isfile(
@@ -346,7 +357,124 @@ def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
         )
 
 
-#################################################
+def parse_cli_args() -> argparse.Namespace:
+    """
+    Parse command line arguments and do reasonable checks and assignments.
+
+    :returns:  Command line arguments parsed via argparse.
+    """
+
+    # define a few custom arg validators.
+    def kept_logs_int(value: str) -> int:
+        """Validator for log rotation limits."""
+        try:
+            val = int(value)
+            if val > MAXIMUM_LOGS_LIMIT:
+                raise ValueError("Value is above the maximum limit.")
+            if val <= -1:
+                raise ValueError("Value must not be negative.")
+            return val
+        except (TypeError, ValueError) as e:
+            raise argparse.ArgumentTypeError(
+                f"Value for Max Logs Kept must be a number from 0 to {MAXIMUM_LOGS_LIMIT}",
+            ) from e
+
+    def log_levels_int(level_name: str) -> int:
+        """Validator for log level name to existing level int."""
+        level_name = level_name.upper()
+        try:
+            val = getattr(logging, level_name, None)
+            if not isinstance(val, int):
+                raise TypeError(f"Log level '{level_name}' is not available.")
+            return val
+        except (TypeError, ValueError) as e:
+            raise argparse.ArgumentTypeError(
+                "Log Level must be one of:  CRITICAL, ERROR, WARNING, INFO, DEBUG, "
+                "VOICEDEBUG, FFMPEG, NOISY, or EVERYTHING",
+            ) from e
+
+    ap = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent(
+            """\
+        Launch a music playing discord bot built using discord.py, youtubeDL, and ffmpeg.
+        Available via Github:
+          https://github.com/Just-Some-Bots/MusicBot
+        """
+        ),
+        epilog=textwrap.dedent(
+            """\
+        For more help and support with this bot, join our discord:
+          https://discord.gg/bots
+
+        This software is provided under the MIT License.
+        See the `LICENSE` text file for complete details.
+        """
+        ),
+    )
+
+    # Show Version and exit option.
+    ap.add_argument(
+        "-V",
+        "--version",
+        dest="show_version",
+        action="store_true",
+        help="Print the MusicBot version information and exit.",
+    )
+
+    # No Startup Checks option.
+    ap.add_argument(
+        "--no-checks",
+        dest="do_start_checks",
+        action="store_false",
+        help="Skip all startup checks.",
+    )
+
+    # Log related options
+    ap.add_argument(
+        "--logs-kept",
+        dest="keep_n_logs",
+        default=DEFAULT_LOGS_KEPT,
+        type=kept_logs_int,
+        help=f"Specify how many log files to keep, between 0 and {MAXIMUM_LOGS_LIMIT} inclusive."
+        f" (Default: {DEFAULT_LOGS_KEPT})",
+    )
+    ap.add_argument(
+        "--log-level",
+        dest="log_level",
+        default="NOTSET",
+        type=log_levels_int,
+        help="Override the log level settings set in config. Must be one of: "
+        "CRITICAL, ERROR, WARNING, INFO, DEBUG, VOICEDEBUG, FFMPEG, "
+        "NOISY, or EVERYTHING   (Default: NOTSET)",
+    )
+    ap.add_argument(
+        "--log-rotate-fmt",
+        dest="old_log_fmt",
+        default=DEFAULT_LOGS_ROTATE_FORMAT,
+        type=str,
+        help="Override the default date format used when rotating log files. "
+        "This should contain values compatible with strftime().  "
+        f"(Default:  '{DEFAULT_LOGS_ROTATE_FORMAT.replace('%', '%%')}')",
+    )
+
+    args = ap.parse_args()
+
+    # Show version and exit.
+    if args.show_version:
+        print(f"Just-Some-Bots/MusicBot\nVersion:  {BOTVERSION}\n")
+        sys.exit(0)
+
+    if -1 < args.keep_n_logs <= MAXIMUM_LOGS_LIMIT:
+        set_logging_max_kept_logs(args.keep_n_logs)
+
+    if args.log_level != logging.NOTSET:
+        set_logging_level(args.log_level, override=True)
+
+    if args.old_log_fmt != DEFAULT_LOGS_ROTATE_FORMAT:
+        set_logging_rotate_date_format(args.old_log_fmt)
+
+    return args
 
 
 def respawn_bot_process(pybin: str = "") -> None:
@@ -394,12 +522,23 @@ def respawn_bot_process(pybin: str = "") -> None:
         os.execlp(exec_args[0], *exec_args)
 
 
-async def main() -> Union[RestartSignal, TerminateSignal, None]:
-    """All of the MusicBot starts here."""
-    # TODO: *actual* CLI arg parsing
+async def main(
+    args: argparse.Namespace,
+) -> Union[RestartSignal, TerminateSignal, None]:
+    """
+    All of the MusicBot starts here.
 
-    if "--no-checks" not in sys.argv:
+    :param: args:  some arguments parsed from the command line.
+
+    :returns:  Oddly, returns rather than raises a *Signal or nothing.
+    """
+    # TODO: this function may not need to be async.
+
+    # Handle startup checks, if they haven't been skipped.
+    if args.do_start_checks:
         sanity_checks()
+    else:
+        log.info("Skipped startup checks.")
 
     exit_signal: Union[RestartSignal, TerminateSignal, None] = None
     tried_requirementstxt = False
@@ -418,7 +557,6 @@ async def main() -> Union[RestartSignal, TerminateSignal, None]:
             from musicbot import MusicBot  # pylint: disable=import-outside-toplevel
 
             m = MusicBot(use_certifi=use_certifi)
-            # await m._doBotInit(use_certifi)
             await m.run()
 
         except (
@@ -467,8 +605,10 @@ async def main() -> Union[RestartSignal, TerminateSignal, None]:
                 err = PIP.run_install("--upgrade -r requirements.txt")
 
                 if err:  # TODO: add the specific error check back.
-                    # The proper thing to do here is tell the user to fix their install, not help make it worse.
-                    # Comprehensive return codes aren't really a feature of pip, we'd need to read the log, and so does the user.
+                    # The proper thing to do here is tell the user to fix
+                    # their install, not help make it worse or insecure.
+                    # Comprehensive return codes aren't really a feature of pip,
+                    # If we need to read the log, then so does the user.
                     print()
                     log.critical(
                         "This is not recommended! You can try to %s to install dependencies anyways.",
@@ -527,16 +667,47 @@ async def main() -> Union[RestartSignal, TerminateSignal, None]:
 
 
 if __name__ == "__main__":
-    # TODO: we should check / force-change working directory.
+    # take care of loggers right away
+    setup_loggers()
+
+    # parse arguments before any logs, so --help does not make an empty log.
+    cli_args = parse_cli_args()
+
+    # Log file creation is defered until this first write.
+    log.info("Loading MusicBot version:  %s", BOTVERSION)
+    log.info("Log opened:  %s", time.ctime())
+
+    # Check if run.py is in the current working directory.
+    run_py_dir = os.path.dirname(os.path.realpath(__file__))
+    if run_py_dir != os.getcwd():
+        # if not, verify musicbot and .git folders exists and change directory.
+        run_mb_dir = pathlib.Path(run_py_dir).joinpath("musicbot")
+        run_git_dir = pathlib.Path(run_py_dir).joinpath(".git")
+        if run_mb_dir.is_dir() and run_git_dir.is_dir():
+            log.warning("Changing working directory to:  %s", run_py_dir)
+            os.chdir(run_py_dir)
+        else:
+            log.critical(
+                "Cannot start the bot!  You started `run.py` in the wrong directory"
+                " and we could not locate `musicbot` and `.git` folders to verify"
+                " a new directory location."
+            )
+            log.error(
+                "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
+                "If you did not use git to clone the repository, you are strongly urged to."
+            )
+            time.sleep(3)  # make sure they see the message.
+            sys.exit(127)
+
     # py3.8 made ProactorEventLoop default on windows.
     # Now we need to make adjustments for a bug in aiohttp :)
     loop = asyncio.get_event_loop_policy().get_event_loop()
     try:
-        exit_sig = loop.run_until_complete(main())
+        exit_sig = loop.run_until_complete(main(cli_args))
     except KeyboardInterrupt:
         # TODO: later this will probably get more cleanup so we can
         # close other things more proper like too.
-        log.info("Caught a keyboard interrupt signal.")
+        log.info("\nCaught a keyboard interrupt signal.")
         shutdown_loggers()
         rotate_log_files()
         raise

@@ -14,6 +14,7 @@ from .constants import (
     DEFAULT_BLACKLIST_FILE,
     DEFAULT_FOOTER_TEXT,
     DEFAULT_I18N_FILE,
+    DEFAULT_LOG_LEVEL,
     DEFAULT_OPTIONS_FILE,
     EXAMPLE_OPTIONS_FILE,
 )
@@ -599,8 +600,14 @@ class ConfigDefaults:
     delete_messages: bool = True
     delete_invoking: bool = False
     persistent_queue: bool = True
-    debug_level: int = logging.INFO
-    debug_level_str: str = "INFO"
+
+    debug_level: int = getattr(logging, DEFAULT_LOG_LEVEL, logging.INFO)
+    debug_level_str: str = (
+        DEFAULT_LOG_LEVEL
+        if logging.getLevelName(debug_level) == DEFAULT_LOG_LEVEL
+        else "INFO"
+    )
+
     status_message: str = ""
     write_current_song: bool = False
     allow_author_skip: bool = True
@@ -718,11 +725,14 @@ class ExtendedConfigParser(configparser.ConfigParser):
             int_level = getattr(logging, val)
             return (str_level, int_level)
 
+        int_level = getattr(logging, DEFAULT_LOG_LEVEL, logging.INFO)
+        str_level = logging.getLevelName(int_level)
         log.warning(
-            'Invalid DebugLevel option "%s" given, falling back to INFO',
+            'Invalid DebugLevel option "%s" given, falling back to level: %s',
             val,
+            str_level,
         )
-        return ("INFO", logging.INFO)
+        return (str_level, int_level)
 
     def getdatasize(
         self,

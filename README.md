@@ -29,6 +29,12 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Add actual command-line arguments to control logging, show version, and skip startup checks.
+  - Update logging to defer log file creation until the first log is emitted.
+  - Update log file rotation to use file modification time, not just sort by filename.
+  - Allow CLI log-level to override log level set in config/options.ini.
+- Playing compound links now works better and does not double-queue the carrier video.
+- Majority of function definitions now have some kind of docstring.
 - Enforce code checks using `Pylint` and `isort` to reduce inconsistency and clean up code.
 - Ensure source code complies with mypy checks, and fix various bugs on the way.
   - Updates MusicBot logging to enable time-based log files and safely close the logs in most cases.

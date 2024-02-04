@@ -14,9 +14,8 @@ except (subprocess.SubprocessError, OSError, ValueError) as e:
 # constant string exempt from i18n
 DEFAULT_FOOTER_TEXT: str = f"Just-Some-Bots/MusicBot ({VERSION})"
 
-DEFAULT_MUSICBOT_LOG_FILE: str = "logs/musicbot.log"
-DEFAULT_DISCORD_LOG_FILE: str = "logs/discord.log"
 
+# File path constants
 DEFAULT_OPTIONS_FILE: str = "config/options.ini"
 DEFAULT_PERMS_FILE: str = "config/permissions.ini"
 DEFAULT_I18N_FILE: str = "config/i18n/en.json"
@@ -31,7 +30,24 @@ EXAMPLE_OPTIONS_FILE: str = "config/example_options.ini"
 EXAMPLE_PERMS_FILE: str = "config/example_permissions.ini"
 EXAMPLE_COMMAND_ALIAS_FILE: str = "config/example_aliases.json"
 
+
+# Logging related constants
+DEFAULT_MUSICBOT_LOG_FILE: str = "logs/musicbot.log"
+DEFAULT_DISCORD_LOG_FILE: str = "logs/discord.log"
+# Default is 0, for no rotation at all.
+DEFAULT_LOGS_KEPT: int = 0
+MAXIMUM_LOGS_LIMIT: int = 100
+# This value is run through strftime() and then sandwitched between
+DEFAULT_LOGS_ROTATE_FORMAT: str = ".ended-%Y-%j-%H%m%S"
+# Default log level can be one of:
+# CRITICAL, ERROR, WARNING, INFO, DEBUG,
+# VOICEDEBUG, FFMPEG, NOISY, or EVERYTHING
+DEFAULT_LOG_LEVEL: str = "INFO"
+
+
+# Discord and other API constants
 DISCORD_MSG_CHAR_LIMIT: int = 2000
+
 
 EMOJI_CHECK_MARK_BUTTON: str = "\u2705"
 EMOJI_CROSS_MARK_BUTTON: str = "\u274E"
