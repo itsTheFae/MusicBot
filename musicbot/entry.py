@@ -67,6 +67,7 @@ class BasePlaylistEntry(Serializable):
     def duration_td(self) -> datetime.timedelta:
         """
         Get this entry's duration as a timedelta object.
+        The object may contain a 0 value.
         """
         raise NotImplementedError
 
@@ -207,10 +208,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
         """
         Returns duration as a datetime.timedelta object.
         May contain 0 seconds duration.
-        Partial seconds are rounded away.
         """
         t = self.duration or 0
-        return datetime.timedelta(seconds=round(t))
+        return datetime.timedelta(seconds=t)
 
     @property
     def thumbnail_url(self) -> str:
@@ -456,6 +456,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
         log.debug("Calculating mean volume of:  %s", input_file)
         exe = shutil.which("ffmpeg")
         # TODO:  if this is printing JSON, we should really not use regex to parse it...
+        # ... OK -BUT- ffmpeg does not return ONLY the JSON, and I cannot find out how to make it.
+        # so that explains the need for regex.
+        # still, maybe we should regex split the JSON from non-json and go ham on that?
         args = "-af loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:print_format=json -f null /dev/null"
 
         raw_output = await run_command(f'"{exe}" -i "{input_file}" {args}')
@@ -610,10 +613,9 @@ class StreamPlaylistEntry(BasePlaylistEntry):
         """
         Get timedelta object from any known duration data.
         May contain a 0 second duration.
-        Microseconds are rounded away.
         """
         t = self.duration or 0
-        return datetime.timedelta(seconds=round(t))
+        return datetime.timedelta(seconds=t)
 
     @property
     def thumbnail_url(self) -> str:

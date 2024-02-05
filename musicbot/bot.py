@@ -12,7 +12,6 @@ import sys
 import time
 import traceback
 from collections import defaultdict
-from datetime import timedelta
 from io import BytesIO, StringIO
 from textwrap import dedent
 from typing import Any, DefaultDict, Dict, List, Optional, Set, Union
@@ -95,8 +94,6 @@ log = logging.getLogger(__name__)
 # TODO: fix perms command to send in channel if DM fails.
 # TODO: fix current blacklist to be more clear.
 # TODO: add a proper blacklist for song-related data, not just users.
-# TODO: review duration related code, make it less spamy if nothing else.
-# TODO: review timedelta usage to make sure time is formatted as desired. no MS, no empty hours.
 
 
 class MusicBot(discord.Client):
@@ -1169,7 +1166,7 @@ class MusicBot(discord.Client):
         await self._scheck_ensure_env()
 
         # TODO: Server permissions check
-        # TODO: pre-expand playlists in autoplaylist
+        # TODO: pre-expand playlists in autoplaylist?
 
         # config/permissions async validate?
         await self._scheck_configs()
@@ -3079,13 +3076,13 @@ class MusicBot(discord.Client):
 
                 if (
                     permissions.max_song_length
-                    and info.get("duration", 0) > permissions.max_song_length
+                    and info.duration_td.seconds > permissions.max_song_length
                 ):
                     raise exceptions.PermissionsError(
                         self.str.get(
                             "cmd-play-song-limit",
                             "Song duration exceeds limit ({0} > {1})",
-                        ).format(info["duration"], permissions.max_song_length),
+                        ).format(info.duration, permissions.max_song_length),
                         expire_in=30,
                     )
 
@@ -3391,9 +3388,7 @@ class MusicBot(discord.Client):
                     ).format(
                         entries.index(entry) + 1,
                         entry["title"],
-                        format_song_duration(
-                            str(entry.duration_td),
-                        ),
+                        format_song_duration(entry.duration_td),
                     )
                 )
             # This combines the formatted result strings into one list.
@@ -3558,10 +3553,9 @@ class MusicBot(discord.Client):
                 )
                 self.server_specific_data[guild.id]["last_np_msg"] = None
 
-            # TODO: Fix timedelta garbage with util function
-            song_progress = str(timedelta(seconds=player.progress))
+            song_progress = format_song_duration(player.progress)
             song_total = (
-                str(player.current_entry.duration_td)
+                format_song_duration(player.current_entry.duration_td)
                 if player.current_entry.duration is not None
                 else "(no duration data)"
             )
@@ -4390,15 +4384,15 @@ class MusicBot(discord.Client):
         Prints the current song queue.
         """
 
+        # TODO: find a way to paginate the results herein.
         lines = []
         unlisted = 0
         andmoretext = f"* ... and {len(player.playlist.entries)} more*"
 
         if player.is_playing and player.current_entry:
-            # TODO: Fix timedelta garbage with util function
-            song_progress = str(timedelta(seconds=round(player.progress)))
+            song_progress = format_song_duration(player.progress)
             song_total = (
-                str(player.current_entry.duration_td)
+                format_song_duration(player.current_entry.duration_td)
                 if player.current_entry.duration is not None
                 else "(no duration data)"
             )

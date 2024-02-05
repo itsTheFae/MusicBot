@@ -649,9 +649,9 @@ class YtdlpResponseDict(YUserDict):
         """
         Returns duration as a datetime.timedelta object.
         May contain 0 seconds duration.
-        Partial seconds are rounded away.
         """
-        return datetime.timedelta(seconds=round(self.duration))
+        t = self.duration or 0
+        return datetime.timedelta(seconds=t)
 
     @property
     def is_live(self) -> bool:

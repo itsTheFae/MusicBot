@@ -440,7 +440,7 @@ class Playlist(EventEmitter, Serializable):
             raise InvalidDataError("no duration data")
 
         estimated_time = sum(
-            float(e.duration_td.seconds) for e in islice(self.entries, position - 1)
+            e.duration_td.total_seconds() for e in islice(self.entries, position - 1)
         )
 
         # When the player plays a song, it eats the first playlist item, so we just have to add the time back

@@ -646,11 +646,25 @@ def count_members_in_voice(  # pylint: disable=dangerous-default-value
     return num_voice
 
 
-def format_song_duration(time_delta: str) -> str:
+def format_song_duration(seconds: Union[int, float, datetime.timedelta]) -> str:
     """
-    Conditionally remove hour component of timedelta string if it is 0.
+    Take in the given `seconds` and format it as a compact timedelta string.
+    If input `seconds` is an int or float, it will be converted to a timedelta.
+    If the input has partial seconds, those are quietly removed without rounding.
     """
     # TODO: fix this to take in a timedelta object instead of a string.
+    if isinstance(seconds, (int, float)):
+        seconds = datetime.timedelta(seconds=seconds)
+
+    if not isinstance(seconds, datetime.timedelta):
+        raise TypeError(
+            "Can only format a duration that is int, float, or timedelta object."
+        )
+
+    # Simply remove any microseconds from the delta.
+    time_delta = str(seconds).split(".", maxsplit=1)[0]
+
+    # Check the hours portion for empty 0 and remove it.
     duration_array = time_delta.split(":")
     return time_delta if int(duration_array[0]) > 0 else ":".join(duration_array[1:])
 
