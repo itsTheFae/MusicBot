@@ -7,7 +7,7 @@ analyse-fallback-blocks=no
 
 # Clear in-memory caches upon conclusion of linting. Useful if running pylint
 # in a server-like mode.
-clear-cache-post-run=no
+clear-cache-post-run=yes
 
 # Load and enable all available extensions. Use --list-extensions to see a list
 # all available extensions.

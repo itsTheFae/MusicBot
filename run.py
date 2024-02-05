@@ -32,6 +32,8 @@ from musicbot.utils import (
     shutdown_loggers,
 )
 
+
+# protect dependency import from stoping the launcher
 try:
     import aiohttp
 except ImportError:
@@ -42,11 +44,19 @@ log = logging.getLogger("musicbot.launcher")
 
 class GIT:
     @classmethod
-    def works(cls) -> bool:
-        """Checks for output from git --version to verify git can be run."""
+    def works(cls, raise_instead: bool = False) -> bool:
+        """
+        Checks for output from git --version to verify git can be run.
+
+        :param: raise_instead:  Return True on success but raise Runtime error otherwise.
+
+        :raises:  RuntimeError  if `raise_instead` is set True
+        """
         try:
             git_bin = shutil.which("git")
             if not git_bin:
+                if raise_instead:
+                    raise RuntimeError("Cannot locate `git` executable in environment path.")
                 return False
             return bool(subprocess.check_output([git_bin, "--version"]))
         except (
@@ -55,14 +65,42 @@ class GIT:
             PermissionError,
             FileNotFoundError,
             subprocess.CalledProcessError,
-        ):
+        ) as e:
+            if raise_instead:
+                raise RuntimeError(
+                    f"Cannot execute `git` commands due to an error:  {str(e)}"
+                ) from e
+            return False
+
+    @classmethod
+    def check_for_updates(cls) -> bool:
+        """
+        Uses git executable to fetch with --dry-run, checking for updates without
+        updating anything.
+        """
+        cls.works(raise_instead=True)
+        git_bin = shutil.which("git")
+        if not git_bin:
+            raise FileNotFoundError("Could not locate `git` executable on path.")
+        try:
+            raw_data = subprocess.check_output([git_bin, "fetch", "--dry-run"])
+        except (
+            OSError,
+            UnicodeError,
+            PermissionError,
+            FileNotFoundError,
+            subprocess.CalledProcessError,
+        ) as e:
+            log.exception(
+                "Update check via `git` executable failed due to an error:  %s",
+                str(e),
+            )
             return False
 
     @classmethod
     def run_upgrade_pull(cls) -> None:
         """Runs `git pull` in the current working directory."""
-        if not cls.works():
-            raise RuntimeError("Cannot locate or run 'git' executable.")
+        cls.works(raise_instead=True)
 
         log.info("Attempting to upgrade with `git pull` on current path.")
         try:
@@ -154,7 +192,7 @@ class PIP:
         )
         try:
             raw_data = cls.run_python_m(
-                ["install", "--upgrade", "-r", "requirements.txt"],
+                ["install", "--no-input", "-U", "-r", "requirements.txt"],
                 check_output=True,
             )
             if isinstance(raw_data, bytes):
@@ -313,7 +351,7 @@ def req_ensure_env() -> None:
         bugger_off()
 
     try:
-        # TODO: change these perhaps.  Assert is removed in bytecode.
+        # TODO: change these perhaps.  Assert is removed in byte-code.
         assert os.path.isdir("config"), 'folder "config" not found'
         assert os.path.isdir("musicbot"), 'folder "musicbot" not found'
         assert os.path.isfile(
@@ -590,7 +628,10 @@ async def main(
                 continue
 
         except SyntaxError:
-            log.exception("Syntax error (this is a bug, not your fault)")
+            if "-dirty" in BOTVERSION:
+                log.exception("Syntax error (version is dirty, did you edit the code?)")
+            else:
+                log.exception("Syntax error (this is a bug, not your fault)")
             break
 
         except ImportError:
@@ -602,7 +643,7 @@ async def main(
                 log.exception("Error starting bot")
                 log.info("Attempting to install dependencies...")
 
-                err = PIP.run_install("--upgrade -r requirements.txt")
+                err = PIP.run_install("--no-warn-script-location --user -U -r requirements.txt")
 
                 if err:  # TODO: add the specific error check back.
                     # The proper thing to do here is tell the user to fix
@@ -673,7 +714,7 @@ if __name__ == "__main__":
     # parse arguments before any logs, so --help does not make an empty log.
     cli_args = parse_cli_args()
 
-    # Log file creation is defered until this first write.
+    # Log file creation is deferred until this first write.
     log.info("Loading MusicBot version:  %s", BOTVERSION)
     log.info("Log opened:  %s", time.ctime())
 
