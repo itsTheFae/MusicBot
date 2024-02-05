@@ -10,8 +10,7 @@ import unicodedata
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Set, Tuple, Union
 
-# TODO:  remove all utils with module deps to their own utils file.
-import aiohttp
+# TODO:  protect colorlog import and fall back to non-color handler
 import colorlog
 
 from .constants import (
@@ -25,7 +24,6 @@ from .exceptions import PermissionsError
 
 if TYPE_CHECKING:
     from discord import Member, StageChannel, VoiceChannel
-    from multidict import CIMultiDictProxy
 
     from .bot import MusicBot
 
@@ -421,29 +419,6 @@ def paginate(
         chunks.append(currentchunk)
 
     return chunks
-
-
-async def get_headers(  # pylint: disable=dangerous-default-value
-    session: aiohttp.ClientSession,
-    url: str,
-    *,
-    timeout: int = 5,
-    allow_redirects: bool = True,
-    req_headers: Dict[str, Any] = {},
-) -> Union["CIMultiDictProxy[str]", None]:
-    """
-    Uses given aiohttp `session` to make a HEAD request against given `url` to fetch headers only.
-    If `headerfield` is set, only the given header field is returned.
-
-    :param: timeout:  Set a different timeout for the HEAD request.
-    :param: allow_redirect:  Follow "Location" headers through, on by default.
-    :param: req_headers:  Set a collection of headers to send with the HEAD request.
-    """
-    req_timeout = aiohttp.ClientTimeout(total=timeout)
-    async with session.head(
-        url, timeout=req_timeout, allow_redirects=allow_redirects, headers=req_headers
-    ) as response:
-        return response.headers
 
 
 def instance_diff(obj1: Any, obj2: Any) -> Dict[str, Tuple[Any, Any]]:

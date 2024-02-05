@@ -9,7 +9,7 @@ from collections import UserDict
 from concurrent.futures import ThreadPoolExecutor
 from pprint import pformat
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aiohttp
 import yt_dlp as youtube_dl  # type: ignore[import-untyped]
@@ -21,9 +21,10 @@ from yt_dlp.utils import UnsupportedError
 
 from .exceptions import ExtractionError
 from .spotify import Spotify
-from .utils import get_headers
 
 if TYPE_CHECKING:
+    from multidict import CIMultiDictProxy
+
     from .bot import MusicBot
 
     # Explicit compat with python 3.8
@@ -121,7 +122,7 @@ class Downloader:
 
     async def get_url_headers(self, url: str) -> Dict[str, str]:
         """
-        Make an HTTP HEAD request and return response headers.
+        Make an HTTP HEAD request and return response headers safe for serialization.
         Header names are converted to upper case.
         If `url` is not valid the header 'X-INVALID-URL' is set to its value.
         """
@@ -130,7 +131,7 @@ class Downloader:
         # do a HEAD request and add the headers to extraction info.
         if test_url and self.bot.session:
             try:
-                head_data = await get_headers(
+                head_data = await self._get_headers(
                     self.bot.session,
                     test_url,
                     req_headers=self.http_req_headers,
@@ -153,6 +154,40 @@ class Downloader:
         else:
             headers = {"X-INVALID-URL": url}
         return headers
+
+    async def _get_headers(  # pylint: disable=dangerous-default-value
+        self,
+        session: aiohttp.ClientSession,
+        url: str,
+        *,
+        timeout: int = 5,
+        allow_redirects: bool = True,
+        req_headers: Dict[str, Any] = {},
+    ) -> Union["CIMultiDictProxy[str]", None]:
+        """
+        Uses given aiohttp `session` to fetch HEAD of given `url` without making
+        any checks if the URL is valid.
+        If `headerfield` is set, only the given header field is returned.
+
+        :param: timeout:  Set a different timeout for the HEAD request.
+        :param: allow_redirect:  Follow "Location" headers through, on by default.
+        :param: req_headers:  Set a collection of headers to send with the HEAD request.
+
+        :returns:  A case-insensitive multidict instance, not serializable.
+
+        :raises:  aiohttp.ClientError and derived exceptions
+            For errors handled internally by aiohttp.
+        :raises:  OSError
+            For errors not handled by aiohttp.
+        """
+        req_timeout = aiohttp.ClientTimeout(total=timeout)
+        async with session.head(
+            url,
+            timeout=req_timeout,
+            allow_redirects=allow_redirects,
+            headers=req_headers,
+        ) as response:
+            return response.headers
 
     def _sanitize_and_log(  # pylint: disable=dangerous-default-value
         self,

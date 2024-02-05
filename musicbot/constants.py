@@ -37,7 +37,7 @@ DEFAULT_DISCORD_LOG_FILE: str = "logs/discord.log"
 # Default is 0, for no rotation at all.
 DEFAULT_LOGS_KEPT: int = 0
 MAXIMUM_LOGS_LIMIT: int = 100
-# This value is run through strftime() and then sandwitched between
+# This value is run through strftime() and then sandwiched between
 DEFAULT_LOGS_ROTATE_FORMAT: str = ".ended-%Y-%j-%H%m%S"
 # Default log level can be one of:
 # CRITICAL, ERROR, WARNING, INFO, DEBUG,
