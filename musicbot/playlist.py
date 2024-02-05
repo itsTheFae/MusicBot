@@ -435,7 +435,6 @@ class Playlist(EventEmitter, Serializable):
 
         :raises: musicbot.exceptions.InvalidDataError  if duration data cannot be calculated.
         """
-        # TODO: double check the way we deal with time again.  I've messed something up.
         if any(e.duration is None for e in islice(self.entries, position - 1)):
             raise InvalidDataError("no duration data")
 

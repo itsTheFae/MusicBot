@@ -652,7 +652,6 @@ def format_song_duration(seconds: Union[int, float, datetime.timedelta]) -> str:
     If input `seconds` is an int or float, it will be converted to a timedelta.
     If the input has partial seconds, those are quietly removed without rounding.
     """
-    # TODO: fix this to take in a timedelta object instead of a string.
     if isinstance(seconds, (int, float)):
         seconds = datetime.timedelta(seconds=seconds)
 
