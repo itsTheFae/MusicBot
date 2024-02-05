@@ -30,6 +30,13 @@ Cherry-picking (or otherwise copying) is welcome should you feel inclined.
 Here is a list of changes made so far, with most recent first:
 
 - Add actual command-line arguments to control logging, show version, and skip startup checks.
+  - Supported CLI flags:
+    - `-V` to print version and exit.
+    - `--help` or `-h`  for standard help / usage.
+    - `--no-checks`  Legacy option to skip startup checks.
+    - `--logs-kept`  Set the number of logs to keep when rotating logs.
+    - `--log-level`  Set an override to `DebugLevel` in config/options.ini file.
+    - `--log-rotate-fmt`  Set a filename component using strftime() compatible string.
   - Update logging to defer log file creation until the first log is emitted.
   - Update log file rotation to use file modification time, not just sort by filename.
   - Allow CLI log-level to override log level set in config/options.ini.
