@@ -10,8 +10,11 @@ import unicodedata
 from functools import wraps
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Set, Tuple, Union
 
-# TODO:  protect colorlog import and fall back to non-color handler
-import colorlog
+# protected imports to keep run.py from breaking on missing packages.
+try:
+    import colorlog
+except ImportError:
+    colorlog = None
 
 from .constants import (
     DEFAULT_DISCORD_LOG_FILE,
@@ -122,36 +125,44 @@ def setup_loggers() -> None:
     )
     logger.addHandler(fhandler)
 
-    # Setup logging to console for musicbot.
+    # Setup logging to console for musicbot, handle missing colorlog gracefully.
     shandler = logging.StreamHandler(stream=sys.stdout)
-    sformatter = colorlog.LevelFormatter(
-        fmt={
-            "DEBUG": "{log_color}[{levelname}:{module}] {message}",
-            "INFO": "{log_color}{message}",
-            "WARNING": "{log_color}{levelname}: {message}",
-            "ERROR": "{log_color}[{levelname}:{module}] {message}",
-            "CRITICAL": "{log_color}[{levelname}:{module}] {message}",
-            "EVERYTHING": "{log_color}[{levelname}:{module}] {message}",
-            "NOISY": "{log_color}[{levelname}:{module}] {message}",
-            "VOICEDEBUG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
-            "FFMPEG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
-        },
-        log_colors={
-            "DEBUG": "cyan",
-            "INFO": "white",
-            "WARNING": "yellow",
-            "ERROR": "red",
-            "CRITICAL": "bold_red",
-            "EVERYTHING": "bold_cyan",
-            "NOISY": "bold_white",
-            "FFMPEG": "bold_purple",
-            "VOICEDEBUG": "purple",
-        },
-        style="{",
-        datefmt="",
-    )
+    if colorlog is not None:
+        sformatter = colorlog.LevelFormatter(
+            fmt={
+                "DEBUG": "{log_color}[{levelname}:{module}] {message}",
+                "INFO": "{log_color}{message}",
+                "WARNING": "{log_color}{levelname}: {message}",
+                "ERROR": "{log_color}[{levelname}:{module}] {message}",
+                "CRITICAL": "{log_color}[{levelname}:{module}] {message}",
+                "EVERYTHING": "{log_color}[{levelname}:{module}] {message}",
+                "NOISY": "{log_color}[{levelname}:{module}] {message}",
+                "VOICEDEBUG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
+                "FFMPEG": "{log_color}[{levelname}:{module}][{relativeCreated:.9f}] {message}",
+            },
+            log_colors={
+                "DEBUG": "cyan",
+                "INFO": "white",
+                "WARNING": "yellow",
+                "ERROR": "red",
+                "CRITICAL": "bold_red",
+                "EVERYTHING": "bold_cyan",
+                "NOISY": "bold_white",
+                "FFMPEG": "bold_purple",
+                "VOICEDEBUG": "purple",
+            },
+            style="{",
+            datefmt="",
+        )
+
+    # colorlog import must have failed.
+    else:
+        sformatter = logging.Formatter(
+            "[{name}] {levelname}: {message}",
+            style="{",
+        )
+
     shandler.setFormatter(sformatter)  # type: ignore[arg-type]
-    # shandler.setLevel(self.config.debug_level)
     logger.addHandler(shandler)
 
     # Setup logging for discord module.
