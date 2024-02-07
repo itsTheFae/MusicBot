@@ -1,15 +1,202 @@
+import asyncio
 import inspect
 import json
 import logging
+import pathlib
 import pydoc
-from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Set, Type, Union
+from collections import defaultdict
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    DefaultDict,
+    Dict,
+    List,
+    Optional,
+    Set,
+    Type,
+    Union,
+)
 
+from .json import Json
 from .utils import _get_variable
+
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from discord import Embed, Message
 
-log = logging.getLogger(__name__)
+    from .bot import MusicBot
+    from .config import Config
+
+
+class GuildAsyncEvent(asyncio.Event):
+    """
+    Simple extension of asyncio.Event() to provide a boolean flag for activity.
+    """
+
+    def __init__(self) -> None:
+        """
+        Create an event with an activity flag.
+        """
+        super().__init__()
+        self._event_active: bool = False
+
+    def is_active(self) -> bool:
+        """Reports activity state"""
+        return self._event_active
+
+    def activate(self) -> None:
+        """Sets the event's active flag."""
+        self._event_active = True
+
+    def deactivate(self) -> None:
+        """Unset the event's active flag."""
+        self._event_active = False
+
+
+class GuildSpecificData:
+    """
+    A typed collection of data specific to each guild/server.
+    This could replace the defaultdict implementation...
+    Currently unused.
+    """
+
+    def __init__(self, bot: "MusicBot") -> None:
+        """
+        Initialize a managed server specific data set.
+        """
+        # Members for internal use only.
+        self._ssd: DefaultDict[int, "GuildSpecificData"] = bot.server_data
+        self._bot_config: "Config" = bot.config
+        self._guild_id: int = 0
+        self._command_prefix: str = ""
+        self._prefix_history: Set[str] = set()
+        self._events: DefaultDict[str, GuildAsyncEvent] = defaultdict(GuildAsyncEvent)
+        self._file_lock: asyncio.Lock = asyncio.Lock()
+        self._is_file_loaded: bool = False
+
+        # Members below are available for public use.
+        self.last_np_msg: Optional["Message"] = None
+        self.availability_paused: bool = False
+        self.auto_paused: bool = False
+
+        # create a task to load any persistent guild options.
+        # in theory, this should work out fine.
+        if bot.loop:
+            bot.loop.create_task(self.load_guild_options_file())
+
+    def _lookup_guild_id(self) -> int:
+        """
+        Looks up guild.id used to create this instance of GuildSpecificData
+        Will return 0 if for some reason lookup fails.
+        """
+        for key, val in self._ssd.items():
+            if val == self:
+                return key
+        return 0
+
+    @property
+    def command_prefix(self) -> str:
+        """
+        If per-server prefix is enabled, and the server has a specific
+        command prefix, it will be returned.
+        Otherwise the default command prefix is returned from MusicBot config.
+        """
+        if self._bot_config.enable_options_per_guild:
+            if self._command_prefix:
+                return self._command_prefix
+        return self._bot_config.command_prefix
+
+    @command_prefix.setter
+    def command_prefix(self, value: str) -> None:
+        """Set the value of command_prefix"""
+        # update prefix history
+        self._prefix_history.add(self._command_prefix)
+
+        # set prefix value
+        self._command_prefix = value
+
+        # clean up history buffer if needed.
+        if len(self._prefix_history) > 3:
+            self._prefix_history.pop()
+
+    @property
+    def command_prefix_history(self) -> List[str]:
+        """Get the prefix history from this session, including the current prefix."""
+        history = list(self._prefix_history)
+        if self._command_prefix:
+            history = [self._command_prefix] + history
+        return history
+
+    def get_event(self, name: str) -> GuildAsyncEvent:
+        """
+        Gets an event by the given `name` or otherwise creates and stores one.
+        """
+        return self._events[name]
+
+    async def load_guild_options_file(self) -> None:
+        """
+        Load a JSON file from the server's data directory that contains
+        server-specific options intended to persist through shutdowns.
+        This method only supports per-server command prefix currently.
+        """
+        if self._guild_id == 0:
+            self._guild_id = self._lookup_guild_id()
+            if self._guild_id == 0:
+                log.error(
+                    "Cannot load data for guild with ID 0. This is likely a bug in the code!"
+                )
+                return
+
+        opt_file = pathlib.Path(f"data/{self._guild_id}/options.json")
+        if not opt_file.is_file():
+            log.debug("No file for guild %s", self._guild_id)
+            return
+
+        async with self._file_lock:
+            try:
+                log.debug("Loading guild data for guild with ID:  %s", self._guild_id)
+                options = Json(opt_file)
+                self._is_file_loaded = True
+            except OSError:
+                log.exception(
+                    "An OS error prevented reading guild data file:  %s",
+                    opt_file,
+                )
+                return
+
+        # TODO: find a good place to log this data with a guild name, as before.
+        guild_prefix = options.get("command_prefix", None)
+        if guild_prefix:
+            self._command_prefix = guild_prefix
+
+    async def save_guild_options_file(self) -> None:
+        """
+        Save server-specific options, like the command prefix, to a JSON
+        file in the server's data directory.
+        """
+        if self._guild_id == 0:
+            log.error(
+                "Cannot save data for guild with ID 0. This is likely a bug in the code!"
+            )
+            return
+
+        opt_file = pathlib.Path(f"data/{self._guild_id}/options.json")
+
+        # Prepare a dictionary to store our options.
+        opt_dict = {"command_prefix": self._command_prefix}
+
+        async with self._file_lock:
+            try:
+                with open(opt_file, "w", encoding="utf8") as fh:
+                    fh.write(json.dumps(opt_dict))
+            except OSError:
+                log.exception("Could not save guild specific data due to OS Error.")
+            except (TypeError, ValueError):
+                log.exception(
+                    "Failed to serialize guild specific data due to invalid data."
+                )
 
 
 class SkipState:
