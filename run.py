@@ -124,8 +124,8 @@ class PIP:
         """
         check_output = kwargs.pop("check_output", False)
         if check_output:
-            return subprocess.check_output([sys.executable, "-m", "pip"] + list(args))
-        return subprocess.check_call([sys.executable, "-m", "pip"] + list(args))
+            return subprocess.check_output([sys.executable, "-m", "pip"] + list(*args))
+        return subprocess.check_call([sys.executable, "-m", "pip"] + list(*args))
 
     @classmethod
     def run_install(
