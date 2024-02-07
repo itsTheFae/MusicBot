@@ -13,8 +13,10 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Set, Tupl
 # protected imports to keep run.py from breaking on missing packages.
 try:
     import colorlog
+
+    COLORLOG_LOADED = True
 except ImportError:
-    colorlog = None
+    COLORLOG_LOADED = False
 
 from .constants import (
     DEFAULT_DISCORD_LOG_FILE,
@@ -127,7 +129,7 @@ def setup_loggers() -> None:
 
     # Setup logging to console for musicbot, handle missing colorlog gracefully.
     shandler = logging.StreamHandler(stream=sys.stdout)
-    if colorlog is not None:
+    if COLORLOG_LOADED:
         sformatter = colorlog.LevelFormatter(
             fmt={
                 "DEBUG": "{log_color}[{levelname}:{module}] {message}",
@@ -157,7 +159,7 @@ def setup_loggers() -> None:
 
     # colorlog import must have failed.
     else:
-        sformatter = logging.Formatter(
+        sformatter = logging.Formatter(  # type: ignore[assignment]
             "[{name}] {levelname}: {message}",
             style="{",
         )
