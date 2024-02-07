@@ -4522,10 +4522,8 @@ class MusicBot(discord.Client):
 
             try:
                 # try to DM. this could fail for users with strict privacy settings.
-                await author.send(
-                    msg_str,
-                    file=datafile,
-                )
+                # or users who just can't get direct messages.
+                await author.send(msg_str, file=datafile)
 
             except discord.errors.HTTPException as e:
                 if e.code == 50007:  # cannot send to this user.
@@ -4544,6 +4542,7 @@ class MusicBot(discord.Client):
         self,
         guild: discord.Guild,
         author: discord.Member,
+        channel: MessageableChannel,
         leftover_args: List[str],
         cat: str = "all",
     ) -> CommandResponse:
@@ -4601,15 +4600,28 @@ class MusicBot(discord.Client):
             if rawudata:
                 data.extend(rawudata)
 
+        sent_to_channel = None
         with BytesIO() as sdata:
             slug = slugify(guild.name)
             fname = f"{slug}-ids-{cat}.txt"
             sdata.writelines(d.encode("utf8") + b"\n" for d in data)
             sdata.seek(0)
+            datafile = discord.File(sdata, filename=fname)
+            msg_str = "Here are the IDs you requested:"
 
-            await author.send(file=discord.File(sdata, filename=fname))
+            try:
+                # try to DM and fall back to channel
+                await author.send(msg_str, file=datafile)
 
-        return Response("Sent a message with a list of IDs.", delete_after=20)
+            except discord.errors.HTTPException as e:
+                if e.code == 50007:  # cannot send to this user.
+                    log.debug("DM failed, sending in channel instead.")
+                    sent_to_channel = await channel.send(msg_str, file=datafile)
+                else:
+                    raise
+        if not sent_to_channel:
+            return Response("Sent a message with a list of IDs.", delete_after=20)
+        return None
 
     async def cmd_perms(
         self,
