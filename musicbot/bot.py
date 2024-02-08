@@ -4442,6 +4442,8 @@ class MusicBot(discord.Client):
 
         def _check_react(reaction: discord.Reaction, user: discord.Member) -> bool:
             # Do not check for the requesting author, any reaction is valid.
+            if not self.user:
+                return False
             return q_msg.id == reaction.message.id and user.id != self.user.id
 
         try:
