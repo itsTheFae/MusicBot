@@ -256,14 +256,16 @@ class MusicBot(discord.Client):
         :param: server:  The discord Guild in which to expect the member.
         :param: voice:  Require the owner to be in a voice channel.
         """
-        return discord.utils.find(
+        owner = discord.utils.find(
             lambda m: m.id == self.config.owner_id and (m.voice if voice else True),
             server.members if server else self.get_all_members(),
         )
+        log.noise(  # type: ignore[attr-defined]
+            "Looking for owner (voice:%s) and got:  %s", voice, owner
+        )
+        return owner
 
-    async def _join_startup_channels(
-        self, channels: Set[VoiceableChannel], *, autosummon: bool = True
-    ) -> None:
+    async def _join_startup_channels(self, channels: Set[VoiceableChannel]) -> None:
         """
         Attempt to join voice channels that have been configured in options.
         Also checks for existing voice sessions and attempts to resume
@@ -284,7 +286,7 @@ class MusicBot(discord.Client):
                 )
                 channel_map[guild] = guild.me.voice.channel
 
-            if autosummon:
+            if self.config.auto_summon:
                 owner = self._get_owner(server=guild, voice=True)
                 if owner and owner.voice and owner.voice.channel:
                     log.info('Found owner in "%s"', owner.voice.channel.name)
@@ -361,13 +363,10 @@ class MusicBot(discord.Client):
                 channel, (discord.VoiceChannel, discord.StageChannel)
             ):
                 log.warning(
-                    "Not joining %s/%s, that's a text channel.",
+                    "Not joining %s/%s, it isn't a supported voice channel.",
                     channel.guild.name,
                     channel.name,
                 )
-
-            else:
-                log.warning("Invalid channel thing: %s", channel)
 
     async def _wait_delete_msg(
         self, message: discord.Message, after: Union[int, float]
@@ -1816,9 +1815,7 @@ class MusicBot(discord.Client):
         # maybe option to leave the ownerid blank and generate a random command for the owner to use
         # wait_for_message is pretty neato
 
-        await self._join_startup_channels(
-            self.autojoin_channels, autosummon=self.config.auto_summon
-        )
+        await self._join_startup_channels(self.autojoin_channels)
 
         # we do this after the config stuff because it's a lot easier to notice here
         if self.config.missing_keys:
