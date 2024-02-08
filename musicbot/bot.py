@@ -89,8 +89,8 @@ CommandResponse = Union[Response, None]
 
 log = logging.getLogger(__name__)
 
-# TODO: fix listids command to send in channel if DM fails.
-# TODO: fix perms command to send in channel if DM fails.
+# X TODO: fix listids command to send in channel if DM fails.
+# X TODO: fix perms command to send in channel if DM fails.
 # TODO: fix current blacklist to be more clear.
 # TODO: add a proper blacklist for song-related data, not just users.
 
@@ -1212,6 +1212,7 @@ class MusicBot(discord.Client):
         expire_in = int(kwargs.pop("expire_in", 0))
         allow_none = kwargs.pop("allow_none", True)
         also_delete = kwargs.pop("also_delete", None)
+        fallback_channel = kwargs.pop("fallback_channel", None)
 
         msg = None
         retry_after = 0.0
@@ -1242,6 +1243,11 @@ class MusicBot(discord.Client):
                     "Message is over the message size limit (%s)",
                     DISCORD_MSG_CHAR_LIMIT,
                 )
+
+            # if `dest` is a user with strict privacy or a bot, direct message can fail.
+            elif e.code == 50007 and fallback_channel:
+                log.debug("DM failed, sending in fallback channel instead.")
+                await self.safe_send_message(fallback_channel, content, **kwargs)
 
             elif e.status == 429:
                 # Note:  `e.response` could be either type:  aiohttp.ClientResponse  OR  requests.Response
@@ -4506,6 +4512,7 @@ class MusicBot(discord.Client):
             safe_title = slugify(info.title)
             filename = f"playlist_{safe_title}.txt"
 
+        # TODO: refactor this in favor of safe_send_message doing it all.
         with BytesIO() as fcontent:
             total = info.playlist_count or info.entry_count
             fcontent.write(f"# Title:  {info.title}\n".encode("utf8"))
@@ -4602,6 +4609,7 @@ class MusicBot(discord.Client):
             if rawudata:
                 data.extend(rawudata)
 
+        # TODO: refactor this in favor of safe_send_message doing it all.
         sent_to_channel = None
         with BytesIO() as sdata:
             slug = slugify(guild.name)
@@ -4628,6 +4636,7 @@ class MusicBot(discord.Client):
     async def cmd_perms(
         self,
         author: discord.Member,
+        channel: MessageableChannel,
         user_mentions: List[discord.Member],
         guild: discord.Guild,
         permissions: PermissionGroup,
@@ -4677,7 +4686,7 @@ class MusicBot(discord.Client):
             perm_data = permissions.__dict__[perm]
             lines.insert(len(lines) - 1, f"{perm}: {perm_data}")
 
-        await self.safe_send_message(author, "\n".join(lines))
+        await self.safe_send_message(author, "\n".join(lines), fallback_channel=channel)
         return Response("\N{OPEN MAILBOX WITH RAISED FLAG}", delete_after=20)
 
     @owner_only
