@@ -13,6 +13,8 @@ except (subprocess.SubprocessError, OSError, ValueError) as e:
 
 # constant string exempt from i18n
 DEFAULT_FOOTER_TEXT: str = f"Just-Some-Bots/MusicBot ({VERSION})"
+DEFAULT_BOT_NAME: str = "MusicBot"
+DEFAULT_BOT_ICON: str = "https://i.imgur.com/gFHBoZA.png"
 
 
 # File path constants
@@ -54,3 +56,7 @@ EMOJI_CROSS_MARK_BUTTON: str = "\u274E"
 EMOJI_IDLE_ICON: str = "\U0001f634"  # same as \N{SLEEPING FACE}
 EMOJI_PLAY_ICON: str = "\u25B6"  # add \uFE0F to make button
 EMOJI_PAUSE_ICON: str = "\u23F8\uFE0F"  # add \uFE0F to make button
+EMOJI_LAST_ICON: str = "\u23ED\uFE0F"  # next track button
+EMOJI_FIRST_ICON: str = "\u23EE\uFE0F"  # last track button
+EMOJI_NEXT_ICON: str = "\u23E9"  # fast-forward button
+EMOJI_PREV_ICON: str = "\u23EA"  # rewind button
