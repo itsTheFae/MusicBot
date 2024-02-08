@@ -485,6 +485,8 @@ class MusicBot(discord.Client):
                 # append to the file to preserve its formatting.
                 with open(self.config.auto_playlist_file, "r+", encoding="utf8") as fh:
                     lines = fh.readlines()
+                    if not lines:
+                        lines.append("# MusicBot Auto Playlist\n")
                     if lines[-1].endswith("\n"):
                         lines.append(f"{song_url}\n")
                     else:
