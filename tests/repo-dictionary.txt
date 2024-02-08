@@ -28,6 +28,7 @@ clientresponse
 cmd
 codeblock
 colorlog
+colour
 compat
 conf
 config

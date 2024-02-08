@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import inspect
 import json
 import logging
@@ -18,13 +19,16 @@ from typing import (
     Union,
 )
 
+import discord
+
+from .constants import DEFAULT_BOT_ICON, DEFAULT_BOT_NAME, DEFAULT_FOOTER_TEXT
 from .json import Json
 from .utils import _get_variable
 
 log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from discord import Embed, Message
+    from discord.types.embed import EmbedType
 
     from .bot import MusicBot
     from .config import Config
@@ -77,7 +81,7 @@ class GuildSpecificData:
         self._is_file_loaded: bool = False
 
         # Members below are available for public use.
-        self.last_np_msg: Optional["Message"] = None
+        self.last_np_msg: Optional["discord.Message"] = None
         self.availability_paused: bool = False
         self.auto_paused: bool = False
 
@@ -209,7 +213,7 @@ class SkipState:
         enable counting votes for skipping a song.
         """
         self.skippers: Set[int] = set()
-        self.skip_msgs: Set["Message"] = set()
+        self.skip_msgs: Set["discord.Message"] = set()
 
     @property
     def skip_count(self) -> int:
@@ -225,7 +229,7 @@ class SkipState:
         self.skippers.clear()
         self.skip_msgs.clear()
 
-    def add_skipper(self, skipper_id: int, msg: "Message") -> int:
+    def add_skipper(self, skipper_id: int, msg: "discord.Message") -> int:
         """
         Add a message and the author's ID to the skip vote.
         """
@@ -239,7 +243,7 @@ class Response:
 
     def __init__(
         self,
-        content: Union[str, "Embed"],
+        content: Union[str, "discord.Embed"],
         reply: bool = False,
         delete_after: int = 0,
         codeblock: str = "",
@@ -262,13 +266,160 @@ class Response:
         self._codeblock = f"```{codeblock}\n{{}}\n```"
 
     @property
-    def content(self) -> Union[str, "Embed"]:
+    def content(self) -> Union[str, "discord.Embed"]:
         """
         Get the Response content, but quietly format a code block if needed.
         """
         if self.codeblock:
             return self._codeblock.format(self._content)
         return self._content
+
+
+class EmbedResponse(discord.Embed):
+    """
+    Extended version of discord.Embed with aspects of a Response object.
+    It's goal is to facilitate a more universal output, which can be switched from
+    Plain-Text to Embed.
+
+    Members from discord.Embed:
+    --------------------------------------------
+    Attributes          |  Methods
+    --------------------+-----------------------
+    author              |    Embed.from_dict
+    colour              |    add_field
+    description         |    clear_fields
+    fields              |    copy
+    footer              |    insert_field_at
+    image               |    remove_author
+    provider            |    remove_field
+    thumbnail           |    remove_footer
+    timestamp           |    set_author
+    title               |    set_field_at
+    type                |    set_footer
+    url                 |    set_image
+    video               |    set_thumbnail
+                        |    to_dict
+    --------------------+------------------------
+
+    """
+
+    __slots__ = ["_content", "reply", "delete_after", "codeblock", "_codeblock"]
+
+    def __init__(
+        self,
+        content: str = "",
+        reply: bool = False,
+        delete_after: int = 0,
+        codeblock: str = "",
+        *,
+        # args all passed to discord.Embed.
+        colour: Optional[Union[int, discord.Colour]] = None,
+        color: Optional[Union[int, discord.Colour]] = None,
+        title: Optional[Any] = None,
+        type: "EmbedType" = "rich",  # pylint: disable=redefined-builtin
+        url: Optional[Any] = None,
+        description: Optional[Any] = None,
+        timestamp: Optional[datetime.datetime] = None,
+    ) -> None:
+        """
+        A variation of discord.Embed, extended with features for MusicBot.
+        This class should be used to create all messages and responses from the bot.
+
+        :param: content:  the message to be sent, an alias for `description` in embed.
+        :param: reply:  if this response should reply to the original author.
+        :param: delete_after:  how long to wait before deleting the message created by this Response.
+            Set to 0 to never delete.
+        :param: codeblock:  format a code block with this value as the language used for syntax highlights.
+        """
+        self._content = content
+        self.reply = reply
+        self.delete_after = delete_after
+        self.codeblock = codeblock
+        self._codeblock = f"```{codeblock}\n{{}}\n```"
+
+        desc = self.content if content else description
+        super().__init__(
+            colour=colour,
+            color=color,
+            title=title,
+            type=type,
+            url=url,
+            description=desc,
+            timestamp=timestamp,
+        )
+
+        # TODO: make sure the author name, avatar, and the footer text get
+        # updated with non-default values at sending time.
+        self.update_footer("", "")
+        self.update_author("", "")
+
+    @staticmethod
+    def make_basic() -> "EmbedResponse":
+        """Provides a basic template for embeds"""
+
+        e = EmbedResponse(colour=discord.Colour(7506394))
+
+        return e
+
+    def update_author(self, name: str, av_url: str) -> None:
+        """
+        Apply new values to author field, using defaults for omitted fields.
+        """
+        if not name:
+            name = DEFAULT_BOT_NAME
+        if not av_url:
+            av_url = DEFAULT_BOT_ICON
+        self.set_author(
+            name=name,
+            url="https://github.com/Just-Some-Bots/MusicBot",
+            icon_url=av_url,
+        )
+
+    def update_footer(self, text: str = "", icon_url: str = "") -> None:
+        """
+        Apply new values to the footer field, using defaults for omitted fields.
+        """
+        self.set_footer(
+            text=text if text else DEFAULT_FOOTER_TEXT,
+            icon_url=icon_url if icon_url else DEFAULT_BOT_ICON,
+        )
+
+    @property
+    def content(self) -> Union[str, "discord.Embed"]:
+        """
+        Get the Response content, but quietly format a code block if needed.
+        """
+        if self.codeblock:
+            return self._codeblock.format(self._content)
+        return self._content
+
+    def to_markdown(self) -> str:
+        """
+        Converts the embed to a markdown text.
+        Embeds may have more content than text messages will allow!
+        """
+        out = ""
+        if self.title:
+            out += f"## {self.title}\n"
+        if self.description:
+            out += f"{self.description}\n"
+        if self.url:
+            out += f"**URL:**  {self.url}\n"
+
+        # TODO: should we print both image and thumbnail URLs??
+        # or anything at all?
+
+        for field in self.fields:
+            fn = f"**{field.name}**" if field.name else ""
+            fv = ""
+            if field.value:
+                if field.name:
+                    fv = f" {field.value}"
+                else:
+                    fv = field.value
+            out += f"{fn}{fv}\n"
+
+        return out
 
 
 class Serializer(json.JSONEncoder):
