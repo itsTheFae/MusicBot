@@ -77,7 +77,8 @@ class Downloader:
         """
         self.bot: "MusicBot" = bot
         self.download_folder: pathlib.Path = bot.config.audio_cache_path
-        # TODO: this should probably be configurable.  Perhaps via CLI args.
+        # TODO: max_workers should probably be configurable.  Perhaps via CLI args.
+        # TODO: this executor may not be good for long-running downloads...
         self.thread_pool = ThreadPoolExecutor(max_workers=2)
 
         # force ytdlp and HEAD requests to use the same UA string.
@@ -160,7 +161,7 @@ class Downloader:
         session: aiohttp.ClientSession,
         url: str,
         *,
-        timeout: int = 5,
+        timeout: int = 10,  # TODO: this timeout should be configurable.
         allow_redirects: bool = True,
         req_headers: Dict[str, Any] = {},
     ) -> Union["CIMultiDictProxy[str]", None]:
