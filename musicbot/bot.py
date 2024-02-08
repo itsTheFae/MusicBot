@@ -357,7 +357,9 @@ class MusicBot(discord.Client):
                         channel.name,
                     )
 
-            if channel:
+            if channel and not isinstance(
+                channel, (discord.VoiceChannel, discord.StageChannel)
+            ):
                 log.warning(
                     "Not joining %s/%s, that's a text channel.",
                     channel.guild.name,
