@@ -48,29 +48,29 @@ Here is a list of changes made so far, with most recent first:
   - Update logging to defer log file creation until the first log is emitted.
   - Update log file rotation to use file modification time, not just sort by filename.
   - Allow CLI log-level to override log level set in config/options.ini.
-- Playing compound links now works better and does not double-queue the carrier video.
+- Playing compound links now works better and does not double-queue the carrier video.  **[merged]**
 - Majority of function definitions now have some kind of docstring.
 - Enforce code checks using `Pylint` and `isort` to reduce inconsistency and clean up code.
 - Ensure source code complies with mypy checks, and fix various bugs on the way.
   - Updates MusicBot logging to enable time-based log files and safely close the logs in most cases.
-  - Removes `shlex` from the `search` command, search engines now handle quotes directly.
+  - Removes `shlex` from the `search` command, search engines now handle quotes directly.    **[merged]**
   - Fixes possible issues with counting members in channel not respecting bot exceptions.
   - Updates ConfigParser to provide extra parser methods rather than relying on validation later.
   - Updates Permissions to also use extended ConfigParser methods, for consistency.
   - Adds requirements.dev.txt for all the bells and whistles, mostly for devs.
   - Refactored the decorator methods to live in utils.py or be removed.
-- Complete overhaul of ytdl information extraction and several player commands, performance focused.  
-  - Updates `shuffleplay` to shuffle playlist entries before they are queued.
-  - Adds playlist name and other details to `pldump` generated files.
-  - Enable `pldump` command to send file to invoking channel if DM fails.
-  - Updates Now Playing Status to use custom status and activity *(experimental)*.
-  - Adds stream support to autoplaylist entries, if they are detected as a stream.
-  - Adds stream support to regular play command, if input is detected as a stream.
-  - Adds playlist link support to autoplaylist entries. *(experimental)*
-  - Asks if user wants to queue the playlist when using links with playlist and video IDs.
-  - Include thumbnail in now-playing for any tracks that have it.
-  - Remove all extraneous calls to extract_info, and carry extracted info with entries.
-  - Rebuild of Spotify API to make it faster to enqueue Spotify playlists and albums.  
+- Complete overhaul of ytdl information extraction and several player commands, performance focused.    **[merged]**
+  - Updates `shuffleplay` to shuffle playlist entries before they are queued.  **[merged]**
+  - Adds playlist name and other details to `pldump` generated files.  **[merged]**
+  - Enable `pldump` command to send file to invoking channel if DM fails.  **[merged]**
+  - Updates Now Playing Status to use custom status and activity *(experimental)*.  **[merged]**
+  - Adds stream support to autoplaylist entries, if they are detected as a stream.  **[merged]**
+  - Adds stream support to regular play command, if input is detected as a stream.  **[merged]**
+  - Adds playlist link support to autoplaylist entries. *(experimental)*  **[merged]**
+  - Asks if user wants to queue the playlist when using links with playlist and video IDs.  **[merged]**
+  - Include thumbnail in now-playing for any tracks that have it.  **[merged]**
+  - Remove all extraneous calls to extract_info, and carry extracted info with entries.  **[merged]**
+  - Rebuild of Spotify API to make it faster to enqueue Spotify playlists and albums.  **[merged]**
 - Non-important change of log colors to help set the levels apart.  
 - Fix `skip` command to properly tally votes of members.  **[merged]**
 - Clean up auto-pause logic to make it less of a mess to look at. **[merged]**
