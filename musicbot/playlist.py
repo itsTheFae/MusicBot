@@ -94,6 +94,7 @@ class Playlist(EventEmitter, Serializable):
         *,
         head: bool = False,
         defer_serialize: bool = False,
+        is_autoplaylist: bool = False,
         **meta: Any,
     ) -> Tuple[StreamPlaylistEntry, int]:
         """
@@ -121,6 +122,7 @@ class Playlist(EventEmitter, Serializable):
         entry = StreamPlaylistEntry(
             self,
             info,
+            from_apl=is_autoplaylist,
             **meta,
         )
         self._add_entry(entry, head=head, defer_serialize=defer_serialize)
@@ -132,6 +134,7 @@ class Playlist(EventEmitter, Serializable):
         *,
         head: bool = False,
         defer_serialize: bool = False,
+        is_autoplaylist: bool = False,
         **meta: Any,
     ) -> Tuple[EntryTypes, int]:
         """
@@ -198,7 +201,7 @@ class Playlist(EventEmitter, Serializable):
         log.noise(  # type: ignore[attr-defined]
             f"Adding URLPlaylistEntry for: {info.get('__input_subject')}"
         )
-        entry = URLPlaylistEntry(self, info, **meta)
+        entry = URLPlaylistEntry(self, info, from_apl=is_autoplaylist, **meta)
         self._add_entry(entry, head=head, defer_serialize=defer_serialize)
         return entry, (1 if head else len(self.entries))
 
@@ -207,6 +210,7 @@ class Playlist(EventEmitter, Serializable):
         info: "YtdlpResponseDict",
         head: bool,
         ignore_video_id: str = "",
+        is_autoplaylist: bool = False,
         **meta: Any,
     ) -> Tuple[List[EntryTypes], int]:
         """
@@ -282,7 +286,11 @@ class Playlist(EventEmitter, Serializable):
 
             try:
                 entry, _pos = await self.add_entry_from_info(
-                    item, head=head, defer_serialize=defer_serialize, **meta
+                    item,
+                    head=head,
+                    defer_serialize=defer_serialize,
+                    is_autoplaylist=is_autoplaylist,
+                    **meta,
                 )
                 entry_list.append(entry)
             except (WrongEntryTypeError, ExtractionError):

@@ -91,8 +91,6 @@ CommandResponse = Union[Response, None]
 
 log = logging.getLogger(__name__)
 
-# X TODO: fix listids command to send in channel if DM fails.
-# X TODO: fix perms command to send in channel if DM fails.
 # TODO: fix current blacklist to be more clear.
 # TODO: add a proper blacklist for song-related data, not just users.
 
@@ -941,7 +939,11 @@ class MusicBot(discord.Client):
 
                 if info.has_entries:
                     await player.playlist.import_from_info(
-                        info, channel=None, author=None, head=False
+                        info,
+                        channel=None,
+                        author=None,
+                        head=False,
+                        is_autoplaylist=True,
                     )
 
                 # Do I check the initial conditions again?
@@ -949,9 +951,16 @@ class MusicBot(discord.Client):
 
                 try:
                     await player.playlist.add_entry_from_info(
-                        info, channel=None, author=None, head=False
+                        info,
+                        channel=None,
+                        author=None,
+                        head=False,
+                        is_autoplaylist=True,
                     )
-                except exceptions.ExtractionError as e:
+                except (
+                    exceptions.ExtractionError,
+                    exceptions.WrongEntryTypeError,
+                ) as e:
                     log.error(
                         "Error adding song from autoplaylist: %s",
                         str(e),
@@ -984,6 +993,18 @@ class MusicBot(discord.Client):
         Event called by MusicPlayer when an entry is added to the playlist.
         """
         log.debug("Running on_player_entry_added")
+        # if playing auto-playlist track and a user queues a track,
+        # if we're configured to do so, auto skip the apl track.
+        if (
+            player.current_entry
+            and player.current_entry.from_auto_playlist
+            and playlist.peek() == entry
+            and not entry.from_auto_playlist
+            # TODO:  and self.config.autoplaylist_autoskip
+        ):
+            player.skip()
+
+        # Only serialize the queue for user-added tracks, unless deferred
         if (
             entry.meta.get("author")
             and entry.meta.get("channel")

@@ -44,6 +44,7 @@ class BasePlaylistEntry(Serializable):
         self.filename: str = ""
         self.downloaded_bytes: int = 0
         self.cache_busted: bool = False
+        self.from_auto_playlist: bool = False
         self._is_downloading: bool = False
         self._is_downloaded: bool = False
         self._waiting_futures: List[AsyncFuture] = []
@@ -160,8 +161,17 @@ class URLPlaylistEntry(BasePlaylistEntry):
         self,
         playlist: "Playlist",
         info: YtdlpResponseDict,
+        from_apl: bool = False,
         **meta: Dict[str, Any],
     ) -> None:
+        """
+        Create URL Playlist entry that will be downloaded for playback.
+
+        :param: playlist:  The playlist object this entry should belong to.
+        :param: info:  A YtdlResponseDict with from downloader.extract_info()
+        :param: from_apl:  Flag this entry as automatic playback, not queued by a user.
+        :param: meta:  a collection extra of key-values stored with the entry.
+        """
         super().__init__()
 
         self.playlist: "Playlist" = playlist
@@ -169,6 +179,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         self.filecache: "AudioFileCache" = playlist.bot.filecache
 
         self.info: YtdlpResponseDict = info
+        self.from_auto_playlist = from_apl
 
         if self.duration is None:
             log.info(
@@ -568,12 +579,22 @@ class StreamPlaylistEntry(BasePlaylistEntry):
         self,
         playlist: "Playlist",
         info: YtdlpResponseDict,
+        from_apl: bool = False,
         **meta: Dict[str, Any],
     ) -> None:
+        """
+        Create Stream Playlist entry that will be sent directly to ffmpeg for playback.
+
+        :param: playlist:  The playlist object this entry should belong to.
+        :param: info:  A YtdlResponseDict with from downloader.extract_info()
+        :param: from_apl:  Flag this entry as automatic playback, not queued by a user.
+        :param: meta:  a collection extra of key-values stored with the entry.
+        """
         super().__init__()
 
         self.playlist: "Playlist" = playlist
         self.info: YtdlpResponseDict = info
+        self.from_auto_playlist = from_apl
         self.meta: Dict[str, Any] = meta
 
         self.filename: str = self.url
