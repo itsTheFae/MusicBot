@@ -1828,6 +1828,10 @@ class MusicBot(discord.Client):
             log.info(
                 "  Search List: %s", ["Disabled", "Enabled"][self.config.searchlist]
             )
+            log.info(
+                "  Round Robin Queue: %s",
+                ["Disabled", "Enabled"][self.config.round_robin_queue],
+            )
 
         print(flush=True)
 
