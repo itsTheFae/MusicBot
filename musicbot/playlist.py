@@ -326,23 +326,26 @@ class Playlist(EventEmitter, Serializable):
 
         for entry in self.entries:
             author = entry.meta.get("author", None)
-            if author and author not in all_authors:
+            if author is not None and author not in all_authors:
                 all_authors.append(author)
+            else:
+                new_queue.append(
+                    entry
+                )  # Append entries without author directly to new_queue
 
         request_counter = 0
-        song: Optional[EntryTypes] = None
-        while self.entries:
+        while all_authors:
             if request_counter == len(all_authors):
                 request_counter = 0
 
-            song = self.get_next_song_from_author(all_authors[request_counter])
+            current_author = all_authors[request_counter]
+            song = self.get_next_song_from_author(current_author)
 
             if song is None:
                 all_authors.pop(request_counter)
                 continue
 
             new_queue.append(song)
-            self.entries.remove(song)
             request_counter += 1
 
         self.entries = new_queue
