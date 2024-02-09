@@ -54,7 +54,6 @@ from .utils import (
     mute_discord_console_log,
     owner_only,
     slugify,
-    write_file,
 )
 
 # optional imports
@@ -91,7 +90,7 @@ CommandResponse = Union[Response, None]
 
 log = logging.getLogger(__name__)
 
-# TODO: fix current blacklist to be more clear.
+
 # TODO: add a proper blacklist for song-related data, not just users.
 
 
@@ -138,7 +137,6 @@ class MusicBot(discord.Client):
         if self.config.usealias:
             self.aliases = Aliases(aliases_file)
 
-        self.blacklist = set(load_file(self.config.blacklist_file))
         self.autoplaylist = load_file(self.config.auto_playlist_file)
 
         self.aiolocks: DefaultDict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
@@ -153,9 +151,6 @@ class MusicBot(discord.Client):
         else:
             log.info("Loaded autoplaylist with %s entries", len(self.autoplaylist))
             self.filecache.load_autoplay_cachemap()
-
-        if self.blacklist:
-            log.debug("Loaded blacklist with %s entries", len(self.blacklist))
 
         # Factory function for server specific data objects.
         def server_factory() -> GuildSpecificData:
@@ -984,7 +979,7 @@ class MusicBot(discord.Client):
     async def on_player_entry_added(
         self,
         player: MusicPlayer,
-        playlist: Playlist,  # pylint: disable=unused-argument
+        playlist: Playlist,
         entry: EntryTypes,
         defer_serialize: bool = False,
         **_: Any,
@@ -994,7 +989,7 @@ class MusicBot(discord.Client):
         """
         log.debug("Running on_player_entry_added")
         # if playing auto-playlist track and a user queues a track,
-        # if we're configured to do so, auto skip the apl track.
+        # if we're configured to do so, auto skip the auto playlist track.
         if (
             player.current_entry
             and player.current_entry.from_auto_playlist
@@ -2121,17 +2116,17 @@ class MusicBot(discord.Client):
 
         return Response(desc, reply=True, delete_after=60)
 
-    async def cmd_blacklist(
+    async def cmd_blockuser(
         self,
         user_mentions: List[discord.Member],
         option: str,
     ) -> CommandResponse:
         """
         Usage:
-            {command_prefix}blacklist [ + | - | add | remove ] @UserName [@UserName2 ...]
+            {command_prefix}blockuser [ + | - | add | remove ] @UserName [@UserName2 ...]
 
-        Add or remove users to the blacklist.
-        Blacklisted users are forbidden from using bot commands.
+        Manage users in the block list.
+        Blocked users are forbidden from using all bot commands.
         """
 
         if not user_mentions:
@@ -2148,26 +2143,25 @@ class MusicBot(discord.Client):
 
         for user in user_mentions.copy():
             if user.id == self.config.owner_id:
-                print("[Commands:Blacklist] The owner cannot be blacklisted.")
+                log.info("The owner cannot be added to the block list.")
                 user_mentions.remove(user)
 
-        old_len = len(self.blacklist)
+        old_len = len(self.config.user_blocklist)
+        user_ids = {str(user.id) for user in user_mentions}
 
         if option in ["+", "add"]:
-            self.blacklist.update(str(user.id) for user in user_mentions)
-
-            # TODO:  this should be locked, unless it is made server-specific.
-            write_file(self.config.blacklist_file, self.blacklist)
+            async with self.aiolocks["user_blocklist"]:
+                self.config.user_blocklist.append_items(user_ids)
 
             return Response(
                 self.str.get(
                     "cmd-blacklist-added", "{0} users have been added to the blacklist"
-                ).format(len(self.blacklist) - old_len),
+                ).format(len(self.config.user_blocklist) - old_len),
                 reply=True,
                 delete_after=10,
             )
 
-        if self.blacklist.isdisjoint(user.id for user in user_mentions):
+        if self.config.user_blocklist.is_disjoint(user_mentions):
             return Response(
                 self.str.get(
                     "cmd-blacklist-none",
@@ -2177,14 +2171,14 @@ class MusicBot(discord.Client):
                 delete_after=10,
             )
 
-        self.blacklist.difference_update(user.id for user in user_mentions)
-        write_file(self.config.blacklist_file, self.blacklist)
+        async with self.aiolocks["user_blocklist"]:
+            self.config.user_blocklist.remove_items(user_ids)
 
         return Response(
             self.str.get(
                 "cmd-blacklist-removed",
                 "{0} users have been removed from the blacklist",
-            ).format(old_len - len(self.blacklist)),
+            ).format(old_len - len(self.config.user_blocklist)),
             reply=True,
             delete_after=10,
         )
@@ -3056,9 +3050,12 @@ class MusicBot(discord.Client):
                     time_until = await player.playlist.estimate_time_until(
                         position, player
                     )
-                    reply_text += self.str.get(
-                        "cmd-play-eta", " - estimated time until playing: %s"
-                    ) % f"`{format_song_duration(time_until)}`"
+                    reply_text += (
+                        self.str.get(
+                            "cmd-play-eta", " - estimated time until playing: %s"
+                        )
+                        % f"`{format_song_duration(time_until)}`"
+                    )
                 except exceptions.InvalidDataError:
                     reply_text += self.str.get(
                         "cmd-play-eta-error", " - cannot estimate time until playing"
@@ -5294,7 +5291,7 @@ class MusicBot(discord.Client):
         # check for user id in blacklist.
         if (
             # TODO: fix this when blacklist(s) get updated
-            str(message.author.id) in self.blacklist
+            self.config.user_blocklist.is_blocked(message.author)
             and message.author.id != self.config.owner_id
         ):
             log.warning(

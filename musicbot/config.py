@@ -5,23 +5,27 @@ import os
 import pathlib
 import shutil
 import sys
-from typing import TYPE_CHECKING, Any, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Iterable, List, Optional, Set, Tuple, Union
 
 from .constants import (
     BUNDLED_AUTOPLAYLIST_FILE,
     DEFAULT_AUDIO_CACHE_PATH,
     DEFAULT_AUTOPLAYLIST_FILE,
-    DEFAULT_BLACKLIST_FILE,
     DEFAULT_FOOTER_TEXT,
     DEFAULT_I18N_FILE,
     DEFAULT_LOG_LEVEL,
     DEFAULT_OPTIONS_FILE,
+    DEFAULT_SONG_BLOCKLIST_FILE,
+    DEFAULT_USER_BLOCKLIST_FILE,
+    DEPRECATED_USER_BLACKLIST,
     EXAMPLE_OPTIONS_FILE,
 )
 from .exceptions import HelpfulError
 from .utils import format_size_to_bytes, format_time_to_seconds, set_logging_level
 
 if TYPE_CHECKING:
+    import discord
+
     from .bot import MusicBot
 
 log = logging.getLogger(__name__)
@@ -44,13 +48,19 @@ def get_all_keys(
     return keys
 
 
-def create_empty_file_ifnoexist(path: pathlib.Path) -> None:
+def create_file_ifnoexist(
+    path: pathlib.Path, content: Optional[Union[str, List[str]]]
+) -> None:
     """
-    Creates an empty UTF8 text file at given `path` if it does not exist.
+    Creates a UTF8 text file at given `path` if it does not exist.
+    If supplied, `content` will be used to write initial content to the file.
     """
     if not path.exists():
         with open(path, "w", encoding="utf8") as fh:
-            fh.close()
+            if content and isinstance(content, list):
+                fh.writelines(content)
+            elif content and isinstance(content, str):
+                fh.write(content)
             log.warning("Creating %s", path)
 
 
@@ -105,7 +115,7 @@ class Config:
         self.owner_id: int = config.getownerid(
             "Permissions", "OwnerID", fallback=ConfigDefaults.owner_id
         )
-        self.dev_ids = config.getidset(
+        self.dev_ids: Set[int] = config.getidset(
             "Permissions", "DevIDs", fallback=ConfigDefaults.dev_ids
         )
         self.bot_exception_ids = config.getidset(
@@ -284,9 +294,16 @@ class Config:
         self.debug_mode: bool = self.debug_level <= logging.DEBUG
         set_logging_level(self.debug_level)
 
-        self.blacklist_file = config.getpathlike(
-            "Files", "BlacklistFile", fallback=ConfigDefaults.blacklist_file
+        self.user_blocklist_file = config.getpathlike(
+            "Files", "UserBlocklistFile", fallback=ConfigDefaults.user_blocklist_file
         )
+        self.user_blocklist: "UserBlocklist" = UserBlocklist(self.user_blocklist_file)
+
+        self.song_blocklist_file = config.getpathlike(
+            "Files", "SongBlocklistFile", fallback=ConfigDefaults.song_blocklist_file
+        )
+        self.song_blocklist: "SongBlocklist" = SongBlocklist(self.song_blocklist_file)
+
         self.auto_playlist_file = config.getpathlike(
             "Files", "AutoPlaylistFile", fallback=ConfigDefaults.auto_playlist_file
         )
@@ -411,8 +428,6 @@ class Config:
             self.spotify_enabled = True
 
         self.delete_invoking = self.delete_invoking and self.delete_messages
-
-        create_empty_file_ifnoexist(self.blacklist_file)
 
         if not self.footer_text:
             self.footer_text = ConfigDefaults.footer_text
@@ -630,8 +645,12 @@ class ConfigDefaults:
     footer_text: str = DEFAULT_FOOTER_TEXT
     defaultround_robin_queue: bool = False
 
+    song_blocklist: Set[str] = set()
+    user_blocklist: Set[int] = set()
+
     options_file: pathlib.Path = pathlib.Path(DEFAULT_OPTIONS_FILE)
-    blacklist_file: pathlib.Path = pathlib.Path(DEFAULT_BLACKLIST_FILE)
+    user_blocklist_file: pathlib.Path = pathlib.Path(DEFAULT_USER_BLOCKLIST_FILE)
+    song_blocklist_file: pathlib.Path = pathlib.Path(DEFAULT_SONG_BLOCKLIST_FILE)
     auto_playlist_file: pathlib.Path = pathlib.Path(DEFAULT_AUTOPLAYLIST_FILE)
     i18n_file: pathlib.Path = pathlib.Path(DEFAULT_I18N_FILE)
     audio_cache_path: pathlib.Path = pathlib.Path(
@@ -803,11 +822,217 @@ setattr(
 )
 
 
-# These two are going to be wrappers for the id lists, with add/remove/load/save functions
-# and id/object conversion so types aren't an issue
-class Blacklist:
-    pass
+class Blocklist:
+    """
+    Base class for more specific block lists.
+    """
+
+    def __init__(self, blocklist_file: pathlib.Path, comment_char: str = "#") -> None:
+        """
+        Loads a block list into memory, ignoring empty lines and commented lines,
+        as well as striping comments from string remainders.
+
+        Note: If the default comment character `#` is used, this function will
+        strip away discriminators from usernames.
+        User IDs should be used instead, if definite ID is needed.
+
+        Similarly, URL fragments will be removed from URLs as well. This typically
+        is not an issue as fragments are only client-side by specification.
+        """
+        self._blocklist_file: pathlib.Path = blocklist_file
+        self._comment_char = comment_char
+        self.items: Set[str] = set()
+
+        self.load_blocklist_file()
+
+    def __len__(self) -> int:
+        """Gets the number of items in the block list."""
+        return len(self.items)
+
+    def load_blocklist_file(self) -> bool:
+        """
+        Loads (or reloads) the block list file into memory.
+
+        :returns:  True if loading finished False if it could not for any reason.
+        """
+        if not self._blocklist_file.is_file():
+            log.warning("Blocklist file not found:  %s", self._blocklist_file)
+            return False
+
+        try:
+            with open(self._blocklist_file, "r", encoding="utf8") as f:
+                for line in f:
+                    line = line.strip()
+
+                    if line:
+                        # Skip lines starting with comments.
+                        if self._comment_char and line.startswith(self._comment_char):
+                            continue
+
+                        # strip comments from the remainder of a line.
+                        if self._comment_char and self._comment_char in line:
+                            line = line.split(self._comment_char, maxsplit=1)[0].strip()
+
+                        self.items.add(line)
+            return True
+        except OSError:
+            log.error(
+                "Could not load block list from file:  %s",
+                self._blocklist_file,
+                exc_info=True,
+            )
+
+        return False
+
+    def append_items(
+        self,
+        items: Iterable[str],
+        comment: str = "",
+        spacer: str = "\t\t%s ",
+    ) -> bool:
+        """
+        Appends the given `items` to the block list file.
+
+        :param: items:  An iterable of strings to be appended.
+        :param: comment:  An optional comment added to each new item.
+        :param: spacer:
+            A format string for placing comments, where %s is replaced with the
+            comment character used by this block list.
+
+        :returns: True if updating is successful.
+        """
+        if not self._blocklist_file.is_file():
+            return False
+
+        try:
+            space = ""
+            if comment:
+                space = spacer.format(self._comment_char)
+            with open(self._blocklist_file, "a", encoding="utf8") as f:
+                for item in items:
+                    f.write(f"{item}{space}{comment}\n")
+                    self.items.add(item)
+            return True
+        except OSError:
+            log.error(
+                "Could not update the blocklist file:  %s",
+                self._blocklist_file,
+                exc_info=True,
+            )
+        return False
+
+    def remove_items(self, items: Iterable[str]) -> bool:
+        """
+        Find and remove the given `items` from the block list file.
+
+        :returns: True if updating is successful.
+        """
+        if not self._blocklist_file.is_file():
+            return False
+
+        self.items.difference_update(set(items))
+
+        try:
+            # read the original file in and remove lines with our items.
+            # this is done to preserve the comments and formatting.
+            lines = self._blocklist_file.read_text(encoding="utf8").split("\n")
+            with open(self._blocklist_file, "w", encoding="utf8") as f:
+                for line in lines:
+                    # strip comment from line.
+                    line_strip = line.split(self._comment_char, maxsplit=1)[0].strip()
+
+                    # don't add the line if it matches any given items.
+                    if line in items or line_strip in items:
+                        continue
+                    f.write(f"{line}\n")
+
+        except OSError:
+            log.error(
+                "Could not update the blocklist file:  %s",
+                self._blocklist_file,
+                exc_info=True,
+            )
+        return False
 
 
-class Whitelist:
-    pass
+class UserBlocklist(Blocklist):
+    def __init__(self, blocklist_file: pathlib.Path, comment_char: str = "#") -> None:
+        """
+        A UserBlocklist manages a block list which contains discord usernames and IDs.
+        """
+        self._handle_legacy_file(blocklist_file)
+
+        c = comment_char
+        create_file_ifnoexist(
+            blocklist_file,
+            [
+                f"{c} MusicBot discord user block list denies all access to bot.\n",
+                f"{c} Add one User ID or username per each line.\n",
+                f"{c} Nick-names or server-profile names are not checked.\n",
+                f"{c} User ID is prefered. Usernames with discriminators (ex: User#1234) may not work.\n",
+                f"{c} In this file '{c}' is the comment character. All characters following it are ignored.\n",
+            ],
+        )
+        super().__init__(blocklist_file, comment_char)
+        log.debug(
+            "Loaded User Blocklist with %s entires.",
+            len(self.items),
+        )
+
+    def _handle_legacy_file(self, new_file: pathlib.Path) -> None:
+        """
+        In case the original, ambiguous block list file exists, lets rename it.
+        """
+        old_file = pathlib.Path(DEPRECATED_USER_BLACKLIST)
+        if old_file.is_file() and not new_file.is_file():
+            log.warning(
+                "We found a legacy blacklist file, it will be renamed to:  %s",
+                new_file,
+            )
+            old_file.rename(new_file)
+
+    def is_blocked(self, user: Union["discord.User", "discord.Member"]) -> bool:
+        """
+        Checks if the given `user` has their discord username or ID listed in the loaded block list.
+        """
+        user_id = str(user.id)
+        # this should only consider discord username, not nick/ server profile.
+        user_name = user.name
+        if user_id in self.items or user_name in self.items:
+            return True
+        return False
+
+    def is_disjoint(
+        self, users: Iterable[Union["discord.User", "discord.Member"]]
+    ) -> bool:
+        """
+        Returns False if any of the `users` are listed in the block list.
+
+        :param: users:  A list or set of discord Users or Members.
+        """
+        return not any(self.is_blocked(u) for u in users)
+
+
+class SongBlocklist(Blocklist):
+    def __init__(self, blocklist_file: pathlib.Path, comment_char: str = ";") -> None:
+        c = comment_char
+        create_file_ifnoexist(
+            blocklist_file,
+            [
+                f"{c} MusicBot discord song block list denies songs by URL or Title.\n",
+                f"{c} Add one URL or Title per line. Leading and trailing space is ignored.\n",
+                f"{c} This list is matched loosely, so adding 'press' will block 'juice press' and 'press release'.\n",
+                f"{c} Matches will be tried twice, once before extraction and once after extraction.\n",
+                f"{c} Lines starting with {c} and all characters following it in a line are ignored.\n",
+            ],
+        )
+        super().__init__(blocklist_file, comment_char)
+        log.debug("Loaded a Song Blocklist with %s entries.", len(self.items))
+
+    def is_blocked(self, song_subject: str) -> bool:
+        """
+        Checks if the given `song_subject` contains any entry in the song block list.
+
+        :param: song_subject:  Any input the bot player commands will take or pass to ytdl extraction.
+        """
+        return any(x in song_subject for x in self.items)

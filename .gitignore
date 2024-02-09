@@ -19,6 +19,8 @@ config/autoplaylist_removed.txt
 config/autoplaylist.cachemap.json
 config/whitelist.txt
 config/blacklist.txt
+config/blocklist_users.txt
+config/blocklist_songs.txt
 
 docker-compose.yml
 
