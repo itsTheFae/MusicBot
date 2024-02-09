@@ -35,6 +35,7 @@ Cherry-picking (or otherwise copying) is welcome should you feel inclined.
 Here is a list of changes made so far, with most recent first:
 
 
+- Auto playlist tracks are auto-skipped when a user adds a new song.
 - Update the `queue` command to add pagination by both command arg and reactions.
 - Allow `listids` and `perms` commands to fall back to sending in public if DM fails.
 - Add actual command-line arguments to control logging, show version, and skip startup checks.
