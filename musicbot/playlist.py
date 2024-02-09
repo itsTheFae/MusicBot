@@ -362,7 +362,7 @@ class Playlist(EventEmitter, Serializable):
         else:
             self.entries.append(entry)
 
-        if self.bot.config.round_robin_queue:
+        if self.bot.config.round_robin_queue and not entry.from_auto_playlist:
             self.reorder_for_round_robin()
 
         self.emit(
