@@ -35,6 +35,14 @@ Cherry-picking (or otherwise copying) is welcome should you feel inclined.
 Here is a list of changes made so far, with most recent first:
 
 
+- Updates blocklist feature and adds block list for songs as well as users.
+  - Repaces old `blacklist` command with `blockuser` command.
+  - Adds new command `blocksong` which works similarly to `blockuser` command.
+  - Updates options.ini to replace or add block list options:
+    - Replaces `[Files] Blacklist` with `[Files] UserBlocklistFile` option.
+    - Adds `[Files] SongBlocklistFile` option.
+    - Adds `[MusicBot] EnableUserBlocklist` to toggle the features. Default enabled.
+    - Adds `[MusicBot] EnableSongBlocklist` to toggle the features. Default disabled.
 - Auto playlist tracks are auto-skipped when a user adds a new song.
 - Update the `queue` command to add pagination by both command arg and reactions.
 - Allow `listids` and `perms` commands to fall back to sending in public if DM fails.
