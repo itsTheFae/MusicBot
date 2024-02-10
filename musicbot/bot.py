@@ -158,7 +158,7 @@ class MusicBot(discord.Client):
             server_factory
         )
 
-        # TODO: get rid of this, it likely is not needed.
+        # TODO: get rid of this, I added it for debug
         self.is_ready_done: bool = False
 
         self.spotify: Optional[Spotify] = None

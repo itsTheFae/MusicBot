@@ -251,10 +251,15 @@ class Downloader:
             as a base exception for any networking errors raised by yt_dlp.
         """
         # Hash the URL for use as a unique ID in file paths.
-        md5 = hashlib.md5()
-        md5.update(song_subject.encode("utf8"))
-        # we only use the last 8 characters of md5.  Its probably good enough.
-        song_subject_hash = md5.hexdigest()[-8:]
+        # but ignore services with multiple URLs for the same media.
+        song_subject_hash = ""
+        if (
+            "youtube.com" not in song_subject.lower()
+            and "youtu.be" not in song_subject.lower()
+        ):
+            md5 = hashlib.md5()
+            md5.update(song_subject.encode("utf8"))
+            song_subject_hash = md5.hexdigest()[-8:]
 
         # Use ytdl or one of our custom integration to get info.
         data = await self._filtered_extract_info(
