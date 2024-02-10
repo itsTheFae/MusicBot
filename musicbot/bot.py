@@ -91,9 +91,6 @@ CommandResponse = Union[Response, None]
 log = logging.getLogger(__name__)
 
 
-# TODO: add a proper blacklist for song-related data, not just users.
-
-
 class MusicBot(discord.Client):
     def __init__(
         self,
@@ -1886,6 +1883,20 @@ class MusicBot(discord.Client):
 
         return None
 
+    def _do_song_blocklist_check(self, song_subject: str) -> None:
+        """
+        Check if the `song_subject` is matched in the block list.
+
+        :raises: musicbot.exceptions.CommandError
+            The subject is matched by a block list entry.
+        """
+        if self.config.song_blocklist.is_blocked(song_subject):
+            raise exceptions.CommandError(
+                # TODO: i18n
+                f"The requested song `{song_subject}` is blocked by the song blocklist.",
+                expire_in=30,
+            )
+
     async def handle_vc_inactivity(self, guild: discord.Guild) -> None:
         """
         Manage a server-specific event timer when MusicBot's voice channel becomes idle,
@@ -2145,6 +2156,13 @@ class MusicBot(discord.Client):
             if user.id == self.config.owner_id:
                 log.info("The owner cannot be added to the block list.")
                 user_mentions.remove(user)
+            if option in ["+", "add"] and self.config.user_blocklist.is_blocked(user):
+                log.info(
+                    "Not adding user to block list, already blocked:  %s/%s",
+                    user.id,
+                    user.name,
+                )
+                user_mentions.remove(user)
 
         old_len = len(self.config.user_blocklist)
         user_ids = {str(user.id) for user in user_mentions}
@@ -2179,6 +2197,81 @@ class MusicBot(discord.Client):
                 "cmd-blacklist-removed",
                 "{0} users have been removed from the blacklist",
             ).format(old_len - len(self.config.user_blocklist)),
+            reply=True,
+            delete_after=10,
+        )
+
+    async def cmd_blocksong(
+        self,
+        _player: MusicPlayer,
+        option: str,
+        leftover_args: List[str],
+        song_subject: str = "",
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}blocksong [ + | - | add | remove ] [subject]
+
+        Manage a block list applied to song requests and extracted info.
+        A `subject` may be a song URL or a word or phrase found in the track title.
+        If `subject` is omitted, a currently playing track will be used instead.
+
+        Song block list matches loosely, but is case sensitive.
+        So adding "Pie" will match "cherry Pie" but not "cherry pie" in checks.
+        """
+        if leftover_args:
+            song_subject = " ".join([song_subject, *leftover_args])
+
+        if not song_subject:
+            valid_url = self._get_song_url_or_none(song_subject, _player)
+            if not valid_url:
+                raise exceptions.CommandError(
+                    "You must provide a song subject if no song is currently playing.",
+                    expire_in=30,
+                )
+            song_subject = valid_url
+
+        if option not in ["+", "-", "add", "remove"]:
+            raise exceptions.CommandError(
+                self.str.get(
+                    "cmd-blacklist-invalid",
+                    'Invalid option "{0}" specified, use +, -, add, or remove',
+                ).format(option),
+                expire_in=20,
+            )
+
+        if option in ["+", "add"]:
+            if self.config.song_blocklist.is_blocked(song_subject):
+                raise exceptions.CommandError(
+                    f"Subject `{song_subject}` is already in the song block list."
+                )
+
+            async with self.aiolocks["song_blocklist"]:
+                self.config.song_blocklist.append_items([song_subject])
+
+            # TODO: i18n/UI stuff.
+            return Response(
+                f"Added subject `{song_subject}` to the song block list.",
+                reply=True,
+                delete_after=10,
+            )
+
+        if not self.config.song_blocklist.is_blocked(song_subject):
+            raise exceptions.CommandError(
+                "The subject is not in the song block list and cannot be removed.",
+                expire_in=10,
+            )
+
+        # TODO:  add self.config.autoplaylist_remove_on_block
+        # if self.config.autoplaylist_remove_on_block
+        # and song_subject is current_entry.url
+        # and current_entry.from_auto_playlist
+        #   await self.remove_url_from_autoplaylist(song_subject)
+        async with self.aiolocks["song_blocklist"]:
+            self.config.song_blocklist.remove_items([song_subject])
+
+        return Response(
+            f"Subject `{song_subject}` has been removed from the block list.",
             reply=True,
             delete_after=10,
         )
@@ -2232,6 +2325,7 @@ class MusicBot(discord.Client):
             )
 
         if option in ["+", "add"]:
+            self._do_song_blocklist_check(url)
             if url not in self.autoplaylist:
                 await self.add_url_to_autoplaylist(url)
                 return Response(
@@ -2870,6 +2964,7 @@ class MusicBot(discord.Client):
         valid_song_url = self.downloader.get_url_or_none(song_url)
         if valid_song_url:
             song_url = valid_song_url
+            self._do_song_blocklist_check(song_url)
 
             # Handle if the link has a playlist ID in addition to a video ID.
             await self._cmd_play_compound_link(
@@ -2888,6 +2983,7 @@ class MusicBot(discord.Client):
             # treat all arguments as a search string.
             song_url = " ".join([song_url, *leftover_args])
             leftover_args = []  # prevent issues later.
+            self._do_song_blocklist_check(song_url)
 
         # Validate spotify links are supported before we try them.
         if "open.spotify.com" in song_url.lower():
@@ -3018,6 +3114,10 @@ class MusicBot(discord.Client):
                         "Extracted an entry with youtube:playlist as extractor key"
                     )
 
+                # Check the block list again, with the info this time.
+                self._do_song_blocklist_check(info.url)
+                self._do_song_blocklist_check(info.title)
+
                 if (
                     permissions.max_song_length
                     and info.duration_td.seconds > permissions.max_song_length
@@ -3145,7 +3245,7 @@ class MusicBot(discord.Client):
 
         async with channel.typing():
             # TODO: find more streams to test.
-            # NOTE: this WILL return a link if ytdlp does not support the service.
+            # NOTE: this will return a URL if one was given but ytdl doesn't support it.
             try:
                 info = await self.downloader.extract_info(
                     song_url, download=False, process=True, as_stream=True
@@ -3162,6 +3262,11 @@ class MusicBot(discord.Client):
                     expire_in=30,
                 )
                 # TODO: could process these and force them to be stream entries...
+
+            self._do_song_blocklist_check(info.url)
+            # if its a "forced stream" this would be a waste.
+            if info.url != info.title:
+                self._do_song_blocklist_check(info.title)
 
             await player.playlist.add_stream_from_info(
                 info, channel=channel, author=author, head=False
@@ -3277,6 +3382,8 @@ class MusicBot(discord.Client):
         srvc = services[service]
         args_str = " ".join(leftover_args)
         search_query = f"{srvc}{items_requested}:{args_str}"
+
+        self._do_song_blocklist_check(args_str)
 
         search_msg = await self.safe_send_message(
             channel, self.str.get("cmd-search-searching", "Searching for videos...")

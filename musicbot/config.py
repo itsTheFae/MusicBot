@@ -838,6 +838,9 @@ class Blocklist:
 
         Similarly, URL fragments will be removed from URLs as well. This typically
         is not an issue as fragments are only client-side by specification.
+
+        :param: blocklist_file:  A file path to a block list, which will be created if it does not exist.
+        :param: comment_char:  A character used to denote comments in the file.
         """
         self._blocklist_file: pathlib.Path = blocklist_file
         self._comment_char = comment_char
@@ -970,7 +973,7 @@ class UserBlocklist(Blocklist):
                 f"{c} Add one User ID or username per each line.\n",
                 f"{c} Nick-names or server-profile names are not checked.\n",
                 f"{c} User ID is prefered. Usernames with discriminators (ex: User#1234) may not work.\n",
-                f"{c} In this file '{c}' is the comment character. All characters following it are ignored.\n",
+                f"{c} In this file '{c}' is a comment character. All characters following it are ignored.\n",
             ],
         )
         super().__init__(blocklist_file, comment_char)
@@ -1015,15 +1018,20 @@ class UserBlocklist(Blocklist):
 
 class SongBlocklist(Blocklist):
     def __init__(self, blocklist_file: pathlib.Path, comment_char: str = ";") -> None:
+        """
+        A SongBlocklist manages a block list which contains song URLs or other
+        words and phrases that should be blocked from playback.
+        """
         c = comment_char
         create_file_ifnoexist(
             blocklist_file,
             [
                 f"{c} MusicBot discord song block list denies songs by URL or Title.\n",
                 f"{c} Add one URL or Title per line. Leading and trailing space is ignored.\n",
-                f"{c} This list is matched loosely, so adding 'press' will block 'juice press' and 'press release'.\n",
-                f"{c} Matches will be tried twice, once before extraction and once after extraction.\n",
-                f"{c} Lines starting with {c} and all characters following it in a line are ignored.\n",
+                f"{c} This list is matched loosely, with case sensitivity, so adding 'press'\n",
+                f"{c} will block 'juice press' and 'press release' but not 'Press'\n",
+                f"{c} Block list entries will be tested against input and extraction info.\n",
+                f"{c} Lines starting with {c} are comments. All characters follow it are ignored.\n",
             ],
         )
         super().__init__(blocklist_file, comment_char)

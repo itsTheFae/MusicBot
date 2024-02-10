@@ -29,6 +29,7 @@ cmd
 codeblock
 colorlog
 colour
+CommandError
 compat
 conf
 config
