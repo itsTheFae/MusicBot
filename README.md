@@ -36,7 +36,7 @@ Here is a list of changes made so far, with most recent first:
 
 
 - Updates blocklist feature and adds block list for songs as well as users.
-  - Repaces old `blacklist` command with `blockuser` command.
+  - Replaces old `blacklist` command with `blockuser` command.
   - Adds new command `blocksong` which works similarly to `blockuser` command.
   - Updates options.ini to replace or add block list options:
     - Replaces `[Files] Blacklist` with `[Files] UserBlocklistFile` option.
