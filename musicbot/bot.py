@@ -2560,12 +2560,12 @@ class MusicBot(discord.Client):
         Usage:
             {command_prefix}play song_link
             {command_prefix}play text to search for
-            {command_prefix}play spotify_uri
+            {command_prefix}play spotify_url
 
         Adds the song to the playlist.  If a link is not provided, the first
         result from a youtube search is added to the queue.
 
-        If enabled in the config, the bot will also support Spotify URIs, however
+        If enabled in the config, the bot will also support Spotify URLs, however
         it will use the metadata (e.g song name and artist) to find a YouTube
         equivalent of the song. Streaming from Spotify is not possible.
         """
@@ -2642,7 +2642,7 @@ class MusicBot(discord.Client):
         Adds the song to the playlist next.  If a link is not provided, the first
         result from a youtube search is added to the queue.
 
-        If enabled in the config, the bot will also support Spotify URIs, however
+        If enabled in the config, the bot will also support Spotify URLs, however
         it will use the metadata (e.g song name and artist) to find a YouTube
         equivalent of the song. Streaming from Spotify is not possible.
         """
@@ -2658,6 +2658,46 @@ class MusicBot(discord.Client):
             leftover_args,
             song_url,
             head=True,
+        )
+
+    async def cmd_playnow(
+        self,
+        message: discord.Message,
+        _player: Optional[MusicPlayer],
+        channel: MessageableChannel,
+        guild: discord.Guild,
+        author: discord.Member,
+        permissions: PermissionGroup,
+        leftover_args: List[str],
+        song_url: str,
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}play song_link
+            {command_prefix}play text to search for
+            {command_prefix}play spotify_url
+
+        Adds the song to be played back immediately.  If a link is not provided, the first
+        result from a youtube search is added to the queue.
+
+        If enabled in the config, the bot will also support Spotify URLs, however
+        it will use the metadata (e.g song name and artist) to find a YouTube
+        equivalent of the song. Streaming from Spotify is not possible.
+        """
+        await self._do_cmd_unpause_check(_player, channel)
+
+        # attempt to queue the song, but used the front of the queue and skip current playback.
+        return await self._cmd_play(
+            message,
+            _player,
+            channel,
+            guild,
+            author,
+            permissions,
+            leftover_args,
+            song_url,
+            head=True,
+            skip_playing=True,
         )
 
     async def cmd_repeat(
@@ -2949,10 +2989,16 @@ class MusicBot(discord.Client):
         head: bool,
         shuffle_entries: bool = False,
         ignore_video_id: str = "",
+        skip_playing: bool = False,
     ) -> CommandResponse:
         """
-        This function handles actually playing any given URL or song subject.
+        This function handles actually adding any given URL or song subject to
+        the player playlist if extraction was successful and various checks pass.
 
+        :param: head:  Toggle adding the song(s) to the front of the queue, not the end.
+        :param: shuffle_entries:  Shuffle entires before adding them to the queue.
+        :param: ignore_video_id:  Ignores a video in a playlist if it has this ID.
+        :param: skip_playing:  Skip current playback if a new entry is added.
         """
         player = _player if _player else None
 
@@ -3169,7 +3215,16 @@ class MusicBot(discord.Client):
                 )
                 btext = entry.title
 
+            log.debug("Added song(s) at position %s", position)
             if position == 1 and player.is_stopped:
+                position = self.str.get("cmd-play-next", "Up next!")
+                reply_text %= (btext, position)
+
+            # shift the playing track to the end of queue and skip current playback.
+            elif skip_playing and player.is_playing and player.current_entry:
+                player.playlist.entries.append(player.current_entry)
+                player.skip()
+
                 position = self.str.get("cmd-play-next", "Up next!")
                 reply_text %= (btext, position)
 
