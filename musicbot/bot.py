@@ -2996,7 +2996,7 @@ class MusicBot(discord.Client):
         the player playlist if extraction was successful and various checks pass.
 
         :param: head:  Toggle adding the song(s) to the front of the queue, not the end.
-        :param: shuffle_entries:  Shuffle entires before adding them to the queue.
+        :param: shuffle_entries:  Shuffle entries before adding them to the queue.
         :param: ignore_video_id:  Ignores a video in a playlist if it has this ID.
         :param: skip_playing:  Skip current playback if a new entry is added.
         """
