@@ -1890,6 +1890,9 @@ class MusicBot(discord.Client):
         :raises: musicbot.exceptions.CommandError
             The subject is matched by a block list entry.
         """
+        if not self.config.song_blocklist_enabled:
+            return
+
         if self.config.song_blocklist.is_blocked(song_subject):
             raise exceptions.CommandError(
                 # TODO: i18n
@@ -2153,10 +2156,12 @@ class MusicBot(discord.Client):
             )
 
         for user in user_mentions.copy():
-            if user.id == self.config.owner_id:
-                log.info("The owner cannot be added to the block list.")
-                user_mentions.remove(user)
             if option in ["+", "add"] and self.config.user_blocklist.is_blocked(user):
+                if user.id == self.config.owner_id:
+                    raise exceptions.CommandError(
+                        "The owner cannot be added to the block list."
+                    )
+
                 log.info(
                     "Not adding user to block list, already blocked:  %s/%s",
                     user.id,
@@ -2164,17 +2169,37 @@ class MusicBot(discord.Client):
                 )
                 user_mentions.remove(user)
 
+            if option in ["-", "remove"] and not self.config.user_blocklist.is_blocked(
+                user
+            ):
+                log.info(
+                    "Not removing user from blocklist, not listed:  %s/%s",
+                    user.id,
+                    user.name,
+                )
+                user_mentions.remove(user)
+
+        # allow management regardless, but tell the user if it will apply.
+        if self.config.user_blocklist_enabled:
+            status_msg = "User block list is currently enabled."
+        else:
+            status_msg = "User block list is currently disabled."
+
         old_len = len(self.config.user_blocklist)
         user_ids = {str(user.id) for user in user_mentions}
 
         if option in ["+", "add"]:
+            if not user_mentions:
+                raise exceptions.CommandError(
+                    "Cannot add the users you listed, they are already added."
+                )
+
             async with self.aiolocks["user_blocklist"]:
                 self.config.user_blocklist.append_items(user_ids)
 
+            n_users = len(self.config.user_blocklist) - old_len
             return Response(
-                self.str.get(
-                    "cmd-blacklist-added", "{0} users have been added to the blacklist"
-                ).format(len(self.config.user_blocklist) - old_len),
+                f"{n_users} user(s) have been added to the block list.\n{status_msg}",
                 reply=True,
                 delete_after=10,
             )
@@ -2192,11 +2217,9 @@ class MusicBot(discord.Client):
         async with self.aiolocks["user_blocklist"]:
             self.config.user_blocklist.remove_items(user_ids)
 
+        n_users = old_len - len(self.config.user_blocklist)
         return Response(
-            self.str.get(
-                "cmd-blacklist-removed",
-                "{0} users have been removed from the blacklist",
-            ).format(old_len - len(self.config.user_blocklist)),
+            f"{n_users} user(s) have been removed from the block list.\n{status_msg}",
             reply=True,
             delete_after=10,
         )
@@ -2240,10 +2263,16 @@ class MusicBot(discord.Client):
                 expire_in=20,
             )
 
+        # allow management regardless, but tell the user if it will apply.
+        if self.config.song_blocklist_enabled:
+            status_msg = "Song block list is currently enabled."
+        else:
+            status_msg = "Song block list is currently disabled."
+
         if option in ["+", "add"]:
             if self.config.song_blocklist.is_blocked(song_subject):
                 raise exceptions.CommandError(
-                    f"Subject `{song_subject}` is already in the song block list."
+                    f"Subject `{song_subject}` is already in the song block list.\n{status_msg}"
                 )
 
             async with self.aiolocks["song_blocklist"]:
@@ -2251,7 +2280,7 @@ class MusicBot(discord.Client):
 
             # TODO: i18n/UI stuff.
             return Response(
-                f"Added subject `{song_subject}` to the song block list.",
+                f"Added subject `{song_subject}` to the song block list.\n{status_msg}",
                 reply=True,
                 delete_after=10,
             )
@@ -2271,7 +2300,7 @@ class MusicBot(discord.Client):
             self.config.song_blocklist.remove_items([song_subject])
 
         return Response(
-            f"Subject `{song_subject}` has been removed from the block list.",
+            f"Subject `{song_subject}` has been removed from the block list.\n{status_msg}",
             reply=True,
             delete_after=10,
         )

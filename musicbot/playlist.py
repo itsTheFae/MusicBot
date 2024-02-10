@@ -251,6 +251,19 @@ class Playlist(EventEmitter, Serializable):
                 baditems += 1
                 continue
 
+            # Check if the item is in the song block list.
+            if self.bot.config.song_blocklist_enabled and (
+                self.bot.config.song_blocklist.is_blocked(item.url)
+                or self.bot.config.song_blocklist.is_blocked(item.title)
+            ):
+                log.info(
+                    "Not allowing entry that is in song block list:  %s  URL: %s",
+                    item.title,
+                    item.url,
+                )
+                baditems += 1
+                continue
+
             # Exclude entries over max permitted duration.
             if (
                 author_perms

@@ -294,11 +294,21 @@ class Config:
         self.debug_mode: bool = self.debug_level <= logging.DEBUG
         set_logging_level(self.debug_level)
 
+        self.user_blocklist_enabled = config.getboolean(
+            "MusicBot",
+            "EnableUserBlocklist",
+            fallback=ConfigDefaults.user_blocklist_enabled,
+        )
         self.user_blocklist_file = config.getpathlike(
             "Files", "UserBlocklistFile", fallback=ConfigDefaults.user_blocklist_file
         )
         self.user_blocklist: "UserBlocklist" = UserBlocklist(self.user_blocklist_file)
 
+        self.song_blocklist_enabled = config.getboolean(
+            "MusicBot",
+            "EnableSongBlocklist",
+            fallback=ConfigDefaults.song_blocklist_enabled,
+        )
         self.song_blocklist_file = config.getpathlike(
             "Files", "SongBlocklistFile", fallback=ConfigDefaults.song_blocklist_file
         )
@@ -647,6 +657,9 @@ class ConfigDefaults:
 
     song_blocklist: Set[str] = set()
     user_blocklist: Set[int] = set()
+    song_blocklist_enabled: bool = False
+    # default true here since the file being populated was previously how it was enabled.
+    user_blocklist_enabled: bool = True
 
     options_file: pathlib.Path = pathlib.Path(DEFAULT_OPTIONS_FILE)
     user_blocklist_file: pathlib.Path = pathlib.Path(DEFAULT_USER_BLOCKLIST_FILE)
@@ -1017,7 +1030,7 @@ class UserBlocklist(Blocklist):
 
 
 class SongBlocklist(Blocklist):
-    def __init__(self, blocklist_file: pathlib.Path, comment_char: str = ";") -> None:
+    def __init__(self, blocklist_file: pathlib.Path, comment_char: str = "#") -> None:
         """
         A SongBlocklist manages a block list which contains song URLs or other
         words and phrases that should be blocked from playback.
