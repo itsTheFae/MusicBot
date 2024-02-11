@@ -5819,7 +5819,7 @@ class MusicBot(discord.Client):
                 exc_info=True,
             )
 
-            expirein = e.expire_in if self.config.delete_messages else None
+            expirein = e.expire_in if self.config.delete_messages else 0
             alsodelete = message if self.config.delete_invoking else None
 
             if self.config.embeds:
