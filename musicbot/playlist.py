@@ -76,7 +76,6 @@ class Playlist(EventEmitter, Serializable):
 
     def delete_entry_at_index(self, index: int) -> EntryTypes:
         """Remove and return the entry at the given index."""
-        # TODO: maybe lock all queue management?
         self.entries.rotate(-index)
         entry = self.entries.popleft()
         self.entries.rotate(index)
@@ -111,10 +110,6 @@ class Playlist(EventEmitter, Serializable):
 
         :returns:  A tuple with the entry object, and its position in the queue.
         """
-        # TODO: A bit more validation, "~stream some_url" should not just say :ok_hand:
-        # @Fae: about as much validation we can do is making sure the URL is playable.
-        # Users are using stream to play without downloading, and enforcing a check
-        # for "streaming" media here would break that use case.
 
         log.noise(  # type: ignore[attr-defined]
             f"Adding stream entry for URL:  {info.url}"
@@ -157,7 +152,7 @@ class Playlist(EventEmitter, Serializable):
         if not info:
             raise ExtractionError("Could not extract information")
 
-        # TODO: Sort out what happens next when this happens
+        # this should, in theory, never happen.
         if info.ytdl_type == "playlist":
             raise WrongEntryTypeError(
                 "This is a playlist.",

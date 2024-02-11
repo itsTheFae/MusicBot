@@ -19,6 +19,7 @@ from yt_dlp.networking.exceptions import (  # type: ignore[import-untyped]
 from yt_dlp.utils import DownloadError  # type: ignore[import-untyped]
 from yt_dlp.utils import UnsupportedError
 
+from .constants import DEFAULT_MAX_INFO_DL_THREADS, DEFAULT_MAX_INFO_REQUEST_TIMEOUT
 from .exceptions import ExtractionError
 from .spotify import Spotify
 
@@ -77,9 +78,8 @@ class Downloader:
         """
         self.bot: "MusicBot" = bot
         self.download_folder: pathlib.Path = bot.config.audio_cache_path
-        # TODO: max_workers should probably be configurable.  Perhaps via CLI args.
-        # TODO: this executor may not be good for long-running downloads...
-        self.thread_pool = ThreadPoolExecutor(max_workers=2)
+        # NOTE: this executor may not be good for long-running downloads...
+        self.thread_pool = ThreadPoolExecutor(max_workers=DEFAULT_MAX_INFO_DL_THREADS)
 
         # force ytdlp and HEAD requests to use the same UA string.
         self.http_req_headers = {
@@ -135,6 +135,7 @@ class Downloader:
                 head_data = await self._get_headers(
                     self.bot.session,
                     test_url,
+                    timeout=DEFAULT_MAX_INFO_REQUEST_TIMEOUT,
                     req_headers=self.http_req_headers,
                 )
                 if not head_data:
@@ -161,7 +162,7 @@ class Downloader:
         session: aiohttp.ClientSession,
         url: str,
         *,
-        timeout: int = 10,  # TODO: this timeout should be configurable.
+        timeout: int = 10,
         allow_redirects: bool = True,
         req_headers: Dict[str, Any] = {},
     ) -> Union["CIMultiDictProxy[str]", None]:
@@ -217,9 +218,9 @@ class Downloader:
                 data[field] = redacted_str
 
         if log.getEffectiveLevel() <= logging.EVERYTHING:  # type: ignore[attr-defined]
-            log.noise("Sanitized YTDL Extraction Info:\n%s", pformat(data))  # type: ignore[attr-defined]
+            log.noise("Sanitized YTDL Extraction Info (not JSON):\n%s", pformat(data))  # type: ignore[attr-defined]
         else:
-            log.debug("Sanitized YTDL Extraction Info:  %s", data)
+            log.noise("Sanitized YTDL Extraction Info (not JSON):  %s", data)  # type: ignore[attr-defined]
 
     async def extract_info(
         self, song_subject: str, *args: Any, **kwargs: Any
@@ -257,7 +258,7 @@ class Downloader:
             "youtube.com" not in song_subject.lower()
             and "youtu.be" not in song_subject.lower()
         ):
-            md5 = hashlib.md5()
+            md5 = hashlib.md5()  # nosec
             md5.update(song_subject.encode("utf8"))
             song_subject_hash = md5.hexdigest()[-8:]
 
@@ -287,8 +288,8 @@ class Downloader:
         self._sanitize_and_log(
             data,
             # these fields are here because they are often very lengthy.
-            # they could be useful to others, so this TODO should live here forever.
-            # TODO: devs should change redact_fields as needed, but maybe not commit changes
+            # they could be useful to others, devs should change redact_fields
+            # as needed, but maybe not commit these changes
             redact_fields=["automatic_captions", "formats", "heatmap"],
         )
         return YtdlpResponseDict(data)
@@ -549,7 +550,6 @@ class YtdlpResponseDict(YUserDict):
         Note, the URLs returned from this function may be time-sensitive.
         In the case of spotify, URLs may not last longer than a day.
         """
-        # TODO: IF time-sensitive URLs are a problem; might get away with downloading and sending as an attachment?
         turl = self.data.get("thumbnail", None)
         # if we have a thumbnail url, clean it up if needed and return it.
         if isinstance(turl, str) and turl:

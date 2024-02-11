@@ -621,6 +621,7 @@ def parse_cli_args() -> argparse.Namespace:
         help="Skip all startup checks, including the update check.",
     )
 
+    # Skip update checks option.
     ap.add_argument(
         "--no-update-check",
         dest="no_update_check",
@@ -628,6 +629,7 @@ def parse_cli_args() -> argparse.Namespace:
         help="Skip only the update check at startup.",
     )
 
+    # Disable dependency install on error option.
     ap.add_argument(
         "--no-install-deps",
         dest="no_install_deps",
@@ -635,7 +637,7 @@ def parse_cli_args() -> argparse.Namespace:
         help="Disable MusicBot from trying to install dependencies when it cannot import them.",
     )
 
-    # Log related options
+    # Log related options.
     ap.add_argument(
         "--logs-kept",
         dest="keep_n_logs",
@@ -666,10 +668,6 @@ def parse_cli_args() -> argparse.Namespace:
     # TODO: maybe more arguments for other things:
     # --config-dir      force this directory for config data (all files)
     # --config-file     load config from this file, but default for other configs.
-    # --max-dl-threads  max number of threads to use for ytdlp extractions and downloads.
-    # --bind-to-ip      IP address used by ytdlp as the source for requests.
-    # -4 --only-ipv4    Force binding to all available IPv4 addresses. Value:  0.0.0.0
-    # -6 --only-ipv6    Force binding to all available IPv6 addresses. Value:  ::
 
     args = ap.parse_args()
 

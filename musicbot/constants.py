@@ -48,6 +48,9 @@ DEFAULT_LOGS_ROTATE_FORMAT: str = ".ended-%Y-%j-%H%m%S"
 DEFAULT_LOG_LEVEL: str = "INFO"
 
 
+DEFAULT_MAX_INFO_DL_THREADS: int = 2
+DEFAULT_MAX_INFO_REQUEST_TIMEOUT: int = 10
+
 # Discord and other API constants
 DISCORD_MSG_CHAR_LIMIT: int = 2000
 

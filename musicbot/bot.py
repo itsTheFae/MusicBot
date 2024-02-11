@@ -2578,7 +2578,7 @@ class MusicBot(discord.Client):
         Usage:
             {command_prefix}play song_link
             {command_prefix}play text to search for
-            {command_prefix}play spotify_url
+            {command_prefix}play spotify_uri
 
         Adds the song to the playlist.  If a link is not provided, the first
         result from a youtube search is added to the queue.
@@ -2693,7 +2693,7 @@ class MusicBot(discord.Client):
         Usage:
             {command_prefix}play song_link
             {command_prefix}play text to search for
-            {command_prefix}play spotify_url
+            {command_prefix}play spotify_uri
 
         Adds the song to be played back immediately.  If a link is not provided, the first
         result from a youtube search is added to the queue.
