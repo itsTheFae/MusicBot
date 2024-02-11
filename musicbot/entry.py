@@ -489,7 +489,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             log.error(
                 "ffprobe returned something that could not be used.", exc_info=True
             )
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             log.exception("ffprobe could not be executed for some reason.")
 
         return None
