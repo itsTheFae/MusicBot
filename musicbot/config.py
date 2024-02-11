@@ -439,6 +439,12 @@ class Config:
 
         self.delete_invoking = self.delete_invoking and self.delete_messages
 
+        if self.status_message and len(self.status_message) > 128:
+            log.warning(
+                "StatusMessage config option is too long, it will be limited to 128 characters."
+            )
+            self.status_message = self.status_message[:128]
+
         if not self.footer_text:
             self.footer_text = ConfigDefaults.footer_text
 

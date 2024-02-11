@@ -1032,6 +1032,12 @@ class MusicBot(discord.Client):
         """Inspects available players and ultimately fire change_presence()"""
         activity = None  # type: Optional[discord.BaseActivity]
         status = discord.Status.online  # type: discord.Status
+        # NOTE:  Bots can only set: name, type, state, and url fields of activity.
+        # Even though Custom type is available, we cannot use emoji field with bots.
+        # So Custom Activity is effectively useless at time of writing.
+        # Streaming Activity is a coin toss at best. Usually status changes correctly.
+        # However all other details in the client might be wrong or missing.
+        # Example:  Youtube url shows "Twitch" in client profile info.
 
         playing = sum(1 for p in self.players.values() if p.is_playing)
         paused = sum(1 for p in self.players.values() if p.is_paused)
@@ -1042,45 +1048,55 @@ class MusicBot(discord.Client):
             if paused > playing:
                 status = discord.Status.idle
 
+            text = f"music on {total} servers"
+            if self.config.status_message:
+                text = self.config.status_message
+
             activity = discord.Activity(
                 type=discord.ActivityType.playing,
-                name=f"music on {total} guilds",
+                name=text,
             )
 
         # only 1 server is playing.
         elif playing:
             player = list(self.players.values())[0]
             if player.current_entry:
+                text = player.current_entry.title.strip()[:128]
+                if self.config.status_message:
+                    text = self.config.status_message
+
                 activity = discord.Activity(
                     type=discord.ActivityType.streaming,
                     url=player.current_entry.url,
-                    name=player.current_entry.title.strip()[:128],
-                    # platform="" does not work.
+                    name=text,
                 )
 
         # only 1 server is paused.
         elif paused:
             player = list(self.players.values())[0]
             if player.current_entry:
+                text = player.current_entry.title.strip()[:128]
+                if self.config.status_message:
+                    text = self.config.status_message
+
                 status = discord.Status.idle
                 activity = discord.Activity(
                     type=discord.ActivityType.custom,
-                    state=player.current_entry.title.strip()[:128],
+                    state=text,
                     name="Custom Status",  # seemingly required.
-                    # TODO: emoji is broken in dpy lib. 2024-01-10
-                    emoji={"name": ":pause_button:"},
                 )
 
         # nothing going on.
         else:
+            text = f" ~ {EMOJI_IDLE_ICON} ~ "
+            if self.config.status_message:
+                text = self.config.status_message
+
             status = discord.Status.idle
             activity = discord.CustomActivity(
                 type=discord.ActivityType.custom,
-                state=f" ~ {EMOJI_IDLE_ICON} ~ ",
+                state=text,
                 name="Custom Status",  # seems required to make idle status work.
-                # TODO: emoji is currently broken in discord.py lib. 2024-01-10
-                # emoji={"name": EMOJI_IDLE_ICON},
-                emoji="\N{POWER SLEEP SYMBOL}",
             )
 
         async with self.aiolocks[_func_()]:
