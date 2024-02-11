@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import importlib.util
+import json
 import logging
 import os
 import pathlib
@@ -14,7 +15,7 @@ import textwrap
 import time
 import traceback
 from base64 import b64decode
-from typing import Any, Union
+from typing import List, Tuple, Union
 
 from musicbot.constants import (
     DEFAULT_LOGS_KEPT,
@@ -49,7 +50,7 @@ class GIT:
 
         :param: raise_instead:  Return True on success but raise Runtime error otherwise.
 
-        :raises:  RuntimeError  if `raise_instead` is set True
+        :raises:  RuntimeError  if `raise_instead` is set True.
         """
         try:
             git_bin = shutil.which("git")
@@ -72,6 +73,58 @@ class GIT:
                     f"Cannot execute `git` commands due to an error:  {str(e)}"
                 ) from e
             return False
+
+    @classmethod
+    def show_branch(cls) -> str:
+        """
+        Runs `git rev-parse --abbrev-ref HEAD` to get the current branch name.
+        Will return an empty string if running the command fails.
+        """
+        try:
+            git_bin = shutil.which("git")
+            if not git_bin:
+                log.warning("Could not find git executable.")
+                return ""
+
+            gitbytes = subprocess.check_output(
+                [git_bin, "rev-parse", "--abbrev-ref", "HEAD"]
+            )
+            branch = gitbytes.decode("utf8").strip()
+
+            return branch
+        except (OSError, ValueError, subprocess.CalledProcessError):
+            return ""
+
+    @classmethod
+    def check_updates(cls) -> Tuple[str, str]:
+        """
+        Runs `git fetch --dry-run` and extracts the commit IDs.
+        If the command fails or no commit IDs are found, this
+        will return empty strings rather than raise errors.
+        """
+        branch = cls.show_branch()
+        if not branch:
+            return ("", "")
+
+        try:
+            commit_at = ""
+            commit_to = ""
+            git_bin = shutil.which("git")
+            if not git_bin:
+                return ("", "")
+
+            gitbytes = subprocess.check_output([git_bin, "fetch", "--dry-run"])
+            lines = gitbytes.decode("utf8").split("\n")
+            for line in lines:
+                parts = line.split()
+                if branch in parts:
+                    commits = line.strip().split(" ", maxsplit=1)[0]
+                    commit_at, commit_to = commits.split("..")
+                    break
+
+            return (commit_at, commit_to)
+        except (OSError, ValueError, subprocess.CalledProcessError):
+            return ("", "")
 
     @classmethod
     def run_upgrade_pull(cls) -> None:
@@ -106,7 +159,7 @@ class PIP:
             raise RuntimeError("Cannot execute pip.")
 
         try:
-            return cls.run_python_m(*command.split(), check_output=check_output)
+            return cls.run_python_m(command.split(), check_output=check_output)
         except subprocess.CalledProcessError as e:
             return e.returncode
         except (OSError, PermissionError, FileNotFoundError):
@@ -114,7 +167,9 @@ class PIP:
         return 0
 
     @classmethod
-    def run_python_m(cls, *args: Any, **kwargs: Any) -> Union[bytes, int]:
+    def run_python_m(
+        cls, args: List[str], check_output: bool = False
+    ) -> Union[bytes, int]:
         """
         Use subprocess check_call or check_output to run a pip module
         command using the `args` as additional arguments to pip.
@@ -122,10 +177,15 @@ class PIP:
 
         :param: check_output:  Use check_output rather than check_call.
         """
-        check_output = kwargs.pop("check_output", False)
         if check_output:
-            return subprocess.check_output([sys.executable, "-m", "pip"] + list(*args))
-        return subprocess.check_call([sys.executable, "-m", "pip"] + list(*args))
+            return subprocess.check_output(
+                [sys.executable, "-m", "pip"] + args,
+                stderr=subprocess.DEVNULL,
+            )
+        return subprocess.check_call(
+            [sys.executable, "-m", "pip"] + args,
+            stdout=subprocess.DEVNULL,
+        )
 
     @classmethod
     def run_install(
@@ -164,6 +224,25 @@ class PIP:
         except OSError:
             log.exception("PIP failed due to OSError.")
             return False
+
+    @classmethod
+    def check_updates(cls) -> int:
+        """
+        Runs `pip install -U -r ./requirements.txt --quiet --dry-run --report -`
+        and returns the number of packages that could be updated.
+        """
+        updata = cls.run_install(
+            "-U -r ./requirements.txt --quiet --dry-run --report -",
+            check_output=True,
+        )
+        try:
+            if isinstance(updata, bytes):
+                pip_data = json.loads(updata)
+                return len(pip_data.get("install", []))
+        except json.JSONDecodeError:
+            log.warning("Could not decode pip update report JSON.")
+
+        return 0
 
     @classmethod
     def run_upgrade_requirements(cls, get_output: bool = False) -> Union[str, int]:
@@ -235,7 +314,7 @@ def bugger_off(msg: str = "Press enter to continue . . .", code: int = 1) -> Non
     sys.exit(code)
 
 
-def sanity_checks(optional: bool = True) -> None:
+def sanity_checks(args: argparse.Namespace, optional: bool = True) -> None:
     """
     Run a collection of pre-startup checks to either automatically correct
     issues or inform the user of how to correct them.
@@ -264,6 +343,10 @@ def sanity_checks(optional: bool = True) -> None:
 
     # Check disk usage
     opt_check_disk_space()
+
+    # Display an update check, if enabled.
+    if not args.no_update_check:
+        opt_check_updates()
 
     log.info("Optional checks passed.")
 
@@ -370,15 +453,18 @@ def req_ensure_env() -> None:
         bugger_off()
 
     try:
-        # TODO: change these perhaps.  Assert is removed in byte-code.
-        assert os.path.isdir("config"), 'folder "config" not found'
-        assert os.path.isdir("musicbot"), 'folder "musicbot" not found'
-        assert os.path.isfile(
-            "musicbot/__init__.py"
-        ), "musicbot folder is not a Python module"
+        if not os.path.isdir("config"):
+            raise RuntimeError('folder "config" not found')
 
-        assert importlib.util.find_spec("musicbot"), "musicbot module is not importable"
-    except AssertionError as e:
+        if not os.path.isdir("musicbot"):
+            raise RuntimeError('folder "musicbot" not found')
+
+        if not os.path.isfile("musicbot/__init__.py"):
+            raise RuntimeError("musicbot folder is not a Python module")
+
+        if not importlib.util.find_spec("musicbot"):
+            raise RuntimeError("musicbot module is not importable")
+    except RuntimeError as e:
         log.critical("Failed environment check, %s", e)
         bugger_off()
 
@@ -411,6 +497,54 @@ def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
         log.warning(
             "Less than %sMB of free space remains on this device",
             warnlimit_mb,
+        )
+
+
+def opt_check_updates() -> None:
+    """
+    Runs a collection of git and pip commands and logs if updates are available.
+    """
+    log.info("\nChecking for updates to MusicBot or dependencies...")
+    needs_update = False
+    if GIT.works():
+        git_branch = GIT.show_branch()
+        commit_at, commit_to = GIT.check_updates()
+        if commit_at and commit_to:
+            log.warning(
+                "MusicBot updates are available through `git` command.\n"
+                "Your current branch is:  %s\n"
+                "The latest commit ID is:  %s",
+                git_branch,
+                commit_to,
+            )
+            needs_update = True
+        else:
+            log.info("No MusicBot updates available via `git` command.")
+    else:
+        log.warning(
+            "Could not check for updates using `git` commands.  You should check manually."
+        )
+
+    if PIP.works():
+        # TODO: should probably list / prioritize packages.
+        package_count = PIP.check_updates()
+        if package_count:
+            log.warning(
+                "There may be updates for dependency packages. "
+                "PIP reports %s package(s) could be installed.",
+                package_count,
+            )
+            needs_update = True
+        else:
+            log.info("No dependency updates available via `pip` command.")
+    else:
+        log.warning(
+            "Could not check for updates using `pip` commands.  You should check manually."
+        )
+    if needs_update:
+        log.info(
+            "You can run a guided update by using the command:\n    %s ./update.py",
+            sys.executable,
         )
 
 
@@ -484,7 +618,21 @@ def parse_cli_args() -> argparse.Namespace:
         "--no-checks",
         dest="do_start_checks",
         action="store_false",
-        help="Skip all startup checks.",
+        help="Skip all startup checks, including the update check.",
+    )
+
+    ap.add_argument(
+        "--no-update-check",
+        dest="no_update_check",
+        action="store_true",
+        help="Skip only the update check at startup.",
+    )
+
+    ap.add_argument(
+        "--no-install-deps",
+        dest="no_install_deps",
+        action="store_true",
+        help="Disable MusicBot from trying to install dependencies when it cannot import them.",
     )
 
     # Log related options
@@ -516,10 +664,12 @@ def parse_cli_args() -> argparse.Namespace:
     )
 
     # TODO: maybe more arguments for other things:
-    # --check-updates   look for new tags or commits on branch, then exit.
-    # --apply-updates   basically run update.py from here I guess.
-    # --config-dir   force this directory for config data (all files)
-    # --config-file  load config from this file, but default for other configs.
+    # --config-dir      force this directory for config data (all files)
+    # --config-file     load config from this file, but default for other configs.
+    # --max-dl-threads  max number of threads to use for ytdlp extractions and downloads.
+    # --bind-to-ip      IP address used by ytdlp as the source for requests.
+    # -4 --only-ipv4    Force binding to all available IPv4 addresses. Value:  0.0.0.0
+    # -6 --only-ipv6    Force binding to all available IPv6 addresses. Value:  ::
 
     args = ap.parse_args()
 
@@ -599,7 +749,7 @@ async def main(
 
     # Handle startup checks, if they haven't been skipped.
     if args.do_start_checks:
-        sanity_checks()
+        sanity_checks(args)
     else:
         log.info("Skipped startup checks.")
 
@@ -666,6 +816,14 @@ async def main(
             break
 
         except ImportError:
+            if args.no_install_deps:
+                log.error(
+                    "Error importing MusicBot or it's dependency packages.\n"
+                    "The `--no-install-deps` option is set, so MusicBot will exit now."
+                )
+                log.exception("This is the exception which caused the above error: ")
+                break
+
             if not PIP.works():
                 log.critical(
                     "MusicBot could not import dependency modules and we cannot run `pip` automatically!\n"
@@ -701,7 +859,10 @@ async def main(
                 log.info("Ok lets hope it worked")
                 print()
             else:
-                log.exception("Unknown ImportError, exiting.")
+                log.error(
+                    "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
+                )
+                log.exception("The exception which caused the above error: ")
                 break
 
         except HelpfulError as e:

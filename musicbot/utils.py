@@ -603,9 +603,6 @@ def count_members_in_voice(  # pylint: disable=dangerous-default-value
         return 0
 
     num_voice = 0
-    log.noise(  # type: ignore[attr-defined]
-        f"Channel Count Pre-Filter:  {len(voice_channel.members)}"
-    )
     for member in voice_channel.members:
         if not member:
             continue
@@ -630,7 +627,6 @@ def count_members_in_voice(  # pylint: disable=dangerous-default-value
             continue
 
         num_voice += 1
-    log.noise(f"Channel Count Post-Filter:  {num_voice}")  # type: ignore[attr-defined]
     return num_voice
 
 

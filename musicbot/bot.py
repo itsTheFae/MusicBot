@@ -1,11 +1,13 @@
 import asyncio
 import inspect
+import json
 import logging
 import math
 import os
 import pathlib
 import random
 import re
+import shutil
 import ssl
 import sys
 import time
@@ -5383,7 +5385,120 @@ class MusicBot(discord.Client):
 
         return Response(codeblock.format(result))
 
+    @owner_only
+    async def cmd_checkupdates(self) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}checkupdates
+
+        Display the current bot version and check for updates to MusicBot or dependencies.
+        The option `GitUpdatesBranch` must be set to check for updates to MusicBot.
+        """
+        git_status = ""
+        pip_status = ""
+        updates = False
+
+        # attempt fetching git info.
+        try:
+            git_bin = shutil.which("git")
+            if not git_bin:
+                git_status = "Could not locate git executable."
+                raise RuntimeError("Could not locate git executable.")
+
+            git_cmd_branch = [git_bin, "rev-parse", "--abbrev-ref", "HEAD"]
+            git_cmd_check = [git_bin, "fetch", "--dry-run"]
+
+            # extract current git branch name.
+            cmd_branch = await asyncio.create_subprocess_exec(
+                *git_cmd_branch,
+                stdout=asyncio.subprocess.PIPE,
+            )
+            branch_stdout, _stderr = await cmd_branch.communicate()
+            branch_name = branch_stdout.decode("utf8").strip()
+
+            # check if fetch would update.
+            cmd_check = await asyncio.create_subprocess_exec(
+                *git_cmd_check,
+                stdout=asyncio.subprocess.PIPE,
+            )
+            check_stdout, _stderr = await cmd_check.communicate()
+            lines = check_stdout.decode("utf8").split("\n")
+
+            # inspect dry run for our branch name to see if there are updates.
+            commit_to = ""
+            for line in lines:
+                parts = line.split()
+                if branch_name in parts:
+                    commits = line.strip().split(" ", maxsplit=1)[0]
+                    _commit_at, commit_to = commits.split("..")
+                    break
+
+            if not commit_to:
+                git_status = f"No updates in branch `{branch_name}` remote."
+            else:
+                git_status = (
+                    f"New commits are available in `{branch_name}` branch remote."
+                )
+                updates = True
+        except (OSError, ValueError, ConnectionError, RuntimeError):
+            log.exception("Failed while checking for updates via git command.")
+            git_status = "Error while checking, see logs for details."
+
+        # attempt to fetch pip info.
+        try:
+            pip_cmd_check = [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "-U",
+                "-r",
+                "./requirements.txt",
+                "--quiet",
+                "--dry-run",
+                "--report",
+                "-",
+            ]
+            pip_cmd = await asyncio.create_subprocess_exec(
+                *pip_cmd_check,
+                stdout=asyncio.subprocess.PIPE,
+            )
+            pip_stdout, _stderr = await pip_cmd.communicate()
+            pip_json = json.loads(pip_stdout)
+            pip_packages = ""
+            for pkg in pip_json.get("install", []):
+                meta = pkg.get("metadata", {})
+                if not meta:
+                    log.debug("Package missing meta in pip report.")
+                    continue
+                name = meta.get("name", "")
+                ver = meta.get("version", "")
+                log.info("package available %s == %s", name, ver)
+                if name and ver:
+                    pip_packages += f"Update for `{name}` to version: `{ver}`\n"
+            if pip_packages:
+                pip_status = pip_packages
+                updates = True
+            else:
+                pip_status = "No updates for dependencies found."
+        except (OSError, ValueError, ConnectionError):
+            log.exception("Failed to get pip update status due to some error.")
+            pip_status = "Error while checking, see logs for details."
+
+        if updates:
+            header = "There are updates for MusicBot available for download."
+        else:
+            header = "MusicBot is totally up-to-date!"
+
+        return Response(
+            f"{header}\n\n"
+            f"**Source Code Updates:**\n{git_status}\n\n"
+            f"**Dependency Updates:**\n{pip_status}",
+            delete_after=60,
+        )
+
     async def cmd_testready(self, channel: MessageableChannel) -> CommandResponse:
+        # TODO: remove this. :)
         """
         Not a real command, and will be removed in the future.
         """
@@ -5479,14 +5594,13 @@ class MusicBot(discord.Client):
             else:
                 return  # if I want to log this I just move it under the prefix check
 
-        # check for user id in blacklist.
+        # check for user id or name in blacklist.
         if (
-            # TODO: fix this when blacklist(s) get updated
             self.config.user_blocklist.is_blocked(message.author)
             and message.author.id != self.config.owner_id
         ):
             log.warning(
-                "User blacklisted: %s/%s  tried command: %s",
+                "User in block list: %s/%s  tried command: %s",
                 message.author.id,
                 str(message.author),
                 command,
