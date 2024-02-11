@@ -140,16 +140,27 @@ class BasePlaylistEntry(Serializable):
         return id(self)
 
 
-async def run_command(cmd: str) -> bytes:
+async def run_command(command: List[str]) -> bytes:
     """
-    Use an async subprocess shell to execute the command given in `cmd`
-    and wait for then return its output.
+    Use an async subprocess exec to execute the given `command`
+    This method will wait for then return the output.
+
+    :param: command:
+        Must be a list of arguments, where element 0 is an executable path.
+
+    :returns:  stdout concatenated with stderr as bytes.
     """
-    # TODO: this should probably be the _exec version, for just a touch more security.
-    p = await asyncio.create_subprocess_shell(
-        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    p = await asyncio.create_subprocess_exec(
+        # The inconsistency between the various implements of subprocess, asyncio.subprocess, and
+        # all the other process calling functions tucked into python is alone enough to be dangerous.
+        # There is a time and place for everything, and this is not the time or place for shells.
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
     )
-    log.debug("Starting asyncio subprocess (%s) with command: %s", p, cmd)
+    log.noise(  # type: ignore[attr-defined]
+        "Starting asyncio subprocess (%s) with command: %s", p, command
+    )
     stdout, stderr = await p.communicate()
     return stdout + stderr
 
@@ -183,10 +194,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         if self.duration is None:
             log.info(
-                "Cannot extract duration of the entry. This does not affect the ability of the bot. "
-                "However, estimated time for this entry will not be unavailable and estimated time "
-                "of the queue will also not be available until this entry got downloaded.\n"
-                "entry name: %s",
+                "Extraction did not provide a duration for this entry.\n"
+                "MusicBot cannot estimate queue times until it is downloaded.\n"
+                "Entry name:  %s",
                 self.title,
             )
 
@@ -382,44 +392,21 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 else:
                     await self._really_download()
 
+            # check for duration and attempt to extract it if missing.
             if self.duration is None:
+                # optional pymediainfo over ffprobe?
                 if pymediainfo:
-                    try:
-                        mediainfo = pymediainfo.MediaInfo.parse(self.filename)
-                        self.duration = mediainfo.tracks[0].duration / 1000
-                    except (FileNotFoundError, OSError, RuntimeError):
-                        log.exception("Failed to get duration via pymediainfo.")
-                        self.duration = None
+                    self.duration = self._get_duration_pymedia(self.filename)
 
-                else:
-                    args = [
-                        "ffprobe",
-                        "-i",
-                        self.filename,
-                        "-show_entries",
-                        "format=duration",
-                        "-v",
-                        "quiet",
-                        "-of",
-                        'csv="p=0"',
-                    ]
-
-                    raw_output = await run_command(" ".join(args))
-                    output = raw_output.decode("utf-8")
-
-                    try:
-                        self.duration = float(output)
-                    except ValueError:
-                        # @TheerapakG: If somehow it is not string of float
-                        self.duration = None
+                # no matter what, ffprobe should be available.
+                if self.duration is None:
+                    self.duration = await self._get_duration_ffprobe(self.filename)
 
                 if not self.duration:
                     log.error(
-                        "Cannot extract duration of downloaded entry, invalid output from ffprobe or pymediainfo. "
-                        "This does not affect the ability of the bot. However, estimated time for this entry "
-                        "will not be unavailable and estimated time of the queue will also not be available "
-                        "until this entry got removed.\n"
-                        "entry file: %s",
+                        "MusicBot could not get duration data for this entry.\n"
+                        "Queue time estimation may be unavailable until this track is cleared.\n"
+                        "Entry file: %s",
                         self.filename,
                     )
                 else:
@@ -458,6 +445,55 @@ class URLPlaylistEntry(BasePlaylistEntry):
         finally:
             self._is_downloading = False
 
+    def _get_duration_pymedia(self, input_file: str) -> Optional[float]:
+        """
+        Tries to use pymediainfo module to extract duration, if the module is available.
+        """
+        if pymediainfo:
+            log.debug("Trying to get duration via pymediainfo for:  %s", input_file)
+            try:
+                mediainfo = pymediainfo.MediaInfo.parse(input_file)
+                if mediainfo.tracks:
+                    return int(mediainfo.tracks[0].duration) / 1000
+            except (FileNotFoundError, OSError, RuntimeError, ValueError, TypeError):
+                log.exception("Failed to get duration via pymediainfo.")
+        return None
+
+    async def _get_duration_ffprobe(self, input_file: str) -> Optional[float]:
+        """
+        Tries to use ffprobe to extract duration from media if possible.
+        """
+        log.debug("Trying to get duration via ffprobe for:  %s", input_file)
+        ffprobe_bin = shutil.which("ffprobe")
+        if not ffprobe_bin:
+            log.error("Could not locate ffprobe in your path!")
+            return None
+
+        ffprobe_cmd = [
+            ffprobe_bin,
+            "-i",
+            self.filename,
+            "-show_entries",
+            "format=duration",
+            "-v",
+            "quiet",
+            "-of",
+            'csv="p=0"',
+        ]
+
+        try:
+            raw_output = await run_command(ffprobe_cmd)
+            output = raw_output.decode("utf8")
+            return float(output)
+        except (ValueError, UnicodeError):
+            log.error(
+                "ffprobe returned something that could not be used.", exc_info=True
+            )
+        except Exception:
+            log.exception("ffprobe could not be executed for some reason.")
+
+        return None
+
     async def get_mean_volume(self, input_file: str) -> str:
         """
         Attempt to calculate the mean volume of the `input_file` by using
@@ -465,14 +501,26 @@ class URLPlaylistEntry(BasePlaylistEntry):
         arguments sent to ffmpeg during playback.
         """
         log.debug("Calculating mean volume of:  %s", input_file)
-        exe = shutil.which("ffmpeg")
+        ffmpeg_bin = shutil.which("ffmpeg")
+        if not ffmpeg_bin:
+            log.error("Could not locate ffmpeg on your path!")
+            return ""
         # TODO:  if this is printing JSON, we should really not use regex to parse it...
         # ... OK -BUT- ffmpeg does not return ONLY the JSON, and I cannot find out how to make it.
         # so that explains the need for regex.
         # still, maybe we should regex split the JSON from non-json and go ham on that?
-        args = "-af loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:print_format=json -f null /dev/null"
+        ffmpeg_cmd = [
+            ffmpeg_bin,
+            "-i",
+            input_file,
+            "-af",
+            "loudnorm=I=-24.0:LRA=7.0:TP=-2.0:linear=true:print_format=json",
+            "-f",
+            "null",
+            "/dev/null",
+        ]
 
-        raw_output = await run_command(f'"{exe}" -i "{input_file}" {args}')
+        raw_output = await run_command(ffmpeg_cmd)
         output = raw_output.decode("utf-8")
         log.debug("Experimental Mean Volume Output:  %s", output)
 
