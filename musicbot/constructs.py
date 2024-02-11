@@ -100,8 +100,8 @@ class GuildSpecificData:
         for key, val in self._ssd.items():
             if val == self:
                 guild = discord.utils.find(
-                    lambda m: m.id == key,
-                    self._bot.guilds,  # pylint: disable=cell-var-from-loop
+                    lambda m: m.id == key,  # pylint: disable=cell-var-from-loop
+                    self._bot.guilds,
                 )
                 if guild:
                     self._guild_name = guild.name
