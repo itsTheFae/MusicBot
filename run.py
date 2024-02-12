@@ -87,7 +87,8 @@ class GIT:
                 return ""
 
             gitbytes = subprocess.check_output(
-                [git_bin, "rev-parse", "--abbrev-ref", "HEAD"]
+                [git_bin, "rev-parse", "--abbrev-ref", "HEAD"],
+                stderr=subprocess.STDOUT,
             )
             branch = gitbytes.decode("utf8").strip()
 

@@ -5403,7 +5403,7 @@ class MusicBot(discord.Client):
         return Response(codeblock.format(result))
 
     @owner_only
-    async def cmd_checkupdates(self) -> CommandResponse:
+    async def cmd_checkupdates(self, channel: MessageableChannel) -> CommandResponse:
         """
         Usage:
             {command_prefix}checkupdates
@@ -5414,6 +5414,8 @@ class MusicBot(discord.Client):
         git_status = ""
         pip_status = ""
         updates = False
+
+        await channel.typing()
 
         # attempt fetching git info.
         try:
@@ -5437,8 +5439,10 @@ class MusicBot(discord.Client):
             cmd_check = await asyncio.create_subprocess_exec(
                 *git_cmd_check,
                 stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
-            check_stdout, _stderr = await cmd_check.communicate()
+            check_stdout, check_stderr = await cmd_check.communicate()
+            check_stdout += check_stderr
             lines = check_stdout.decode("utf8").split("\n")
 
             # inspect dry run for our branch name to see if there are updates.
