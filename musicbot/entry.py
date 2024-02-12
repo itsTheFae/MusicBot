@@ -411,9 +411,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
                     )
                 else:
                     log.debug(
-                        "Get duration of %s as %s seconds by inspecting it directly",
-                        self.filename,
+                        "Got duration of %s seconds for file:  %s",
                         self.duration,
+                        self.filename,
                     )
 
             if self.playlist.bot.config.use_experimental_equalization:
@@ -478,7 +478,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             "-v",
             "quiet",
             "-of",
-            'csv="p=0"',
+            'csv=p=0',
         ]
 
         try:
@@ -505,10 +505,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
         if not ffmpeg_bin:
             log.error("Could not locate ffmpeg on your path!")
             return ""
-        # TODO:  if this is printing JSON, we should really not use regex to parse it...
-        # ... OK -BUT- ffmpeg does not return ONLY the JSON, and I cannot find out how to make it.
-        # so that explains the need for regex.
-        # still, maybe we should regex split the JSON from non-json and go ham on that?
+
+        # NOTE: this command should contain JSON, but I have no idea how to make
+        # ffmpeg spit out only the JSON.
         ffmpeg_cmd = [
             ffmpeg_bin,
             "-i",
@@ -518,15 +517,16 @@ class URLPlaylistEntry(BasePlaylistEntry):
             "-f",
             "null",
             "/dev/null",
+            "-hide_banner",
+            "-nostats",
         ]
 
         raw_output = await run_command(ffmpeg_cmd)
         output = raw_output.decode("utf-8")
-        log.debug("Experimental Mean Volume Output:  %s", output)
 
         i_matches = re.findall(r'"input_i" : "(-?([0-9]*\.[0-9]+))",', output)
         if i_matches:
-            log.debug("i_matches=%s", i_matches[0][0])
+            # log.debug("i_matches=%s", i_matches[0][0])
             i_value = float(i_matches[0][0])
         else:
             log.debug("Could not parse I in normalise json.")
@@ -534,7 +534,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         lra_matches = re.findall(r'"input_lra" : "(-?([0-9]*\.[0-9]+))",', output)
         if lra_matches:
-            log.debug("lra_matches=%s", lra_matches[0][0])
+            # log.debug("lra_matches=%s", lra_matches[0][0])
             lra_value = float(lra_matches[0][0])
         else:
             log.debug("Could not parse LRA in normalise json.")
@@ -542,7 +542,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         tp_matches = re.findall(r'"input_tp" : "(-?([0-9]*\.[0-9]+))",', output)
         if tp_matches:
-            log.debug("tp_matches=%s", tp_matches[0][0])
+            # log.debug("tp_matches=%s", tp_matches[0][0])
             tp_value = float(tp_matches[0][0])
         else:
             log.debug("Could not parse TP in normalise json.")
@@ -550,7 +550,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         thresh_matches = re.findall(r'"input_thresh" : "(-?([0-9]*\.[0-9]+))",', output)
         if thresh_matches:
-            log.debug("thresh_matches=%s", thresh_matches[0][0])
+            # log.debug("thresh_matches=%s", thresh_matches[0][0])
             thresh = float(thresh_matches[0][0])
         else:
             log.debug("Could not parse thresh in normalise json.")
@@ -558,7 +558,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         offset_matches = re.findall(r'"target_offset" : "(-?([0-9]*\.[0-9]+))', output)
         if offset_matches:
-            log.debug("offset_matches=%s", offset_matches[0][0])
+            # log.debug("offset_matches=%s", offset_matches[0][0])
             offset = float(offset_matches[0][0])
         else:
             log.debug("Could not parse offset in normalise json.")
