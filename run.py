@@ -948,8 +948,9 @@ if __name__ == "__main__":
             sys.exit(127)
 
     # py3.8 made ProactorEventLoop default on windows.
-    # Now we need to make adjustments for a bug in aiohttp :)
-    loop = asyncio.get_event_loop_policy().get_event_loop()
+    # py3.12 deprecated using get_event_loop(), we need new_event_loop().
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
         exit_sig = loop.run_until_complete(main(cli_args))
     except KeyboardInterrupt:
