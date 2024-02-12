@@ -5431,6 +5431,7 @@ class MusicBot(discord.Client):
             cmd_branch = await asyncio.create_subprocess_exec(
                 *git_cmd_branch,
                 stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.DEVNULL,
             )
             branch_stdout, _stderr = await cmd_branch.communicate()
             branch_name = branch_stdout.decode("utf8").strip()
@@ -5483,6 +5484,7 @@ class MusicBot(discord.Client):
             pip_cmd = await asyncio.create_subprocess_exec(
                 *pip_cmd_check,
                 stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.DEVNULL,
             )
             pip_stdout, _stderr = await pip_cmd.communicate()
             pip_json = json.loads(pip_stdout)
