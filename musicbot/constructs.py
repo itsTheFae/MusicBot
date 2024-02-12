@@ -182,10 +182,15 @@ class GuildSpecificData:
                 )
                 return
 
-        # TODO: find a good place to log this data with a guild name, as before.
         guild_prefix = options.get("command_prefix", None)
         if guild_prefix:
             self._command_prefix = guild_prefix
+            log.info(
+                "Guild %s/%s has custom command prefix: %s",
+                self._guild_id,
+                self._guild_name,
+                self._command_prefix,
+            )
 
     async def save_guild_options_file(self) -> None:
         """

@@ -347,6 +347,8 @@ def sanity_checks(args: argparse.Namespace, optional: bool = True) -> None:
     # Display an update check, if enabled.
     if not args.no_update_check:
         opt_check_updates()
+    else:
+        log.info("Skipped checking for updates.")
 
     log.info("Optional checks passed.")
 

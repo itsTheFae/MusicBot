@@ -686,7 +686,6 @@ class Spotify:
                 if r.status != 200:
                     # Note:  when status == 429 we could check for "Retry*" headers.
                     # however, this isn't an API endpoint, so we don't get Retry data.
-                    # TODO: check if changing UA string would work around 429.
                     raise SpotifyError(
                         f"API response status is not OK: [{r.status}]  {r.reason}"
                     )

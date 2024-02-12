@@ -672,6 +672,7 @@ class MusicBot(discord.Client):
         player.skip_state.reset()
 
         # This is the one event where it's ok to serialize autoplaylist entries
+        # TODO:  we can prevent it with: if entry.from_auto_playlist:
         await self.serialize_queue(player.voice_client.channel.guild)
 
         if self.config.write_current_song:
