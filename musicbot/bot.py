@@ -5517,6 +5517,19 @@ class MusicBot(discord.Client):
             delete_after=60,
         )
 
+    async def cmd_botversion(self) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}botversion
+
+        Prints the current bot version to chat.
+        """
+        return Response(
+            "https://github.com/Just-Some-Bots/MusicBot\n"
+            f"Current version:  `{BOTVERSION}`",
+            delete_after=30,
+        )
+
     async def cmd_testready(self, channel: MessageableChannel) -> CommandResponse:
         # TODO: remove this. :)
         """
