@@ -478,7 +478,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             "-v",
             "quiet",
             "-of",
-            'csv=p=0',
+            "csv=p=0",
         ]
 
         try:
