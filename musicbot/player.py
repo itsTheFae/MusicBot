@@ -70,9 +70,9 @@ class SourcePlaybackCounter(AudioSource):
 class MusicPlayer(EventEmitter, Serializable):
     def __init__(
         self,
-        bot: MusicBot,
+        bot: "MusicBot",
         voice_client: VoiceClient,
-        playlist: Playlist,
+        playlist: "Playlist",
     ):
         """
         Manage a MusicPlayer with all its bits and bolts.
@@ -82,12 +82,12 @@ class MusicPlayer(EventEmitter, Serializable):
         :param: playlist:  a collection of playable entries to be played.
         """
         super().__init__()
-        self.bot: MusicBot = bot
+        self.bot: "MusicBot" = bot
         self.loop: asyncio.AbstractEventLoop = bot.loop
         self.loopqueue: bool = False
         self.repeatsong: bool = False
         self.voice_client: VoiceClient = voice_client
-        self.playlist: Playlist = playlist
+        self.playlist: "Playlist" = playlist
         self.autoplaylist: List[str] = []
         self.state: MusicPlayerState = MusicPlayerState.STOPPED
         self.skip_state: SkipState = SkipState()
@@ -120,7 +120,7 @@ class MusicPlayer(EventEmitter, Serializable):
             self._source._source.volume = value
 
     def on_entry_added(
-        self, playlist: Playlist, entry: EntryTypes, defer_serialize: bool = False
+        self, playlist: "Playlist", entry: EntryTypes, defer_serialize: bool = False
     ) -> None:
         """
         Event dispatched by Playlist when an entry is added to the queue.
@@ -433,11 +433,11 @@ class MusicPlayer(EventEmitter, Serializable):
     def _deserialize(
         cls,
         raw_json: Dict[str, Any],
-        bot: Optional[MusicBot] = None,
+        bot: Optional["MusicBot"] = None,
         voice_client: Optional[VoiceClient] = None,
-        playlist: Optional[Playlist] = None,
+        playlist: Optional["Playlist"] = None,
         **kwargs: Any,
-    ) -> MusicPlayer:
+    ) -> "MusicPlayer":
         assert bot is not None, cls._bad("bot")
         assert voice_client is not None, cls._bad("voice_client")
         assert playlist is not None, cls._bad("playlist")
@@ -462,10 +462,10 @@ class MusicPlayer(EventEmitter, Serializable):
     def from_json(
         cls,
         raw_json: str,
-        bot: MusicBot,  # pylint: disable=unused-argument
+        bot: "MusicBot",  # pylint: disable=unused-argument
         voice_client: VoiceClient,  # pylint: disable=unused-argument
-        playlist: Playlist,  # pylint: disable=unused-argument
-    ) -> Optional[MusicPlayer]:
+        playlist: "Playlist",  # pylint: disable=unused-argument
+    ) -> Optional["MusicPlayer"]:
         """
         Create a MusicPlayer instance from serialized `raw_json` string data.
         The remaining arguments are made available to the MusicPlayer

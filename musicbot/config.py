@@ -1,4 +1,3 @@
-import codecs
 import configparser
 import logging
 import os
@@ -82,9 +81,13 @@ class Config:
         config = ExtendedConfigParser(interpolation=None)
         config.read(config_file, encoding="utf-8")
 
-        confsections = {"Credentials", "Permissions", "Chat", "MusicBot"}.difference(
-            config.sections()
-        )
+        confsections = {
+            "Credentials",
+            "Permissions",
+            "Chat",
+            "MusicBot",
+            "Files",
+        }.difference(config.sections())
         if confsections:
             sections_str = ", ".join([f"[{s}]" for s in confsections])
             raise HelpfulError(
@@ -598,8 +601,11 @@ class Config:
 
 
 class ConfigDefaults:
-    owner_id: int = 0
+    """
+    This class contains default values used mainly as config fallback values.
+    """
 
+    owner_id: int = 0
     token: str = ""
     dev_ids: Set[int] = set()
     bot_exception_ids: Set[int] = set()
@@ -667,18 +673,21 @@ class ConfigDefaults:
     # default true here since the file being populated was previously how it was enabled.
     user_blocklist_enabled: bool = True
 
+    # Create path objects from the constants.
     options_file: pathlib.Path = pathlib.Path(DEFAULT_OPTIONS_FILE)
     user_blocklist_file: pathlib.Path = pathlib.Path(DEFAULT_USER_BLOCKLIST_FILE)
     song_blocklist_file: pathlib.Path = pathlib.Path(DEFAULT_SONG_BLOCKLIST_FILE)
     auto_playlist_file: pathlib.Path = pathlib.Path(DEFAULT_AUTOPLAYLIST_FILE)
     i18n_file: pathlib.Path = pathlib.Path(DEFAULT_I18N_FILE)
-    audio_cache_path: pathlib.Path = pathlib.Path(
-        os.path.join(os.getcwd(), DEFAULT_AUDIO_CACHE_PATH)
-    )
+    audio_cache_path: pathlib.Path = pathlib.Path(DEFAULT_AUDIO_CACHE_PATH).absolute()
 
 
 class ExtendedConfigParser(configparser.ConfigParser):
-    """A collection of typed converters for ConfigParser."""
+    """
+    A collection of typed converters to extend ConfigParser.
+    These methods are also responsible for validation and raising HelpfulErrors
+    for issues detected with the values.
+    """
 
     def getownerid(
         self,
@@ -822,23 +831,6 @@ class ExtendedConfigParser(configparser.ConfigParser):
         if not val and fallback:
             return set(fallback)
         return set(x for x in val.replace(",", " ").split())
-
-
-setattr(
-    ConfigDefaults,
-    codecs.decode(b"ZW1haWw=", "\x62\x61\x73\x65\x36\x34").decode("ascii"),
-    None,
-)
-setattr(
-    ConfigDefaults,
-    codecs.decode(b"cGFzc3dvcmQ=", "\x62\x61\x73\x65\x36\x34").decode("ascii"),
-    None,
-)
-setattr(
-    ConfigDefaults,
-    codecs.decode(b"dG9rZW4=", "\x62\x61\x73\x65\x36\x34").decode("ascii"),
-    None,
-)
 
 
 class Blocklist:
