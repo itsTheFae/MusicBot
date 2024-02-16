@@ -447,6 +447,8 @@ disable=raw-checker-failed,
         too-many-branches,
         too-many-locals,
         
+        import-outside-toplevel,
+        
         missing-module-docstring,
         missing-class-docstring,
         
