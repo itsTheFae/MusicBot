@@ -646,10 +646,13 @@ def format_song_duration(seconds: Union[int, float, datetime.timedelta]) -> str:
 
     # Simply remove any microseconds from the delta.
     time_delta = str(seconds).split(".", maxsplit=1)[0]
+    t_hours = seconds.seconds / 3600
 
-    # Check the hours portion for empty 0 and remove it.
-    duration_array = time_delta.split(":")
-    return time_delta if int(duration_array[0]) > 0 else ":".join(duration_array[1:])
+    # if hours is 0 remove it.
+    if seconds.days == 0 and t_hours < 1:
+        duration_array = time_delta.split(":")
+        return ":".join(duration_array[1:])
+    return time_delta
 
 
 def format_size_from_bytes(size_bytes: int) -> str:
