@@ -613,13 +613,10 @@ class MusicBot(discord.Client):
 
     async def disconnect_voice_client(self, guild: discord.Guild) -> None:
         """
-        Check for a client in the given `guild` and disconnect it gracefully.
-        The player will be removed to MusicBot.players list, and associated
-        event timers will be reset.
+        Check for a MusicPlayer in the given `guild` and close it's VoiceClient
+        gracefully then remove the MusicPlayer instance and reset any timers on
+        the guild for player/channel inactivity.
         """
-        vc = self.voice_client_in(guild)
-        if not vc:
-            return
 
         if guild.id in self.players:
             player = self.players.pop(guild.id)
@@ -631,30 +628,56 @@ class MusicBot(discord.Client):
                 if event.is_active() and not event.is_set():
                     event.set()
 
+            if player.voice_client.is_connected():
+                await player.voice_client.disconnect()
+                # I assume aiohttp needs a context switch to ensure SSL connection clean up.
+                # this very short sleep should let that happen.
+                await asyncio.sleep(0.3)
+
             player.kill()
 
         await self.update_now_playing_status()
-        await vc.disconnect()
 
     async def disconnect_all_voice_clients(self) -> None:
         """
         Loop over all available self.voice_clients and use their guild id
-        to disconnect their VoiceClient...
+        to shutdown and associated MusicPlayer instances.
+        If the VoiceClient does not belong to a MusicPlayer it will issue a warning
+        and shutdown the VoiceClient any ways.
         """
         for vc in self.voice_clients:
             if isinstance(vc, discord.VoiceClient):
+                # teardown the MusicPlayer in this voice channel.
                 await self.disconnect_voice_client(vc.guild)
+
+                # just in case this VoiceClient is not attached to a MusicPlayer.
+                if vc.is_connected():
+                    log.debug(
+                        "Disconnecting a VoiceClient which wasn't disconnected with a MusicPlayer!"
+                    )
+                    await vc.disconnect()
+                    # short sleep to ensure aiohttp connection is cleaned up.
+                    await asyncio.sleep(0.3)
             else:
                 log.warning(
-                    "Hmm, our voice_clients list contains a non-VoiceClient object?"
+                    "Hmm, our voice_clients list contains a non-VoiceClient object?\n"
+                    "The object is actually of type:  %s",
+                    type(vc),
                 )
 
     def get_player_in(self, guild: discord.Guild) -> Optional[MusicPlayer]:
-        """Get a MusicPlayer in the given guild, but do not create a new player."""
+        """
+        Get a MusicPlayer in the given guild, but do not create a new player.
+        MusicPlayer returned from this method may not be connected to a voice channel!
+        """
         p = self.players.get(guild.id)
         log.everything(  # type: ignore[attr-defined]
             "Guild (%s) wants a player, optional:  %s", guild, repr(p)
         )
+        if p and not p.voice_client:
+            log.debug("MusicPlayer is missing a VoiceClient somehow.")
+        if p and p.voice_client and not p.voice_client.is_connected():
+            log.debug("MusicPlayer has a VoiceClient that is not connected!")
         return p
 
     async def get_player(
@@ -3958,9 +3981,9 @@ class MusicBot(discord.Client):
                 )
             )
 
-        voice_client = self.voice_client_in(guild)
-        if voice_client and guild == author.voice.channel.guild:
-            await voice_client.move_to(author.voice.channel)
+        player = self.get_player_in(guild)
+        if player and player.voice_client and guild == author.voice.channel.guild:
+            await player.voice_client.move_to(author.voice.channel)
         else:
             # move to _verify_vc_perms?
             chperms = author.voice.channel.permissions_for(guild.me)
@@ -6309,12 +6332,3 @@ class MusicBot(discord.Client):
                 log.everything(  # type: ignore[attr-defined]
                     f"Channel attribute {name} is now: {a_val}  -- Was: {b_val}"
                 )
-
-    def voice_client_in(self, guild: discord.Guild) -> Optional[discord.VoiceClient]:
-        """
-        Check for and return discord.VoiceClient object if one exists for the given `guild`.
-        """
-        for vc in self.voice_clients:
-            if isinstance(vc, discord.VoiceClient) and vc.guild == guild:
-                return vc
-        return None
