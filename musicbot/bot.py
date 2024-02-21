@@ -1900,13 +1900,18 @@ class MusicBot(discord.Client):
             self._log_configs()
 
         # we do this after the config stuff because it's a lot easier to notice here
-        if self.config.missing_keys:
+        if self.config.register.ini_missing_options:
+            missing_list = "\n".join(
+                str(o) for o in self.config.register.ini_missing_options
+            )
             conf_warn = exceptions.HelpfulError(
                 preface="Detected missing config options!",
-                issue="Your options.ini file is missing some options. Defaults will be used for this session.\n"
-                f"Here is a list of options we think are missing:\n    {', '.join(self.config.missing_keys)}",
+                issue=(
+                    "Your config file is missing some options. Defaults will be used for this session.\n"
+                    f"Here is a list of options we think are missing:\n{missing_list}"
+                ),
                 solution="Check the example_options.ini file for newly added options and copy them to your config.",
-                footnote="The bot will continue executing in 3 seconds.",
+                footnote="The bot will continue executing in 3 seconds.  You can also use the `config` command to sort this out.",
             )
             log.warning(str(conf_warn)[1:])
             await asyncio.sleep(3)
@@ -4511,6 +4516,217 @@ class MusicBot(discord.Client):
             ).format(new_volume),
             expire_in=20,
         )
+
+    @owner_only
+    async def cmd_config(
+        self,
+        user_mentions: List[discord.Member],
+        channel_mentions: List[discord.abc.GuildChannel],
+        option: str,
+        leftover_args: List[str],
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}config missing
+                Shows help text about any missing config options.
+
+            {command_prefix}config diff
+                Lists the names of options which have been changed since loading config file.
+
+            {command_prefix}config list
+                List the available config options and their sections.
+
+            {command_prefix}config help [Section] [Option]
+                Shows help text for a specific option.
+
+            {command_prefix}config show [Section] [Option]
+                Display the current value of the option.
+
+            {command_prefix}config save [Section] [Option]
+                Saves the current current value to the options file.
+
+            {command_prefix}config set [Section] [Option] [value]
+                Validates the option and sets the config for the session, but not to file.
+
+        This command allows management of MusicBot config options file.
+        """
+        if user_mentions and channel_mentions:
+            raise exceptions.CommandError(
+                "Config cannot use channel and user mentions at the same time.",
+                expire_in=30,
+            )
+
+        valid_options = ["missing", "diff", "list", "save", "help", "show", "set"]
+        if option not in valid_options:
+            raise exceptions.CommandError(
+                f"Invalid option for command: `{option}`",
+                expire_in=30,
+            )
+
+        # Show missing options with help text.
+        if option == "missing":
+            missing = ""
+            for opt in self.config.register.ini_missing_options:
+                missing += (
+                    f"**Missing Option:** `{opt}`\n"
+                    "```"
+                    f"{opt.comment}\n"
+                    f"Default is set to:  {opt.default}"
+                    "```\n"
+                )
+            if not missing:
+                missing = "*All config options are present and accounted for!*"
+
+            return Response(
+                missing,
+                delete_after=60,
+            )
+
+        # Show options names that have changed since loading.
+        if option == "diff":
+            changed = ""
+            for opt in self.config.register.get_updated_options():
+                changed += f"`{str(opt)}`\n"
+
+            if not changed:
+                changed = "No config options appear to be changed."
+            else:
+                changed = f"**Changed Options:**\n{changed}"
+
+            return Response(
+                changed,
+                delete_after=60,
+            )
+
+        # List all available options.
+        if option == "list":
+            non_edit_opts = ""
+            editable_opts = ""
+            for opt in self.config.register.option_list:
+                if opt.editable:
+                    editable_opts += f"`{opt}`\n"
+                else:
+                    non_edit_opts += f"`{opt}`\n"
+
+            opt_list = (
+                f"## Available Options:\n"
+                f"**Editable Options:**\n{editable_opts}\n"
+                f"**Manual Edit Only:**\n{non_edit_opts}"
+            )
+            return Response(
+                opt_list,
+                delete_after=60,
+            )
+
+        # sub commands beyond here need 2 leftover_args
+        if option in ["help", "show", "save"]:
+            if len(leftover_args) < 2:
+                raise exceptions.CommandError(
+                    "You must provide a section name and option name for this command.",
+                    expire_in=30,
+                )
+
+        # Get the command args from leftovers and check them.
+        section_arg = leftover_args.pop(0)
+        option_arg = leftover_args.pop(0)
+        if user_mentions:
+            leftover_args += [str(m.id) for m in user_mentions]
+        if channel_mentions:
+            leftover_args += [str(ch.id) for ch in channel_mentions]
+        value_arg = " ".join(leftover_args)
+        p_opt = self.config.register.get_config_option(section_arg, option_arg)
+
+        if section_arg not in self.config.register.sections:
+            sects = ", ".join(self.config.register.sections)
+            raise exceptions.CommandError(
+                f"The section `{section_arg}` is not available.\n"
+                f"The available sections are:  {sects}",
+                expire_in=30,
+            )
+
+        if p_opt is None:
+            option_arg = f"[{section_arg}] > {option_arg}"
+            raise exceptions.CommandError(
+                f"The option `{option_arg}` is not available.",
+                expire_in=30,
+            )
+        opt = p_opt
+
+        # Display some commentary about the option and its default.
+        if option == "help":
+            default = "\nThis option can only be set by editing the config file."
+            if opt.editable:
+                default = f"\nBy default this option is set to: {opt.default}"
+            return Response(
+                f"**Option:** `{opt}`\n{opt.comment}{default}",
+                delete_after=60,
+            )
+
+        # Save the current config value to the INI file.
+        if option == "save":
+            if not opt.editable:
+                raise exceptions.CommandError(
+                    f"Option `{opt}` is not editable. Cannot save to disk.",
+                    expire_in=30,
+                )
+
+            async with self.aiolocks["config_edit"]:
+                saved = self.config.save_option(opt)
+
+            if not saved:
+                raise exceptions.CommandError(
+                    f"Failed to save the option:  `{opt}`",
+                    expire_in=30,
+                )
+            return Response(
+                f"Successfully saved the option:  `{opt}`",
+                delete_after=30,
+            )
+
+        # Display the current config and INI file values.
+        if option == "show":
+            if not opt.editable:
+                raise exceptions.CommandError(
+                    f"Option `{opt}` is not editable, value cannot be displayed.",
+                    expire_in=30,
+                )
+            cur_val, ini_val = self.config.register.get_values(opt)
+            return Response(
+                f"**Option:** `{opt}`\n"
+                f"Current Value:  `{cur_val}`\n"
+                f"INI File Value:  `{ini_val}`",
+                delete_after=30,
+            )
+
+        # update a config variable, but don't save it.
+        if option == "set":
+            if not opt.editable:
+                raise exceptions.CommandError(
+                    f"Option `{opt}` is not editable. Cannot update setting.",
+                    expire_in=30,
+                )
+
+            if not value_arg:
+                raise exceptions.CommandError(
+                    "You must provide a section, option, and value for this sub command.",
+                    expire_in=30,
+                )
+
+            log.debug("Doing set with on %s == %s", opt, value_arg)
+            async with self.aiolocks["config_update"]:
+                updated = self.config.update_option(opt, value_arg)
+            if not updated:
+                raise exceptions.CommandError(
+                    f"Option `{opt}` was not updated!",
+                    expire_in=30,
+                )
+            return Response(
+                f"Option `{opt}` was updated for this session.\n"
+                f"To save the change use `config save {opt.section} {opt.option}`",
+                delete_after=30,
+            )
+
+        return None
 
     @owner_only
     async def cmd_option(self, option: str, value: str) -> CommandResponse:
