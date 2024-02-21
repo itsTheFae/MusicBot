@@ -494,7 +494,7 @@ class Config:
         )
         self.leave_after_queue_empty: bool = self.register.init_option(
             section="MusicBot",
-            option="LeaveAfterSong",
+            option="LeaveAfterQueueEmpty",
             dest="leave_after_queue_empty",
             default=ConfigDefaults.leave_after_queue_empty,
             getter="getboolean",
