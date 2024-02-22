@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     import discord
 
     from .bot import MusicBot
+    from .permissions import Permissions
 
 # Type for ConfigParser.get(... vars) argument
 ConfVars = Optional[Dict[str, str]]
@@ -873,6 +874,7 @@ class Config:
     def update_option(self, option: "ConfigOption", value: str) -> bool:
         """
         Uses option data to parse the given value and update its associated config.
+        No data is saved to file however.
         """
         tmp_parser = ExtendedConfigParser()
         tmp_parser.read_dict({option.section: {option.option: value}})
@@ -893,6 +895,22 @@ class Config:
         except (HelpfulError, ValueError, TypeError):
             return False
 
+    def _mk_new_ini_option(
+        self, option: "ConfigOption", new_value: str = ""
+    ) -> List[str]:
+        """
+        Format an option with its help text to be inserted in place of missing options.
+        """
+        new_lines = []
+        for line in option.comment.split("\n"):
+            new_lines.append(f"# {line}")
+
+        ini_default = self.register.to_ini(option, use_default=True)
+        new_lines.append(f"# Default for this setting is:  {ini_default}")
+        new_lines.append(f"{option.option} = {new_value}")
+        new_lines.append("")  # empty line for spacing.
+        return new_lines
+
     def save_option(self, option: "ConfigOption") -> bool:
         """
         Converts the current Config value into an INI file value as needed.
@@ -903,8 +921,31 @@ class Config:
             data = self.config_file.read_text(encoding="utf8")
             lines = data.split("\n")
             newlines = []
+            notfound = True
+            cur_section = ""
             for line in lines:
-                if line.startswith(option.option):
+                # deal with opening and closing sections.
+                if line.startswith("[") and line.endswith("]"):
+                    # extract section name from the line.
+                    this_section = line[1:-1]
+
+                    # Are we at the end of a section?
+                    if cur_section != this_section:
+                        # deal with section missing option entirely.
+                        if notfound and option.section == cur_section:
+                            log.debug(
+                                "Adding new option to end of section:  %s", cur_section
+                            )
+                            newlines += self._mk_new_ini_option(
+                                option, new_value=self.register.to_ini(option)
+                            )
+                            notfound = False
+                        # update section name tracking now.
+                        cur_section = this_section
+
+                # if this line has the option we are looking for, replace the line.
+                if line.startswith(option.option) and cur_section == option.section:
+                    notfound = False
                     new_val = self.register.to_ini(option)
                     line = f"{option.option} = {new_val}"
                 newlines.append(line)
@@ -1016,6 +1057,8 @@ class ConfigOption:
         comment: str,
         getter: str = "get",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> None:
         """
         Defines a configuration option in MusicBot and attributes used to
@@ -1028,6 +1071,7 @@ class ConfigOption:
         :param: default:    The default value for this option if it is missing or invalid.
         :param: comment:    A comment or help text to show for this option.
         :param: editable:   If this option can be changed via commands.
+        :param: invisible:  (Permissions only) hide from display when formatted for per-user display.
         """
         self.section = section
         self.option = option
@@ -1036,6 +1080,8 @@ class ConfigOption:
         self.default = default
         self.comment = comment
         self.editable = editable
+        self.invisible = invisible
+        self.empty_display_val = empty_display_val
 
     def __str__(self) -> str:
         return f"[{self.section}] > {self.option}"
@@ -1047,7 +1093,9 @@ class ConfigOptionRegistry:
     query the state of configurations or translate them.
     """
 
-    def __init__(self, config: Config, parser: "ExtendedConfigParser") -> None:
+    def __init__(
+        self, config: Union[Config, "Permissions"], parser: "ExtendedConfigParser"
+    ) -> None:
         """
         Manage a configuration registry that associates config options to their
         parent section, a runtime name, validation for values, and commentary
@@ -1175,6 +1223,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "get",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> str:
         pass
 
@@ -1188,6 +1238,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getboolean",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> bool:
         pass
 
@@ -1201,6 +1253,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getint",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> int:
         pass
 
@@ -1214,6 +1268,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getfloat",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> float:
         pass
 
@@ -1227,6 +1283,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getidset",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> Set[int]:
         pass
 
@@ -1240,6 +1298,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getstrset",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> Set[str]:
         pass
 
@@ -1253,6 +1313,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getdebuglevel",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> DebugLevel:
         pass
 
@@ -1266,6 +1328,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "getpathlike",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> pathlib.Path:
         pass
 
@@ -1278,6 +1342,8 @@ class ConfigOptionRegistry:
         comment: str,
         getter: str = "get",
         editable: bool = True,
+        invisible: bool = False,
+        empty_display_val: str = "",
     ) -> RegTypes:
         """
         Register an option while getting its configuration value at the same time.
@@ -1306,6 +1372,8 @@ class ConfigOptionRegistry:
             getter=getter,
             comment=comment,
             editable=editable,
+            invisible=invisible,
+            empty_display_val=empty_display_val,
         )
         self._option_list.append(config_opt)
         self._sections.add(section)
@@ -1323,45 +1391,53 @@ class ConfigOptionRegistry:
             )
         return opt
 
-    def to_ini(self, option: ConfigOption) -> str:
+    def to_ini(self, option: ConfigOption, use_default: bool = False) -> str:
         """
         Convert the parsed config value into an INI value.
-        This method does not perform validation, simply converts the current value.
+        This method does not perform validation, simply converts the value.
+
+        :param: use_default:  return the default value instead of current config.
         """
-        if not hasattr(self._config, option.dest):
-            raise AttributeError(
-                f"Dev Bug! Attribute `Config.{option.dest}` does not exist."
-            )
+        if use_default:
+            conf_value = option.default
+        else:
+            if not hasattr(self._config, option.dest):
+                raise AttributeError(
+                    f"Dev Bug! Attribute `Config.{option.dest}` does not exist."
+                )
 
-        conf_value = getattr(self._config, option.dest)
+            conf_value = getattr(self._config, option.dest)
+        return self._value_to_ini(conf_value, option.getter)
 
-        if option.getter == "get":
+    def _value_to_ini(self, conf_value: RegTypes, getter: str) -> str:
+        """Converts a value to an ini string."""
+        if getter == "get":
             return str(conf_value)
 
-        if option.getter == "getint":
+        if getter == "getint":
             return str(conf_value)
 
-        if option.getter == "getfloat":
+        if getter == "getfloat":
             return f"{conf_value:.3f}"
 
-        if option.getter == "getboolean":
+        if getter == "getboolean":
             return "yes" if conf_value else "no"
 
-        if option.getter in ["getstrset", "getidset"]:
+        if getter in ["getstrset", "getidset"] and isinstance(conf_value, set):
             return ", ".join(str(x) for x in conf_value)
 
-        if option.getter == "getdatasize":
+        if getter == "getdatasize" and isinstance(conf_value, int):
             return format_size_from_bytes(conf_value)
 
-        if option.getter == "getduration":
-            td = datetime.timedelta(seconds=conf_value)
+        if getter == "getduration" and isinstance(conf_value, (int, float)):
+            td = datetime.timedelta(seconds=round(conf_value))
             return str(td)
 
-        if option.getter == "getpathlike":
+        if getter == "getpathlike":
             return str(conf_value)
 
         # NOTE: Added for completeness but unused as debug_level is not editable.
-        if option.getter == "getdebuglevel":
+        if getter == "getdebuglevel" and isinstance(conf_value, int):
             return str(logging.getLevelName(conf_value))
 
         return str(conf_value)

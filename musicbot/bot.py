@@ -126,7 +126,9 @@ class MusicBot(discord.Client):
 
         self.config = Config(config_file)
 
-        self.permissions = Permissions(perms_file, grant_all=[self.config.owner_id])
+        self.permissions = Permissions(perms_file)
+        # Set the owner ID in case it wasn't auto...
+        self.permissions.set_owner_id(self.config.owner_id)
         self.str = I18nJson(self.config.i18n_file)
 
         if self.config.usealias:
@@ -4321,7 +4323,7 @@ class MusicBot(discord.Client):
         if permission_force_skip and (force_skip or self.config.legacy_skip):
             if (
                 not permission_force_skip
-                and not permissions.skiplooped
+                and not permissions.skip_looped
                 and player.repeatsong
             ):
                 raise exceptions.PermissionsError(
@@ -4383,7 +4385,7 @@ class MusicBot(discord.Client):
         )
 
         if skips_remaining <= 0:
-            if not permissions.skiplooped and player.repeatsong:
+            if not permissions.skip_looped and player.repeatsong:
                 raise exceptions.PermissionsError(
                     self.str.get(
                         "cmd-skip-vote-noperms-looped-song",
@@ -4416,7 +4418,7 @@ class MusicBot(discord.Client):
             )
 
         # TODO: When a song gets skipped, delete the old x needed to skip messages
-        if not permissions.skiplooped and player.repeatsong:
+        if not permissions.skip_looped and player.repeatsong:
             raise exceptions.PermissionsError(
                 self.str.get(
                     "cmd-skip-vote-noperms-looped-song",
@@ -5305,7 +5307,7 @@ class MusicBot(discord.Client):
             return Response("Sent a message with a list of IDs.", delete_after=20)
         return None
 
-    async def cmd_perms(
+    async def cmd_listperms(
         self,
         author: discord.Member,
         channel: MessageableChannel,
@@ -5343,23 +5345,36 @@ class MusicBot(discord.Client):
         permissions = self.permissions.for_user(user)
 
         if user == author:
-            lines = [f"Command permissions in {guild.name}\n", "```", "```"]
+            perms = (
+                f"Your command permissions in {guild.name} are:\n"
+                f"```{permissions.format(for_user=True)}```"
+            )
         else:
-            lines = [
-                f"Command permissions for {user.name} in {guild.name}\n",
-                "```",
-                "```",
-            ]
+            perms = (
+                f"The command permissions for {user.name} in {guild.name} are:\n"
+                f"```{permissions.format()}```"
+            )
 
-        for perm in permissions.__dict__:
-            # TODO: double check this still works as desired.
-            if perm in ["user_list"] or permissions.__dict__[perm] == set():
-                continue
-            perm_data = permissions.__dict__[perm]
-            lines.insert(len(lines) - 1, f"{perm}: {perm_data}")
-
-        await self.safe_send_message(author, "\n".join(lines), fallback_channel=channel)
+        await self.safe_send_message(author, perms, fallback_channel=channel)
         return Response("\N{OPEN MAILBOX WITH RAISED FLAG}", delete_after=20)
+
+    async def cmd_perms(self) -> None:
+        """
+        Usage:
+            {command_prefix}perms
+                show groups
+            {command_prefix}perms add [GroupName]
+                add new group with defaults
+            {command_prefix}perms remove GroupName
+                remove existing group
+            {command_prefix}perms show [GroupName] [PermName]
+                show permission value
+            {command_prefix}perms set [] [] []
+                set permission value
+            {command_prefix}perms save
+                save permissions file.
+        """
+        raise exceptions.CommandError("Not Implemented. Yet..")
 
     @owner_only
     async def cmd_setname(self, leftover_args: List[str], name: str) -> CommandResponse:
@@ -6144,24 +6159,9 @@ class MusicBot(discord.Client):
                     handler_kwargs[key] = arg_value
                     params.pop(key)
 
+            # Test non-owners for command permissions.
             if message.author.id != self.config.owner_id:
-                if (
-                    user_permissions.command_whitelist
-                    and command not in user_permissions.command_whitelist
-                ):
-                    raise exceptions.PermissionsError(
-                        f"This command is not enabled for your group ({user_permissions.name}).",
-                        expire_in=20,
-                    )
-
-                if (
-                    user_permissions.command_blacklist
-                    and command in user_permissions.command_blacklist
-                ):
-                    raise exceptions.PermissionsError(
-                        f"This command is disabled for your group ({user_permissions.name}).",
-                        expire_in=20,
-                    )
+                user_permissions.can_use_command(command)
 
             # Invalid usage, return docstring
             if params:
