@@ -34,13 +34,16 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
-
-- Adds logic to check for updates to MusicBot via git and for dependencies via pip.
+- Adds re-try logic to get_player to (hopefully) deal with initial connection failures.
+- Changes to player/voice handling to (hopefully) prevent dead players.
+- Changes on_ready event to call status update and join channels after the event.
+- Further updates to start-up to (hopefully) gracefully fail and install dependencies.
+- Adds logic to check for updates to MusicBot via git and for dependencies via pip.  **[merged]**
   - Adds new command `checkupdates` to print status about available updates.
   - Adds new CLI flag `--no-update-check` to disable checking for updates on startup.
   - Adds new CLI flag `--no-install-deps` to disable automatic install of dependencies when ImportError happens.
-- Improved security of subprocess command execution, to reduce command/shell injection risks.
-- Updates blocklist feature and adds block list for songs as well as users.
+- Improved security of subprocess command execution, to reduce command/shell injection risks.  **[merged]**
+- Updates blocklist feature and adds block list for songs as well as users.  **[merged]**
   - Replaces old `blacklist` command with `blockuser` command.
   - Adds new command `blocksong` which works similarly to `blockuser` command.
   - Updates options.ini to replace or add block list options:
@@ -48,10 +51,10 @@ Here is a list of changes made so far, with most recent first:
     - Adds `[Files] SongBlocklistFile` option.
     - Adds `[MusicBot] EnableUserBlocklist` to toggle the features. Default enabled.
     - Adds `[MusicBot] EnableSongBlocklist` to toggle the features. Default disabled.
-- Auto playlist tracks are auto-skipped when a user adds a new song.
-- Update the `queue` command to add pagination by both command arg and reactions.
-- Allow `listids` and `perms` commands to fall back to sending in public if DM fails.
-- Add actual command-line arguments to control logging, show version, and skip startup checks.
+- Auto playlist tracks are auto-skipped when a user adds a new song.  **[merged]**
+- Update the `queue` command to add pagination by both command arg and reactions.  **[merged]**
+- Allow `listids` and `perms` commands to fall back to sending in public if DM fails.  **[merged]**
+- Add actual command-line arguments to control logging, show version, and skip startup checks.  **[merged]**
   - Supported CLI flags:
     - `-V` to print version and exit.
     - `--help` or `-h`  for standard help / usage.
@@ -63,16 +66,16 @@ Here is a list of changes made so far, with most recent first:
   - Update log file rotation to use file modification time, not just sort by filename.
   - Allow CLI log-level to override log level set in config/options.ini.
 - Playing compound links now works better and does not double-queue the carrier video.  **[merged]**
-- Majority of function definitions now have some kind of docstring.
+- Majority of function definitions now have some kind of docstring.  **[merged]**
 - Enforce code checks using `Pylint` and `isort` to reduce inconsistency and clean up code.
 - Ensure source code complies with mypy checks, and fix various bugs on the way.
-  - Updates MusicBot logging to enable time-based log files and safely close the logs in most cases.
+  - Updates MusicBot logging to enable time-based log files and safely close the logs in most cases.  **[merged]**
   - Removes `shlex` from the `search` command, search engines now handle quotes directly.    **[merged]**
-  - Fixes possible issues with counting members in channel not respecting bot exceptions.
-  - Updates ConfigParser to provide extra parser methods rather than relying on validation later.
-  - Updates Permissions to also use extended ConfigParser methods, for consistency.
+  - Fixes possible issues with counting members in channel not respecting bot exceptions.  **[merged]**
+  - Updates ConfigParser to provide extra parser methods rather than relying on validation later.  **[merged]**
+  - Updates Permissions to also use extended ConfigParser methods, for consistency.  **[merged]**
   - Adds requirements.dev.txt for all the bells and whistles, mostly for devs.
-  - Refactored the decorator methods to live in utils.py or be removed.
+  - Refactored the decorator methods to live in utils.py or be removed.  **[merged]**
 - Complete overhaul of ytdl information extraction and several player commands, performance focused.    **[merged]**
   - Updates `shuffleplay` to shuffle playlist entries before they are queued.  **[merged]**
   - Adds playlist name and other details to `pldump` generated files.  **[merged]**
