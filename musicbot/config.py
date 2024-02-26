@@ -939,7 +939,7 @@ class Config:
             return True
         except (
             OSError,
-            AttributeError, 
+            AttributeError,
             configparser.DuplicateSectionError,
             configparser.ParsingError,
         ):
