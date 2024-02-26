@@ -34,6 +34,9 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Adds `config` and `setperms` commands for doing config and permissions edits.
+  - Adds new dependency for configupdater package to make this work. Not optional.
+  - Refactors config system to provide registry of options, defaults, comments, and validation.
 - Adds re-try logic to get_player to (hopefully) deal with initial connection failures.
 - Changes to player/voice handling to (hopefully) prevent dead players.
 - Changes on_ready event to call status update and join channels after the event.
