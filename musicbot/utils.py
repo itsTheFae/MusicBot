@@ -759,6 +759,33 @@ def format_time_to_seconds(time_str: Union[str, int]) -> int:
     if isinstance(time_str, int):
         return time_str
 
+    # support HH:MM:SS notations like those from timedelta.__str__
+    hms_total = 0
+    if ":" in time_str:
+        parts = time_str.split()
+        for part in parts:
+            bits = part.split(":")
+            part_sec = 0
+            try:
+                # format is MM:SS
+                if len(bits) == 2:
+                    m = int(bits[0])
+                    s = int(bits[1])
+                    part_sec += (m * 60) + s
+                # format is HH:MM:SS
+                elif len(bits) == 3:
+                    h = int(bits[0] or 0)
+                    m = int(bits[1])
+                    s = int(bits[2] or 0)
+                    part_sec += (h * 3600) + (m * 60) + s
+                # format is not supported.
+                else:
+                    continue
+                hms_total += part_sec
+                time_str = time_str.replace(part, "")
+            except (ValueError, TypeError):
+                continue
+
     # TODO: find a good way to make this i18n friendly.
     time_lex = re.compile(r"(\d*\.?\d+)\s*(y|d|h|m|s)?", re.I)
     unit_seconds = {
@@ -768,7 +795,7 @@ def format_time_to_seconds(time_str: Union[str, int]) -> int:
         "m": 60,
         "s": 1,
     }
-    total_sec = 0
+    total_sec = hms_total
     for value, unit in time_lex.findall(time_str):
         if not unit:
             unit = "s"
