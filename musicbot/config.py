@@ -17,6 +17,8 @@ from typing import (
     overload,
 )
 
+import configupdater
+
 from .constants import (
     BUNDLED_AUTOPLAYLIST_FILE,
     DEFAULT_AUDIO_CACHE_PATH,
@@ -918,43 +920,27 @@ class Config:
         Should multiline values be needed, maybe use ConfigUpdater package instead.
         """
         try:
-            data = self.config_file.read_text(encoding="utf8")
-            lines = data.split("\n")
-            newlines = []
-            notfound = True
-            cur_section = ""
-            for line in lines:
-                # deal with opening and closing sections.
-                if line.startswith("[") and line.endswith("]"):
-                    # extract section name from the line.
-                    this_section = line[1:-1]
+            cu = configupdater.ConfigUpdater()
+            cu.optionxform = str  # type: ignore
+            cu.read(self.config_file, encoding="utf8")
 
-                    # Are we at the end of a section?
-                    if cur_section != this_section:
-                        # deal with section missing option entirely.
-                        if notfound and option.section == cur_section:
-                            log.debug(
-                                "Adding new option to end of section:  %s", cur_section
-                            )
-                            newlines += self._mk_new_ini_option(
-                                option, new_value=self.register.to_ini(option)
-                            )
-                            notfound = False
-                        # update section name tracking now.
-                        cur_section = this_section
-
-                # if this line has the option we are looking for, replace the line.
-                if line.startswith(option.option) and cur_section == option.section:
-                    notfound = False
-                    new_val = self.register.to_ini(option)
-                    line = f"{option.option} = {new_val}"
-                newlines.append(line)
-
-            data = "\n".join(newlines)
-            self.config_file.write_text(data, encoding="utf8")
-            log.info("Saved config option: %s  =  %s", option, new_val)
+            if option.section in list(cu.keys()):
+                if option.option not in list(cu[option.section].keys()):
+                    log.debug("Option was missing previously.")
+                cu[option.section][option.option] = self.register.to_ini(option)
+            else:
+                log.error(
+                    "Config section not in parsed config! Missing: %s", option.section
+                )
+                return False
+            cu.update_file()
+            log.info(
+                "Saved config option: %s  =  %s",
+                option,
+                cu[option.section][option.option],
+            )
             return True
-        except (OSError, AttributeError):
+        except (OSError, AttributeError, configparser.DuplicateSectionError):
             log.exception("Failed to save config:  %s", option)
             return False
 
@@ -1110,6 +1096,7 @@ class ConfigOptionRegistry:
         # registered sections.
         self._sections: Set[str] = set()
         self._options: Set[str] = set()
+        self._distinct_options: Set[str] = set()
 
         # set up missing config data.
         self.ini_missing_options: Set[ConfigOption] = set()
@@ -1378,6 +1365,7 @@ class ConfigOptionRegistry:
         self._option_list.append(config_opt)
         self._sections.add(section)
         self._options.add(str(config_opt))
+        self._distinct_options.add(option)
 
         # get the current config value.
         getfunc = getattr(self._parser, getter)

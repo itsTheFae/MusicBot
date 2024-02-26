@@ -1,8 +1,10 @@
+import configparser
 import logging
 import pathlib
 import shutil
-from typing import TYPE_CHECKING, Any, Dict, Set, Tuple, Type, Union
+from typing import TYPE_CHECKING, Dict, Set, Tuple, Type, Union
 
+import configupdater
 import discord
 
 from .config import ConfigOption, ConfigOptionRegistry, ExtendedConfigParser, RegTypes
@@ -12,7 +14,7 @@ from .constants import (
     DEFAULT_PERMS_GROUP_NAME,
     EXAMPLE_PERMS_FILE,
 )
-from .exceptions import PermissionsError
+from .exceptions import HelpfulError, PermissionsError
 
 if TYPE_CHECKING:
     from .bot import MusicBot
@@ -95,30 +97,6 @@ class PermissiveDefaults(PermissionsDefaults):
     extractors: Set[str] = set()
 
 
-class Permissive:
-    CommandWhiteList: Set[str] = set()
-    CommandBlackList: Set[str] = set()
-    IgnoreNonVoice: Set[str] = set()
-    GrantToRoles: Set[int] = set()
-    UserList: Set[int] = set()
-
-    MaxSongs: int = 0
-    MaxSongLength: int = 0
-    MaxPlaylistLength: int = 0
-    MaxSearchItems: int = 10
-
-    AllowPlaylists: bool = True
-    InstaSkip: bool = True
-    SkipLooped: bool = True
-    Remove: bool = True
-    SkipWhenAbsent: bool = False
-    BypassKaraokeMode: bool = True
-
-    SummonNoVoice: bool = True
-
-    Extractors: Set[str] = set()
-
-
 class Permissions:
     def __init__(self, perms_file: pathlib.Path) -> None:
         """
@@ -156,6 +134,12 @@ class Permissions:
                 self.groups[section] = self._generate_permissive_group(section)
             else:
                 self.groups[section] = self._generate_default_group(section)
+
+        # in case the permissions don't have a default group, make one.
+        if not self.config.has_section(DEFAULT_PERMS_GROUP_NAME):
+            self.groups[DEFAULT_PERMS_GROUP_NAME] = self._generate_default_group(
+                DEFAULT_PERMS_GROUP_NAME
+            )
 
         # in case the permissions don't have an owner group, create a virtual one.
         if not self.config.has_section(DEFAULT_OWNER_GROUP_NAME):
@@ -228,14 +212,85 @@ class Permissions:
         # Or just assign default role.
         return self.default_group
 
-    def create_group(self, name: str, **kwargs: Dict[str, Any]) -> None:
+    def add_group(self, name: str) -> None:
         """
-        Currently unused, intended to create a permission group that could
-        then be saved back to the permissions config file.
+        Creates a permission group, but does nothing to the parser.
         """
-        # TODO: Test this.  and implement the rest of permissions editing...
-        self.config.read_dict({name: kwargs})
         self.groups[name] = self._generate_default_group(name)
+
+    def remove_group(self, name: str) -> None:
+        """Removes a permission group but does nothing to the parser."""
+        del self.groups[name]
+        self.register.unregister_group(name)
+
+    def save_group(self, group: str) -> bool:
+        """
+        Converts the current Permission Group value into an INI file value as needed.
+        Note: ConfigParser must not use multi-line values. This will break them.
+        Should multiline values be needed, maybe use ConfigUpdater package instead.
+        """
+        try:
+            cu = configupdater.ConfigUpdater()
+            cu.optionxform = str  # type: ignore
+            cu.read(self.perms_file, encoding="utf8")
+
+            opts = self.register.get_option_dict(group)
+            # update/delete existing
+            if group in set(cu.keys()):
+                # update
+                if group in self.groups:
+                    for option in set(cu[group].keys()):
+                        cu[group][option].value = self.register.to_ini(opts[option])
+
+                # delete
+                else:
+                    cu.remove_section(group)
+
+            # add new
+            elif group in self.groups:
+                options = ""
+                for _, opt in opts.items():
+                    comments = "# ".join(opt.comment.split("\n"))
+                    ini_val = self.register.to_ini(opt)
+                    options += f"{comments}\n" f"{opt.option} = {ini_val}\n\n"
+                new_section = configupdater.ConfigUpdater()
+                new_section.optionxform = str  # type: ignore
+                new_section.read_string(f"[{group}]\n{options}\n")
+                cu.add_section(new_section[group].detach())
+
+            cu.update_file()
+            return True
+
+        except configparser.DuplicateSectionError:
+            log.exception("You have a duplicate section, fix your Permissions file!")
+        except OSError:
+            log.exception("Failed to save permissions group:  %s", group)
+
+        return False
+
+    def update_option(self, option: ConfigOption, value: str) -> bool:
+        """
+        Uses option data to parse the given value and update its associated permission.
+        No data is saved to file however.
+        """
+        tparser = ExtendedConfigParser()
+        tparser.read_dict({option.section: {option.option: value}})
+
+        try:
+            get = getattr(tparser, option.getter, None)
+            if not get:
+                log.critical("Dev Bug! Permission has getter that is not available.")
+                return False
+            new_conf_val = get(option.section, option.option, fallback=option.default)
+            if not isinstance(new_conf_val, type(option.default)):
+                log.error(
+                    "Dev Bug! Permission has invalid type, getter and default must be the same type."
+                )
+                return False
+            setattr(self.groups[option.section], option.dest, new_conf_val)
+            return True
+        except (HelpfulError, ValueError, TypeError):
+            return False
 
 
 class PermissionGroup:
@@ -473,6 +528,24 @@ class PermissionGroup:
 class PermissionOptionRegistry(ConfigOptionRegistry):
     def __init__(self, config: Permissions, parser: ExtendedConfigParser) -> None:
         super().__init__(config, parser)
+
+    @property
+    def distinct_options(self) -> Set[str]:
+        """Unique Permission names for Permission groups."""
+        return self._distinct_options
+
+    def get_option_dict(self, group: str) -> Dict[str, ConfigOption]:
+        """Get only ConfigOptions for the group, in a dict by option name."""
+        return {opt.option: opt for opt in self.option_list if opt.section == group}
+
+    def unregister_group(self, group: str) -> None:
+        """Removes all registered options for group."""
+        new_opts = []
+        for opt in self.option_list:
+            if opt.section == group:
+                continue
+            new_opts.append(opt)
+        self._option_list = new_opts
 
     def get_values(self, opt: ConfigOption) -> Tuple[RegTypes, str]:
         """

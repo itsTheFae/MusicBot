@@ -27,6 +27,8 @@ from . import downloader, exceptions
 from .aliases import Aliases, AliasesDefault
 from .config import Config, ConfigDefaults
 from .constants import (
+    DEFAULT_OWNER_GROUP_NAME,
+    DEFAULT_PERMS_GROUP_NAME,
     DISCORD_MSG_CHAR_LIMIT,
     EMOJI_CHECK_MARK_BUTTON,
     EMOJI_CROSS_MARK_BUTTON,
@@ -4558,6 +4560,7 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
+        option = option.lower()
         valid_options = ["missing", "diff", "list", "save", "help", "show", "set"]
         if option not in valid_options:
             raise exceptions.CommandError(
@@ -5307,7 +5310,7 @@ class MusicBot(discord.Client):
             return Response("Sent a message with a list of IDs.", delete_after=20)
         return None
 
-    async def cmd_listperms(
+    async def cmd_perms(
         self,
         author: discord.Member,
         channel: MessageableChannel,
@@ -5358,23 +5361,222 @@ class MusicBot(discord.Client):
         await self.safe_send_message(author, perms, fallback_channel=channel)
         return Response("\N{OPEN MAILBOX WITH RAISED FLAG}", delete_after=20)
 
-    async def cmd_perms(self) -> None:
+    @owner_only
+    async def cmd_setperms(
+        self,
+        user_mentions: List[discord.Member],
+        leftover_args: List[str],
+        option: str = "list",
+    ) -> CommandResponse:
         """
         Usage:
-            {command_prefix}perms
-                show groups
-            {command_prefix}perms add [GroupName]
+            {command_prefix}setperms list
+                show loaded groups and list permission options.
+
+            {command_prefix}setperms add [GroupName]
                 add new group with defaults
-            {command_prefix}perms remove GroupName
+
+            {command_prefix}setperms remove [GroupName]
                 remove existing group
-            {command_prefix}perms show [GroupName] [PermName]
+
+            {command_prefix}setperms help [PermName]
+                show help text for the permission option.
+
+            {command_prefix}setperms show [GroupName]
                 show permission value
-            {command_prefix}perms set [] [] []
+
+            {command_prefix}setperms save [GroupName]
+                save permissions group to file.
+
+            {command_prefix}setperms set [GroupName] [PermName] [Value]
                 set permission value
-            {command_prefix}perms save
-                save permissions file.
         """
-        raise exceptions.CommandError("Not Implemented. Yet..")
+        if user_mentions:
+            raise exceptions.CommandError(
+                "Permissions cannot use channel and user mentions at the same time.",
+                expire_in=30,
+            )
+
+        option = option.lower()
+        valid_options = ["list", "add", "remove", "save", "help", "show", "set"]
+        if option not in valid_options:
+            raise exceptions.CommandError(
+                f"Invalid option for command: `{option}`",
+                expire_in=30,
+            )
+
+        # List permission groups and available permission options.
+        if option == "list":
+            gl = []
+            for section in self.permissions.register.sections:
+                gl.append(f"`{section}`\n")
+
+            non_edit_opts = ""
+            editable_opts = ""
+            for opt in self.permissions.register.option_list:
+                if opt.editable:
+                    editable_opts += f"`{opt.option}`\n"
+                else:
+                    non_edit_opts += f"`{opt.option}`\n"
+
+            groups = "".join(gl)
+            opt_list = (
+                f"## Available Groups:\n{groups}\n"
+                f"## Available Options:\n"
+                f"**Editable Options:**\n{editable_opts}\n"
+                f"**Manual Edit Only:**\n{non_edit_opts}"
+            )
+            return Response(
+                opt_list,
+                delete_after=60,
+            )
+
+        # sub commands beyond here need 2 leftover_args
+        if option in ["help", "show", "save", "add", "remove"]:
+            if len(leftover_args) < 1:
+                raise exceptions.CommandError(
+                    "You must provide a group or option name for this command.",
+                    expire_in=30,
+                )
+        if option == "set" and len(leftover_args) < 3:
+            raise exceptions.CommandError(
+                "You must provide a group, option, and value to set for this command.",
+                expire_in=30,
+            )
+
+        # Get the command args from leftovers and check them.
+        group_arg = ""
+        option_arg = ""
+        if option == "help":
+            group_arg = DEFAULT_PERMS_GROUP_NAME
+            option_arg = leftover_args.pop(0)
+        else:
+            group_arg = leftover_args.pop(0)
+        if option == "set":
+            option_arg = leftover_args.pop(0)
+
+        if user_mentions:
+            leftover_args += [str(m.id) for m in user_mentions]
+        value_arg = " ".join(leftover_args)
+
+        if group_arg not in self.config.register.sections and option != "add":
+            sects = ", ".join(self.config.register.sections)
+            raise exceptions.CommandError(
+                f"The group `{group_arg}` is not available.\n"
+                f"The available groups are:  {sects}",
+                expire_in=30,
+            )
+
+        if option in ["help", "set"]:
+            p_opt = self.config.register.get_config_option(group_arg, option_arg)
+            if p_opt is None:
+                option_arg = f"[{group_arg}] > {option_arg}"
+                raise exceptions.CommandError(
+                    f"The option `{option_arg}` is not available.",
+                    expire_in=30,
+                )
+            opt = p_opt
+
+        # Display some commentary about the option and its default.
+        if option == "help":
+            default = (
+                "\nThis permission can only be set by editing the permissions file."
+            )
+            if opt.editable:
+                default = f"\nBy default this permission is set to: {opt.default}"
+            return Response(
+                f"**Permission:** `{opt.option}`\n{opt.comment}{default}",
+                delete_after=60,
+            )
+
+        if option == "add":
+            if group_arg in self.permissions.register.sections:
+                raise exceptions.CommandError(
+                    f"Cannot add group `{group_arg}` it already exists.",
+                    expire_in=30,
+                )
+            async with self.aiolocks["permission_edit"]:
+                self.permissions.add_group(group_arg)
+
+            return Response(
+                f"Successfully added new group:  `{group_arg}`",
+                delete_after=30,
+            )
+
+        if option == "remove":
+            if group_arg in [DEFAULT_OWNER_GROUP_NAME, DEFAULT_PERMS_GROUP_NAME]:
+                raise exceptions.CommandError(
+                    "Cannot remove built-in group.", expire_in=30
+                )
+
+            async with self.aiolocks["permission_edit"]:
+                self.permissions.remove_group(group_arg)
+
+            return Response(
+                f"Successfully removed group:  `{group_arg}`",
+                delete_after=30,
+            )
+
+        # Save the current config value to the INI file.
+        if option == "save":
+            if group_arg == DEFAULT_OWNER_GROUP_NAME:
+                raise exceptions.CommandError(
+                    "The owner group is not editable.",
+                    expire_in=30,
+                )
+
+            async with self.aiolocks["permission_edit"]:
+                saved = self.permissions.save_group(group_arg)
+
+            if not saved:
+                raise exceptions.CommandError(
+                    f"Failed to save the option:  `{opt}`",
+                    expire_in=30,
+                )
+            return Response(
+                f"Successfully saved the option:  `{opt}`",
+                delete_after=30,
+            )
+
+        # Display the current permissions group and INI file values.
+        if option == "show":
+            cur_val, ini_val = self.permissions.register.get_values(opt)
+            return Response(
+                f"**Permission:** `{opt}`\n"
+                f"Current Value:  `{cur_val}`\n"
+                f"INI File Value:  `{ini_val}`",
+                delete_after=30,
+            )
+
+        # update a permission, but don't save it.
+        if option == "set":
+            if group_arg == DEFAULT_OWNER_GROUP_NAME:
+                raise exceptions.CommandError(
+                    "The owner group is not editable.",
+                    expire_in=30,
+                )
+
+            if not value_arg:
+                raise exceptions.CommandError(
+                    "You must provide a section, option, and value for this sub command.",
+                    expire_in=30,
+                )
+
+            log.debug("Doing set with on %s == %s", opt, value_arg)
+            async with self.aiolocks["permission_update"]:
+                updated = self.permissions.update_option(opt, value_arg)
+            if not updated:
+                raise exceptions.CommandError(
+                    f"Permission `{opt}` was not updated!",
+                    expire_in=30,
+                )
+            return Response(
+                f"Permission `{opt}` was updated for this session.\n"
+                f"To save the change use `perms save {opt.section} {opt.option}`",
+                delete_after=30,
+            )
+
+        return None
 
     @owner_only
     async def cmd_setname(self, leftover_args: List[str], name: str) -> CommandResponse:
