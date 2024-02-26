@@ -1057,7 +1057,7 @@ class MusicBot(discord.Client):
                         "MusicBot needs to stop the autoplaylist extraction and bail."
                     )
                     return
-                except Exception:
+                except Exception:  # pylint: disable=broad-exception-caught
                     log.exception(
                         "MusicBot got an unhandled exception in player finished event."
                     )
