@@ -239,28 +239,39 @@ class Permissions:
             if group in set(cu.keys()):
                 # update
                 if group in self.groups:
+                    log.debug("Updating group in permssions file:  %s", group)
                     for option in set(cu[group].keys()):
                         cu[group][option].value = self.register.to_ini(opts[option])
 
                 # delete
                 else:
+                    log.debug("Deleting group from permissions file:  %s", group)
                     cu.remove_section(group)
 
             # add new
             elif group in self.groups:
+                log.debug("Adding new group to permissions file:  %s", group)
                 options = ""
                 for _, opt in opts.items():
-                    comments = "# ".join(opt.comment.split("\n"))
+                    c_bits = opt.comment.split("\n")
+                    if len(c_bits) > 1:
+                        comments = "".join([f"# {x}\n" for x in c_bits])
+                    else:
+                        comments = f"# {opt.comment.strip()}\n"
                     ini_val = self.register.to_ini(opt)
-                    options += f"{comments}\n" f"{opt.option} = {ini_val}\n\n"
+                    options += f"{comments}{opt.option} = {ini_val}\n\n"
                 new_section = configupdater.ConfigUpdater()
                 new_section.optionxform = str  # type: ignore
                 new_section.read_string(f"[{group}]\n{options}\n")
                 cu.add_section(new_section[group].detach())
 
+            log.debug("Saving permissions file now.")
             cu.update_file()
             return True
 
+        # except configparser.MissingSectionHeaderError:
+        except configparser.ParsingError:
+            log.exception("ConfigUpdater could not parse the permissions file!")
         except configparser.DuplicateSectionError:
             log.exception("You have a duplicate section, fix your Permissions file!")
         except OSError:

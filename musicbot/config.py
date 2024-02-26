@@ -897,22 +897,6 @@ class Config:
         except (HelpfulError, ValueError, TypeError):
             return False
 
-    def _mk_new_ini_option(
-        self, option: "ConfigOption", new_value: str = ""
-    ) -> List[str]:
-        """
-        Format an option with its help text to be inserted in place of missing options.
-        """
-        new_lines = []
-        for line in option.comment.split("\n"):
-            new_lines.append(f"# {line}")
-
-        ini_default = self.register.to_ini(option, use_default=True)
-        new_lines.append(f"# Default for this setting is:  {ini_default}")
-        new_lines.append(f"{option.option} = {new_value}")
-        new_lines.append("")  # empty line for spacing.
-        return new_lines
-
     def save_option(self, option: "ConfigOption") -> bool:
         """
         Converts the current Config value into an INI file value as needed.
@@ -927,8 +911,21 @@ class Config:
             if option.section in list(cu.keys()):
                 if option.option not in list(cu[option.section].keys()):
                     log.debug("Option was missing previously.")
-                cu[option.section][option.option] = self.register.to_ini(option)
+                    cu[option.section][option.option] = self.register.to_ini(option)
+                    c_bits = option.comment.split("\n")
+                    adder = cu[option.section][option.option].add_before
+                    adder.space()
+                    if len(c_bits) > 1:
+                        for line in c_bits:
+                            adder.comment(line)
+                    else:
+                        adder.comment(option.comment)
+                    cu[option.section][option.option].add_after.space()
+                else:
+                    cu[option.section][option.option] = self.register.to_ini(option)
             else:
+                # TODO: Maybe we should make a method that handles first-time setup
+                # or otherwise some form of auto-update thing for config?
                 log.error(
                     "Config section not in parsed config! Missing: %s", option.section
                 )
@@ -937,10 +934,15 @@ class Config:
             log.info(
                 "Saved config option: %s  =  %s",
                 option,
-                cu[option.section][option.option],
+                cu[option.section][option.option].value,
             )
             return True
-        except (OSError, AttributeError, configparser.DuplicateSectionError):
+        except (
+            OSError,
+            AttributeError, 
+            configparser.DuplicateSectionError,
+            configparser.ParsingError,
+        ):
             log.exception("Failed to save config:  %s", option)
             return False
 

@@ -5411,20 +5411,19 @@ class MusicBot(discord.Client):
             for section in self.permissions.register.sections:
                 gl.append(f"`{section}`\n")
 
-            non_edit_opts = ""
             editable_opts = ""
             for opt in self.permissions.register.option_list:
-                if opt.editable:
-                    editable_opts += f"`{opt.option}`\n"
-                else:
-                    non_edit_opts += f"`{opt.option}`\n"
+                if opt.section != DEFAULT_PERMS_GROUP_NAME:
+                    continue
+
+                # if opt.editable:
+                editable_opts += f"`{opt.option}`\n"
 
             groups = "".join(gl)
             opt_list = (
                 f"## Available Groups:\n{groups}\n"
                 f"## Available Options:\n"
-                f"**Editable Options:**\n{editable_opts}\n"
-                f"**Manual Edit Only:**\n{non_edit_opts}"
+                f"{editable_opts}\n"
             )
             return Response(
                 opt_list,
@@ -5459,8 +5458,8 @@ class MusicBot(discord.Client):
             leftover_args += [str(m.id) for m in user_mentions]
         value_arg = " ".join(leftover_args)
 
-        if group_arg not in self.config.register.sections and option != "add":
-            sects = ", ".join(self.config.register.sections)
+        if group_arg not in self.permissions.register.sections and option != "add":
+            sects = ", ".join(self.permissions.register.sections)
             raise exceptions.CommandError(
                 f"The group `{group_arg}` is not available.\n"
                 f"The available groups are:  {sects}",
@@ -5468,7 +5467,7 @@ class MusicBot(discord.Client):
             )
 
         if option in ["help", "set"]:
-            p_opt = self.config.register.get_config_option(group_arg, option_arg)
+            p_opt = self.permissions.register.get_config_option(group_arg, option_arg)
             if p_opt is None:
                 option_arg = f"[{group_arg}] > {option_arg}"
                 raise exceptions.CommandError(
@@ -5483,7 +5482,8 @@ class MusicBot(discord.Client):
                 "\nThis permission can only be set by editing the permissions file."
             )
             if opt.editable:
-                default = f"\nBy default this permission is set to: {opt.default}"
+                dval = self.permissions.register.to_ini(opt, use_default=True)
+                default = f"\nBy default this permission is set to: {dval}"
             return Response(
                 f"**Permission:** `{opt.option}`\n{opt.comment}{default}",
                 delete_after=60,
@@ -5530,11 +5530,11 @@ class MusicBot(discord.Client):
 
             if not saved:
                 raise exceptions.CommandError(
-                    f"Failed to save the option:  `{opt}`",
+                    f"Failed to save the group:  `{group_arg}`",
                     expire_in=30,
                 )
             return Response(
-                f"Successfully saved the option:  `{opt}`",
+                f"Successfully saved the group:  `{group_arg}`",
                 delete_after=30,
             )
 
