@@ -34,6 +34,8 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- All launcher files `run.sh` and `run.bat` now pass CLI arguments to python.
+- Auto playlist had some refinements in entry extraction and error handling.
 - Adds `config` and `setperms` commands for doing config and permissions edits.
   - Adds new dependency for configupdater package to make this work. Not optional.
   - Refactors config system to provide registry of options, defaults, comments, and validation.
