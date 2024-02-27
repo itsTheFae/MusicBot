@@ -3,7 +3,6 @@ import datetime
 import inspect
 import json
 import logging
-import pathlib
 import pydoc
 from collections import defaultdict
 from typing import (
@@ -21,7 +20,12 @@ from typing import (
 
 import discord
 
-from .constants import DEFAULT_BOT_ICON, DEFAULT_BOT_NAME, DEFAULT_FOOTER_TEXT
+from .constants import (
+    DEFAULT_BOT_ICON,
+    DEFAULT_BOT_NAME,
+    DEFAULT_DATA_NAME_OPTIONS,
+    DEFAULT_FOOTER_TEXT,
+)
 from .json import Json
 from .utils import _get_variable
 
@@ -161,7 +165,9 @@ class GuildSpecificData:
                 )
                 return
 
-        opt_file = pathlib.Path(f"data/{self._guild_id}/options.json")
+        opt_file = self._bot_config.data_path.joinpath(
+            str(self._guild_id), DEFAULT_DATA_NAME_OPTIONS
+        )
         if not opt_file.is_file():
             log.debug("No file for guild %s/%s", self._guild_id, self._guild_name)
             return
@@ -203,7 +209,9 @@ class GuildSpecificData:
             )
             return
 
-        opt_file = pathlib.Path(f"data/{self._guild_id}/options.json")
+        opt_file = self._bot_config.data_path.joinpath(
+            str(self._guild_id), DEFAULT_DATA_NAME_OPTIONS
+        )
 
         # Prepare a dictionary to store our options.
         opt_dict = {"command_prefix": self._command_prefix}

@@ -27,6 +27,9 @@ from . import downloader, exceptions
 from .aliases import Aliases, AliasesDefault
 from .config import Config, ConfigDefaults
 from .constants import (
+    DEFAULT_DATA_NAME_CUR_SONG,
+    DEFAULT_DATA_NAME_QUEUE,
+    DEFAULT_DATA_NAME_SERVERS,
     DEFAULT_OWNER_GROUP_NAME,
     DEFAULT_PERMS_GROUP_NAME,
     DISCORD_MSG_CHAR_LIMIT,
@@ -94,6 +97,11 @@ CommandResponse = Union[Response, None]
 
 
 log = logging.getLogger(__name__)
+
+# TODO:  Add historic auto playlist feature, save any song that is played (not skipped)
+# TODO:  Add multiple playlists, switch by name.
+# TOOD:  Add option to make plalists server-specific where desired.
+# TODO:  Add feature to handle "file://" URIs and map them to a static folder.
 
 
 class MusicBot(discord.Client):
@@ -501,7 +509,7 @@ class MusicBot(discord.Client):
                         return f"# Removed # {url}"
                     return line
 
-                # read the original file in and remove lines with the URL.
+                # read the original file in and update lines with the URL.
                 # this is done to preserve the comments and formatting.
                 try:
                     apl = pathlib.Path(self.config.auto_playlist_file)
@@ -1249,9 +1257,7 @@ class MusicBot(discord.Client):
                 await self.change_presence(status=status, activity=activity)
                 self.last_status = activity
 
-    async def serialize_queue(
-        self, guild: discord.Guild, *, path: Optional[str] = None
-    ) -> None:
+    async def serialize_queue(self, guild: discord.Guild) -> None:
         """
         Serialize the current queue for a server's player to json.
         """
@@ -1260,8 +1266,7 @@ class MusicBot(discord.Client):
         if not player:
             return
 
-        if path is None:
-            path = f"data/{guild.id}/queue.json"
+        path = self.config.data_path.joinpath(str(guild.id), DEFAULT_DATA_NAME_QUEUE)
 
         async with self.aiolocks["queue_serialization" + ":" + str(guild.id)]:
             log.debug("Serializing queue for %s", guild.id)
@@ -1274,8 +1279,6 @@ class MusicBot(discord.Client):
         guild: discord.Guild,
         voice_client: discord.VoiceClient,
         playlist: Optional[Playlist] = None,
-        *,
-        directory: Optional[str] = None,
     ) -> Optional[MusicPlayer]:
         """
         Deserialize a saved queue for a server into a MusicPlayer.  If no queue is saved, returns None.
@@ -1284,23 +1287,20 @@ class MusicBot(discord.Client):
         if playlist is None:
             playlist = Playlist(self)
 
-        if directory is None:
-            directory = f"data/{guild.id}/queue.json"
+        path = self.config.data_path.joinpath(str(guild.id), DEFAULT_DATA_NAME_QUEUE)
 
         async with self.aiolocks["queue_serialization:" + str(guild.id)]:
-            if not os.path.isfile(directory):
+            if not path.is_file():
                 return None
 
             log.debug("Deserializing queue for %s", guild.id)
 
-            with open(directory, "r", encoding="utf8") as f:
+            with open(path, "r", encoding="utf8") as f:
                 data = f.read()
 
         return MusicPlayer.from_json(data, self, voice_client, playlist)
 
-    async def write_current_song(
-        self, guild: discord.Guild, entry: EntryTypes, *, path: Optional[str] = None
-    ) -> None:
+    async def write_current_song(self, guild: discord.Guild, entry: EntryTypes) -> None:
         """
         Writes the current song to file
         """
@@ -1308,8 +1308,7 @@ class MusicBot(discord.Client):
         if not player:
             return
 
-        if path is None:
-            path = f"data/{guild.id}/current.txt"
+        path = self.config.data_path.joinpath(str(guild.id), DEFAULT_DATA_NAME_CUR_SONG)
 
         async with self.aiolocks["current_song:" + str(guild.id)]:
             log.debug("Writing current song for %s", guild.id)
@@ -1962,9 +1961,10 @@ class MusicBot(discord.Client):
         """
         log.debug("Ensuring data folders exist")
         for guild in self.guilds:
-            pathlib.Path(f"data/{guild.id}/").mkdir(exist_ok=True)
+            self.config.data_path.joinpath(str(guild.id)).mkdir(exist_ok=True)
 
-        with open("data/server_names.txt", "w", encoding="utf8") as f:
+        names_path = self.config.data_path.joinpath(DEFAULT_DATA_NAME_SERVERS)
+        with open(names_path, "w", encoding="utf8") as f:
             for guild in sorted(self.guilds, key=lambda s: int(s.id)):
                 f.write(f"{guild.id}: {guild.name}\n")
 
@@ -6691,7 +6691,7 @@ class MusicBot(discord.Client):
                     )
 
         log.debug("Creating data folder for guild %s", guild.id)
-        pathlib.Path(f"data/{guild.id}/").mkdir(exist_ok=True)
+        self.config.data_path.joinpath(str(guild.id)).mkdir(exist_ok=True)
 
     async def on_guild_remove(self, guild: discord.Guild) -> None:
         """

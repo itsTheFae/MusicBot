@@ -23,6 +23,8 @@ from .constants import (
     BUNDLED_AUTOPLAYLIST_FILE,
     DEFAULT_AUDIO_CACHE_PATH,
     DEFAULT_AUTOPLAYLIST_FILE,
+    DEFAULT_DATA_NAME_SERVERS,
+    DEFAULT_DATA_PATH,
     DEFAULT_FOOTER_TEXT,
     DEFAULT_I18N_FILE,
     DEFAULT_LOG_LEVEL,
@@ -616,6 +618,10 @@ class Config:
             getter="getpathlike",
             comment="An optional directory path where MusicBot will store long and short-term cache for playback.",
         )
+
+        # Convert all path constants into config as pathlib.Path objects.
+        self.data_path = pathlib.Path(DEFAULT_DATA_PATH).resolve()
+        self.server_names_path = self.data_path.joinpath(DEFAULT_DATA_NAME_SERVERS)
 
         # Make the registry check for missing data in the INI file.
         self.register.update_missing_config()
