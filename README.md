@@ -34,6 +34,10 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Adds bootleg Voice connection resume from network outages.
+  - Uses discord.py library reconnect logic for back-off retry, can be slow after long outages.
+  - Uses custom retry logic to attempt connection multiple times before failing.
+  - Detects network outage and automatically pauses or resumes player.
 - All launcher files `run.sh` and `run.bat` now pass CLI arguments to python.
 - Auto playlist had some refinements in entry extraction and error handling.
 - Adds `config` and `setperms` commands for doing config and permissions edits.
