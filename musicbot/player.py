@@ -66,6 +66,9 @@ class SourcePlaybackCounter(AudioSource):
         return self.progress * 0.02
 
     def cleanup(self) -> None:
+        log.noise(  # type: ignore[attr-defined]
+            "Cleanup got called on the audio source:  %s", repr(self)
+        )
         self._source.cleanup()
 
 
@@ -147,6 +150,9 @@ class MusicPlayer(EventEmitter, Serializable):
 
     def skip(self) -> None:
         """Skip the current playing entry but just killing playback."""
+        log.noise(  # type: ignore[attr-defined]
+            "MusicPlayer.skip() is called:  %s", repr(self)
+        )
         self._kill_current_player()
 
     def stop(self) -> None:
@@ -154,6 +160,9 @@ class MusicPlayer(EventEmitter, Serializable):
         Immediately halt playback, killing current player source, setting
         state to stopped and emitting an event.
         """
+        log.noise(  # type: ignore[attr-defined]
+            "MusicPlayer.stop() is called:  %s", repr(self)
+        )
         self.state = MusicPlayerState.STOPPED
         self._kill_current_player()
 
@@ -166,6 +175,9 @@ class MusicPlayer(EventEmitter, Serializable):
         If MusicPlayer was paused but the VoiceClient player is missing,
         do something odd and set state to playing but kill the player...
         """
+        log.noise(  # type: ignore[attr-defined]
+            "MusicPlayer.resume() is called:  %s", repr(self)
+        )
         if self.is_paused and self._current_player:
             self._current_player.resume()
             self.state = MusicPlayerState.PLAYING
@@ -183,6 +195,9 @@ class MusicPlayer(EventEmitter, Serializable):
         """
         Suspend player audio playback and emit an event, if the player was playing.
         """
+        log.noise(  # type: ignore[attr-defined]
+            "MusicPlayer.pause() is called:  %s", repr(self)
+        )
         if self.is_playing:
             self.state = MusicPlayerState.PAUSED
 
@@ -202,6 +217,9 @@ class MusicPlayer(EventEmitter, Serializable):
         Set the state of the bot to Dead, clear all events and playlists,
         then kill the current VoiceClient source player.
         """
+        log.noise(  # type: ignore[attr-defined]
+            "MusicPlayer.kill() is called:  %s", repr(self)
+        )
         self.state = MusicPlayerState.DEAD
         self.playlist.clear()
         self._events.clear()
@@ -286,6 +304,9 @@ class MusicPlayer(EventEmitter, Serializable):
         :param: _continue:  Force a player that is not dead or stopped to
             start a new playback source anyway.
         """
+        log.noise(  # type: ignore[attr-defined]
+            "MusicPlayer.play() is called:  %s", repr(self)
+        )
         self.loop.create_task(self._play(_continue=_continue))
 
     async def _play(self, _continue: bool = False) -> None:
