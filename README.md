@@ -34,6 +34,7 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Fix logging on Windows so module names are not `<string>` placeholder.
 - Adds bootleg Voice connection resume from network outages.
   - Uses discord.py library reconnect logic for back-off retry, can be slow after long outages.
   - Uses custom retry logic to attempt connection multiple times before failing.
