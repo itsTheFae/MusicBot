@@ -475,7 +475,9 @@ class MusicBot(discord.Client):
                     await self.disconnect_voice_client(guild)
 
                     try:
-                        player = await self.get_player(channel, create=True, deserialize=True)
+                        player = await self.get_player(
+                            channel, create=True, deserialize=True
+                        )
                         """
                         if self.server_data[guild.id].availability_paused:
                             log.debug(
@@ -498,7 +500,9 @@ class MusicBot(discord.Client):
                 else:
                     log.debug("MusicBot will make a new MusicPlayer now...")
                     try:
-                        player = await self.get_player(channel, create=True, deserialize=True)
+                        player = await self.get_player(
+                            channel, create=True, deserialize=True
+                        )
 
                         if self.server_data[guild.id].auto_paused:
                             self.server_data[guild.id].auto_paused = False
@@ -721,10 +725,12 @@ class MusicBot(discord.Client):
         if vc and isinstance(vc, (discord.VoiceClient, discord.StageChannel)):
             # make sure it is usable
             if vc.is_connected():
-                log.debug("Reusing bots VoiceClient from guild:  %s", channel.guild)
+                log.voicedebug(  # type: ignore[attr-defined]
+                    "Reusing bots VoiceClient from guild:  %s", channel.guild
+                )
                 return vc
             # or otherwise we kill it and start fresh.
-            log.debug(
+            log.voicedebug(  # type: ignore[attr-defined]
                 "Forcing disconnect on stale VoiceClient in guild:  %s", channel.guild
             )
             try:
@@ -755,7 +761,9 @@ class MusicBot(discord.Client):
                     reconnect=True,
                     self_deaf=self.config.self_deafen,
                 )
-                log.debug("MusicBot has a VoiceClient now...")
+                log.voicedebug(  # type: ignore[attr-defined]
+                    "MusicBot has a VoiceClient now..."
+                )
                 break
             except asyncio.exceptions.TimeoutError:
                 log.warning(
@@ -883,19 +891,22 @@ class MusicBot(discord.Client):
         MusicPlayer returned from this method may not be connected to a voice channel!
         """
         p = self.players.get(guild.id)
-        log.everything(  # type: ignore[attr-defined]
-            "Guild (%s) wants a player, optional:  %s", guild, repr(p)
-        )
-        if p and not p.voice_client:
-            log.error(
-                "[BUG] MusicPlayer is missing a VoiceClient some how.  You should probably restart the bot."
+        if log.getEffectiveLevel() <= logging.EVERYTHING:  # type: ignore[attr-defined]
+            log.voicedebug(  # type: ignore[attr-defined]
+                "Guild (%s) wants a player, optional:  %s", guild, repr(p)
             )
-        if p and p.voice_client and not p.voice_client.is_connected():
-            log.warning(
-                "MusicPlayer has a VoiceClient that is not connected! You may need to restart the bot if this continues.."
-            )
-            log.noise("MusicPlayer obj:  %r", p)  # type: ignore[attr-defined]
-            log.noise("VoiceClient obj:  %r", p.voice_client)  # type: ignore[attr-defined]
+
+        if log.getEffectiveLevel() <= logging.VOICEDEBUG:  # type: ignore[attr-defined]
+            if p and not p.voice_client:
+                log.error(
+                    "[BUG] MusicPlayer is missing a VoiceClient some how.  You should probably restart the bot."
+                )
+            if p and p.voice_client and not p.voice_client.is_connected():
+                # This is normal if the bot is still connecting to voice, or
+                # if the player has been pointedly disconnected.
+                log.warning("MusicPlayer has a VoiceClient that is not connected.")
+                log.noise("MusicPlayer obj:  %r", p)  # type: ignore[attr-defined]
+                log.noise("VoiceClient obj:  %r", p.voice_client)  # type: ignore[attr-defined]
         return p
 
     async def get_player(
@@ -915,7 +926,7 @@ class MusicBot(discord.Client):
         """
         guild = channel.guild
 
-        log.everything(  # type: ignore[attr-defined]
+        log.voicedebug(  # type: ignore[attr-defined]
             "Getting a MusicPlayer for guild:  %s  In Channel:  %s  Will Create:  %s  Deserialize:  %s",
             guild,
             channel,
@@ -929,7 +940,7 @@ class MusicBot(discord.Client):
                 player = await self.deserialize_queue(guild, voice_client)
 
                 if player:
-                    log.debug(
+                    log.voicedebug(  # type: ignore[attr-defined]
                         "Created player via deserialization for guild %s with %s entries",
                         guild.id,
                         len(player.playlist),
@@ -967,7 +978,6 @@ class MusicBot(discord.Client):
 
         :returns: The player with it's event connections.
         """
-        log.debug("MusicBot._init_player()")
         player = (
             player.on("play", self.on_player_play)
             .on("resume", self.on_player_resume)
@@ -979,7 +989,6 @@ class MusicBot(discord.Client):
         )
 
         if guild:
-            log.debug("MusicPlayer init is storing player for guild:  %s", guild)
             self.players[guild.id] = player
 
         return player
@@ -6837,7 +6846,10 @@ class MusicBot(discord.Client):
         https://discordpy.readthedocs.io/en/stable/api.html#discord.on_voice_state_update
         """
         if not self.init_ok:
-            log.warning("VoiceState updated before on_ready finished")  # TODO: remove after coverage testing
+            if self.config.debug_mode:
+                log.warning(
+                    "VoiceState updated before on_ready finished"
+                )  # TODO: remove after coverage testing
             return  # Ignore stuff before ready
 
         if self.config.leave_inactive_channel:
