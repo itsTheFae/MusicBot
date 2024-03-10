@@ -719,7 +719,8 @@ class MusicBot(discord.Client):
                 channel.name,
             )
             raise exceptions.PermissionsError(
-                f"MusicBot does not have permission to Connect in channel:  `{channel.name}`"
+                f"MusicBot does not have permission to Connect in channel:  `{channel.name}`",
+                expire_in=30,
             )
         if not chperms.speak:
             log.error(
@@ -727,7 +728,8 @@ class MusicBot(discord.Client):
                 channel.name,
             )
             raise exceptions.PermissionsError(
-                f"MusicBot does not have permission to Speak in channel:  `{channel.name}`"
+                f"MusicBot does not have permission to Speak in channel:  `{channel.name}`",
+                expire_in=30,
             )
 
         # check for and return bots VoiceClient if we already have one.
@@ -883,7 +885,7 @@ class MusicBot(discord.Client):
                     log.warning("The disconnect failed or was cancelled.")
             else:
                 log.warning(
-                    "Hmm, our voice_clients list contains a non-VoiceClient object?\n"
+                    "MusicBot.voice_clients list contains a non-VoiceClient object?\n"
                     "The object is actually of type:  %s",
                     type(vc),
                 )
