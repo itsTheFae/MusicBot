@@ -4301,35 +4301,6 @@ class MusicBot(discord.Client):
         if player and player.voice_client and guild == author.voice.channel.guild:
             await player.voice_client.move_to(author.voice.channel)
         else:
-            # move to _verify_vc_perms?
-            chperms = author.voice.channel.permissions_for(guild.me)
-
-            if not chperms.connect:
-                log.warning(
-                    "Cannot join channel '%s', no permission.",
-                    author.voice.channel.name,
-                )
-                raise exceptions.CommandError(
-                    self.str.get(
-                        "cmd-summon-noperms-connect",
-                        "Cannot join channel `{0}`, no permission to connect.",
-                    ).format(author.voice.channel.name),
-                    expire_in=25,
-                )
-
-            if not chperms.speak:
-                log.warning(
-                    "Cannot join channel '%s', no permission to speak.",
-                    author.voice.channel.name,
-                )
-                raise exceptions.CommandError(
-                    self.str.get(
-                        "cmd-summon-noperms-speak",
-                        "Cannot join channel `{0}`, no permission to speak.",
-                    ).format(author.voice.channel.name),
-                    expire_in=25,
-                )
-
             player = await self.get_player(
                 author.voice.channel,
                 create=True,
