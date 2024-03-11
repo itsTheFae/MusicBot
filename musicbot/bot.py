@@ -2989,7 +2989,7 @@ class MusicBot(discord.Client):
                 player.paused_auto = False
             return
 
-        if not self.network_outage:
+        if self.network_outage:
             log.debug("Ignoring auto-pause due to network outage.")
             return
 
