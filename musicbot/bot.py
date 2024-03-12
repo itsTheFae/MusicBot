@@ -6429,7 +6429,7 @@ class MusicBot(discord.Client):
         )
 
     @owner_only
-    async def cmd_botlatency(self, author: discord.Member) -> CommandResponse:
+    async def cmd_botlatency(self) -> CommandResponse:
         """
         Usage:
             {command_prefix}botlatency
@@ -6438,6 +6438,12 @@ class MusicBot(discord.Client):
         """
         vclats = ""
         for vc in self.voice_clients:
+            if not isinstance(vc, discord.VoiceClient) or not hasattr(
+                vc.channel, "rtc_region"
+            ):
+                log.debug("Got a strange voice client entry.")
+                continue
+
             vl = vc.latency * 1000
             vla = vc.average_latency * 1000
             vclats += f" - `{vl:.0f} ms` (`{vla:.0f} ms` Avg.) in region: `{vc.channel.rtc_region}`\n"
@@ -6447,8 +6453,7 @@ class MusicBot(discord.Client):
 
         sl = self.latency * 1000
         return Response(
-            f"**API Latency:** `{sl:.0f} ms`\n"
-            f"**VoiceClient Latency:**\n{vclats}",
+            f"**API Latency:** `{sl:.0f} ms`\n**VoiceClient Latency:**\n{vclats}",
             delete_after=30,
         )
 
