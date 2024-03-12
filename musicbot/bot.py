@@ -5241,7 +5241,8 @@ class MusicBot(discord.Client):
             )
 
         # now check if page number is out of bounds.
-        limit_per_page = 10  # TODO: make this configurable, up to 25 fields per embed.
+        limit_per_page = 25  # TODO: make this configurable, up to 25 fields per embed.
+        # TODO:  actually just don't use fields, put it all into description field.
         pages_total = math.ceil(total_entry_count / limit_per_page)
         if page_number > pages_total:
             raise exceptions.CommandError(
