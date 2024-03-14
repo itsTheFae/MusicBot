@@ -88,6 +88,12 @@ MessageableChannel = Union[
     discord.GroupChannel,
     discord.PartialMessageable,
 ]
+GuildMessageableChannels = Union[
+    discord.TextChannel,
+    discord.Thread,
+    discord.VoiceChannel,
+    discord.StageChannel,
+]
 # Voice Channels that MusicBot Can connect to.
 VoiceableChannel = Union[
     discord.VoiceChannel,
@@ -1025,14 +1031,11 @@ class MusicBot(discord.Client):
         if self.config.write_current_song:
             await self.write_current_song(player.voice_client.channel.guild, entry)
 
-        channel = entry.meta.get("channel", None)
-        author = entry.meta.get("author", None)
-
-        if channel and author:
-            author_perms = self.permissions.for_user(author)
+        if entry.channel and entry.author:
+            author_perms = self.permissions.for_user(entry.author)
 
             if (
-                author not in player.voice_client.channel.members
+                entry.author not in player.voice_client.channel.members
                 and author_perms.skip_when_absent
             ):
                 newmsg = self.str.get(
@@ -1041,7 +1044,7 @@ class MusicBot(discord.Client):
                 ).format(
                     channel=player.voice_client.channel.name,
                     title=entry.title,
-                    author=entry.meta["author"].name,
+                    author=entry.author.name,
                 )
                 player.skip()
             elif self.config.now_playing_mentions:
@@ -1049,7 +1052,7 @@ class MusicBot(discord.Client):
                     "on_player_play-onChannel_playingMention",
                     "{author} - your song {title} is now playing in {channel}!",
                 ).format(
-                    author=entry.meta["author"].mention,
+                    author=entry.author.mention,
                     title=entry.title,
                     channel=player.voice_client.channel.name,
                 )
@@ -1060,7 +1063,7 @@ class MusicBot(discord.Client):
                 ).format(
                     channel=player.voice_client.channel.name,
                     title=entry.title,
-                    author=entry.meta["author"].name,
+                    author=entry.author.name,
                 )
 
         else:
@@ -1070,12 +1073,13 @@ class MusicBot(discord.Client):
                 "Now playing automatically added entry {title} in {channel}!",
             ).format(title=entry.title, channel=player.voice_client.channel.name)
 
+        np_channel: Optional[MessageableChannel] = None
         if newmsg:
-            if self.config.dm_nowplaying and author:
-                await self.safe_send_message(author, newmsg)
+            if self.config.dm_nowplaying and entry.author:
+                await self.safe_send_message(entry.author, newmsg)
                 return
 
-            if self.config.no_nowplaying_auto and not author:
+            if self.config.no_nowplaying_auto and entry.from_auto_playlist:
                 return
 
             guild = player.voice_client.guild
@@ -1091,16 +1095,11 @@ class MusicBot(discord.Client):
                         continue
 
                     if potential_channel and potential_channel.guild == guild:
-                        channel = potential_channel
+                        np_channel = potential_channel
                         break
 
-            if channel:
-                pass
-            elif not channel and last_np_msg:
-                channel = last_np_msg.channel
-            else:
-                log.debug("no channel to put now playing message into")
-                return
+            if not np_channel and last_np_msg:
+                np_channel = last_np_msg.channel
 
         if self.config.embeds:
             content = self._gen_embed()
@@ -1120,8 +1119,12 @@ class MusicBot(discord.Client):
                 content.title = newmsg
 
         # send it in specified channel
+        if not np_channel:
+            log.debug("no channel to put now playing message into")
+            return
+
         self.server_data[guild.id].last_np_msg = await self.safe_send_message(
-            channel,
+            np_channel,
             content if self.config.embeds else newmsg,
             expire_in=30 if self.config.delete_nowplaying else 0,
         )
@@ -1205,8 +1208,8 @@ class MusicBot(discord.Client):
             if not next_entry:
                 break
 
-            channel = next_entry.meta.get("channel", None)
-            author = next_entry.meta.get("author", None)
+            channel = next_entry.channel
+            author = next_entry.author
 
             if not channel or not author:
                 break
@@ -1239,13 +1242,12 @@ class MusicBot(discord.Client):
             and not player.current_entry
             and self.config.auto_playlist
         ):
+            # NOTE:  self.autoplaylist will only contain links loaded from the file.
+            #  while player.autoplaylist may contain links expanded from playlists.
+            #  the only issue is that links from a playlist might fail and fire
+            #  remove event, but no link will be removed since none will match.
             if not player.autoplaylist:
                 if not self.autoplaylist:
-                    # TODO: When I add playlist expansion, make sure that's not happening during this check.
-                    # @Fae: Could lock this but it probably isn't needed.
-                    # - if `self.autoplaylist` is already empty, and the last entry was a playlist URL
-                    # - then queued songs from that URL go into the `player.playlist`, not into `self.autoplaylist`.
-                    # So if it's empty, it will stay that way unless someone is actively adding URLs when this fires.
                     log.warning("No playable songs in the autoplaylist, disabling.")
                     self.config.auto_playlist = False
                 else:
@@ -1304,40 +1306,41 @@ class MusicBot(discord.Client):
                     log.exception(
                         "MusicBot got an unhandled exception in player finished event."
                     )
-                    return
+                    break
 
                 if info.has_entries:
-                    await player.playlist.import_from_info(
+                    log.info(
+                        "Expanding auto playlist with entries extracted from:  %s",
+                        info.url,
+                    )
+                    entries = info.get_entries_objects()
+                    pl_urls: List[str] = []
+                    for entry in entries:
+                        pl_urls.append(entry.url)
+
+                    player.autoplaylist = pl_urls + player.autoplaylist
+                    continue
+
+                try:
+                    await player.playlist.add_entry_from_info(
                         info,
                         channel=None,
                         author=None,
                         head=False,
-                        is_autoplaylist=True,
                     )
-                else:
-                    try:
-                        await player.playlist.add_entry_from_info(
-                            info,
-                            channel=None,
-                            author=None,
-                            head=False,
-                            is_autoplaylist=True,
-                        )
-                    except (
-                        exceptions.ExtractionError,
-                        exceptions.WrongEntryTypeError,
-                    ) as e:
-                        log.error(
-                            "Error adding song from autoplaylist: %s",
-                            str(e),
-                        )
-                        log.debug("", exc_info=True)
-                        continue
-
+                except (
+                    exceptions.ExtractionError,
+                    exceptions.WrongEntryTypeError,
+                ) as e:
+                    log.error(
+                        "Error adding song from autoplaylist: %s",
+                        str(e),
+                    )
+                    log.debug("Exception data for above error:", exc_info=True)
+                    continue
                 break
 
             if not self.autoplaylist:
-                # TODO: When I add playlist expansion, make sure that's not happening during this check
                 log.warning("No playable songs in the autoplaylist, disabling.")
                 self.config.auto_playlist = False
 
@@ -1371,29 +1374,23 @@ class MusicBot(discord.Client):
             player.skip()
 
         # Only serialize the queue for user-added tracks, unless deferred
-        if (
-            entry.meta.get("author")
-            and entry.meta.get("channel")
-            and not defer_serialize
-        ):
+        if entry.author and entry.channel and not defer_serialize:
             await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_error(
         self,
         player: MusicPlayer,  # pylint: disable=unused-argument
-        entry: EntryTypes,
+        entry: Optional[EntryTypes],
         ex: Optional[Exception],
         **_: Any,
     ) -> None:
         """
         Event called by MusicPlayer when an entry throws an error.
         """
-        author = entry.meta.get("author", None)
-        channel = entry.meta.get("channel", None)
-        if channel and author:
+        if entry and entry.channel:
             song = entry.title or entry.url
             await self.safe_send_message(
-                channel,
+                entry.channel,
                 # TODO: i18n / UI stuff
                 f"Playback failed for song: `{song}` due to error:\n```\n{ex}\n```",
             )
@@ -3059,7 +3056,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         _player: Optional[MusicPlayer],
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3097,7 +3094,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         _player: Optional[MusicPlayer],
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3136,7 +3133,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         _player: Optional[MusicPlayer],
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3174,7 +3171,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         _player: Optional[MusicPlayer],
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3412,7 +3409,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         player: MusicPlayer,
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3490,7 +3487,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         _player: Optional[MusicPlayer],
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3763,7 +3760,7 @@ class MusicBot(discord.Client):
     async def cmd_stream(
         self,
         _player: Optional[MusicPlayer],
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -3875,7 +3872,7 @@ class MusicBot(discord.Client):
         self,
         message: discord.Message,
         player: MusicPlayer,
-        channel: MessageableChannel,
+        channel: GuildMessageableChannels,
         guild: discord.Guild,
         author: discord.Member,
         permissions: PermissionGroup,
@@ -4235,7 +4232,7 @@ class MusicBot(discord.Client):
             )
 
             entry = player.current_entry
-            entry_author = player.current_entry.meta.get("author", None)
+            entry_author = player.current_entry.author
 
             if entry_author:
                 np_text = self.str.get(
@@ -4260,6 +4257,10 @@ class MusicBot(discord.Client):
                     progress=prog_str,
                     url=entry.url,
                 )
+
+                # TODO: i18n
+                if entry.from_auto_playlist:
+                    np_text += "\n`via autoplaylist`"
 
             if self.config.embeds:
                 content = self._gen_embed()
@@ -4476,9 +4477,7 @@ class MusicBot(discord.Client):
                 if permissions.remove or author == user:
                     try:
                         entry_indexes = [
-                            e
-                            for e in player.playlist.entries
-                            if e.meta.get("author", None) == user
+                            e for e in player.playlist.entries if e.author == user
                         ]
                         for entry in entry_indexes:
                             player.playlist.entries.remove(entry)
@@ -4534,16 +4533,17 @@ class MusicBot(discord.Client):
                 expire_in=20,
             )
 
-        if permissions.remove or author == player.playlist.get_entry_at_index(
-            idx - 1
-        ).meta.get("author", None):
+        if (
+            permissions.remove
+            or author == player.playlist.get_entry_at_index(idx - 1).author
+        ):
             entry = player.playlist.delete_entry_at_index((idx - 1))
-            if entry.meta.get("channel", False) and entry.meta.get("author", False):
+            if entry.channel and entry.author:
                 return Response(
                     self.str.get(
                         "cmd-remove-reply-author", "Removed entry `{0}` added by `{1}`"
                     )
-                    .format(entry.title, entry.meta["author"].name)
+                    .format(entry.title, entry.author.name)
                     .strip()
                 )
 
@@ -4611,7 +4611,7 @@ class MusicBot(discord.Client):
             )
 
         current_entry = player.current_entry
-        entry_author = current_entry.meta.get("author", None)
+        entry_author = current_entry.author
         entry_author_id = 0
         if entry_author:
             entry_author_id = entry_author.id
@@ -5264,8 +5264,8 @@ class MusicBot(discord.Client):
             prog_str = f"`[{song_progress}/{song_total}]`"
 
             # TODO: Honestly the meta info could use a typed interface too.
-            cur_entry_channel = player.current_entry.meta.get("channel", None)
-            cur_entry_author = player.current_entry.meta.get("author", None)
+            cur_entry_channel = player.current_entry.channel
+            cur_entry_author = player.current_entry.author
             if cur_entry_channel and cur_entry_author:
                 current_progress = self.str.get(
                     "cmd-queue-playing-author",
@@ -5281,6 +5281,8 @@ class MusicBot(discord.Client):
                     "cmd-queue-playing-noauthor",
                     "Currently playing: `{0}`\nProgress: {1}\n",
                 ).format(player.current_entry.title, prog_str)
+                # TODO: i18n
+                current_progress += "`via autoplaylist`\n"
 
         # calculate start and stop slice indices
         start_index = limit_per_page * page_number
@@ -5303,12 +5305,10 @@ class MusicBot(discord.Client):
                 log.debug("Skipped the current playlist entry.")
                 continue
 
-            item_channel = item.meta.get("channel", None)
-            item_author = item.meta.get("author", None)
-            if item_channel and item_author:
+            if item.channel and item.author:
                 embed.add_field(
                     name=f"Entry #{idx}",
-                    value=f"Title: `{item.title}`\nAdded by: `{item_author.name}`",
+                    value=f"Title: `{item.title}`\nAdded by: `{item.author.name}`",
                     inline=False,
                 )
             else:
