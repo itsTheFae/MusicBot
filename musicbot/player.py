@@ -89,7 +89,6 @@ class SourcePlaybackCounter(AudioSource):
         return self._start_time + (self._num_reads * 0.02)
 
 
-
 class MusicPlayer(EventEmitter, Serializable):
     def __init__(
         self,
