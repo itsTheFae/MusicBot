@@ -34,6 +34,8 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Adds commands `latency` for users and `botlatency` for owners.
+- Adds playback progress to saved queue, and starts playback at the saved position.
 - Adds an offline status update to logout/shutdown process.
 - Fix logging on Windows so module names are not `<string>` placeholder.
 - Adds bootleg Voice connection resume from network outages.
@@ -51,6 +53,7 @@ Here is a list of changes made so far, with most recent first:
 - Further updates to start-up to (hopefully) gracefully fail and install dependencies.
 - Adds logic to check for updates to MusicBot via git and for dependencies via pip.  **[merged]**
   - Adds new command `checkupdates` to print status about available updates.
+  - Adds new command `botversion` to print bot current version, as reported by git.
   - Adds new CLI flag `--no-update-check` to disable checking for updates on startup.
   - Adds new CLI flag `--no-install-deps` to disable automatic install of dependencies when ImportError happens.
 - Improved security of subprocess command execution, to reduce command/shell injection risks.  **[merged]**
