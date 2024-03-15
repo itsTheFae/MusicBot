@@ -6458,7 +6458,7 @@ class MusicBot(discord.Client):
 
             vl = vc.latency * 1000
             vla = vc.average_latency * 1000
-            vclats += f" - `{vl:.0f} ms` (`{vla:.0f} ms` Avg.) in region: `{vc.channel.rtc_region}`\n"
+            vclats += f"- `{vl:.0f} ms` (`{vla:.0f} ms` Avg.) in region: `{vc.channel.rtc_region}`\n"
 
         if not vclats:
             vclats = "No voice clients connected.\n"
