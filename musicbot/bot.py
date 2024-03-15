@@ -1151,9 +1151,12 @@ class MusicBot(discord.Client):
         """
         log.debug("Running on_player_pause")
         await self.update_now_playing_status()
+
+        # save current entry progress, if it played "enough" to merit saving.
+        if player.session_progress > 1:
+            await self.serialize_queue(player.voice_client.channel.guild)
+
         self.loop.create_task(self.handle_player_inactivity(player))
-        # TODO: if we manage to add seek functionality this might be wise.
-        # await self.serialize_queue(player.voice_client.channel.guild)
 
     async def on_player_stop(self, player: MusicPlayer, **_: Any) -> None:
         """

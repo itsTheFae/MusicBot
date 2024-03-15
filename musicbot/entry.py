@@ -58,6 +58,13 @@ class BasePlaylistEntry(Serializable):
         self._waiting_futures: List[AsyncFuture] = []
 
     @property
+    def start_time(self) -> float:
+        """
+        Time in seconds that is passed to ffmpeg -ss flag.
+        """
+        return 0
+
+    @property
     def url(self) -> str:
         """
         Get a URL suitable for YoutubeDL to download, or likewise
@@ -193,6 +200,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         """
         super().__init__()
 
+        self._start_time: Optional[float] = None
         self.playlist: "Playlist" = playlist
         self.downloader: "Downloader" = playlist.bot.downloader
         self.filecache: "AudioFileCache" = playlist.bot.filecache
@@ -211,6 +219,13 @@ class URLPlaylistEntry(BasePlaylistEntry):
         self.channel: Optional[GuildMessageableChannels] = channel
 
         self.aoptions: str = "-vn"
+
+    @property
+    def boptions(self) -> str:
+        """Before input options for ffmpeg to use with this entry."""
+        if self._start_time is not None:
+            return f"-ss {self._start_time}"
+        return ""
 
     @property
     def from_auto_playlist(self) -> bool:
@@ -369,6 +384,16 @@ class URLPlaylistEntry(BasePlaylistEntry):
             log.error("Could not load %s", cls.__name__, exc_info=e)
 
         return None
+
+    @property
+    def start_time(self) -> float:
+        if self._start_time is not None:
+            return self._start_time
+        return 0
+
+    def set_start_time(self, start_time: float) -> None:
+        """Sets a start time in seconds to use with the ffmpeg -ss flag."""
+        self._start_time = start_time
 
     async def _ensure_entry_info(self) -> None:
         """helper to ensure this entry object has critical information"""
