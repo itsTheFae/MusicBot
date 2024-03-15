@@ -450,9 +450,6 @@ class MusicBot(discord.Client):
                     channel_map[guild] = owner.voice.channel
 
         for guild, channel in channel_map.items():
-            log.everything(  # type: ignore[attr-defined]
-                "AutoJoin Channel Map Item:\n  %r\n  %r", guild, channel
-            )
             if guild in joined_servers:
                 log.info(
                     'Already joined a channel in "%s", skipping channel:  %s',
@@ -534,6 +531,7 @@ class MusicBot(discord.Client):
                     channel.guild.name,
                     channel.name,
                 )
+        log.info("Finished joining configured channels.")
 
     async def _wait_delete_msg(
         self, message: discord.Message, after: Union[int, float]
