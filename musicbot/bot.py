@@ -60,6 +60,7 @@ from .utils import (
     dev_only,
     format_size_from_bytes,
     format_song_duration,
+    format_time_to_seconds,
     instance_diff,
     is_empty_voice_channel,
     load_file,
@@ -3223,6 +3224,60 @@ class MusicBot(discord.Client):
             song_url,
             head=True,
             skip_playing=True,
+        )
+
+    async def cmd_seek(
+        self, _player: Optional[MusicPlayer], seek_time: str = ""
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}seek [time]
+
+        Restarts the current song at the given time.
+        Time should be given in seconds, fractional seconds are accepted.
+        Due to codec specifics in ffmpeg, this may not be accurate.
+        """
+        if not _player or not _player.current_entry:
+            raise exceptions.CommandError(
+                "Cannot use seek if there is nothing playing.",
+                expire_in=30,
+            )
+
+        if not isinstance(_player.current_entry, URLPlaylistEntry):
+            raise exceptions.CommandError(
+                "Seeking is not supported for streams.",
+                expire_in=30,
+            )
+
+        if not seek_time:
+            raise exceptions.CommandError(
+                "Cannot use seek without a time to position playback.",
+                expire_in=30,
+            )
+
+        f_seek_time: float = 0
+        if "." in seek_time:
+            try:
+                p1, p2 = seek_time.rsplit(".", maxsplit=1)
+                i_seek_time = format_time_to_seconds(p1)
+                f_seek_time = float(f"0.{p2}")
+                f_seek_time += i_seek_time
+            except (ValueError, TypeError) as e:
+                raise exceptions.CommandError(
+                    f"Could not convert `{seek_time}` to a valid time in seconds.",
+                    expire_in=30,
+                ) from e
+        else:
+            f_seek_time = 0.0 + format_time_to_seconds(seek_time)
+
+        entry = _player.current_entry
+        entry.set_start_time(f_seek_time)
+        _player.playlist.insert_entry_at_index(0, entry)
+        _player.skip()
+
+        return Response(
+            f"Seeking to time `{seek_time}` (`{f_seek_time}` seconds) in the current song.",
+            delete_after=30,
         )
 
     async def cmd_repeat(
