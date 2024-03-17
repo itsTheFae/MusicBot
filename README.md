@@ -117,5 +117,3 @@ Here is a list of changes made so far, with most recent first:
 - Improved audio cache management, settings to limit storage use and `cache` command to see info or manually clear it. **[merged]**  
 - Per-Server command prefix settings available via new `setprefix` command. Allows almost anything to be a prefix! **[merged]**  
 - Player inactivity timer options to auto-disconnect when the player is not playing for a set period of time. **[merged]**  
-
-:)
