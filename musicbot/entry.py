@@ -231,8 +231,8 @@ class URLPlaylistEntry(BasePlaylistEntry):
     def from_auto_playlist(self) -> bool:
         """Returns true if the entry has an author or a channel."""
         if self.author is not None or self.channel is not None:
-            return True
-        return False
+            return False
+        return True
 
     @property
     def url(self) -> str:
@@ -721,8 +721,8 @@ class StreamPlaylistEntry(BasePlaylistEntry):
     def from_auto_playlist(self) -> bool:
         """Returns true if the entry has an author or a channel."""
         if self.author is not None or self.channel is not None:
-            return True
-        return False
+            return False
+        return True
 
     @property
     def url(self) -> str:
