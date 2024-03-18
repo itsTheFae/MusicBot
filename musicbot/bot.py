@@ -3249,6 +3249,12 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
+        if _player.current_entry.duration is None:
+            raise exceptions.CommandError(
+                "Cannot use seek on current track, it has an unknown duration.",
+                expire_in=30,
+            )
+
         if not isinstance(_player.current_entry, URLPlaylistEntry):
             raise exceptions.CommandError(
                 "Seeking is not supported for streams.",
@@ -3275,6 +3281,13 @@ class MusicBot(discord.Client):
                 ) from e
         else:
             f_seek_time = 0.0 + format_time_to_seconds(seek_time)
+
+        if f_seek_time > _player.current_entry.duration:
+            td = format_song_duration(_player.current_entry.duration_td)
+            raise exceptions.CommandError(
+                f"Cannot seek to `{seek_time}` in the current track with a length of `{td}`",
+                expire_in=30,
+            )
 
         entry = _player.current_entry
         entry.set_start_time(f_seek_time)

@@ -34,6 +34,7 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Adds `seek` command to restart the current playing track at the given time.
 - Adds commands `latency` for users and `botlatency` for owners.
 - Adds playback progress to saved queue, and starts playback at the saved position.
 - Adds an offline status update to logout/shutdown process.
