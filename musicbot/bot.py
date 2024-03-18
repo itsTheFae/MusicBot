@@ -4386,6 +4386,10 @@ class MusicBot(discord.Client):
                     content.add_field(
                         name="Added By:", value=entry_author.name, inline=False
                     )
+                elif entry.from_auto_playlist:
+                    content.add_field(
+                        name="Added By:", value="`auto playlist`", inline=False
+                    )
                 content.add_field(
                     name="Progress",
                     value=f"{prog_str}\n{prog_bar_str}\n\n",
