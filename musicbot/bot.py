@@ -128,10 +128,14 @@ class MusicBot(discord.Client):
         load_opus_lib()
 
         if config_file is None:
-            config_file = ConfigDefaults.options_file
+            self._config_file = ConfigDefaults.options_file
+        else:
+            self._config_file = config_file
 
         if perms_file is None:
-            perms_file = PermissionsDefaults.perms_file
+            self._perms_file = PermissionsDefaults.perms_file
+        else:
+            self._perms_file = perms_file
 
         if aliases_file is None:
             aliases_file = AliasesDefault.aliases_file
@@ -149,9 +153,9 @@ class MusicBot(discord.Client):
         self.players: Dict[int, MusicPlayer] = {}
         self.autojoinable_channels: Set[VoiceableChannel] = set()
 
-        self.config = Config(config_file)
+        self.config = Config(self._config_file)
 
-        self.permissions = Permissions(perms_file)
+        self.permissions = Permissions(self._perms_file)
         # Set the owner ID in case it wasn't auto...
         self.permissions.set_owner_id(self.config.owner_id)
         self.str = I18nJson(self.config.i18n_file)
@@ -4955,6 +4959,9 @@ class MusicBot(discord.Client):
             {command_prefix}config list
                 List the available config options and their sections.
 
+            {command_prefix}config reload
+                Reload the options.ini file from disk.
+
             {command_prefix}config help [Section] [Option]
                 Shows help text for a specific option.
 
@@ -4976,7 +4983,16 @@ class MusicBot(discord.Client):
             )
 
         option = option.lower()
-        valid_options = ["missing", "diff", "list", "save", "help", "show", "set"]
+        valid_options = [
+            "missing",
+            "diff",
+            "list",
+            "save",
+            "help",
+            "show",
+            "set",
+            "reload",
+        ]
         if option not in valid_options:
             raise exceptions.CommandError(
                 f"Invalid option for command: `{option}`",
@@ -5037,6 +5053,24 @@ class MusicBot(discord.Client):
                 opt_list,
                 delete_after=60,
             )
+
+        # Try to reload options.ini file from disk.
+        if option == "reload":
+            try:
+                new_conf = Config(self._config_file)
+                await new_conf.async_validate(self)
+
+                self.config = new_conf
+
+                return Response(
+                    "Config options reloaded from file successfully!",
+                    delete_after=30,
+                )
+            except Exception as e:
+                raise exceptions.CommandError(
+                    f"Unable to reload Config due to the following errror:\n{str(e)}",
+                    expire_in=30,
+                ) from e
 
         # sub commands beyond here need 2 leftover_args
         if option in ["help", "show", "save"]:
@@ -5789,6 +5823,9 @@ class MusicBot(discord.Client):
             {command_prefix}setperms list
                 show loaded groups and list permission options.
 
+            {command_prefix}setperms reload
+                reloads permissions from the permissions.ini file
+
             {command_prefix}setperms add [GroupName]
                 add new group with defaults
 
@@ -5814,12 +5851,41 @@ class MusicBot(discord.Client):
             )
 
         option = option.lower()
-        valid_options = ["list", "add", "remove", "save", "help", "show", "set"]
+        valid_options = [
+            "list",
+            "add",
+            "remove",
+            "save",
+            "help",
+            "show",
+            "set",
+            "reload",
+        ]
         if option not in valid_options:
             raise exceptions.CommandError(
                 f"Invalid option for command: `{option}`",
                 expire_in=30,
             )
+
+        # Reload the permissions file from disk.
+        if option == "reload":
+            try:
+                new_permissions = Permissions(self._perms_file)
+                # Set the owner ID in case it wasn't auto...
+                new_permissions.set_owner_id(self.config.owner_id)
+                await new_permissions.async_validate(self)
+
+                self.permissions = new_permissions
+
+                return Response(
+                    "Permissions reloaded from file successfully!",
+                    delete_after=30,
+                )
+            except Exception as e:
+                raise exceptions.CommandError(
+                    f"Unable to reload Permissions due to the following errror:\n{str(e)}",
+                    expire_in=30,
+                ) from e
 
         # List permission groups and available permission options.
         if option == "list":

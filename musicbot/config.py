@@ -842,7 +842,7 @@ class Config:
                         "Please configure settings in '%s' and re-run the bot.",
                         DEFAULT_OPTIONS_FILE,
                     )
-                    sys.exit(1)
+                    raise RuntimeError("MusicBot cannot proceed with this config.")
 
             except ValueError as e:  # Config id value was changed but its not valid
                 raise HelpfulError(
