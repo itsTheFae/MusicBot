@@ -247,13 +247,11 @@ def set_logging_level(level: int, override: bool = False) -> None:
         dlogger.setLevel(level)
 
 
-# TODO: perhaps add config file option for max logs kept.
 def set_logging_max_kept_logs(number: int) -> None:
     """Inform the logger how many logs it should keep."""
     setattr(logging, "mb_max_logs_kept", number)
 
 
-# TODO: perhaps add a config file option for date format.
 def set_logging_rotate_date_format(sftime: str) -> None:
     """Inform the logger how it should format rotated file date strings."""
     setattr(logging, "mb_rot_date_fmt", sftime)

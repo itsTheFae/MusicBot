@@ -28,11 +28,14 @@ from .constants import (
     DEFAULT_FOOTER_TEXT,
     DEFAULT_I18N_FILE,
     DEFAULT_LOG_LEVEL,
+    DEFAULT_LOGS_KEPT,
+    DEFAULT_LOGS_ROTATE_FORMAT,
     DEFAULT_OPTIONS_FILE,
     DEFAULT_SONG_BLOCKLIST_FILE,
     DEFAULT_USER_BLOCKLIST_FILE,
     DEPRECATED_USER_BLACKLIST,
     EXAMPLE_OPTIONS_FILE,
+    MAXIMUM_LOGS_LIMIT,
 )
 from .exceptions import HelpfulError
 from .utils import (
@@ -40,6 +43,8 @@ from .utils import (
     format_size_to_bytes,
     format_time_to_seconds,
     set_logging_level,
+    set_logging_max_kept_logs,
+    set_logging_rotate_date_format,
 )
 
 if TYPE_CHECKING:
@@ -344,6 +349,22 @@ class Config:
             getter="getboolean",
             comment="Shuffles the autoplaylist tracks before playing them.",
         )
+        self.auto_playlist_autoskip: bool = self.register.init_option(
+            section="MusicBot",
+            option="AutoPlaylistAutoSkip",
+            dest="auto_playlist_autoskip",
+            default=ConfigDefaults.auto_playlist_autoskip,
+            getter="getboolean",
+            comment="Automatic skip of auto-playlist tracks when users request to play a song.",
+        )
+        self.auto_playlist_remove_on_block: bool = self.register.init_option(
+            section="MusicBot",
+            option="AutoPlaylistRemoveBlocked",
+            dest="auto_playlist_remove_on_block",
+            default=ConfigDefaults.auto_playlist_remove_on_block,
+            getter="getboolean",
+            comment="Remove songs from the auto-playlist if they are found in the song blocklist.",
+        )
         self.auto_pause: bool = self.register.init_option(
             section="MusicBot",
             option="AutoPause",
@@ -619,6 +640,29 @@ class Config:
             comment="An optional directory path where MusicBot will store long and short-term cache for playback.",
         )
 
+        self.logs_max_kept: int = self.register.init_option(
+            section="Files",
+            option="LogsMaxKept",
+            dest="logs_max_kept",
+            default=ConfigDefaults.logs_max_kept,
+            getter="getint",
+            comment=(
+                "Configure automatic log file rotation at restart, and limit the number of files kept.\n"
+                f"Default is 0, or disabled.  Maximum allowed number is {MAXIMUM_LOGS_LIMIT}."
+            ),
+        )
+
+        self.logs_date_format: str = self.register.init_option(
+            section="Files",
+            option="LogsDateFormat",
+            dest="logs_date_format",
+            default=ConfigDefaults.logs_date_format,
+            comment=(
+                "Configure the log file date format used when LogsMaxKept is enabled.\n"
+                f"Default value is:  {DEFAULT_LOGS_ROTATE_FORMAT}"
+            ),
+        )
+
         # Convert all path constants into config as pathlib.Path objects.
         self.data_path = pathlib.Path(DEFAULT_DATA_PATH).resolve()
         self.server_names_path = self.data_path.joinpath(DEFAULT_DATA_NAME_SERVERS)
@@ -651,6 +695,21 @@ class Config:
         :raises: musicbot.exceptions.HelpfulError
             if some validation failed that the user needs to correct.
         """
+        if self.logs_max_kept > MAXIMUM_LOGS_LIMIT:
+            log.warning(
+                "Cannot store more than %s log files. Option LogsMaxKept will be limited instead.",
+                MAXIMUM_LOGS_LIMIT,
+            )
+            self.logs_max_kept = MAXIMUM_LOGS_LIMIT
+        set_logging_max_kept_logs(self.logs_max_kept)
+
+        if not self.logs_date_format and self.logs_max_kept > 0:
+            log.warning(
+                "Config option LogsDateFormat is empty and this will break log file rotation. Using default instead."
+            )
+            self.logs_date_format = DEFAULT_LOGS_ROTATE_FORMAT
+        set_logging_rotate_date_format(self.logs_date_format)
+
         if self.i18n_file != ConfigDefaults.i18n_file and not os.path.isfile(
             self.i18n_file
         ):
@@ -987,6 +1046,8 @@ class ConfigDefaults:
     auto_summon: bool = True
     auto_playlist: bool = True
     auto_playlist_random: bool = True
+    auto_playlist_autoskip: bool = False
+    auto_playlist_remove_on_block: bool = False
     auto_pause: bool = True
     delete_messages: bool = True
     delete_invoking: bool = False
@@ -1018,6 +1079,9 @@ class ConfigDefaults:
     song_blocklist_enabled: bool = False
     # default true here since the file being populated was previously how it was enabled.
     user_blocklist_enabled: bool = True
+
+    logs_max_kept: int = DEFAULT_LOGS_KEPT
+    logs_date_format: str = DEFAULT_LOGS_ROTATE_FORMAT
 
     # Create path objects from the constants.
     options_file: pathlib.Path = pathlib.Path(DEFAULT_OPTIONS_FILE)

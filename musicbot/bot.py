@@ -406,8 +406,6 @@ class MusicBot(discord.Client):
         # Check guilds for a resumable channel, conditionally override with owner summon.
         resuming = False
         for guild in self.guilds:
-            # TODO:  test that this, guild_unavailable hasn't fired in testing yet
-            # but that don't mean this wont break due to fragile API out-of-order packets...
             if guild.unavailable:
                 log.warning(
                     "Guild not available, cannot join:  %s/%s", guild.id, guild.name
@@ -489,7 +487,6 @@ class MusicBot(discord.Client):
                 player = self.get_player_in(guild)
 
                 if player:
-                    # TODO: Get serialization of last playback position working.
                     log.info("Discarding MusicPlayer and making a new one...")
                     await self.disconnect_voice_client(guild)
 
@@ -497,17 +494,6 @@ class MusicBot(discord.Client):
                         player = await self.get_player(
                             channel, create=True, deserialize=True
                         )
-                        """
-                        if self.server_data[guild.id].availability_paused:
-                            log.debug(
-                                "Setting availability of player in guild:  %s",
-                                guild,
-                            )
-                            self.server_data[guild.id].availability_paused = False
-
-                        if self.server_data[guild.id].auto_paused:
-                            self.server_data[guild.id].auto_paused = False
-                        #"""
 
                         if player.is_stopped:
                             player.play()
@@ -692,7 +678,6 @@ class MusicBot(discord.Client):
         Fetch Application Info from discord and generate an OAuth invite
         URL for MusicBot.
         """
-        # TODO: can we get a guild from another invite URL?
         if not self.cached_app_info:
             log.debug("Getting bot Application Info.")
             self.cached_app_info = await self.application_info()
@@ -750,7 +735,6 @@ class MusicBot(discord.Client):
                 "Forcing disconnect on stale VoiceClient in guild:  %s", channel.guild
             )
             try:
-                # TODO: do we need disconnect(force=True)
                 await vc.disconnect()
             except (asyncio.exceptions.CancelledError, asyncio.exceptions.TimeoutError):
                 if self.config.debug_mode:
@@ -1384,11 +1368,11 @@ class MusicBot(discord.Client):
         # if playing auto-playlist track and a user queues a track,
         # if we're configured to do so, auto skip the auto playlist track.
         if (
-            player.current_entry
+            self.config.auto_playlist_autoskip
+            and player.current_entry
             and player.current_entry.from_auto_playlist
             and playlist.peek() == entry
             and not entry.from_auto_playlist
-            # TODO:  and self.config.autoplaylist_autoskip
         ):
             log.debug("Automatically skipping auto-playlist entry for queued entry.")
             player.skip()
@@ -2727,7 +2711,7 @@ class MusicBot(discord.Client):
 
     async def cmd_blocksong(
         self,
-        _player: MusicPlayer,
+        _player: Optional[MusicPlayer],
         option: str,
         leftover_args: List[str],
         song_subject: str = "",
@@ -2776,6 +2760,16 @@ class MusicBot(discord.Client):
                     f"Subject `{song_subject}` is already in the song block list.\n{status_msg}"
                 )
 
+            # remove song from auto-playlist if it is blocked
+            if (
+                self.config.auto_playlist_remove_on_block
+                and _player
+                and _player.current_entry
+                and song_subject == _player.current_entry.url
+                and _player.current_entry.from_auto_playlist
+            ):
+                await self.remove_url_from_autoplaylist(song_subject)
+
             async with self.aiolocks["song_blocklist"]:
                 self.config.song_blocklist.append_items([song_subject])
 
@@ -2786,17 +2780,13 @@ class MusicBot(discord.Client):
                 delete_after=10,
             )
 
+        # handle "remove" and "-"
         if not self.config.song_blocklist.is_blocked(song_subject):
             raise exceptions.CommandError(
                 "The subject is not in the song block list and cannot be removed.",
                 expire_in=10,
             )
 
-        # TODO:  add self.config.autoplaylist_remove_on_block
-        # if self.config.autoplaylist_remove_on_block
-        # and song_subject is current_entry.url
-        # and current_entry.from_auto_playlist
-        #   await self.remove_url_from_autoplaylist(song_subject)
         async with self.aiolocks["song_blocklist"]:
             self.config.song_blocklist.remove_items([song_subject])
 
@@ -2908,15 +2898,15 @@ class MusicBot(discord.Client):
     async def cmd_joinserver(self) -> CommandResponse:
         """
         Usage:
-            {command_prefix}joinserver invite_link
+            {command_prefix}joinserver
 
-        Asks the bot to join a server.  Note: Bot accounts cannot use invite links.
+        Generate an invite link that can be used to add this bot to another server.
         """
-
         url = await self.generate_invite_link()
         return Response(
             self.str.get(
-                "cmd-joinserver-response", "Click here to add me to a server: \n{}"
+                "cmd-joinserver-response",
+                "Click here to add me to another server: \n{}",
             ).format(url),
             reply=True,
             delete_after=30,
@@ -5421,7 +5411,6 @@ class MusicBot(discord.Client):
             )
             prog_str = f"`[{song_progress}/{song_total}]`"
 
-            # TODO: Honestly the meta info could use a typed interface too.
             cur_entry_channel = player.current_entry.channel
             cur_entry_author = player.current_entry.author
             if cur_entry_channel and cur_entry_author:
