@@ -254,13 +254,12 @@ class Config:
             comment="MusicBot will automatically delete Now Playing messages.",
         )
 
-        # TODO: maybe add a getpercent to allow for %45 or 66% and convert it.
         self.default_volume: float = self.register.init_option(
             section="MusicBot",
             option="DefaultVolume",
             dest="default_volume",
             default=ConfigDefaults.default_volume,
-            getter="getfloat",
+            getter="getpercent",
             comment=(
                 "Sets the default volume level MusicBot will play songs at. "
                 "Must be a value from 0 to 1 inclusive."
@@ -282,7 +281,7 @@ class Config:
             option="SkipRatio",
             dest="skip_ratio_required",
             default=ConfigDefaults.skip_ratio_required,
-            getter="getfloat",
+            getter="getpercent",
             comment="This percent of listeners must vote for skip. If SkipsRequired is lower it will be used instead.",
         )
         self.save_videos: bool = self.register.init_option(
@@ -1661,6 +1660,60 @@ class ExtendedConfigParser(configparser.ConfigParser):
                 val,
             )
             return fallback
+
+    def getpercent(
+        self,
+        section: str,
+        key: str,
+        fallback: float = 0.0,
+        raw: bool = False,
+        vars: ConfVars = None,  # pylint: disable=redefined-builtin
+    ) -> float:
+        """
+        Get a config value and parse it as a percentage.
+        Always returns a positive value between 0 and 1 inclusive.
+        """
+        if fallback:
+            fallback = max(0.0, min(abs(fallback), 1.0))
+
+        val = self.get(section, key, fallback="", raw=raw, vars=vars).strip()
+        if not val and fallback:
+            return fallback
+
+        v = 0.0
+        # account for literal percentage character: %
+        if val.startswith("%") or val.endswith("%"):
+            try:
+                ival = val.replace("%", "").strip()
+                v = abs(int(ival)) / 100
+            except (ValueError, TypeError):
+                if fallback:
+                    return fallback
+                raise
+
+        # account for explicit float and implied percentage.
+        else:
+            try:
+                v = abs(float(val))
+                # if greater than 1, assume implied percentage.
+                if v > 1:
+                    v = v / 100
+            except (ValueError, TypeError):
+                if fallback:
+                    return fallback
+                raise
+
+        if v > 1:
+            log.warning(
+                "Option [%s] > %s has a value greater than 100 %% (%s) and will be set to %s instead.",
+                section,
+                key,
+                val,
+                fallback if fallback else 1,
+            )
+            v = fallback if fallback else 1
+
+        return v
 
     def getduration(
         self,
