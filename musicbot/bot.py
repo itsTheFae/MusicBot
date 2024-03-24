@@ -282,10 +282,16 @@ class MusicBot(discord.Client):
                 ping_target = DEFAULT_PING_TARGET
 
         # Make a ping call based on OS.
-        ping_path = shutil.which("ping")
-        if not ping_path:
-            log.warning("Could not locate path to `ping` system executable.")
-            ping_path = "ping"
+        if not hasattr(self, "_mb_ping_exe_path"):
+            ping_path = shutil.which("ping")
+            if not ping_path:
+                log.warning(
+                    "Could not locate `ping` executable in your environment."
+                )
+                ping_path = "ping"
+            setattr(self, "_mb_ping_exe_path", ping_path)
+        else:
+            ping_path = getattr(self, "_mb_ping_exe_path", "ping")
 
         ping_cmd: List[str] = []
         if os.name == "nt":
@@ -305,9 +311,25 @@ class MusicBot(discord.Client):
                 stderr=asyncio.subprocess.DEVNULL,
             )
             ping_status = await p.wait()
+        except FileNotFoundError:
+            log.error(
+                "MusicBot could not locate a `ping` command path.  Early network outage detection will not function."
+                "\nMusicBot tried the following command:   %s",
+                " ".join(ping_cmd),
+            )
+            return
+        except PermissionError:
+            log.error(
+                "MusicBot was not allowed to execute the `ping` command.  Early network outage detection will not function."
+                "\nMusicBot tried the following command:   %s",
+                " ".join(ping_cmd),
+            )
+            return
         except OSError:
             log.error(
-                "Your environment may not allow the `ping` system command.  Early network outage detection will not function.",
+                "Your environment may not allow the `ping` system command.  Early network outage detection will not function."
+                "\nMusicBot tried the following command:   %s",
+                " ".join(ping_cmd),
                 exc_info=self.config.debug_mode,
             )
             return
