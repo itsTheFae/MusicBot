@@ -354,8 +354,12 @@ class Config:
             dest="auto_playlist_autoskip",
             default=ConfigDefaults.auto_playlist_autoskip,
             getter="getboolean",
-            comment="Automatic skip of auto-playlist tracks when users request to play a song.",
+            comment=(
+                "Enable automatic skip of auto-playlist songs when a user plays a new song.\n"
+                "This only applies to the current playing song if it was added by the auto-playlist."
+            ),
         )
+        # TODO:  this option needs more implementation to ensure blocked tracks are removed.
         self.auto_playlist_remove_on_block: bool = self.register.init_option(
             section="MusicBot",
             option="AutoPlaylistRemoveBlocked",
@@ -647,6 +651,7 @@ class Config:
             getter="getint",
             comment=(
                 "Configure automatic log file rotation at restart, and limit the number of files kept.\n"
+                "When disabled, only one log is kept and its contents are replaced each run.\n"
                 f"Default is 0, or disabled.  Maximum allowed number is {MAXIMUM_LOGS_LIMIT}."
             ),
         )
@@ -658,6 +663,9 @@ class Config:
             default=ConfigDefaults.logs_date_format,
             comment=(
                 "Configure the log file date format used when LogsMaxKept is enabled.\n"
+                "If left blank, a warning is logged and the default will be used instead.\n"
+                "Learn more about time format codes from the tables and data here:\n"
+                "    https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior\n"
                 f"Default value is:  {DEFAULT_LOGS_ROTATE_FORMAT}"
             ),
         )
