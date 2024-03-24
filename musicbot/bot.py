@@ -285,9 +285,7 @@ class MusicBot(discord.Client):
         if not hasattr(self, "_mb_ping_exe_path"):
             ping_path = shutil.which("ping")
             if not ping_path:
-                log.warning(
-                    "Could not locate `ping` executable in your environment."
-                )
+                log.warning("Could not locate `ping` executable in your environment.")
                 ping_path = "ping"
             setattr(self, "_mb_ping_exe_path", ping_path)
         else:
