@@ -2068,11 +2068,6 @@ class MusicBot(discord.Client):
 
         print(flush=True)
 
-        # TODO: if on-demand loading is not good enough, we can load guild specifics here.
-        # if self.config.enable_options_per_guild:
-        #    for s in self.guilds:
-        #        await self._load_guild_options(s)
-
         # validate bound channels and log them.
         if self.config.bound_channels:
             # Get bound channels by ID, and validate that we can use them.
@@ -2188,7 +2183,14 @@ class MusicBot(discord.Client):
             )
             log.warning(str(conf_warn)[1:])
 
-        # self.loop.create_task(self._on_ready_call_later())
+        # Pre-load guild specific data / options.
+        # TODO:  probably change this later for better UI/UX.
+        if self.config.enable_options_per_guild:
+            for guild in self.guilds:
+                # Triggers on-demand task to load data from disk.
+                self.server_data[guild.id]
+                # context switch to give scheduled task an execution window.
+                await asyncio.sleep(0)
 
     async def _on_ready_always(self) -> None:
         """
