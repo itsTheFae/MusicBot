@@ -1,3 +1,35 @@
+# Notice:
+#  If you want to run this .ps1 script without setting execution policy in PowerShell,
+#  you can make use of the following command in command-prompt.
+#
+#    powershell.exe -noprofile -executionpolicy bypass -file install.ps1
+#
+# ---------------------------------------------Install notice and prompt-----------------------------------------------
+"MusicBot Installer"
+""
+"MusicBot and this installer are provided under an MIT license."
+"This software is provided 'as is' and may not be fit for any particular use, stated or otherwise."
+"Please read the LICENSE file for full details."
+""
+"This installer attempts to provide automatic install for MusicBot and dependencies."
+"It is recommended that you personally check the installer script before running it,"
+"and verify the steps for your OS version are correct."
+""
+"Please consider contributing corrections or new steps if you find issues with this installer."
+"You may also find installation guides on the wiki or community help on our discord server."
+"Wiki:"
+"    https://just-some-bots.github.io/MusicBot/"
+"Discord:"
+"    https://discord.gg/bots"
+""
+
+$iagree = Read-Host "Would you like to continue with the install? [y/n]"
+if($iagree -ne "Y" -and $iagree -ne "y")
+{
+    # exit early if the user does not want to continue.
+    Return
+}
+
 # -----------------------------------------------------CONSTANTS-------------------------------------------------------
 
 $DEFAULT_URL_BASE = "https://discordapp.com/api"
@@ -46,6 +78,7 @@ else
     "FFmpeg already installed"
 }
 
+# TODO: fix this, it fails due to some missing addition to powershell environment.
 Invoke-Expression "refreshenv"
 
 # --------------------------------------------------PULLING THE BOT----------------------------------------------------
@@ -55,7 +88,7 @@ Invoke-Expression "refreshenv"
 "  review - Newer MusicBot, usually stable with less updates than the dev branch."
 "  dev    - The newest MusicBot, latest features and changes which may need testing."
 ""
-$experimental = Read-Host "Enter the branch name you want to install: "
+$experimental = Read-Host "Enter the branch name you want to install"
 if($experimental -eq "dev")
 {
     "installing dev branch..."
