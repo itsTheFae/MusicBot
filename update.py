@@ -223,21 +223,59 @@ def update_ffmpeg() -> None:
 
     print("Checking for ffmpeg versions...")
 
+    bundle_ffmpeg_bin = os.path.join(os.path.abspath("bin"), "ffmpeg.exe")
     ffmpeg_bin = shutil.which("ffmpeg")
     if not ffmpeg_bin:
         print("Could not locate ffmpeg in your environment.")
     else:
-        lver = get_local_ffmpeg_version(ffmpeg_bin)
-        rver = get_remote_ffmpeg_version()
-        print(f"Current {lver}")
-        print(f"Available version:  {rver[0]}")
-        print(f"Available since:  {rver[1]}")
+        localver = get_local_ffmpeg_version(ffmpeg_bin)
+        print(f"Found FFmpeg EXE at:  {ffmpeg_bin}")
+        print(f"Current {localver}")
 
-    do_dl = yes_or_no_input("Should we update the ffmpeg executables?")
-    if do_dl:
-        dl_windows_ffmpeg()
-        newver = get_local_ffmpeg_version(ffmpeg_bin)
-        print(f"Updated ffmpeg to  {newver}")
+    # TODO: query winget for updates if winget is detected.
+    # only query remote version if we are updating bundled exe.
+    if ffmpeg_bin.lower() == bundle_ffmpeg_bin.lower():
+        remotever = get_remote_ffmpeg_version()
+        print(f"Available version:  {remotever[0]}")
+        print(f"Available since:  {remotever[1]}")
+
+    print("")
+
+    if (
+        ffmpeg_bin.lower() != bundle_ffmpeg_bin.lower()
+        and "winget" in ffmpeg_bin.lower()
+    ):
+        winget_bin = shutil.which("winget")
+        if not winget_bin:
+            print("We detected FFmpeg was installed via winget tool, but could not locate winget in your path.")
+            print("You will need to manually update FFmpeg instead.")
+            return
+
+        do_upgrade = yes_or_no_input("Should we upgrade FFmpeg using winget? [Y/n]")
+        if do_upgrade:
+            run_or_raise_error(
+                [
+                    winget_bin,
+                    "upgrade",
+                    "Gyan.FFmpeg",
+                ],
+                "Could not update ffmpeg. You need to update it manually."
+                "Try running:  winget upgrade Gyan.FFmpeg",
+            )
+            return
+
+    elif ffmpeg_bin.lower() == bundle_ffmpeg_bin.lower():
+        do_dl = yes_or_no_input("Should we update the MusicBot bundled ffmpeg executables? [Y/n]")
+        if do_dl:
+            dl_windows_ffmpeg()
+            newver = get_local_ffmpeg_version(ffmpeg_bin)
+            print(f"Updated ffmpeg to  {newver}")
+
+    else:
+        print(
+            "We detected FFmpeg installed but it is not the exe bundled with MusicBot.\n"
+            "You will need to update your FFmpeg install manually."
+        )
 
 
 def finalize() -> None:
