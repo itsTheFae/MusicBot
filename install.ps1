@@ -32,13 +32,36 @@ else
     "python already installed"
 }
 
+# Check if ffmpeg is installed
+"checking if FFmpeg is already installed..."
+Invoke-Expression "winget list -q Gyan.FFmpeg"
+if (!($LastExitCode -eq 0))
+{
+    # install FFmpeg
+    "installing FFmpeg..."
+    Invoke-Expression "winget install Gyan.FFmpeg"
+}
+else
+{
+    "FFmpeg already installed"
+}
+
 Invoke-Expression "refreshenv"
 
 # --------------------------------------------------PULLING THE BOT----------------------------------------------------
 
-"Do you want to install experimental (review) branch?"
-$experimental = Read-Host "Installing experimental (review) branch means limited support, but you get access to newer fixes and features. (N/y): "
-if($experimental -eq "Y" -or $experimental -eq "y")
+"MusicBot currently has three branches available."
+"  master - An older MusicBot, for older discord.py. May not work without tweaks!"
+"  review - Newer MusicBot, usually stable with less updates than the dev branch."
+"  dev    - The newest MusicBot, latest features and changes which may need testing."
+""
+$experimental = Read-Host "Enter the branch name you want to install: "
+if($experimental -eq "dev")
+{
+    "installing dev branch..."
+    $branch = "dev"
+}
+if($experimental -eq "review")
 {
     "installing review branch..."
     $branch = "review"
@@ -56,14 +79,14 @@ Invoke-Expression "cd MusicBot"
 
 if (Get-Command "python" -errorAction SilentlyContinue)
 {
-    Invoke-Expression "python -c 'import sys; exit(0 if sys.version_info >= (3, 6) else 1)'"
+    Invoke-Expression "python -c 'import sys; exit(0 if sys.version_info >= (3, 8) else 1)'"
     if($LastExitCode -eq 0)
     {
         $PYTHON = "python"
     }
 }
 
-$versionArray = "3.6", "3.7", "3.8", "3.9", "3.10", "3.11"
+$versionArray = "3.8", "3.9", "3.10", "3.11", "3.12"
 
 foreach ($version in $versionArray)
 {
