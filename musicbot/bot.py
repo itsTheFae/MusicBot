@@ -2189,7 +2189,7 @@ class MusicBot(discord.Client):
         if self.config.enable_options_per_guild:
             for guild in self.guilds:
                 # Triggers on-demand task to load data from disk.
-                self.server_data[guild.id]
+                self.server_data[guild.id].is_ready()
                 # context switch to give scheduled task an execution window.
                 await asyncio.sleep(0)
 
