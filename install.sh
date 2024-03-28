@@ -393,7 +393,7 @@ case $DISTRO_NAME in
         # Install available packages and libraries for building python 3.8+
         sudo yum -y groupinstall "Development Tools"
         sudo yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
-            curl jq ffmpeg
+            git curl jq ffmpeg
 
         # Build python.
         PyBuildVer="3.10.14"
@@ -418,7 +418,7 @@ case $DISTRO_NAME in
         sudo dnf config-manager --enable powertools
 
         # Install available packages.
-        sudo yum -y install opus-devel libffi-devel curl jq ffmpeg python39 python39-devel
+        sudo yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel
 
         pull_musicbot_git
         ;;
