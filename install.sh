@@ -200,7 +200,7 @@ function create_bot() {
 
 function configure_bot() {
     read -rp "Would like to configure the bot for basic use? [N/y]" YesConfig
-    if [ "${YesConfig,,}" != "y" ] && ["${YesConfig,,}" != "yes"] ; then
+    if [ "${YesConfig,,}" != "y" ] && [ "${YesConfig,,}" != "yes" ] ; then
         return
     fi
 
