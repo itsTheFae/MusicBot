@@ -247,7 +247,9 @@ def update_ffmpeg() -> None:
     ):
         winget_bin = shutil.which("winget")
         if not winget_bin:
-            print("We detected FFmpeg was installed via winget tool, but could not locate winget in your path.")
+            print(
+                "We detected FFmpeg was installed via winget tool, but could not locate winget in your path."
+            )
             print("You will need to manually update FFmpeg instead.")
             return
 
@@ -265,7 +267,9 @@ def update_ffmpeg() -> None:
             return
 
     elif ffmpeg_bin.lower() == bundle_ffmpeg_bin.lower():
-        do_dl = yes_or_no_input("Should we update the MusicBot bundled ffmpeg executables? [Y/n]")
+        do_dl = yes_or_no_input(
+            "Should we update the MusicBot bundled ffmpeg executables? [Y/n]"
+        )
         if do_dl:
             dl_windows_ffmpeg()
             newver = get_local_ffmpeg_version(ffmpeg_bin)
