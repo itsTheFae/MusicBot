@@ -53,7 +53,7 @@ function pull_musicbot_git() {
     case ${BRANCH,,} in
     "dev")
         echo "Installing from 'dev' branch..."
-        git clone https://github.com/Just-Some-Bots/MusicBot.git Musicbot -b dev
+        git clone https://github.com/Just-Some-Bots/MusicBot.git MusicBot -b dev
         ;;
     "review")
         echo "Installing from 'review' branch..."
