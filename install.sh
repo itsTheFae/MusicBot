@@ -9,7 +9,10 @@
 
 #----------------------------------------------Constants----------------------------------------------#
 DEFAULT_URL_BASE="https://discordapp.com/api"
-PYEXEC=3
+# Suported versions of python using only major.minor format
+PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
+PyBin="python3"
+
 DEBUG=0
 
 USER_OBJ_KEYS="id username discriminator verified bot email avatar"
@@ -41,6 +44,58 @@ function exit_err() {
     exit 1
 }
 
+function find_python() {
+    # This function returns a status as well as a value for capture.
+
+    # compile a list of bin names to try for.
+    PyBins=("python3")  # We hope that python3 maps to a good version.
+    for Ver in "${PySupported[@]}" ; do
+        # Typical of source builds and many packages to include the version dot.
+        PyBins+=("python${Ver}")
+        # Some distros remove the dot.
+        PyBins+=("python${Ver//./}")
+    done
+    PyBins+=("python")  # Fat chance, but might as well try versionless too.
+
+    # Test each possible PyBin until the first supported version is found.
+    for PyBin in "${PyBins[@]}" ; do
+        if ! command -v "$PyBin" > /dev/null 2>&1 ; then
+            continue
+        fi
+
+        # Get version data from python, assume python exists in PATH somewhere.
+        # shellcheck disable=SC2207
+        PY_VER=($($PyBin -c "import sys; print('%s %s %s' % sys.version_info[:3])" || { echo "0 0 0"; }))
+        if [[ "${PY_VER[0]}" == "0" ]]; then
+            continue
+        fi
+        PY_VER_MAJOR=$((PY_VER[0]))
+        PY_VER_MINOR=$((PY_VER[1]))
+        PY_VER_PATCH=$((PY_VER[2]))
+        # echo "run.sh detected $PY_BIN version: $PY_VER_MAJOR.$PY_VER_MINOR.$PY_VER_PATCH"
+
+        # Major version must be 3+
+        if [[ $PY_VER_MAJOR -ge 3 ]]; then
+            # If 3, minor version minimum is 3.8
+            if [[ $PY_VER_MINOR -eq 8 ]]; then
+                # if 3.8, patch version minimum is 3.8.7
+                if [[ $PY_VER_PATCH -ge 7 ]]; then
+                    echo "$PyBin"
+                    return 0
+                fi
+            fi
+            # if 3.9+ it should work.
+            if [[ $PY_VER_MINOR -ge 9 ]]; then
+                echo "$PyBin"
+                return 0
+            fi
+        fi
+    done
+
+    echo "python3"
+    return 1
+}
+
 function pull_musicbot_git() {
     cd ~ || exit_err "Fatal:  Could not change to home directory."
     echo " "
@@ -69,7 +124,7 @@ function pull_musicbot_git() {
     esac
     cd MusicBot || exit_err "Fatal:  Could not change to MusicBot directory."
 
-    python${PYEXEC} -m pip install --upgrade -r requirements.txt
+    $PyBin -m pip install --upgrade -r requirements.txt
 
     cp ./config/example_options.ini ./config/options.ini
 }
@@ -80,10 +135,11 @@ function setup_as_service() {
     echo ""
     echo "Do you want to set up the bot as a service?"
     read -rp "This would mean the bot is automatically started and kept up by the system to ensure its online as much as possible [N/y] " SERVICE
+    PyBinPath="$(command -v "$PyBin")"
     case $SERVICE in
     [Yy]*)
         echo "Setting up the bot as a service"
-        sed -i "s/versionnum/$PYEXEC/g" ./musicbot.service
+        sed -i "s,/usr/bin/pythonversionnum,$PyBinPath,g" ./musicbot.service
         sed -i "s,mbdirectory,$DIR,g" ./musicbot.service
         sudo mv ~/MusicBot/musicbot.service /etc/systemd/system/
         sudo chown root:root /etc/systemd/system/musicbot.service
@@ -311,11 +367,9 @@ case $DISTRO_NAME in
     ;;
 
 *"Ubuntu"* )
+    # Some cases only use major version number to allow for both .04 and .10 minor versions.
     case $DISTRO_NAME in
-    # Using only major versions of Ubuntu to allow for both .04 and .10 minor versions.
-    *"Ubuntu 18"*)  #  Tested working 18.04 @ 2024/03/28
-        PYEXEC="3.8"
-
+    *"Ubuntu 18.04"*)  #  Tested working 18.04 @ 2024/03/28
         sudo apt-get update -y
         sudo apt-get upgrade -y
         # 18.04 needs explicit python3.8 package, and has no pip package.
@@ -323,11 +377,20 @@ case $DISTRO_NAME in
             unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
             python3.8-dev jq -y
 
-        # python3.8 needs a manual pip install on 18.04
-        python${PYEXEC} <(curl -s https://bootstrap.pypa.io/get-pip.py)
+        # update python path with newly installed python3.8
+        PyBin="$(find_python)"
+        RetVal=$?
+        if [ "$RetVal" == "0" ] ; then
+            # python3.8 needs a manual pip install on 18.04
+            $PyBin <(curl -s https://bootstrap.pypa.io/get-pip.py)
+        else
+            echo "Error:  Could not find python on the PATH."
+            exit 1
+        fi
 
         pull_musicbot_git
         ;;
+
     # Tested working:
     # 20.04 @ 2024/03/28
     *"Ubuntu 20"*|*"Ubuntu 22"*)
@@ -339,8 +402,11 @@ case $DISTRO_NAME in
 
         pull_musicbot_git
         ;;
+
+    # Ubuntu version 17 and under is not supported.
     *)
         echo "Unsupported version of Ubuntu."
+        echo "If you version is newer than Ubuntu 22, please consider contributing install steps."
         exit 1
         ;;
     esac
@@ -407,7 +473,7 @@ case $DISTRO_NAME in
 
         # Ask if we should build python
         read -rp "Would you like to continue " BuildPython
-        if [ "${BuildPython,,}" == "y"] || [ "${BuildPython,,}" == "yes" ] ; then
+        if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
             # Build python.
             PyBuildVer="3.10.14"
             PySrcDir="Python-${PyBuildVer}"
@@ -420,8 +486,13 @@ case $DISTRO_NAME in
             ./configure --enable-optimizations
             sudo make altinstall
 
-            # Set python version to 3.10 to avoid using other installed py 3.
-            PYEXEC="3.10"
+            # Ensure python bin is updated with altinstall name.
+            PyBin="$(find_python)"
+            RetVal=$?
+            if [ "$RetVal" != "0" ] ; then
+                echo "Error:  Could not locate python after installing it."
+                exit 1
+            fi
         fi
 
         pull_musicbot_git
@@ -447,6 +518,8 @@ case $DISTRO_NAME in
         ;;
     esac
     ;;
+
+# TODO:  Rocky, Alma, OpenBSD ?
 
 *"Darwin"*)
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
