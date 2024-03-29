@@ -37,7 +37,11 @@ if($iagree -ne "Y" -and $iagree -ne "y")
 if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
 {
     ""
-    "Sorry, you must install WinGet (or update Windows) to use this installer."
+    "Sorry, you must install WinGet to use this installer."
+    "Supposedly included with Windows, but we couldn't find it."
+    "You can get it via Microsoft Store, the Official repo on github, or "
+    "use the following link to quickly download an installer for it:"
+    "  https://aka.ms/getwinget  "
     ""
     Return
 }
