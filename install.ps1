@@ -34,6 +34,14 @@ if($iagree -ne "Y" -and $iagree -ne "y")
     Return
 }
 
+if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
+{
+    ""
+    "Sorry, you must install WinGet (or update Windows) to use this installer."
+    ""
+    Return
+}
+
 # -----------------------------------------------------CONSTANTS-------------------------------------------------------
 
 $DEFAULT_URL_BASE = "https://discordapp.com/api"
