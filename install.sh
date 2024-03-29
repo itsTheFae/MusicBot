@@ -313,7 +313,7 @@ case $DISTRO_NAME in
 *"Ubuntu"* )
     case $DISTRO_NAME in
     # Using only major versions of Ubuntu to allow for both .04 and .10 minor versions.
-    *"Ubuntu 18"*)
+    *"Ubuntu 18"*)  #  Tested working 18.04 @ 2024/03/28
         PYEXEC="3.8"
 
         sudo apt-get update -y
@@ -328,6 +328,8 @@ case $DISTRO_NAME in
 
         pull_musicbot_git
         ;;
+    # Tested working:
+    # 20.04 @ 2024/03/28
     *"Ubuntu 20"*|*"Ubuntu 22"*)
         sudo apt-get update -y
         sudo apt-get upgrade -y
@@ -344,6 +346,9 @@ case $DISTRO_NAME in
     esac
     ;;
 
+# NOTE: Raspberry Pi OS 12, i386 arch, returns Debian as Distro name.
+# Tested working:
+# R-Pi OS @ 2024/03/28
 *"Debian"*)
     sudo apt-get update -y
     sudo apt-get upgrade -y
@@ -387,7 +392,7 @@ case $DISTRO_NAME in
         ;;
 
     # Supported versions.
-    *"CentOS 7"*)
+    *"CentOS 7"*)  # Tested 7.9 @ 2024/03/28
         # TODO:  CentOS 7 reaches EOL June 2024.
 
         # Enable extra repos, as required for ffmpeg
@@ -400,22 +405,29 @@ case $DISTRO_NAME in
         sudo yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
             git curl jq ffmpeg
 
-        # Build python.
-        PyBuildVer="3.10.14"
-        PySrcDir="Python-${PyBuildVer}"
-        PySrcFile="${PySrcDir}.tgz"
+        # Ask if we should build python
+        read -rp "Would you like to continue " BuildPython
+        if [ "${BuildPython,,}" == "y"] || [ "${BuildPython,,}" == "yes" ] ; then
+            # Build python.
+            PyBuildVer="3.10.14"
+            PySrcDir="Python-${PyBuildVer}"
+            PySrcFile="${PySrcDir}.tgz"
 
-        curl -o "$PySrcFile" "https://www.python.org/ftp/python/${PyBuildVer}/${PySrcFile}"
-        tar -xzf "$PySrcFile"
-        cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
+            curl -o "$PySrcFile" "https://www.python.org/ftp/python/${PyBuildVer}/${PySrcFile}"
+            tar -xzf "$PySrcFile"
+            cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
 
-        ./configure --enable-optimizations
-        sudo make altinstall
+            ./configure --enable-optimizations
+            sudo make altinstall
+
+            # Set python version to 3.10 to avoid using other installed py 3.
+            PYEXEC="3.10"
+        fi
 
         pull_musicbot_git
         ;;
 
-    *"CentOS Stream 8"*)
+    *"CentOS Stream 8"*)  # Tested 2024/03/28
         # Install extra repos, needed for ffmpeg.
         # Do not use -y flag here.
         sudo dnf install epel-release
