@@ -374,18 +374,37 @@ case $DISTRO_NAME in
         sudo apt-get upgrade -y
         # 18.04 needs explicit python3.8 package, and has no pip package.
         sudo apt-get install build-essential software-properties-common \
-            unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
-            python3.8-dev jq -y
+            libopus-dev libffi-dev libsodium-dev libssl-dev \
+            zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \
+            libreadline-dev libsqlite3-dev libbz2-dev \
+            unzip curl git jq ffmpeg -y
 
-        # update python path with newly installed python3.8
-        PyBin="$(find_python)"
-        RetVal=$?
-        if [ "$RetVal" == "0" ] ; then
-            # python3.8 needs a manual pip install on 18.04
-            $PyBin <(curl -s https://bootstrap.pypa.io/get-pip.py)
-        else
-            echo "Error:  Could not find python on the PATH."
-            exit 1
+        # Ask if we should build python
+        echo "We need to build python from source for your system. It will be installed using altinstall target."
+        read -rp "Would you like to continue ? [N/y]" BuildPython
+        if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
+            # Build python.
+            PyBuildVer="3.10.14"
+            PySrcDir="Python-${PyBuildVer}"
+            PySrcFile="${PySrcDir}.tgz"
+
+            curl -o "$PySrcFile" "https://www.python.org/ftp/python/${PyBuildVer}/${PySrcFile}"
+            tar -xzf "$PySrcFile"
+            cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
+
+            ./configure --enable-optimizations
+            sudo make altinstall
+
+            # Ensure python bin is updated with altinstall name.
+            PyBin="$(find_python)"
+            RetVal=$?
+            if [ "$RetVal" == "0" ] ; then
+                # manually install pip package for current user.
+                $PyBin <(curl -s https://bootstrap.pypa.io/get-pip.py)
+            else
+                echo "Error:  Could not find python on the PATH after installing it."
+                exit 1
+            fi
         fi
 
         pull_musicbot_git
@@ -472,7 +491,8 @@ case $DISTRO_NAME in
             git curl jq ffmpeg
 
         # Ask if we should build python
-        read -rp "Would you like to continue " BuildPython
+        echo "We need to build python from source for your system. It will be installed using altinstall target."
+        read -rp "Would you like to continue ? [N/y]" BuildPython
         if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
             # Build python.
             PyBuildVer="3.10.14"
@@ -489,8 +509,11 @@ case $DISTRO_NAME in
             # Ensure python bin is updated with altinstall name.
             PyBin="$(find_python)"
             RetVal=$?
-            if [ "$RetVal" != "0" ] ; then
-                echo "Error:  Could not locate python after installing it."
+            if [ "$RetVal" == "0" ] ; then
+                # manually install pip package for the current user.
+                $PyBin <(curl -s https://bootstrap.pypa.io/get-pip.py)
+            else
+                echo "Error:  Could not find python on the PATH after installing it."
                 exit 1
             fi
         fi
