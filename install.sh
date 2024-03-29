@@ -375,10 +375,10 @@ case $DISTRO_NAME in
 *"Ubuntu"* )
     # Some cases only use major version number to allow for both .04 and .10 minor versions.
     case $DISTRO_NAME in
-    *"Ubuntu 18.04"*)  #  Tested working 18.04 @ 2024/03/28
+    *"Ubuntu 18.04"*)  #  Tested working 18.04 @ 2024/03/29
         sudo apt-get update -y
         sudo apt-get upgrade -y
-        # 18.04 needs explicit python3.8 package, and has no pip package.
+        # 18.04 needs to build a newer version from source.
         sudo apt-get install build-essential software-properties-common \
             libopus-dev libffi-dev libsodium-dev libssl-dev \
             zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \
