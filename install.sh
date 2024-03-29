@@ -98,6 +98,12 @@ function find_python() {
 
 function pull_musicbot_git() {
     cd ~ || exit_err "Fatal:  Could not change to home directory."
+
+    if [ -d "MusicBot" ] ; then
+        echo "Error: A directory named MusicBot already exists in your home directory."
+        exit_err "Delete the MusicBot directory and try again, or complete the install manually."
+    fi
+
     echo " "
     echo "MusicBot currently has three branches available."
     echo "  master - An older MusicBot, for older discord.py. May not work without tweaks!"
@@ -141,7 +147,7 @@ function setup_as_service() {
         echo "Setting up the bot as a service"
         sed -i "s,/usr/bin/pythonversionnum,$PyBinPath,g" ./musicbot.service
         sed -i "s,mbdirectory,$DIR,g" ./musicbot.service
-        sudo mv ~/MusicBot/musicbot.service /etc/systemd/system/
+        sudo cp ~/MusicBot/musicbot.service /etc/systemd/system/
         sudo chown root:root /etc/systemd/system/musicbot.service
         sudo chmod 644 /etc/systemd/system/musicbot.service
         sudo systemctl enable musicbot
