@@ -427,7 +427,8 @@ case $DISTRO_NAME in
         ;;
 
     # Tested working:
-    # 20.04 @ 2024/03/28
+    # 20.04  @  2024/03/28
+    # 22.04  @  2024/03/30
     *"Ubuntu 20"*|*"Ubuntu 22"*)
         sudo apt-get update -y
         sudo apt-get upgrade -y
@@ -441,7 +442,7 @@ case $DISTRO_NAME in
     # Ubuntu version 17 and under is not supported.
     *)
         echo "Unsupported version of Ubuntu."
-        echo "If you version is newer than Ubuntu 22, please consider contributing install steps."
+        echo "If your version is newer than Ubuntu 22, please consider contributing install steps."
         exit 1
         ;;
     esac
@@ -488,6 +489,8 @@ case $DISTRO_NAME in
     esac
     ;;
 
+# Legacy install, needs testing.
+# Modern Raspberry Pi OS does not return "Raspbian"
 *"Raspbian"*)
     sudo apt-get update -y
     sudo apt-get upgrade -y
