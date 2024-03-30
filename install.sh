@@ -9,10 +9,13 @@
 
 #----------------------------------------------Constants----------------------------------------------#
 DEFAULT_URL_BASE="https://discordapp.com/api"
+MusicBotGitURL="https://github.com/Just-Some-Bots/MusicBot.git"
+CloneDir="MusicBot"
 # Suported versions of python using only major.minor format
 PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
 PyBin="python3"
 
+EnableUnlistedBranches=0
 DEBUG=0
 
 USER_OBJ_KEYS="id username discriminator verified bot email avatar"
@@ -99,12 +102,12 @@ function find_python() {
 function pull_musicbot_git() {
     cd ~ || exit_err "Fatal:  Could not change to home directory."
 
-    if [ -d "MusicBot" ] ; then
-        echo "Error: A directory named MusicBot already exists in your home directory."
-        exit_err "Delete the MusicBot directory and try again, or complete the install manually."
+    if [ -d "${CloneDir}" ] ; then
+        echo "Error: A directory named ${CloneDir} already exists in your home directory."
+        exit_err "Delete the ${CloneDir} directory and try again, or complete the install manually."
     fi
 
-    echo " "
+    echo ""
     echo "MusicBot currently has three branches available."
     echo "  master - An older MusicBot, for older discord.py. May not work without tweaks!"
     echo "  review - Newer MusicBot, usually stable with less updates than the dev branch."
@@ -114,21 +117,26 @@ function pull_musicbot_git() {
     case ${BRANCH,,} in
     "dev")
         echo "Installing from 'dev' branch..."
-        git clone https://github.com/Just-Some-Bots/MusicBot.git MusicBot -b dev
+        git clone "${MusicBotGitURL}" "${CloneDir}" -b dev
         ;;
     "review")
         echo "Installing from 'review' branch..."
-        git clone https://github.com/Just-Some-Bots/MusicBot.git MusicBot -b review
+        git clone "${MusicBotGitURL}" "${CloneDir}" -b review
         ;;
     "master")
         echo "Installing from 'master' branch..."
-        git clone https://github.com/Just-Some-Bots/MusicBot.git MusicBot -b master
+        git clone "${MusicBotGitURL}" "${CloneDir}" -b master
         ;;
     *)
-        exit_err "Unknown branch name given, install cannot continue."
+        if [ "$EnableUnlistedBranches" == "1" ] ; then
+            echo "Installing from '${BRANCH}' branch..."
+            git clone "${MusicBotGitURL}" "${CloneDir}" -b "$BRANCH"
+        else
+            exit_err "Unknown branch name given, install cannot continue."
+        fi
         ;;
     esac
-    cd MusicBot || exit_err "Fatal:  Could not change to MusicBot directory."
+    cd "${CloneDir}" || exit_err "Fatal:  Could not change to MusicBot directory."
 
     $PyBin -m pip install --upgrade -r requirements.txt
 
@@ -139,15 +147,17 @@ function setup_as_service() {
     local DIR
     DIR="$(pwd)"
     echo ""
-    echo "Do you want to set up the bot as a service?"
-    read -rp "This would mean the bot is automatically started and kept up by the system to ensure its online as much as possible [N/y] " SERVICE
+    echo "The installer can also install MusicBot as a system service file."
+    echo "This starts the MusicBot at boot and after failures "
+    read -rp "Install the musicbot system service? [N/y] " SERVICE
     PyBinPath="$(command -v "$PyBin")"
     case $SERVICE in
     [Yy]*)
+        # TODO:  set up user and group
         echo "Setting up the bot as a service"
         sed -i "s,/usr/bin/pythonversionnum,$PyBinPath,g" ./musicbot.service
         sed -i "s,mbdirectory,$DIR,g" ./musicbot.service
-        sudo cp ~/MusicBot/musicbot.service /etc/systemd/system/
+        sudo cp ~/${CloneDir}/musicbot.service /etc/systemd/system/
         sudo chown root:root /etc/systemd/system/musicbot.service
         sudo chmod 644 /etc/systemd/system/musicbot.service
         sudo systemctl enable musicbot
@@ -166,7 +176,7 @@ function ask_setup_aliases() {
     case $SERVICE in
     [Yy]*)
         echo "Setting up command..."
-        sudo mv ~/MusicBot/musicbotcmd /usr/bin/musicbot
+        sudo cp ~/${CloneDir}/musicbotcmd /usr/bin/musicbot
         sudo chown root:root /usr/bin/musicbot
         sudo chmod 644 /usr/bin/musicbot
         sudo chmod +x /usr/bin/musicbot
@@ -362,7 +372,7 @@ case $DISTRO_NAME in
     pull_musicbot_git
     ;;
 
-*"Pop!_OS"*)
+*"Pop!_OS"*)  # Tested working 22.04  @  2024/03/29
     sudo apt-get update -y
     sudo apt-get upgrade -y
     sudo apt-get install build-essential software-properties-common \
@@ -437,22 +447,47 @@ case $DISTRO_NAME in
     esac
     ;;
 
-# NOTE: Raspberry Pi OS 12, i386 arch, returns Debian as Distro name.
-# Tested working:
-# R-Pi OS @ 2024/03/28
+# NOTE: Raspberry Pi OS 11, i386 arch, returns Debian as distro name.
 *"Debian"*)
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-    sudo apt-get install git libopus-dev libffi-dev libsodium-dev ffmpeg \
-        build-essential libncursesw5-dev libgdbm-dev libc6-dev zlib1g-dev \
-        libsqlite3-dev tk-dev libssl-dev openssl python3 python3-pip curl jq -y
-    pull_musicbot_git
+    case $DISTRO_NAME in
+    # Tested working:
+    # R-Pi OS 11  @  2024/03/29
+    # Debian 11.3  @  2024/03/29
+    *"Debian GNU/Linux 11"*)
+        sudo apt-get update -y
+        sudo apt-get upgrade -y
+        sudo apt-get install git libopus-dev libffi-dev libsodium-dev ffmpeg \
+            build-essential libncursesw5-dev libgdbm-dev libc6-dev zlib1g-dev \
+            libsqlite3-dev tk-dev libssl-dev openssl python3 python3-pip curl jq -y
+
+        pull_musicbot_git
+        ;;
+
+    *"Debian GNU/Linux 12"*)
+        # Debian 12 uses system controlled python packages.
+        # This means we need to use a venv to get out-of-repo py packages.
+        # or to apply updates via update.py or the bot command.
+        # Unfortunately also means we need to update the other scripts to
+        # look for venv and to start using it instead.
+        echo "Debian 12 is not currently supported."
+        echo "Python packages are now system controlled, so venv is required to install and run MusicBot"
+        echo ""
+        exit 1
+        
+        sudo apt-get update -y
+        sudo apt-get upgrade -y
+        sudo apt-get install build-essential libopus-dev libffi-dev libsodium-dev \
+            python3-full python3-dev python3-pip git ffmpeg curl
+
+        pull_musicbot_git
+        ;;
+
+    *)
+        exit_err "This version of Debian is not currently supported."
+        ;;
+    esac
     ;;
 
-# I don't know if this will still work.
-# Raspberry Pi OS i386 (bullseye) does not return "Raspbian" you get "Debian" instead.
-# I cannot test the arm versions without a board or an emulator...
-# Guess it wont hurt to leave it in for now...
 *"Raspbian"*)
     sudo apt-get update -y
     sudo apt-get upgrade -y
