@@ -380,7 +380,7 @@ fi
 echo ""
 
 case $DISTRO_NAME in
-*"Arch Linux"*)
+*"Arch Linux"*)  # Tested working 2024.03.01  @  2024/03/31
     # NOTE: Arch now uses system managed python packages, so venv is required.
     sudo pacman -Syu
     sudo pacman -S curl ffmpeg git jq python python-pip
@@ -495,7 +495,7 @@ case $DISTRO_NAME in
         pull_musicbot_git
         ;;
 
-    *"Debian GNU/Linux 12"*)
+    *"Debian GNU/Linux 12"*)  # Tested working 12.5  @  2024/03/31
         # Debian 12 uses system controlled python packages.
         sudo apt-get update -y
         sudo apt-get upgrade -y
