@@ -97,6 +97,7 @@ function find_python() {
                 if [[ $PY_VER_PATCH -ge 7 ]]; then
                     PyBinPath="$(command -v "$PyBin")"
                     echo "$PyBin"
+                    debug "Selected: $PyBin  @  $PyBinPath"
                     return 0
                 fi
             fi
@@ -104,6 +105,7 @@ function find_python() {
             if [[ $PY_VER_MINOR -ge 9 ]]; then
                 PyBinPath="$(command -v "$PyBin")"
                 echo "$PyBin"
+                debug "Selected: $PyBin  @  $PyBinPath"
                 return 0
             fi
         fi
@@ -111,6 +113,7 @@ function find_python() {
 
     PyBinPath="$(command -v "python3")"
     echo "python3"
+    debug "Default: python3  @  $PyBinPath"
     return 1
 }
 
