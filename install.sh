@@ -21,6 +21,8 @@ DEFAULT_URL_BASE="https://discordapp.com/api"
 # Suported versions of python using only major.minor format
 PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
 PyBin="python3"
+# Path updated by find_python
+PyBinPath="$(command -v "$PyBin")"
 
 USER_OBJ_KEYS="id username discriminator verified bot email avatar"
 
@@ -93,18 +95,21 @@ function find_python() {
             if [[ $PY_VER_MINOR -eq 8 ]]; then
                 # if 3.8, patch version minimum is 3.8.7
                 if [[ $PY_VER_PATCH -ge 7 ]]; then
+                    PyBinPath="$(command -v "$PyBin")"
                     echo "$PyBin"
                     return 0
                 fi
             fi
             # if 3.9+ it should work.
             if [[ $PY_VER_MINOR -ge 9 ]]; then
+                PyBinPath="$(command -v "$PyBin")"
                 echo "$PyBin"
                 return 0
             fi
         fi
     done
 
+    PyBinPath="$(command -v "python3")"
     echo "python3"
     return 1
 }
@@ -160,7 +165,6 @@ function setup_as_service() {
     echo "The installer can also install MusicBot as a system service file."
     echo "This starts the MusicBot at boot and after failures "
     read -rp "Install the musicbot system service? [N/y] " SERVICE
-    PyBinPath="$(command -v "$PyBin")"
     case $SERVICE in
     [Yy]*)
         # TODO:  set up user and group
@@ -384,8 +388,12 @@ case $DISTRO_NAME in
     # create a venv to install MusicBot into.
     $PyBin -m venv "${VenvDir}"
     InstalledViaVenv=1
+    CloneDir="${VenvDir}/${CloneDir}"
     # shellcheck disable=SC1091
-    source "${VenvDir}/bin/activate" 
+    source "${VenvDir}/bin/activate"
+
+    # Update python to use venv path.
+    PyBin="$(find_python)"
 
     pull_musicbot_git
 
@@ -495,8 +503,10 @@ case $DISTRO_NAME in
         PyBin="$(find_python)"
         $PyBin -m venv "${VenvDir}"
         InstalledViaVenv=1
+        CloneDir="${VenvDir}/${CloneDir}"
         # shellcheck disable=SC1091
         source "${VenvDir}/bin/activate"
+        PyBin="$(find_python)"
 
         pull_musicbot_git
         
