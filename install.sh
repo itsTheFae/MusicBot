@@ -60,8 +60,6 @@ function exit_err() {
 }
 
 function find_python() {
-    # This function returns a status as well as a value for capture.
-
     # compile a list of bin names to try for.
     PyBins=("python3")  # We hope that python3 maps to a good version.
     for Ver in "${PySupported[@]}" ; do
@@ -73,14 +71,14 @@ function find_python() {
     PyBins+=("python")  # Fat chance, but might as well try versionless too.
 
     # Test each possible PyBin until the first supported version is found.
-    for PyBin in "${PyBins[@]}" ; do
-        if ! command -v "$PyBin" > /dev/null 2>&1 ; then
+    for PyBinTest in "${PyBins[@]}" ; do
+        if ! command -v "$PyBinTest" > /dev/null 2>&1 ; then
             continue
         fi
 
         # Get version data from python, assume python exists in PATH somewhere.
         # shellcheck disable=SC2207
-        PY_VER=($($PyBin -c "import sys; print('%s %s %s' % sys.version_info[:3])" || { echo "0 0 0"; }))
+        PY_VER=($($PyBinTest -c "import sys; print('%s %s %s' % sys.version_info[:3])" || { echo "0 0 0"; }))
         if [[ "${PY_VER[0]}" == "0" ]]; then
             continue
         fi
@@ -95,24 +93,24 @@ function find_python() {
             if [[ $PY_VER_MINOR -eq 8 ]]; then
                 # if 3.8, patch version minimum is 3.8.7
                 if [[ $PY_VER_PATCH -ge 7 ]]; then
-                    PyBinPath="$(command -v "$PyBin")"
-                    echo "$PyBin"
-                    debug "Selected: $PyBin  @  $PyBinPath"
+                    PyBinPath="$(command -v "$PyBinTest")"
+                    PyBin="$PyBinTest"
+                    debug "Selected: $PyBinTest  @  $PyBinPath"
                     return 0
                 fi
             fi
             # if 3.9+ it should work.
             if [[ $PY_VER_MINOR -ge 9 ]]; then
-                PyBinPath="$(command -v "$PyBin")"
-                echo "$PyBin"
-                debug "Selected: $PyBin  @  $PyBinPath"
+                PyBinPath="$(command -v "$PyBinTest")"
+                PyBin="$PyBinTest"
+                debug "Selected: $PyBinTest  @  $PyBinPath"
                 return 0
             fi
         fi
     done
 
     PyBinPath="$(command -v "python3")"
-    echo "python3"
+    PyBin="python3"
     debug "Default: python3  @  $PyBinPath"
     return 1
 }
@@ -387,8 +385,10 @@ case $DISTRO_NAME in
     sudo pacman -Syu
     sudo pacman -S curl ffmpeg git jq python python-pip
 
-    PyBin="$(find_python)"
-    # create a venv to install MusicBot into.
+    # Make sure newly install python is used.
+    find_python
+
+    # create a venv to install MusicBot into and activate it.
     $PyBin -m venv "${VenvDir}"
     InstalledViaVenv=1
     CloneDir="${VenvDir}/${CloneDir}"
@@ -396,7 +396,7 @@ case $DISTRO_NAME in
     source "${VenvDir}/bin/activate"
 
     # Update python to use venv path.
-    PyBin="$(find_python)"
+    find_python
 
     pull_musicbot_git
 
@@ -443,7 +443,7 @@ case $DISTRO_NAME in
             sudo make altinstall
 
             # Ensure python bin is updated with altinstall name.
-            PyBin="$(find_python)"
+            find_python
             RetVal=$?
             if [ "$RetVal" == "0" ] ; then
                 # manually install pip package for current user.
@@ -502,14 +502,14 @@ case $DISTRO_NAME in
         sudo apt-get install build-essential libopus-dev libffi-dev libsodium-dev \
             python3-full python3-dev python3-pip git ffmpeg curl
 
-        # Create an activate a venv using python that was just installed.
-        PyBin="$(find_python)"
+        # Create and activate a venv using python that was just installed.
+        find_python
         $PyBin -m venv "${VenvDir}"
         InstalledViaVenv=1
         CloneDir="${VenvDir}/${CloneDir}"
         # shellcheck disable=SC1091
         source "${VenvDir}/bin/activate"
-        PyBin="$(find_python)"
+        find_python
 
         pull_musicbot_git
         
@@ -585,7 +585,7 @@ case $DISTRO_NAME in
             sudo make altinstall
 
             # Ensure python bin is updated with altinstall name.
-            PyBin="$(find_python)"
+            find_python
             RetVal=$?
             if [ "$RetVal" == "0" ] ; then
                 # manually install pip package for the current user.
