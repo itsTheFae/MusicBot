@@ -7,37 +7,47 @@
 # a variety of different Linux distros.
 # 
 
-#----------------------------------------------Constants----------------------------------------------#
-DEFAULT_URL_BASE="https://discordapp.com/api"
+#-----------------------------------------------Configs-----------------------------------------------#
 MusicBotGitURL="https://github.com/Just-Some-Bots/MusicBot.git"
 CloneDir="MusicBot"
-# Suported versions of python using only major.minor format
-PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
-PyBin="python3"
+VenvDir="${CloneDir}Venv"
 
 EnableUnlistedBranches=0
 DEBUG=0
 
+
+#----------------------------------------------Constants----------------------------------------------#
+DEFAULT_URL_BASE="https://discordapp.com/api"
+# Suported versions of python using only major.minor format
+PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
+PyBin="python3"
+
 USER_OBJ_KEYS="id username discriminator verified bot email avatar"
+
+# Status indicator for post-install notice about python venv based install.
+InstalledViaVenv=0
 
 declare -A BOT
 
 # Get some notion of the current OS / distro name.
 # This will not exhaust options, or ensure a correct name is returned. 
+# A good example is Raspberry Pi OS 11 which returns Debian.
 if [ -n "$(command -v lsb_release)" ] ; then
-    # Most debian-based distros will have this command.
-    # Redhat-based distros usually need to install it via redhat-lsb-core package
+    # Most debian-based distros might have this installed, but not always.
+    # Redhat-based distros usually need to install it via redhat-lsb-core package.
     DISTRO_NAME=$(lsb_release -s -d)
 elif [ -f "/etc/os-release" ]; then
     # Many distros have this file, but not all of them are version complete.
     # For example, CentOS 7 will return "CentOS Linux 7 (Core)"
     # If we need to know the minor version, we need /etc/redhat-release instead.
+    # Same for Debian, which uses /etc/debian_version file instead.
     DISTRO_NAME=$(grep PRETTY_NAME /etc/os-release | sed 's/PRETTY_NAME=//g' | tr -d '="')
 elif [ -f "/etc/debian_version" ]; then
     DISTRO_NAME="Debian $(cat /etc/debian_version)"
 elif [ -f "/etc/redhat-release" ]; then
     DISTRO_NAME=$(cat /etc/redhat-release)
 else
+    # In case everything fails, use Kernel name and release.
     DISTRO_NAME="$(uname -s) $(uname -r)"
 fi
 
@@ -366,10 +376,20 @@ echo ""
 
 case $DISTRO_NAME in
 *"Arch Linux"*)
+    # NOTE: Arch now uses system managed python packages, so venv is required.
     sudo pacman -Syu
-    sudo pacman -S git python python-pip opus libffi libsodium ncurses gdbm \
-        glibc zlib sqlite tk openssl ffmpeg curl jq
+    sudo pacman -S curl ffmpeg git jq python python-pip
+
+    PyBin="$(find_python)"
+    # create a venv to install MusicBot into.
+    $PyBin -m venv "${VenvDir}"
+    InstalledViaVenv=1
+    # shellcheck disable=SC1091
+    source "${VenvDir}/bin/activate" 
+
     pull_musicbot_git
+
+    deactivate
     ;;
 
 *"Pop!_OS"*)  # Tested working 22.04  @  2024/03/29
@@ -466,21 +486,22 @@ case $DISTRO_NAME in
 
     *"Debian GNU/Linux 12"*)
         # Debian 12 uses system controlled python packages.
-        # This means we need to use a venv to get out-of-repo py packages.
-        # or to apply updates via update.py or the bot command.
-        # Unfortunately also means we need to update the other scripts to
-        # look for venv and to start using it instead.
-        echo "Debian 12 is not currently supported."
-        echo "Python packages are now system controlled, so venv is required to install and run MusicBot"
-        echo ""
-        exit 1
-        
         sudo apt-get update -y
         sudo apt-get upgrade -y
         sudo apt-get install build-essential libopus-dev libffi-dev libsodium-dev \
             python3-full python3-dev python3-pip git ffmpeg curl
 
+        # Create an activate a venv using python that was just installed.
+        PyBin="$(find_python)"
+        $PyBin -m venv "${VenvDir}"
+        InstalledViaVenv=1
+        # shellcheck disable=SC1091
+        source "${VenvDir}/bin/activate"
+
         pull_musicbot_git
+        
+        # exit venv
+        deactiveate
         ;;
 
     *)
@@ -586,8 +607,7 @@ case $DISTRO_NAME in
     esac
     ;;
 
-# TODO:  Rocky, Alma, OpenBSD ?
-
+# Legacy installer, needs testing.
 *"Darwin"*)
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew update
@@ -616,4 +636,17 @@ else
     echo "The bot has been successfully installed to your user directory"
     echo "You can configure the bot by navigating to the config folder, and modifying the contents of the options.ini and permissions.ini files"
     echo "Once configured, you can start the bot by running the run.sh file"
+fi
+
+if [ "$InstalledViaVenv" == "1" ] ; then
+    echo ""
+    echo "Notice:"
+    echo "This system required MusicBot to be installed inside a Python venv."
+    echo "In order to run or update MusicBot, you must use the venv or binaries stored within it."
+    echo "To activate the venv, run the following command: "
+    echo "  source ${VenvDir}/bin/activate"
+    echo ""
+    echo "The venv module is bundled with python 3.3+, for more info about venv, see here:"
+    echo "  https://docs.python.org/3/library/venv.html"
+    echo ""
 fi
