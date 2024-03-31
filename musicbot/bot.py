@@ -267,6 +267,10 @@ class MusicBot(discord.Client):
         A self looping method that tests network connectivity.
         This will call to the systems ping command and use its return status.
         """
+        if not self.config.enable_network_checker:
+            log.debug("Network ping test is disabled via config.")
+            return
+
         if self.logout_called:
             log.noise("Network ping test is closing down.")  # type: ignore[attr-defined]
             return

@@ -572,6 +572,20 @@ class Config:
             comment="If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member.",
         )
 
+        self.enable_network_checker: bool = self.regist.init_option(
+            section="MusicBot",
+            option="EnableNetworkChecker",
+            dest="enable_network_checker",
+            default=ConfigDefaults.enable_network_checker,
+            getter="getboolean",
+            comment=(
+                "Allow MusicBot to use system ping command to detect network outage and availability.\n"
+                "This is useful if you keep the bot joined to a channel or playing music 24/7.\n"
+                "MusicBot must be restarted to enable network testing.\n"
+                "By default this is disabled."
+            ),
+        )
+
         self.user_blocklist_enabled: bool = self.register.init_option(
             section="MusicBot",
             option="EnableUserBlocklist",
@@ -1080,6 +1094,7 @@ class ConfigDefaults:
     enable_options_per_guild: bool = False
     footer_text: str = DEFAULT_FOOTER_TEXT
     defaultround_robin_queue: bool = False
+    enable_network_checker: bool = False
 
     song_blocklist: Set[str] = set()
     user_blocklist: Set[int] = set()
