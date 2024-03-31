@@ -8,7 +8,10 @@
 # 
 
 #-----------------------------------------------Configs-----------------------------------------------#
-MusicBotGitURL="https://github.com/Just-Some-Bots/MusicBot.git"
+# Original repo is here:
+#MusicBotGitURL="https://github.com/Just-Some-Bots/MusicBot.git"
+# This is currently required since upstream does not have the updated service file.
+MusicBotGitURL="https://github.com/itsTheFae/MusicBot.git"
 CloneDir="MusicBot"
 VenvDir="${CloneDir}Venv"
 
