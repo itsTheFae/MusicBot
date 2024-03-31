@@ -35,16 +35,23 @@ Cherry-picking (or otherwise copying) is welcome should you feel inclined.
 Here is a list of changes made so far, with most recent first:
 
 - Improve and test various aspects of Install and Update scripts.
-  - Linux install.sh now supports `--list` flag to show possible supported distros.
   - All installers now ask before proceeding to install packages.
-  - Improved install.sh detection of python with correct version.
+  - Linux install.sh now supports `--list` flag to show possible supported distros.
+  - Linux install.sh improved detection of python with correct version.
+  - Linux install.sh now requires User and Group to set up system service.
   - Windows installer adds FFmpeg install step to install.ps1 via winget tool.
-  - Drop support of CentOS 6 as end-of-life.
-  - Adds support for CentOS Stream 8.
-  - Adds CentOS 7, tested despite EOL date being June 2024.
-  - Drop support of Ubuntu versions before 18.04.
-  - Tested Ubuntu 18.04, 20.04, and 22.04 installer.
-  - Adds support for Pop! OS, tested with 22.04 (20.04 is not tested but may work)
+  - Linux distro support updates:
+    - Drop support of CentOS 6 as end-of-life.
+    - Adds support for CentOS Stream 8.
+    - Adds CentOS 7, tested despite EOL date being June 2024.
+    - Drop support of Ubuntu versions before 18.04.
+    - Tested Ubuntu 18.04, 20.04, and 22.04 installer.
+    - Adds support for Pop! OS, tested with 22.04 (20.04 is not tested but may work)
+    - Tested Arch Linux (2024.03.01), with venv install.
+    - Adds support for Debian 12, with venv install.
+    - Tested Debian 11.3 installation.
+    - Tested Raspberry Pi OS (Desktop i386, reported as Debian 11).
+- Update update.sh python detection to the same as in run.sh.
 - Update run.sh python detection to account for name conventions between distros.
 - Adds `uptime` command to show time since last start/restart.
 - Adds `seek` command to restart the current playing track at the given time.
