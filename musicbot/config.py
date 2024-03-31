@@ -572,7 +572,7 @@ class Config:
             comment="If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member.",
         )
 
-        self.enable_network_checker: bool = self.regist.init_option(
+        self.enable_network_checker: bool = self.register.init_option(
             section="MusicBot",
             option="EnableNetworkChecker",
             dest="enable_network_checker",
