@@ -7,6 +7,8 @@ After=network.target
 
 [Service]
 # These options are useful if you set up MusicBot under a dedicated user account.
+# Uncomment and set these to an existing User name and Group name.
+# If you do not set these, MusicBot may run as root!  You've been warned!
 #User=mbuser
 #Group=mbusergroup
 

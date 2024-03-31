@@ -164,19 +164,43 @@ function setup_as_service() {
     DIR="$(pwd)"
     echo ""
     echo "The installer can also install MusicBot as a system service file."
-    echo "This starts the MusicBot at boot and after failures "
+    echo "This starts the MusicBot at boot and after failures."
+    echo "You must specify a User and Group which the service will run as."
     read -rp "Install the musicbot system service? [N/y] " SERVICE
     case $SERVICE in
     [Yy]*)
-        # TODO:  set up user and group
+        # Because running this service as root is really not a good idea,
+        # a user and group is required here.
+        echo "Please provide an existing User name and Group name for the service to use."
+        read -rp "Enter an existing User name: " BotSysUserName
+        echo ""
+        read -rp "Enter an existing Group name: " BotSysGroupName
+        echo ""
+        # TODO: maybe check if the given values are valid, or create the user/group...
+
+        if [ "$BotSysUserName" == "" ] ; then
+            echo "Cannot set up the service with a blank User name."
+            return
+        fi
+        if [ "$BotSysGroupName" == "" ] ; then
+            echo "Cannot set up the service with a blank Group name."
+            return
+        fi
+
         echo "Setting up the bot as a service"
-        sed -i "s,/usr/bin/pythonversionnum,$PyBinPath,g" ./musicbot.service
-        sed -i "s,mbdirectory,$DIR,g" ./musicbot.service
+        # Replace parts of musicbot.service with proper values.
+        sed -i "s,#User=mbuser,User=${BotSysUserName},g" ./musicbot.service
+        sed -i "s,#Group=mbusergroup,Group=${BotSysGroupName},g" ./musicbot.service
+        sed -i "s,/usr/bin/pythonversionnum,${PyBinPath},g" ./musicbot.service
+        sed -i "s,mbdirectory,${DIR},g" ./musicbot.service
+
+        # Copy the service file into place and enable it.
         sudo cp ~/${CloneDir}/musicbot.service /etc/systemd/system/
         sudo chown root:root /etc/systemd/system/musicbot.service
         sudo chmod 644 /etc/systemd/system/musicbot.service
         sudo systemctl enable musicbot
         sudo systemctl start musicbot
+
         echo "Bot setup as a service and started"
         ask_setup_aliases
         ;;
