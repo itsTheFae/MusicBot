@@ -5957,7 +5957,7 @@ class MusicBot(discord.Client):
             option_arg = leftover_args.pop(0)
         else:
             group_arg = leftover_args.pop(0)
-        if option == "set":
+        if option in ["set", "show"]:
             option_arg = leftover_args.pop(0)
 
         if user_mentions:
