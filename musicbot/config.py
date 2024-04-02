@@ -688,6 +688,9 @@ class Config:
         self.data_path = pathlib.Path(DEFAULT_DATA_PATH).resolve()
         self.server_names_path = self.data_path.joinpath(DEFAULT_DATA_NAME_SERVERS)
 
+        # Validate the config settings match destination values.
+        self.register.validate_register_destinations()
+
         # Make the registry check for missing data in the INI file.
         self.register.update_missing_config()
 
@@ -1152,6 +1155,7 @@ class ConfigOption:
         :param: comment:    A comment or help text to show for this option.
         :param: editable:   If this option can be changed via commands.
         :param: invisible:  (Permissions only) hide from display when formatted for per-user display.
+        :param: empty_display_val   Value shown when the parsed value is empty or None.
         """
         self.section = section
         self.option = option
@@ -1293,6 +1297,19 @@ class ConfigOptionRegistry:
         parser_value = p_getter(opt.section, opt.option, fallback=opt.default)
 
         return (config_value, parser_value)
+
+    def validate_register_destinations(self) -> None:
+        """Check all configured options for matching destination definitions."""
+        errors = []
+        for opt in self._option_list:
+            if not hasattr(self._config, opt.dest):
+                errors.append(
+                    f"Config Option `{opt}` has an missing destination named:  {opt.dest}"
+                )
+        if errors:
+            msg = "Dev Bug!  Some options failed config validation.\n"
+            msg += "\n".join(errors)
+            raise RuntimeError(msg)
 
     @overload
     def init_option(
@@ -1437,11 +1454,14 @@ class ConfigOptionRegistry:
         :param: comment:    A comment or help text to show for this option.
         :param: editable:   If this option can be changed via commands.
         """
-        # TODO: add some basic checks to make sure Callable is callable and that
-        # dest is an existing name...
+        # Check that the getter function exists and is callable.
         if not hasattr(self._parser, getter):
             raise ValueError(
                 f"Dev Bug! There is no *ConfigParser function by the name of: {getter}"
+            )
+        if not callable(getattr(self._parser, getter)):
+            raise TypeError(
+                f"Dev Bug! The *ConfigParser.{getter} attribute is not a callable function."
             )
 
         # add the option to the registry.

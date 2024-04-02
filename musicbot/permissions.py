@@ -147,6 +147,8 @@ class Permissions:
                 DEFAULT_OWNER_GROUP_NAME
             )
 
+        self.register.validate_register_destinations()
+
     def _generate_default_group(self, name: str) -> "PermissionGroup":
         """Generate a group with `name` using PermissionDefaults."""
         return PermissionGroup(name, self, PermissionsDefaults)
@@ -540,6 +542,24 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
     def __init__(self, config: Permissions, parser: ExtendedConfigParser) -> None:
         super().__init__(config, parser)
 
+    def validate_register_destinations(self) -> None:
+        """Check all configured options for matching destination definitions."""
+        if not isinstance(self._config, Permissions):
+            raise RuntimeError(
+                "Dev Bug! Somehow this is Config when it should be Permissions."
+            )
+
+        errors = []
+        for opt in self._option_list:
+            if not hasattr(self._config.groups[opt.section], opt.dest):
+                errors.append(
+                    f"Permission `{opt}` has an missing destination named:  {opt.dest}"
+                )
+        if errors:
+            msg = "Dev Bug!  Some permissions failed validation.\n"
+            msg += "\n".join(errors)
+            raise RuntimeError(msg)
+
     @property
     def distinct_options(self) -> Set[str]:
         """Unique Permission names for Permission groups."""
@@ -586,7 +606,7 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
             )
 
         parser_get = getattr(self._parser, opt.getter)
-        config_value = getattr(self._config, opt.dest)
+        config_value = getattr(self._config.groups[opt.section], opt.dest)
         parser_value = parser_get(opt.section, opt.option, fallback=opt.default)
 
         return (config_value, parser_value)

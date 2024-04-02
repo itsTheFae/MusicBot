@@ -5972,7 +5972,8 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
-        if option in ["help", "set"]:
+        # Make sure the option is set if the sub-command needs it.
+        if option in ["help", "set", "show"]:
             p_opt = self.permissions.register.get_config_option(group_arg, option_arg)
             if p_opt is None:
                 option_arg = f"[{group_arg}] > {option_arg}"
