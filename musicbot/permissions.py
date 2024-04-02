@@ -353,7 +353,7 @@ class PermissionGroup:
                 "Some commands will always require the user to be in voice, regardless of this list.\n"
                 "Command names should be separated by spaces."
             ),
-            empty_display_val="(No commands listed)"
+            empty_display_val="(No commands listed)",
         )
         self.granted_to_roles = self._mgr.register.init_option(
             section=name,
@@ -526,7 +526,7 @@ class PermissionGroup:
     def format(self, for_user: bool = False) -> str:
         """
         Format the current group values into INI-like text.
-        
+
         :param: for_user:  Present values for display, instead of literal values.
         """
         perms = f"Permission group name:  {self.name}\n"

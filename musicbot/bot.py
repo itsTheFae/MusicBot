@@ -6048,7 +6048,9 @@ class MusicBot(discord.Client):
 
         # Display the current permissions group and INI file values.
         if option == "show":
-            cur_val, ini_val, empty_display_val = self.permissions.register.get_values(opt)
+            cur_val, ini_val, empty_display_val = self.permissions.register.get_values(
+                opt
+            )
             return Response(
                 f"**Permission:** `{opt}`\n"
                 f"Current Value:  `{cur_val}` {empty_display_val}\n"
