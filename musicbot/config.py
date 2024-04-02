@@ -1275,12 +1275,15 @@ class ConfigOptionRegistry:
                 return opt
         return None
 
-    def get_values(self, opt: ConfigOption) -> Tuple[RegTypes, str]:
+    def get_values(self, opt: ConfigOption) -> Tuple[RegTypes, str, str]:
         """
         Get the values in Config and *ConfigParser for this config option.
+        Returned tuple contains parsed value, ini-string, and a display string
+        for the parsed config value if applicable.
+        Display string may be empty if not used.
         """
         if not opt.editable:
-            return ("", "")
+            return ("", "", "")
 
         if not hasattr(self._config, opt.dest):
             raise AttributeError(
@@ -1296,7 +1299,11 @@ class ConfigOptionRegistry:
         config_value = getattr(self._config, opt.dest)
         parser_value = p_getter(opt.section, opt.option, fallback=opt.default)
 
-        return (config_value, parser_value)
+        display_config_value = ""
+        if not display_config_value and opt.empty_display_val:
+            display_config_value = opt.empty_display_val
+
+        return (config_value, parser_value, display_config_value)
 
     def validate_register_destinations(self) -> None:
         """Check all configured options for matching destination definitions."""

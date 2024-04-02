@@ -5169,7 +5169,8 @@ class MusicBot(discord.Client):
                     f"Option `{opt}` is not editable, value cannot be displayed.",
                     expire_in=30,
                 )
-            cur_val, ini_val = self.config.register.get_values(opt)
+            # TODO: perhaps make use of currently unused display value for empty configs.
+            cur_val, ini_val, _disp_val = self.config.register.get_values(opt)
             return Response(
                 f"**Option:** `{opt}`\n"
                 f"Current Value:  `{cur_val}`\n"

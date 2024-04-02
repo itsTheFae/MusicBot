@@ -588,9 +588,12 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
             new_opts.append(opt)
         self._option_list = new_opts
 
-    def get_values(self, opt: ConfigOption) -> Tuple[RegTypes, str]:
+    def get_values(self, opt: ConfigOption) -> Tuple[RegTypes, str, str]:
         """
         Get the values in PermissionGroup and *ConfigParser for this option.
+        Returned tuple contains parsed value, ini-string, and a display string
+        for the parsed config value if applicable.
+        Display string may be empty if not used.
         """
         if not isinstance(self._config, Permissions):
             raise RuntimeError(
@@ -598,7 +601,7 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
             )
 
         if not opt.editable:
-            return ("", "")
+            return ("", "", "")
 
         if opt.section not in self._config.groups:
             raise ValueError(
