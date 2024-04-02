@@ -348,7 +348,12 @@ class PermissionGroup:
             dest="ignore_non_voice",
             getter="getstrset",
             default=defaults.ignore_non_voice,
-            comment="List of command names that can only be used while in the same voice channel as the MusicBot. Separated by spaces.",
+            comment=(
+                "List of command names that can only be used while in the same voice channel as MusicBot.\n"
+                "Some commands will always require the user to be in voice, regardless of this list.\n"
+                "Command names should be separated by spaces."
+            ),
+            empty_display_val="(No commands listed)"
         )
         self.granted_to_roles = self._mgr.register.init_option(
             section=name,
@@ -375,6 +380,7 @@ class PermissionGroup:
             getter="getint",
             default=defaults.max_songs,
             comment="Maximum number of songs a user is allowed to queue. A value of 0 means unlimited.",
+            empty_display_val="(Unlimited)",
         )
         self.max_song_length = self._mgr.register.init_option(
             section=name,
@@ -386,6 +392,7 @@ class PermissionGroup:
                 "Maximum length of a song in seconds. A value of 0 means unlimited.\n"
                 "This permission may not be enforced if song duration is not available."
             ),
+            empty_display_val="(Unlimited)",
         )
         self.max_playlist_length = self._mgr.register.init_option(
             section=name,
@@ -394,6 +401,7 @@ class PermissionGroup:
             getter="getint",
             default=defaults.max_playlist_length,
             comment="Maximum number of songs a playlist is allowed to have to be queued. A value of 0 means unlimited.",
+            empty_display_val="(Unlimited)",
         )
         self.max_search_items = self._mgr.register.init_option(
             section=name,
@@ -518,6 +526,8 @@ class PermissionGroup:
     def format(self, for_user: bool = False) -> str:
         """
         Format the current group values into INI-like text.
+        
+        :param: for_user:  Present values for display, instead of literal values.
         """
         perms = f"Permission group name:  {self.name}\n"
         for opt in self._mgr.register.option_list:
@@ -609,7 +619,11 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
         config_value = getattr(self._config.groups[opt.section], opt.dest)
         parser_value = parser_get(opt.section, opt.option, fallback=opt.default)
 
-        return (config_value, parser_value)
+        display_config_value = ""
+        if not display_config_value and opt.empty_display_val:
+            display_config_value = opt.empty_display_val
+
+        return (config_value, parser_value, display_config_value)
 
     def get_parser_value(self, opt: ConfigOption) -> RegTypes:
         """returns the parser's parsed value for the given option."""

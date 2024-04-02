@@ -5988,9 +5988,10 @@ class MusicBot(discord.Client):
             default = (
                 "\nThis permission can only be set by editing the permissions file."
             )
+            # TODO:  perhaps use empty display values here.
             if opt.editable:
                 dval = self.permissions.register.to_ini(opt, use_default=True)
-                default = f"\nBy default this permission is set to: {dval}"
+                default = f"\nBy default this permission is set to: `{dval}`"
             return Response(
                 f"**Permission:** `{opt.option}`\n{opt.comment}{default}",
                 delete_after=60,
@@ -6047,10 +6048,10 @@ class MusicBot(discord.Client):
 
         # Display the current permissions group and INI file values.
         if option == "show":
-            cur_val, ini_val = self.permissions.register.get_values(opt)
+            cur_val, ini_val, empty_display_val = self.permissions.register.get_values(opt)
             return Response(
                 f"**Permission:** `{opt}`\n"
-                f"Current Value:  `{cur_val}`\n"
+                f"Current Value:  `{cur_val}` {empty_display_val}\n"
                 f"INI File Value:  `{ini_val}`",
                 delete_after=30,
             )
