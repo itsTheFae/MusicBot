@@ -418,7 +418,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         """Get the current playback speed if one was set, or return 1.0 for normal playback."""
         if self._playback_rate is not None:
             return self._playback_rate
-        return 1.0
+        return self.playlist.bot.config.default_speed or 1.0
 
     def set_playback_speed(self, speed: float) -> None:
         """Set the playback speed to be used with ffmpeg -af:atempo filter."""
