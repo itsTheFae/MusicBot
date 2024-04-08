@@ -4993,9 +4993,6 @@ class MusicBot(discord.Client):
 
         Apply a speed to the currently playing track.
         The rate must be between 0.5 and 100.0 due to ffmpeg limits.
-
-        Estimated times do not account for speed adjustments.
-        Seek times are not adjusted for speed, non-adjusted time must be used.
         Stream playback does not support speed adjustments.
         """
         if not player.current_entry:

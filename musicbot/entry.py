@@ -201,8 +201,6 @@ class URLPlaylistEntry(BasePlaylistEntry):
         super().__init__()
 
         self._start_time: Optional[float] = None
-        # TODO: proper progress reporting when this is not 1.0.
-        # currently it will mess up estimated play time and time-to-next-track.
         self._playback_rate: Optional[float] = None
         self.playlist: "Playlist" = playlist
         self.downloader: "Downloader" = playlist.bot.downloader

@@ -47,6 +47,7 @@ class SourcePlaybackCounter(AudioSource):
         self,
         source: PCMVolumeTransformer[FFmpegPCMAudio],
         start_time: float = 0,
+        playback_speed: float = 1.0,
     ) -> None:
         """
         Manage playback source and attempt to count progress frames used
@@ -57,6 +58,7 @@ class SourcePlaybackCounter(AudioSource):
         self._source = source
         self._num_reads: int = 0
         self._start_time: float = start_time
+        self._playback_speed: float = playback_speed
 
     def read(self) -> bytes:
         res = self._source.read()
@@ -80,13 +82,16 @@ class SourcePlaybackCounter(AudioSource):
 
     @property
     def session_progress(self) -> float:
-        """Like progress but only counts frames from this session."""
-        return self._num_reads * 0.02
+        """
+        Like progress but only counts frames from this session.
+        Adjusts the estimated time by playback speed.
+        """
+        return (self._num_reads * 0.02) * self._playback_speed
 
     @property
     def progress(self) -> float:
         """Get an approximate playback progress time."""
-        return self._start_time + (self._num_reads * 0.02)
+        return self._start_time + self.session_progress
 
 
 class MusicPlayer(EventEmitter, Serializable):
@@ -399,6 +404,7 @@ class MusicPlayer(EventEmitter, Serializable):
                         self.volume,
                     ),
                     start_time=entry.start_time,
+                    playback_speed=entry.playback_speed,
                 )
                 log.voicedebug(  # type: ignore[attr-defined]
                     "Playing %r using %r", self._source, self.voice_client
