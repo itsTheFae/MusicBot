@@ -4375,7 +4375,9 @@ class MusicBot(discord.Client):
                 player.current_entry.duration
                 and player.current_entry.duration_td.total_seconds() > 0
             ):
-                percentage = player.progress / player.current_entry.duration_td.total_seconds()
+                percentage = (
+                    player.progress / player.current_entry.duration_td.total_seconds()
+                )
 
             # create the actual bar
             progress_bar_length = 30

@@ -201,7 +201,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         super().__init__()
 
         self._start_time: Optional[float] = None
-        # TODO: proper progress reporting when this is not 1.0. 
+        # TODO: proper progress reporting when this is not 1.0.
         # currently it will mess up estimated play time and time-to-next-track.
         self._playback_rate: Optional[float] = None
         self.playlist: "Playlist" = playlist
@@ -226,16 +226,17 @@ class URLPlaylistEntry(BasePlaylistEntry):
     @property
     def aoptions(self) -> str:
         """After input options for ffmpeg to use with this entry."""
+        aopts = f"{self._aopt_eq}"
         # Set playback speed options if needed.
         if self._playback_rate is not None:
             # Append to the EQ options if they are set.
             if self._aopt_eq:
-                self._aopt_eq += f",atempo={self.playback_speed:.3f}"
+                aopts = f"{self._aopt_eq},atempo={self.playback_speed:.3f}"
             else:
-                self._aopt_eq += f"-af atempo={self.playback_speed:.3f}"
+                aopts = f"-af atempo={self.playback_speed:.3f}"
 
-        if self._aopt_eq:
-            return f"{self._aopt_eq} -vn"
+        if aopts:
+            return f"{aopts} -vn"
 
         return "-vn"
 

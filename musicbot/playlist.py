@@ -479,7 +479,9 @@ class Playlist(EventEmitter, Serializable):
             if player.current_entry.duration is None:
                 raise InvalidDataError("no duration data in current entry")
 
-            estimated_time += player.current_entry.duration_td.total_seconds() - player.progress
+            estimated_time += (
+                player.current_entry.duration_td.total_seconds() - player.progress
+            )
 
         return datetime.timedelta(seconds=estimated_time)
 
