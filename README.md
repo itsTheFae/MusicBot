@@ -34,6 +34,7 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Add new command `speed` to set playback speed of current track.
 - Improve and test various aspects of Install and Update scripts.
   - All installers now ask before proceeding to install packages.
   - Linux install.sh now supports `--list` flag to show possible supported distros.
