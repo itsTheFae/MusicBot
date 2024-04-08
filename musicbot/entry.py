@@ -201,6 +201,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
         super().__init__()
 
         self._start_time: Optional[float] = None
+        # TODO: proper progress reporting when this is not 1.0. 
+        # currently it will mess up estimated play time and time-to-next-track.
+        self._playback_rate: Optional[float] = None
         self.playlist: "Playlist" = playlist
         self.downloader: "Downloader" = playlist.bot.downloader
         self.filecache: "AudioFileCache" = playlist.bot.filecache
@@ -218,7 +221,23 @@ class URLPlaylistEntry(BasePlaylistEntry):
         self.author: Optional["discord.Member"] = author
         self.channel: Optional[GuildMessageableChannels] = channel
 
-        self.aoptions: str = "-vn"
+        self._aopt_eq: str = ""
+
+    @property
+    def aoptions(self) -> str:
+        """After input options for ffmpeg to use with this entry."""
+        # Set playback speed options if needed.
+        if self._playback_rate is not None:
+            # Append to the EQ options if they are set.
+            if self._aopt_eq:
+                self._aopt_eq += f",atempo={self.playback_speed:.3f}"
+            else:
+                self._aopt_eq += f"-af atempo={self.playback_speed:.3f}"
+
+        if self._aopt_eq:
+            return f"{self._aopt_eq} -vn"
+
+        return "-vn"
 
     @property
     def boptions(self) -> str:
@@ -395,6 +414,17 @@ class URLPlaylistEntry(BasePlaylistEntry):
         """Sets a start time in seconds to use with the ffmpeg -ss flag."""
         self._start_time = start_time
 
+    @property
+    def playback_speed(self) -> float:
+        """Get the current playback speed if one was set, or return 1.0 for normal playback."""
+        if self._playback_rate is not None:
+            return self._playback_rate
+        return 1.0
+
+    def set_playback_speed(self, speed: float) -> None:
+        """Set the playback speed to be used with ffmpeg -af:atempo filter."""
+        self._playback_rate = speed
+
     async def _ensure_entry_info(self) -> None:
         """helper to ensure this entry object has critical information"""
 
@@ -482,7 +512,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
             if self.playlist.bot.config.use_experimental_equalization:
                 try:
-                    aoptions = await self.get_mean_volume(self.filename)
+                    self._aopt_eq = await self.get_mean_volume(self.filename)
 
                 # Unfortunate evil that we abide for now...
                 except Exception:  # pylint: disable=broad-exception-caught
@@ -491,11 +521,6 @@ class URLPlaylistEntry(BasePlaylistEntry):
                         "This has not impacted the ability for the bot to work, but will mean your tracks will not be equalised.",
                         exc_info=True,
                     )
-                    aoptions = "-vn"
-            else:
-                aoptions = "-vn"
-
-            self.aoptions = aoptions
 
             # Trigger ready callbacks.
             self._for_each_future(lambda future: future.set_result(self))

@@ -476,10 +476,10 @@ class Playlist(EventEmitter, Serializable):
 
         # When the player plays a song, it eats the first playlist item, so we just have to add the time back
         if not player.is_stopped and player.current_entry:
-            if player.current_entry.duration is None:  # duration can be 0
+            if player.current_entry.duration is None:
                 raise InvalidDataError("no duration data in current entry")
 
-            estimated_time += player.current_entry.duration - player.progress
+            estimated_time += player.current_entry.duration_td.total_seconds() - player.progress
 
         return datetime.timedelta(seconds=estimated_time)
 

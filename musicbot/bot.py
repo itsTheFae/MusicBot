@@ -4371,8 +4371,11 @@ class MusicBot(discord.Client):
 
             # percentage shows how much of the current song has already been played
             percentage = 0.0
-            if player.current_entry.duration and player.current_entry.duration > 0:
-                percentage = player.progress / player.current_entry.duration
+            if (
+                player.current_entry.duration
+                and player.current_entry.duration_td.total_seconds() > 0
+            ):
+                percentage = player.progress / player.current_entry.duration_td.total_seconds()
 
             # create the actual bar
             progress_bar_length = 30
@@ -4977,6 +4980,61 @@ class MusicBot(discord.Client):
                 "Unreasonable volume provided: {}%. Provide a value between 1 and 100.",
             ).format(new_volume),
             expire_in=20,
+        )
+
+    async def cmd_speed(
+        self, player: MusicPlayer, new_speed: str = ""
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}speed [rate]
+
+        Apply a speed to the currently playing track.
+        The rate must be between 0.5 and 100.0 due to ffmpeg limits.
+
+        Estimated times do not account for speed adjustments.
+        Seek times are not adjusted for speed, non-adjusted time must be used.
+        Stream playback does not support speed adjustments.
+        """
+        if not player.current_entry:
+            raise exceptions.CommandError(
+                "No track is playing, cannot set speed.\n"
+                "Use the config command to set a default playback speed.",
+                expire_in=30,
+            )
+
+        if not isinstance(player.current_entry, URLPlaylistEntry):
+            raise exceptions.CommandError(
+                "Speed cannot be applied to streamed media.",
+                expire_in=30,
+            )
+
+        if not new_speed:
+            raise exceptions.CommandError(
+                "You must provide a speed to set.",
+                expire_in=30,
+            )
+
+        try:
+            speed = float(new_speed)
+            if speed < 0.5 or speed > 100.0:
+                raise ValueError("Value out of range.")
+        except (ValueError, TypeError) as e:
+            raise exceptions.CommandError(
+                "The speed you proivded is invalid. Use a number between 0.5 and 100.",
+                expire_in=30,
+            ) from e
+
+        # Set current playback progress and speed then restart playback.
+        entry = player.current_entry
+        entry.set_start_time(player.progress)
+        entry.set_playback_speed(speed)
+        player.playlist.insert_entry_at_index(0, entry)
+        player.skip()
+
+        return Response(
+            f"Setting playback speed to `{speed:.3f}` for current track.",
+            delete_after=30,
         )
 
     @owner_only
