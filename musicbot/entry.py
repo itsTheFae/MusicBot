@@ -226,7 +226,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         """After input options for ffmpeg to use with this entry."""
         aopts = f"{self._aopt_eq}"
         # Set playback speed options if needed.
-        if self._playback_rate is not None:
+        if self._playback_rate is not None or self.playback_speed != 1.0:
             # Append to the EQ options if they are set.
             if self._aopt_eq:
                 aopts = f"{self._aopt_eq},atempo={self.playback_speed:.3f}"
