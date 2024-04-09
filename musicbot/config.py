@@ -194,6 +194,16 @@ class Config:
             default=ConfigDefaults.command_prefix,
             comment="Command prefix is how all MusicBot commands must be started",
         )
+        self.commands_via_mention: bool = self.register.init_option(
+            section="Chat",
+            option="CommandsByMention",
+            dest="commands_via_mention",
+            default=ConfigDefaults.commands_via_mention,
+            comment=(
+                "Enable using commands with @[YourBotNameHere]\n"
+                "The CommandPrefix is still available, but can be replaced with @ mention."
+            ),
+        )
         self.bound_channels: Set[int] = self.register.init_option(
             section="Chat",
             option="BindToChannels",
@@ -1069,6 +1079,7 @@ class ConfigDefaults:
     spotify_clientsecret: str = ""
 
     command_prefix: str = "!"
+    commands_via_mention: bool = True
     bound_channels: Set[int] = set()
     unbound_servers: bool = False
     autojoin_channels: Set[int] = set()

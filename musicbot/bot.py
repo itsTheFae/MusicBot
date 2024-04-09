@@ -5651,19 +5651,17 @@ class MusicBot(discord.Client):
 
         await self.safe_delete_message(message, quiet=True)
 
+        # TODO:  add alias names to the command names list here.
+        # cmd_names = await self.gen_cmd_list(message)
+
         def is_possible_command_invoke(entry: discord.Message) -> bool:
-            prefix_list = self.server_data[guild.id].command_prefix_history
-            # The semi-cursed use of [^ -~] should match all kinds of unicode, which could be an issue.
-            # If it is a problem, the best solution is probably adding a dependency for emoji.
-            emoji_regex = re.compile(r"^(<a?:.+:\d+>|:.+:|[^ -~]+) \w+")
+            prefix_list = self.server_data[guild.id].command_prefix_list
             content = entry.content
             for prefix in prefix_list:
-                if entry.content.startswith(prefix):
-                    # emoji prefix may have exactly one space.
-                    if emoji_regex.match(entry.content):
-                        return True
-                    content = content.replace(prefix, "")
-                    if content and not content[0].isspace():
+                if content.startswith(prefix):
+                    content = content.replace(prefix, "", 1).strip()
+                    if content:
+                        # TODO: this should check for command names and alias names.
                         return True
             return False
 
@@ -6817,6 +6815,10 @@ class MusicBot(discord.Client):
             log.debug("Got a message with no channel, somehow:  %s", message)
             return
 
+        self_mention = "<@MusicBot>"  # placeholder
+        if self.user:
+            self_mention = f"<@{self.user.id}>"
+
         if message.channel.guild:
             command_prefix = self.server_data[message.channel.guild.id].command_prefix
         else:
@@ -6827,10 +6829,13 @@ class MusicBot(discord.Client):
         emoji_regex = re.compile(r"^(<a?:.+:\d+>|:.+:|[^ -~]+)$")
         if emoji_regex.match(command_prefix):
             message_content = message_content.replace(
-                f"{command_prefix} ", command_prefix
+                f"{command_prefix} ", command_prefix, 1
             )
 
-        if not message_content.startswith(command_prefix):
+        if not message_content.startswith(command_prefix) and (
+            self.config.commands_via_mention
+            and not message_content.startswith(self_mention)
+        ):
             return
 
         if message.author == self.user:
@@ -6852,9 +6857,24 @@ class MusicBot(discord.Client):
             )
             return
 
-        command, *args = message_content.split(
-            " "
-        )  # Uh, doesn't this break prefixes with spaces in them (it doesn't, config parser already breaks them)
+        if self.config.commands_via_mention and message_content.startswith(
+            self_mention
+        ):
+            # replace the space often included after mentions.
+            message_content = message_content.replace(
+                f"{self_mention} ", self_mention, 1
+            )
+            command_prefix = self_mention
+
+        # handle spaces inside of a command prefix.
+        # this is only possible through manual edits to the config.
+        if " " in command_prefix:
+            invalid_prefix = command_prefix
+            command_prefix = command_prefix.replace(" ", "_")
+            message_content = message_content.replace(invalid_prefix, command_prefix, 1)
+
+        # Extract the command name and args from the message content.
+        command, *args = message_content.split(" ")
         command = command[len(command_prefix) :].lower().strip()
 
         # [] produce [''] which is not what we want (it break things)
