@@ -34,8 +34,11 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+
+- Add new config `CommandsByMention` to enable @ mentions instead of prefix for commands.
+- Add new config `DefaultSpeed` to enable speed for all tracks.
 - Add new command `speed` to set playback speed of current track.
-- Improve and test various aspects of Install and Update scripts.
+- Improve and test various aspects of Install and Update scripts.  **[merged]**
   - All installers now ask before proceeding to install packages.
   - Linux install.sh now supports `--list` flag to show possible supported distros.
   - Linux install.sh improved detection of python with correct version.
@@ -58,21 +61,21 @@ Here is a list of changes made so far, with most recent first:
 - Adds `seek` command to restart the current playing track at the given time.
 - Adds commands `latency` for users and `botlatency` for owners.
 - Adds playback progress to saved queue, and starts playback at the saved position.
-- Adds an offline status update to logout/shutdown process.
-- Fix logging on Windows so module names are not `<string>` placeholder.
-- Adds bootleg Voice connection resume from network outages.
+- Adds an offline status update to logout/shutdown process.  **[merged]**
+- Fix logging on Windows so module names are not `<string>` placeholder.  **[merged]**
+- Adds bootleg Voice connection resume from network outages.  **[merged]**
   - Uses discord.py library reconnect logic for back-off retry, can be slow after long outages.
   - Uses custom retry logic to attempt connection multiple times before failing.
   - Detects network outage and automatically pauses or resumes player.
-- All launcher files `run.sh` and `run.bat` now pass CLI arguments to python.
-- Auto playlist had some refinements in entry extraction and error handling.
+- All launcher files `run.sh` and `run.bat` now pass CLI arguments to python.  **[merged]**
+- Auto playlist had some refinements in entry extraction and error handling.  **[merged]**
 - Adds `config` and `setperms` commands for doing config and permissions edits.
   - Adds new dependency for configupdater package to make this work. Not optional.
   - Refactors config system to provide registry of options, defaults, comments, and validation.
-- Adds re-try logic to get_player to (hopefully) deal with initial connection failures.
-- Changes to player/voice handling to (hopefully) prevent dead players.
-- Changes on_ready event to call status update and join channels after the event.
-- Further updates to start-up to (hopefully) gracefully fail and install dependencies.
+- Adds re-try logic to get_player to (hopefully) deal with initial connection failures.  **[merged]**
+- Changes to player/voice handling to (hopefully) prevent dead players.  **[merged]**
+- Changes on_ready event to call status update and join channels after the event.  **[merged]**
+- Further updates to start-up to (hopefully) gracefully fail and install dependencies.  **[merged]**
 - Adds logic to check for updates to MusicBot via git and for dependencies via pip.  **[merged]**
   - Adds new command `checkupdates` to print status about available updates.
   - Adds new command `botversion` to print bot current version, as reported by git.
