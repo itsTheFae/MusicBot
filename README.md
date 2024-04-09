@@ -55,8 +55,8 @@ Here is a list of changes made so far, with most recent first:
     - Adds support for Debian 12, with venv install.
     - Tested Debian 11.3 installation.
     - Tested Raspberry Pi OS (Desktop i386, reported as Debian 11).
-- Update update.sh python detection to the same as in run.sh.
-- Update run.sh python detection to account for name conventions between distros.
+- Update update.sh python detection to the same as in run.sh.  **[merged]**
+- Update run.sh python detection to account for name conventions between distros.  **[merged]**
 - Adds `uptime` command to show time since last start/restart.
 - Adds `seek` command to restart the current playing track at the given time.
 - Adds commands `latency` for users and `botlatency` for owners.
