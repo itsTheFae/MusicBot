@@ -154,7 +154,7 @@ class MusicPlayer(EventEmitter, Serializable):
         """
         Event dispatched by Playlist when an entry is added to the queue.
         """
-        if self.is_stopped:
+        if self.is_stopped and not self._play_lock.locked():
             log.noise("calling-later, self.play from player.")  # type: ignore[attr-defined]
             self.loop.call_later(2, self.play)
 
@@ -356,6 +356,12 @@ class MusicPlayer(EventEmitter, Serializable):
                 "MusicPlayer was previously paused, resuming current player."
             )
             return self.resume()
+
+        if self._play_lock.locked():
+            log.voicedebug(  # type: ignore[attr-defined]
+                "MusicPlayer already locked for playback, this call is ignored."
+            )
+            return
 
         async with self._play_lock:
             if self.is_stopped or _continue:
