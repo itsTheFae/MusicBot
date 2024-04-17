@@ -56,10 +56,13 @@ DEFAULT_LOG_LEVEL: str = "INFO"
 
 # Default target FQDN or IP to ping with network tester.
 DEFAULT_PING_TARGET: str = "discord.com"
+# Default file location URI used by fallback HTTP network testing.
+# This URI must be available via standard HTTP on the above domain/IP target.
+DEFAULT_PING_HTTP_URI: str = "/robots.txt"
 # Max time in seconds that ping should wait for response.
-DEFAULT_PING_TIMEOUT: int = 2
+DEFAULT_PING_TIMEOUT: int = 5
 # Time in seconds to wait between pings.
-DEFAULT_PING_SLEEP: float = 0.8
+DEFAULT_PING_SLEEP: float = 1.5
 
 
 # Minimum number of seconds to wait for a VoiceClient to connect.

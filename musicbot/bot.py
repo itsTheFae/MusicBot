@@ -33,6 +33,7 @@ from .constants import (
     DEFAULT_DATA_NAME_SERVERS,
     DEFAULT_OWNER_GROUP_NAME,
     DEFAULT_PERMS_GROUP_NAME,
+    DEFAULT_PING_HTTP_URI,
     DEFAULT_PING_SLEEP,
     DEFAULT_PING_TARGET,
     DEFAULT_PING_TIMEOUT,
@@ -145,6 +146,7 @@ class MusicBot(discord.Client):
         self._init_time: float = time.time()
         self._os_signal: Optional[signal.Signals] = None
         self._ping_peer_addr: str = ""
+        self._ping_use_http: bool = True
         self.network_outage: bool = False
         self.on_ready_count: int = 0
         self.init_ok: bool = False
@@ -260,7 +262,7 @@ class MusicBot(discord.Client):
         log.info("Initialized, now connecting to discord.")
         # this creates an output similar to a progress indicator.
         muffle_discord_console_log()
-        self.loop.create_task(self._test_network())
+        self.loop.create_task(self._test_network(), name="MB_PingTest")
 
     async def _test_network(self) -> None:
         """
@@ -286,6 +288,62 @@ class MusicBot(discord.Client):
                 log.warning("Could not resolve ping target.")
                 ping_target = DEFAULT_PING_TARGET
 
+        # Make a ping test using sys ping command or http request.
+        if self._ping_use_http:
+            ping_status = await self._test_network_via_http(ping_target)
+        else:
+            ping_status = await self._test_network_via_ping(ping_target)
+            if self._ping_use_http:
+                ping_status = await self._test_network_via_http(ping_target)
+
+        # Ping success, network up.
+        if ping_status == 0:
+            if self.network_outage:
+                self.on_network_up()
+            self.network_outage = False
+
+        # Ping failed, network down.
+        else:
+            if not self.network_outage:
+                self.on_network_down()
+            self.network_outage = True
+
+        # Sleep before next ping.
+        try:
+            await asyncio.sleep(DEFAULT_PING_SLEEP)
+        except asyncio.exceptions.CancelledError:
+            log.noise("Network ping test cancelled.")  # type: ignore[attr-defined]
+            return
+
+        # set up the next ping task if possible.
+        if self.loop and not self.logout_called:
+            self.loop.create_task(self._test_network(), name="MB_PingTest")
+
+    async def _test_network_via_http(self, ping_target: str) -> int:
+        """
+        This method is used as a fall-back if system ping commands are not available.
+        It will make use of current aiohttp session to make a HEAD request for the
+        given `ping_target` and a file defined by DEFAULT_PING_HTTP_URI.
+        """
+        if not self.session:
+            log.warning("Network testing via HTTP does not have a session to borrow.")
+            # As we cannot test it, assume network is up.
+            return 0
+
+        try:
+            ping_host = f"http://{ping_target}{DEFAULT_PING_HTTP_URI}"
+            async with self.session.head(ping_host, timeout=DEFAULT_PING_TIMEOUT):
+                return 0
+        except (aiohttp.ClientError, asyncio.exceptions.TimeoutError, OSError):
+            return 1
+
+    async def _test_network_via_ping(self, ping_target: str) -> int:
+        """
+        This method constructs a ping command to use as a system call.
+        If ping cannot be found or is not permitted, the fall-back flag
+        will be set by this function, and subsequent ping tests will use
+        HTTP ping testing method instead.
+        """
         # Make a ping call based on OS.
         if not hasattr(self, "_mb_ping_exe_path"):
             ping_path = shutil.which("ping")
@@ -320,14 +378,14 @@ class MusicBot(discord.Client):
                 "\nMusicBot tried the following command:   %s",
                 " ".join(ping_cmd),
             )
-            return
+            return 1
         except PermissionError:
             log.error(
                 "MusicBot was not allowed to execute the `ping` command.  Early network outage detection will not function."
                 "\nMusicBot tried the following command:   %s",
                 " ".join(ping_cmd),
             )
-            return
+            return 1
         except OSError:
             log.error(
                 "Your environment may not allow the `ping` system command.  Early network outage detection will not function."
@@ -335,30 +393,8 @@ class MusicBot(discord.Client):
                 " ".join(ping_cmd),
                 exc_info=self.config.debug_mode,
             )
-            return
-
-        # Ping success, network up.
-        if ping_status == 0:
-            if self.network_outage:
-                self.on_network_up()
-            self.network_outage = False
-
-        # Ping failed, network down.
-        else:
-            if not self.network_outage:
-                self.on_network_down()
-            self.network_outage = True
-
-        # Sleep before next ping.
-        try:
-            await asyncio.sleep(DEFAULT_PING_SLEEP)
-        except asyncio.exceptions.CancelledError:
-            log.noise("Network ping test cancelled.")  # type: ignore[attr-defined]
-            return
-
-        # set up the next ping task if possible.
-        if self.loop and not self.logout_called:
-            self.loop.create_task(self._test_network(), name="MB_PingTest")
+            return 1
+        return ping_status
 
     def on_network_up(self) -> None:
         """
