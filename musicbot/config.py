@@ -199,7 +199,7 @@ class Config:
             option="CommandsByMention",
             dest="commands_via_mention",
             default=ConfigDefaults.commands_via_mention,
-            getter="getbool",
+            getter="getboolean",
             comment=(
                 "Enable using commands with @[YourBotNameHere]\n"
                 "The CommandPrefix is still available, but can be replaced with @ mention."
