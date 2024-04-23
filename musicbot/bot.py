@@ -460,8 +460,6 @@ class MusicBot(discord.Client):
         If self.on_ready_count is 0, it will also run owner auto-summon logic.
         """
         log.info("Checking for channels to auto-join or resume...")
-
-        joined_servers: Set[discord.Guild] = set()
         channel_map = {c.guild: c for c in self.autojoinable_channels}
 
         # Check guilds for a resumable channel, conditionally override with owner summon.
@@ -493,6 +491,12 @@ class MusicBot(discord.Client):
                 channel_map[guild] = guild.me.voice.channel
                 resuming = True
 
+            # Check for follow-user mode on resume.
+            follow_user = self.server_data[guild.id].follow_user
+            if from_resume and follow_user:
+                if follow_user.voice and follow_user.voice.channel:
+                    channel_map[guild] = follow_user.voice.channel
+
             # Check if we should auto-summon to the owner, but only on startup.
             if self.config.auto_summon and not from_resume:
                 owner = self._get_owner_member(server=guild, voice=True)
@@ -514,18 +518,9 @@ class MusicBot(discord.Client):
                     channel_map[guild] = owner.voice.channel
 
         for guild, channel in channel_map.items():
-            if guild in joined_servers:
-                log.info(
-                    'Already joined a channel in "%s", skipping channel:  %s',
-                    guild.name,
-                    channel.name,
-                )
-                continue
 
             if (
-                isinstance(
-                    guild.voice_client, (discord.VoiceClient, discord.StageChannel)
-                )
+                isinstance(guild.voice_client, discord.VoiceClient)
                 and guild.voice_client.is_connected()
             ):
                 log.info(
@@ -4548,6 +4543,44 @@ class MusicBot(discord.Client):
             delete_after=30,
         )
 
+    async def cmd_follow(
+        self, guild: discord.Guild, author: discord.Member, user_mentions: List[discord.Member]
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}follow
+
+        MusicBot will automatically follow a user when they change channels.
+        """
+        # If MusicBot is already following a user, either change user or un-follow.
+        if self.server_data[guild.id].follow_user is not None:
+            # Un-follow current user.
+            if self.server_data[guild.id].follow_user.id == author.id:
+                self.server_data[guild.id].follow_user = None
+                return Response(
+                    f"No longer following user `{author.name}`",
+                    delete_after=30,
+                )
+
+            # Change to following a new user.
+            self.server_data[guild.id].follow_user = author
+            return Response(
+                f"Now following user `{author.name}` between voice channels.",
+                delete_after=30,
+            )
+
+        # Follow the invoking user.
+        # If owner mentioned a user, bind to the mentioned user instead.
+        bind_to_member = author
+        if author.id == self.config.owner_id and user_mentions:
+            bind_to_member = user_mentions.pop(0)
+
+        self.server_data[guild.id].follow_user = bind_to_member
+        return Response(
+            f"Will follow user `{bind_to_member.name}` between voice channels.",
+            delete_after=30,
+        )
+
     async def cmd_pause(self, player: MusicPlayer) -> CommandResponse:
         """
         Usage:
@@ -7359,6 +7392,18 @@ class MusicBot(discord.Client):
             player = self.get_player_in(after.channel.guild)
             if player:
                 await self._handle_guild_auto_pause(player)
+
+        follow_user = self.server_data[member.guild.id].follow_user
+        if follow_user and member.id == follow_user.id:
+            # follow-user has left the server voice channels.
+            if after.channel is None:
+                log.debug("No longer following user %s", member)
+                self.server_data[member.guild.id].follow_user = None
+
+            # follow-user has moved to a new channel.
+            elif before.channel != after.channel and player:
+                log.debug("Following user `%s` to channel:  %s", member, after.channel)
+                await player.voice_client.move_to(after.channel)
 
     async def _handle_api_disconnect(self, before: discord.VoiceState) -> bool:
         """
