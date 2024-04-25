@@ -62,8 +62,10 @@ DEFAULT_PING_HTTP_URI: str = "/robots.txt"
 # Max time in seconds that ping should wait for response.
 DEFAULT_PING_TIMEOUT: int = 5
 # Time in seconds to wait between pings.
-DEFAULT_PING_SLEEP: float = 1.5
-
+DEFAULT_PING_SLEEP: float = 2
+# Ping time settings for HTTP fallback.
+FALLBACK_PING_TIMEOUT: int = 15
+FALLBACK_PING_SLEEP: float = 4
 
 # Minimum number of seconds to wait for a VoiceClient to connect.
 VOICE_CLIENT_RECONNECT_TIMEOUT: int = 5

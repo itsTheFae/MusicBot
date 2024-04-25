@@ -43,6 +43,8 @@ from .constants import (
     EMOJI_IDLE_ICON,
     EMOJI_NEXT_ICON,
     EMOJI_PREV_ICON,
+    FALLBACK_PING_SLEEP,
+    FALLBACK_PING_TIMEOUT,
 )
 from .constants import VERSION as BOTVERSION
 from .constants import VOICE_CLIENT_MAX_RETRY_CONNECT, VOICE_CLIENT_RECONNECT_TIMEOUT
@@ -310,7 +312,10 @@ class MusicBot(discord.Client):
 
         # Sleep before next ping.
         try:
-            await asyncio.sleep(DEFAULT_PING_SLEEP)
+            if not self._ping_use_http:
+                await asyncio.sleep(DEFAULT_PING_SLEEP)
+            else:
+                await asyncio.sleep(FALLBACK_PING_SLEEP)
         except asyncio.exceptions.CancelledError:
             log.noise("Network ping test cancelled.")  # type: ignore[attr-defined]
             return
@@ -332,7 +337,7 @@ class MusicBot(discord.Client):
 
         try:
             ping_host = f"http://{ping_target}{DEFAULT_PING_HTTP_URI}"
-            async with self.session.head(ping_host, timeout=DEFAULT_PING_TIMEOUT):
+            async with self.session.head(ping_host, timeout=FALLBACK_PING_TIMEOUT):
                 return 0
         except (aiohttp.ClientError, asyncio.exceptions.TimeoutError, OSError):
             return 1
