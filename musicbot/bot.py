@@ -379,25 +379,34 @@ class MusicBot(discord.Client):
             ping_status = await p.wait()
         except FileNotFoundError:
             log.error(
-                "MusicBot could not locate a `ping` command path.  Early network outage detection will not function."
-                "\nMusicBot tried the following command:   %s",
+                "MusicBot could not locate a `ping` command path.  Will attempt to use HTTP ping instead."
+                "\nMusicBot tried the following command:   %s"
+                "\nYou should enable ping in your system or container environment for best results."
+                "\nAlternatively disable network checking via config.",
                 " ".join(ping_cmd),
             )
+            self._ping_use_http = True
             return 1
         except PermissionError:
             log.error(
-                "MusicBot was not allowed to execute the `ping` command.  Early network outage detection will not function."
-                "\nMusicBot tried the following command:   %s",
+                "MusicBot was denied permission to execute the `ping` command.  Will attempt to use HTTP ping instead."
+                "\nMusicBot tried the following command:   %s"
+                "\nYou should enable ping in your system or container environment for best results."
+                "\nAlternatively disable network checking via config.",
                 " ".join(ping_cmd),
             )
+            self._ping_use_http = True
             return 1
         except OSError:
             log.error(
-                "Your environment may not allow the `ping` system command.  Early network outage detection will not function."
-                "\nMusicBot tried the following command:   %s",
+                "Your environment may not allow the `ping` system command.  Will attempt to use HTTP ping instead."
+                "\nMusicBot tried the following command:   %s"
+                "\nYou should enable ping in your system or container environment for best results."
+                "\nAlternatively disable network checking via config.",
                 " ".join(ping_cmd),
                 exc_info=self.config.debug_mode,
             )
+            self._ping_use_http = True
             return 1
         return ping_status
 
