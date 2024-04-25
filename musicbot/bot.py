@@ -146,7 +146,7 @@ class MusicBot(discord.Client):
         self._init_time: float = time.time()
         self._os_signal: Optional[signal.Signals] = None
         self._ping_peer_addr: str = ""
-        self._ping_use_http: bool = True
+        self._ping_use_http: bool = False
         self.network_outage: bool = False
         self.on_ready_count: int = 0
         self.init_ok: bool = False
