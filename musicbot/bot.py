@@ -156,7 +156,6 @@ class MusicBot(discord.Client):
         self.cached_app_info: Optional[discord.AppInfo] = None
         self.last_status: Optional[discord.BaseActivity] = None
         self.players: Dict[int, MusicPlayer] = {}
-        self.autojoinable_channels: Set[VoiceableChannel] = set()
 
         self.config = Config(self._config_file)
 
@@ -474,14 +473,20 @@ class MusicBot(discord.Client):
         If self.on_ready_count is 0, it will also run owner auto-summon logic.
         """
         log.info("Checking for channels to auto-join or resume...")
-        channel_map = {c.guild: c for c in self.autojoinable_channels}
+        channel_map: Dict[discord.Guild, VoiceableChannel] = {}
 
         # Check guilds for a resumable channel, conditionally override with owner summon.
         resuming = False
         for guild in self.guilds:
+            auto_join_ch = self.server_data[guild.id].auto_join_channel
+            if auto_join_ch:
+                channel_map[guild] = auto_join_ch
+
             if guild.unavailable:
                 log.warning(
-                    "Guild not available, cannot join:  %s/%s", guild.id, guild.name
+                    "Guild not available, cannot auto join:  %s/%s",
+                    guild.id,
+                    guild.name,
                 )
                 continue
 
@@ -2208,12 +2213,13 @@ class MusicBot(discord.Client):
                     invalids.add(ch_id)
                     continue
 
+                # Add the channel to vc_chlist for log readout.
                 vc_chlist.add(ch)
+                # Add the channel to guild-specific auto-join slot.
+                self.server_data[ch.guild.id].auto_join_channel = ch
 
             # Update config data to be reliable later.
             self.config.autojoin_channels.difference_update(invalids)
-            # Store the channel objects for later use.
-            self.autojoinable_channels = vc_chlist
 
             # log what we're connecting to.
             if vc_chlist:
@@ -4531,7 +4537,13 @@ class MusicBot(discord.Client):
 
         player = self.get_player_in(guild)
         if player and player.voice_client and guild == author.voice.channel.guild:
-            await player.voice_client.move_to(author.voice.channel)
+            # NOTE:  .move_to() does not support setting self-deafen flag,
+            # nor respect flags set in initial connect call.
+            # await player.voice_client.move_to(author.voice.channel)
+            await guild.change_voice_state(
+                channel=author.voice.channel,
+                self_deaf=self.config.self_deafen,
+            )
         else:
             player = await self.get_player(
                 author.voice.channel,
@@ -4574,6 +4586,8 @@ class MusicBot(discord.Client):
         if followed_user is not None:
             # Un-follow current user.
             if followed_user.id == author.id:
+                # TODO:  maybe check the current channel for users and decide if
+                # we should automatically move back to guilds auto_join_channel.
                 self.server_data[guild.id].follow_user = None
                 return Response(
                     f"No longer following user `{author.name}`",
@@ -7418,15 +7432,37 @@ class MusicBot(discord.Client):
             if after.channel is None:
                 log.debug("No longer following user %s", member)
                 self.server_data[member.guild.id].follow_user = None
-                if player:
+                if player and not self.server_data[member.guild.id].auto_join_channel:
                     await self._handle_guild_auto_pause(player)
+                if player and self.server_data[member.guild.id].auto_join_channel:
+                    if (
+                        player.voice_client.channel
+                        != self.server_data[member.guild.id].auto_join_channel
+                    ):
+                        # move_to does not support setting deafen flags nor keep
+                        # the flags set from initial connection.
+                        # await player.voice_client.move_to(
+                        #     self.server_data[member.guild.id].auto_join_channel
+                        # )
+                        await member.guild.change_voice_state(
+                            channel=self.server_data[member.guild.id].auto_join_channel,
+                            self_deaf=self.config.self_deafen,
+                        )
 
             # follow-user has moved to a new channel.
             elif before.channel != after.channel and player:
                 log.debug("Following user `%s` to channel:  %s", member, after.channel)
-                player.pause()
-                await player.voice_client.move_to(after.channel)
-                player.resume()
+                if player.is_playing:
+                    player.pause()
+                # using move_to does not respect the self-deafen flags from connect
+                # nor does it allow us to set them...
+                # await player.voice_client.move_to(after.channel)
+                await member.guild.change_voice_state(
+                    channel=after.channel,
+                    self_deaf=self.config.self_deafen,
+                )
+                if player.is_paused:
+                    player.resume()
 
     async def _handle_api_disconnect(self, before: discord.VoiceState) -> bool:
         """
@@ -7462,16 +7498,12 @@ class MusicBot(discord.Client):
             await self.disconnect_voice_client(o_guild)
 
             # reconnect if the guild is configured to auto-join.
-            bcgid = before.channel.guild.id
-            if any(bcgid == ch.guild.id for ch in self.autojoinable_channels):
+            if self.server_data[o_guild.id].auto_join_channel is not None:
                 # Look for the last channel we were in.
                 target_channel = self.get_channel(before.channel.id)
                 if not target_channel:
                     # fall back to the configured channel.
-                    target_channel = discord.utils.find(
-                        lambda c: c.guild.id == bcgid,
-                        self.autojoinable_channels,
-                    )
+                    target_channel = self.server_data[o_guild.id].auto_join_channel
 
                 if not isinstance(
                     target_channel, (discord.VoiceChannel, discord.StageChannel)

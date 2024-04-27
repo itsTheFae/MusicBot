@@ -91,6 +91,9 @@ class GuildSpecificData:
         self.last_np_msg: Optional["discord.Message"] = None
         self.last_played_song_subject: str = ""
         self.follow_user: Optional["discord.Member"] = None
+        self.auto_join_channel: Optional[
+            Union["discord.VoiceChannel", "discord.StageChannel"]
+        ] = None
 
         # create a task to load any persistent guild options.
         # in theory, this should work out fine.
