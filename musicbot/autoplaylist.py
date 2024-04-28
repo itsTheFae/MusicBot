@@ -17,10 +17,14 @@ from .constants import (
 if TYPE_CHECKING:
     from .bot import MusicBot
 
+    StrUserList = UserList[str]
+else:
+    StrUserList = UserList
+
 log = logging.getLogger(__name__)
 
 
-class AutoPlaylist(UserList[str]):
+class AutoPlaylist(StrUserList):
     def __init__(self, filename: pathlib.Path, bot: "MusicBot") -> None:
         super().__init__()
 
