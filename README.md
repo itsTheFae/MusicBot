@@ -34,7 +34,12 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
-
+- Update autoplaylist feature to add multi-playlist and play history support.
+  - Adds config `SavePlayedHistoryGlobal` for global play history.
+  - Adds config `SavePlayedHistoryGuilds` for per-guild play history.
+  - Adds config `AutoPlaylistDirectory` to optionally set an alternative playlist storage path.
+  - Adds new sub-commands to `autoplaylist` command to allow listing and changing playlists.
+- Add new command `follow` to allow MusicBot to follow a single user between guild channels.
 - Add new config `CommandsByMention` to enable @ mentions instead of prefix for commands.
 - Add new config `DefaultSpeed` to enable speed for all tracks.
 - Add new command `speed` to set playback speed of current track.
