@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 from collections import deque
@@ -23,8 +24,6 @@ from .exceptions import ExtractionError, InvalidDataError, WrongEntryTypeError
 from .lib.event_emitter import EventEmitter
 
 if TYPE_CHECKING:
-    import asyncio
-
     from .bot import MusicBot
     from .downloader import YtdlpResponseDict
     from .player import MusicPlayer
@@ -54,7 +53,7 @@ class Playlist(EventEmitter, Serializable):
         """
         super().__init__()
         self.bot: "MusicBot" = bot
-        self.loop: "asyncio.AbstractEventLoop" = bot.loop
+        self.loop: asyncio.AbstractEventLoop = bot.loop
         self.entries: Deque[EntryTypes] = deque()
 
     def __iter__(self) -> Iterator[EntryTypes]:
