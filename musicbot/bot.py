@@ -1449,6 +1449,24 @@ class MusicBot(discord.Client):
         paused = sum(1 for p in self.players.values() if p.is_paused)
         total = len(self.players)
 
+        def format_status_msg(player: Optional[MusicPlayer]) -> str:
+            msg = self.config.status_message
+            msg = msg.replace("{n_playing}", str(playing))
+            msg = msg.replace("{n_paused}", str(paused))
+            msg = msg.replace("{n_connected}", str(total))
+            if player and player.current_entry:
+                msg = msg.replace("{p0_title}", player.current_entry.title)
+                msg = msg.replace(
+                    "{p0_length}",
+                    format_song_duration(player.current_entry.duration_td),
+                )
+                msg = msg.replace("{p0_url}", player.current_entry.url)
+            else:
+                msg = msg.replace("{p0_title}", "")
+                msg = msg.replace("{p0_length}", "")
+                msg = msg.replace("{p0_url}", "")
+            return msg
+
         # multiple servers are playing or paused.
         if total > 1:
             if paused > playing:
@@ -1456,7 +1474,12 @@ class MusicBot(discord.Client):
 
             text = f"music on {total} servers"
             if self.config.status_message:
-                text = self.config.status_message
+                player = None
+                for p in self.players.values():
+                    if p.is_playing:
+                        player = p
+                        break
+                text = format_status_msg(player)
 
             activity = discord.Activity(
                 type=discord.ActivityType.playing,
@@ -1469,7 +1492,7 @@ class MusicBot(discord.Client):
             if player.current_entry:
                 text = player.current_entry.title.strip()[:128]
                 if self.config.status_message:
-                    text = self.config.status_message
+                    text = format_status_msg(player)
 
                 activity = discord.Activity(
                     type=discord.ActivityType.streaming,
@@ -1483,7 +1506,7 @@ class MusicBot(discord.Client):
             if player.current_entry:
                 text = player.current_entry.title.strip()[:128]
                 if self.config.status_message:
-                    text = self.config.status_message
+                    text = format_status_msg(player)
 
                 status = discord.Status.idle
                 activity = discord.Activity(
@@ -1496,7 +1519,7 @@ class MusicBot(discord.Client):
         else:
             text = f" ~ {EMOJI_IDLE_ICON} ~ "
             if self.config.status_message:
-                text = self.config.status_message
+                text = format_status_msg(None)
 
             status = discord.Status.idle
             activity = discord.CustomActivity(
@@ -1512,6 +1535,14 @@ class MusicBot(discord.Client):
                 )
                 await self.change_presence(status=status, activity=activity)
                 self.last_status = activity
+                # Discord docs say Game status can only be updated 5 times in 20 seconds.
+                # This sleep should maintain the above lock for long enough to space
+                # out the status updates in multi-guild setups. 
+                # If not, we should use the lock to ignore further updates.
+                try:
+                    await asyncio.sleep(4)
+                except asyncio.CancelledError:
+                    pass
 
     async def serialize_queue(self, guild: discord.Guild) -> None:
         """
@@ -5203,6 +5234,7 @@ class MusicBot(discord.Client):
 
         This command allows management of MusicBot config options file.
         """
+        # TODO: add a method to skip giving the section name, resolve it instead.
         if user_mentions and channel_mentions:
             raise exceptions.CommandError(
                 "Config cannot use channel and user mentions at the same time.",
