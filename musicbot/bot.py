@@ -1537,7 +1537,7 @@ class MusicBot(discord.Client):
                 self.last_status = activity
                 # Discord docs say Game status can only be updated 5 times in 20 seconds.
                 # This sleep should maintain the above lock for long enough to space
-                # out the status updates in multi-guild setups. 
+                # out the status updates in multi-guild setups.
                 # If not, we should use the lock to ignore further updates.
                 try:
                     await asyncio.sleep(4)
