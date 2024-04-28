@@ -630,6 +630,7 @@ class Config:
             comment="Enable saving songs played per-guild/server to a playlist, history-{guild_id}.txt",
         )
 
+        """
         self.enable_local_media: bool = self.register.init_option(
             section="MusicBot",
             option="EnableLocalMedia",
@@ -642,6 +643,7 @@ class Config:
                 "to play files from the local MediaFileDirectory path."
             ),
         )
+        """
 
         self.user_blocklist_enabled: bool = self.register.init_option(
             section="MusicBot",
@@ -693,6 +695,7 @@ class Config:
                 "Each file should contain a list of playable URLs or terms, one track per line."
             ),
         )
+        """
         self.media_file_dir: pathlib.Path = self.register.init_option(
             section="Files",
             option="MediaFileDirectory",
@@ -706,6 +709,7 @@ class Config:
                 "Maps to:  ./config/music/some/folder/name/file.ext"
             ),
         )
+        """
         self.i18n_file: pathlib.Path = self.register.init_option(
             section="Files",
             option="i18nFile",
