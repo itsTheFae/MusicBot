@@ -168,4 +168,5 @@ class RestartSignal(Signal):
 
 # signal to end the bot "gracefully"
 class TerminateSignal(Signal):
-    exit_code: int = 0
+    def __init__(self, exit_code: int = 0):
+        self.exit_code: int = exit_code
