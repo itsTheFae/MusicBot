@@ -1571,7 +1571,9 @@ class ConfigOptionRegistry:
         self._option_list.append(config_opt)
         self._sections.add(section)
         if str(config_opt) in self._options:
-            log.warning("Option names are not unique between INI sections!  Resolver is disabled.")
+            log.warning(
+                "Option names are not unique between INI sections!  Resolver is disabled."
+            )
             self._has_resolver = False
         self._options.add(str(config_opt))
         self._distinct_options.add(option)

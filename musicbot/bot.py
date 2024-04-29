@@ -5335,7 +5335,9 @@ class MusicBot(discord.Client):
         if option in ["help", "show", "save"]:
             if self.config.register.resolver_available and len(leftover_args) < 2:
                 # assume that section is omitted.
-                possible_sections = self.config.register.get_sections_from_option(leftover_args[0])
+                possible_sections = self.config.register.get_sections_from_option(
+                    leftover_args[0]
+                )
                 if len(possible_sections) == 0:
                     raise exceptions.CommandError(
                         "Could not resolve section name from option name. Please provide a valid section and option name.",
