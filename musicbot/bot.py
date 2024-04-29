@@ -65,7 +65,6 @@ from .utils import (
     format_size_from_bytes,
     format_song_duration,
     format_time_to_seconds,
-    instance_diff,
     is_empty_voice_channel,
     muffle_discord_console_log,
     mute_discord_console_log,
@@ -1257,7 +1256,7 @@ class MusicBot(discord.Client):
             #  the only issue is that links from a playlist might fail and fire
             #  remove event, but no link will be removed since none will match.
             if not player.autoplaylist:
-                if not self.server_data[player.voice_client.guild.id].autoplaylist:
+                if not self.server_data[guild.id].autoplaylist:
                     log.warning(
                         "No playable songs in the Guild autoplaylist, disabling."
                     )
@@ -1278,6 +1277,19 @@ class MusicBot(discord.Client):
                     song_url = player.autoplaylist[0]
                 player.autoplaylist.remove(song_url)
 
+                # Check if song is blocked.
+                if (
+                    self.config.song_blocklist_enabled
+                    and self.config.song_blocklist.is_blocked(song_url)
+                ):
+                    if self.config.auto_playlist_remove_on_block:
+                        await self.server_data[guild.id].autoplaylist.remove_track(
+                            song_url,
+                            ex=UserWarning("Found in song block list."),
+                            delete_from_ap=True,
+                        )
+                    continue
+
                 try:
                     info = await self.downloader.extract_info(
                         song_url, download=False, process=True
@@ -1290,9 +1302,7 @@ class MusicBot(discord.Client):
                         e,
                     )
 
-                    await self.server_data[
-                        player.voice_client.guild.id
-                    ].autoplaylist.remove_track(
+                    await self.server_data[guild.id].autoplaylist.remove_track(
                         song_url, ex=e, delete_from_ap=self.config.remove_ap
                     )
                     continue
@@ -1308,9 +1318,7 @@ class MusicBot(discord.Client):
                         exc_info=True,
                     )
 
-                    await self.server_data[
-                        player.voice_client.guild.id
-                    ].autoplaylist.remove_track(
+                    await self.server_data[guild.id].autoplaylist.remove_track(
                         song_url, ex=e, delete_from_ap=self.config.remove_ap
                     )
                     continue
@@ -1358,12 +1366,12 @@ class MusicBot(discord.Client):
                     continue
                 break
 
-            if not self.server_data[player.voice_client.guild.id].autoplaylist:
+            if not self.server_data[guild.id].autoplaylist:
                 log.warning("No playable songs in the autoplaylist, disabling.")
                 self.config.auto_playlist = False
 
         else:  # Don't serialize for autoplaylist events
-            await self.serialize_queue(player.voice_client.channel.guild)
+            await self.serialize_queue(guild)
 
         if not player.is_stopped and not player.is_dead:
             player.play(_continue=True)
@@ -6978,14 +6986,6 @@ class MusicBot(discord.Client):
             delete_after=30,
         )
 
-    async def cmd_testready(self, channel: MessageableChannel) -> CommandResponse:
-        # TODO: remove this. :)
-        """
-        Not a real command, and will be removed in the future.
-        """
-        await self.safe_send_message(channel, "!!RUN_TESTS!!", expire_in=30)
-        return None
-
     async def on_message(self, message: discord.Message) -> None:
         """
         Event called by discord.py when any message is sent to/around the bot.
@@ -7730,47 +7730,41 @@ class MusicBot(discord.Client):
         Event called by discord.py when guild properties are updated.
         https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_update
         """
-        log.info("Guild update for:  %s", before)
-        diff = instance_diff(before, after)
-        for attr, vals in diff.items():
-            log.everythinng(  # type: ignore[attr-defined]
-                "Guild Update - attribute '%s' is now:  %s  -- was:  %s",
-                attr,
-                vals[0],
-                vals[1],
-            )
-
-        # TODO: replace this with utils.objdiff() or remove both
-        for name in set(getattr(before, "__slotnames__")):
-            a_val = getattr(after, name, None)
-            b_val = getattr(before, name, None)
-            if b_val != a_val:
-                log.everything(  # type: ignore[attr-defined]
-                    f"Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
-                )
+        if log.getEffectiveLevel() <= logging.EVERYTHING:  # type: ignore[attr-defined]
+            log.info("Guild update for:  %s", before)
+            for name in set(getattr(before, "__slotnames__")):
+                a_val = getattr(after, name, None)
+                b_val = getattr(before, name, None)
+                if b_val != a_val:
+                    log.everything(  # type: ignore[attr-defined]
+                        f"Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
+                    )
 
     async def on_guild_channel_update(
-        self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel
+        self, before: GuildMessageableChannels, after: GuildMessageableChannels
     ) -> None:
         """
         Event called by discord.py when a guild channel is updated.
         https://discordpy.readthedocs.io/en/stable/api.html#discord.on_guild_channel_update
         """
-        log.info("Channel update for:  %s", before)
-        diff = instance_diff(before, after)
-        for attr, vals in diff.items():
-            log.everythinng(  # type: ignore[attr-defined]
-                "Guild Channel Update - attribute '%s' is now:  %s  -- was:  %s",
-                attr,
-                vals[0],
-                vals[1],
-            )
+        # This allows us to log when certain channel properties are changed.
+        # Mostly for information sake at current.
+        changes = ""
+        if before.name != after.name:
+            changes += f" name = {after.name}"
+        if isinstance(
+            before, (discord.VoiceChannel, discord.StageChannel)
+        ) and isinstance(after, (discord.VoiceChannel, discord.StageChannel)):
+            # Splitting hairs, but we could pause playback here until voice update later.
+            if before.rtc_region != after.rtc_region:
+                changes += f" voice-region = {after.rtc_region}"
+            if before.bitrate != after.bitrate:
+                changes += f" bitrate = {after.bitrate}"
+            if before.user_limit != after.user_limit:
+                changes += f" user-limit = {after.user_limit}"
+        # The chat delay is not currently respected by MusicBot. Is this a problem?
+        if before.slowmode_delay != after.slowmode_delay:
+            changes += f" slowmode = {after.slowmode_delay}"
 
-        # TODO: replace this with objdiff() or remove both.
-        for name in set(getattr(before, "__slotnames__")):
-            a_val = getattr(after, name, None)
-            b_val = getattr(before, name, None)
-            if b_val != a_val:
-                log.everything(  # type: ignore[attr-defined]
-                    f"Channel attribute {name} is now: {a_val}  -- Was: {b_val}"
-                )
+        if changes:
+            log.info("Channel update for:  %s  -- ", before, changes)

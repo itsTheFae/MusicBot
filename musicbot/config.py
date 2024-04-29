@@ -78,8 +78,8 @@ def create_file_ifnoexist(
             log.warning("Creating %s", path)
 
 
-# TODO: Add a per_server flag to options and ways to collect them.
-# TODO: Add a resolver method to enable `config set` without section names.
+# TODO: maybe add a means of generating default or first-run config.
+# TODO: maybe rename configs into proper sections, with migration for old config.
 
 
 class Config:
@@ -104,7 +104,6 @@ class Config:
         self.config_file = config_file
         self.find_config()
 
-        # TODO: maybe some mechanism to handle config renames?
         config = ExtendedConfigParser()
         config.read(config_file, encoding="utf-8")
         self.register = ConfigOptionRegistry(self, config)
@@ -1076,8 +1075,6 @@ class Config:
                 else:
                     cu[option.section][option.option] = self.register.to_ini(option)
             else:
-                # TODO: Maybe we should make a method that handles first-time setup
-                # or otherwise some form of auto-update thing for config?
                 log.error(
                     "Config section not in parsed config! Missing: %s", option.section
                 )
