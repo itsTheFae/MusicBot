@@ -2201,7 +2201,7 @@ class MusicBot(discord.Client):
         # we do this after the config stuff because it's a lot easier to notice here
         if self.config.register.ini_missing_options:
             missing_list = "\n".join(
-                str(o) for o in self.config.register.ini_missing_options
+                sorted(str(o) for o in self.config.register.ini_missing_options)
             )
             conf_warn = exceptions.HelpfulError(
                 preface="Detected missing config options!",
@@ -5333,7 +5333,22 @@ class MusicBot(discord.Client):
 
         # sub commands beyond here need 2 leftover_args
         if option in ["help", "show", "save"]:
-            if len(leftover_args) < 2:
+            if self.config.register.resolver_available and len(leftover_args) < 2:
+                # assume that section is omitted.
+                possible_sections = self.config.register.get_sections_from_option(leftover_args[0])
+                if len(possible_sections) == 0:
+                    raise exceptions.CommandError(
+                        "Could not resolve section name from option name. Please provide a valid section and option name.",
+                        expire_in=30,
+                    )
+                if len(possible_sections) > 1:
+                    raise exceptions.CommandError(
+                        "The option given is ambiguous, please provide a section name.",
+                        expire_in=30,
+                    )
+                # adjust the command arguments to include the resolved section.
+                leftover_args = [list(possible_sections)[0]] + leftover_args
+            elif len(leftover_args) < 2:
                 raise exceptions.CommandError(
                     "You must provide a section name and option name for this command.",
                     expire_in=30,

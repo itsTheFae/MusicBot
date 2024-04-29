@@ -1264,6 +1264,7 @@ class ConfigOptionRegistry:
         self._sections: Set[str] = set()
         self._options: Set[str] = set()
         self._distinct_options: Set[str] = set()
+        self._has_resolver: bool = True
 
         # set up missing config data.
         self.ini_missing_options: Set[ConfigOption] = set()
@@ -1283,6 +1284,11 @@ class ConfigOptionRegistry:
     def option_list(self) -> List[ConfigOption]:
         """Non-settable option list."""
         return self._option_list
+
+    @property
+    def resolver_available(self) -> bool:
+        """Status of option name-to-section resolver. If False, resolving cannot be used."""
+        return self._has_resolver
 
     def update_missing_config(self) -> None:
         """
@@ -1307,6 +1313,16 @@ class ConfigOptionRegistry:
         for option in self._option_list:
             if str(option) not in p_key_set:
                 self.ini_missing_options.add(option)
+
+    def get_sections_from_option(self, option_name: str) -> Set[str]:
+        """
+        Get the Section name(s) associated with the given `option_name` if available.
+
+        :return:  A set containing one or more section names, or an empty set if no option exists.
+        """
+        if self._has_resolver:
+            return set(o.section for o in self._option_list if o.option == option_name)
+        return set()
 
     def get_updated_options(self) -> List[ConfigOption]:
         """
@@ -1554,6 +1570,9 @@ class ConfigOptionRegistry:
         )
         self._option_list.append(config_opt)
         self._sections.add(section)
+        if str(config_opt) in self._options:
+            log.warning("Option names are not unique between INI sections!  Resolver is disabled.")
+            self._has_resolver = False
         self._options.add(str(config_opt))
         self._distinct_options.add(option)
 
