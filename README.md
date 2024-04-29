@@ -34,6 +34,7 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Improve custom `StatusMessage` option with dynamic variables. Docs in example_options.ini
 - Update autoplaylist feature to add multi-playlist and play history support.
   - Adds config `SavePlayedHistoryGlobal` for global play history.
   - Adds config `SavePlayedHistoryGuilds` for per-guild play history.

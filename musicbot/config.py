@@ -431,7 +431,20 @@ class Config:
             option="StatusMessage",
             dest="status_message",
             default=ConfigDefaults.status_message,
-            comment="Set a custom status text instead of showing dynamic info about what is playing in bot's activity status.",
+            comment=(
+                "Specify a custom message to use as the bot's status. If left empty, the bot\n"
+                "will display dynamic info about music currently being played in its status instead.\n"
+                "Status messages may also use the following variables:\n"
+                " {n_playing}   = Number of currently Playing music players.\n"
+                " {n_paused}    = Number of currently Paused music players.\n"
+                " {n_connected} = Number of connected music players, in any player state.\n"
+                "\n"
+                "The following variables give access to information about the player and track.\n"
+                "These variables may not be accurate in multi-guild bots:\n"
+                " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
+                " {p0_title}    = The track title for the currently playing track.\n"
+                " {p0_url}      = The track url for the currently playing track."
+            ),
         )
         self.write_current_song: bool = self.register.init_option(
             section="MusicBot",
