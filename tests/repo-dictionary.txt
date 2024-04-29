@@ -63,6 +63,7 @@ dl
 dm
 docstring
 dpy
+dpytest
 dynaudnorm
 enqueue
 env

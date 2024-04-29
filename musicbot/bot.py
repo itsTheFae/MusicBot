@@ -759,6 +759,8 @@ class MusicBot(discord.Client):
                 ) from e
 
         # TODO: look into Stage channel handling and test this at some point.
+        # It is likely that we'll want to respond to a voice state update instead
+        # to make sure manually moving a bot to a StageChannel gives it speaker.
         if isinstance(channel, discord.StageChannel):
             try:
                 await channel.guild.me.edit(suppress=False)
@@ -5242,7 +5244,6 @@ class MusicBot(discord.Client):
 
         This command allows management of MusicBot config options file.
         """
-        # TODO: add a method to skip giving the section name, resolve it instead.
         if user_mentions and channel_mentions:
             raise exceptions.CommandError(
                 "Config cannot use channel and user mentions at the same time.",
@@ -7767,4 +7768,4 @@ class MusicBot(discord.Client):
             changes += f" slowmode = {after.slowmode_delay}"
 
         if changes:
-            log.info("Channel update for:  %s  -- ", before, changes)
+            log.info("Channel update for:  %s  --  %s", before, changes)
