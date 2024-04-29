@@ -1040,7 +1040,7 @@ class Config:
         """
         Converts the current Config value into an INI file value as needed.
         Note: ConfigParser must not use multi-line values. This will break them.
-        Should multiline values be needed, maybe use ConfigUpdater package instead.
+        Should multi-line values be needed, maybe use ConfigUpdater package instead.
         """
         try:
             cu = configupdater.ConfigUpdater()

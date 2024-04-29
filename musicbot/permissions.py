@@ -69,7 +69,7 @@ class PermissionsDefaults:
 
 class PermissiveDefaults(PermissionsDefaults):
     """
-    The maxiumum allowed version of defaults.
+    The maximum allowed version of defaults.
     Most values grant access or remove limits by default.
     """
 
@@ -229,7 +229,7 @@ class Permissions:
         """
         Converts the current Permission Group value into an INI file value as needed.
         Note: ConfigParser must not use multi-line values. This will break them.
-        Should multiline values be needed, maybe use ConfigUpdater package instead.
+        Should multi-line values be needed, maybe use ConfigUpdater package instead.
         """
         try:
             cu = configupdater.ConfigUpdater()

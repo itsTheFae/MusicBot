@@ -212,7 +212,7 @@ def mute_discord_console_log() -> None:
     for h in dlogger.handlers:
         if getattr(h, "terminator", None) == "":
             dlogger.removeHandler(h)
-    # for console output cariage return post muffled log string.
+    # for console output carriage return post muffled log string.
     print()
 
 
