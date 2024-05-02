@@ -6,7 +6,7 @@ import os
 import pathlib
 import shutil
 import time
-from typing import TYPE_CHECKING, Dict, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Tuple
 
 from .constants import DATA_FILE_CACHEMAP, DEFAULT_DATA_DIR
 from .utils import format_size_from_bytes
@@ -14,7 +14,7 @@ from .utils import format_size_from_bytes
 if TYPE_CHECKING:
     from .bot import MusicBot
     from .config import Config
-    from .entry import BasePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
+    from .entry import BasePlaylistEntry, URLPlaylistEntry
 
 log = logging.getLogger(__name__)
 
@@ -250,10 +250,8 @@ class AudioFileCache:
 
         return True
 
-    def handle_new_cache_entry(
-        self, entry: Union["URLPlaylistEntry", "StreamPlaylistEntry"]
-    ) -> None:
-        """1
+    def handle_new_cache_entry(self, entry: "URLPlaylistEntry") -> None:
+        """
         Test given entry for cachemap inclusion and run cache limit checks.
         """
         if entry.url in self.bot.playlist_mgr.loaded_tracks:

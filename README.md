@@ -34,6 +34,9 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
+- Added local media file playback feature by using `file://` as a protocol scheme.
+  - Adds config options `EnableLocalMedia` and `MediaFileDirectory` to control the feature.
+- Improved command `config` to work without section name being provided.
 - Improve custom `StatusMessage` option with dynamic variables. Docs in example_options.ini
 - Update autoplaylist feature to add multi-playlist and play history support.
   - Adds config `SavePlayedHistoryGlobal` for global play history.

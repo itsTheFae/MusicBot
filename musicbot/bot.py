@@ -50,7 +50,7 @@ from .constants import (
 from .constants import VERSION as BOTVERSION
 from .constants import VOICE_CLIENT_MAX_RETRY_CONNECT, VOICE_CLIENT_RECONNECT_TIMEOUT
 from .constructs import GuildSpecificData, Response
-from .entry import StreamPlaylistEntry, URLPlaylistEntry
+from .entry import LocalFilePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
 from .filecache import AudioFileCache
 from .json import I18nJson
 from .opus_loader import load_opus_lib
@@ -106,14 +106,14 @@ MessageAuthor = Union[
     discord.User,
     discord.Member,
 ]
-EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry]
+EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry, LocalFilePlaylistEntry]
 CommandResponse = Union[Response, None]
 
 
 log = logging.getLogger(__name__)
 
-# TODO:  Add feature to handle "file://" URIs and map them to a static folder.
-#  use config.enable_local_media in combo with config.media_file_dir in extraction probably.
+# TODO:  add an aliases command to manage command aliases.
+# TODO:  maybe allow aliases to contain whole/partial commands.
 
 
 class MusicBot(discord.Client):
@@ -987,7 +987,8 @@ class MusicBot(discord.Client):
         await self.reset_player_inactivity(player)
         await self.update_now_playing_status()
         # manage the cache since we may have downloaded something.
-        self.filecache.handle_new_cache_entry(entry)
+        if isinstance(entry, URLPlaylistEntry):
+            self.filecache.handle_new_cache_entry(entry)
         player.skip_state.reset()
 
         await self.serialize_queue(player.voice_client.channel.guild)
@@ -1253,7 +1254,7 @@ class MusicBot(discord.Client):
             and not player.current_entry
             and self.config.auto_playlist
         ):
-            # NOTE:  self.autoplaylist will only contain links loaded from the file.
+            # NOTE:  self.server_data[].autoplaylist will only contain links loaded from the file.
             #  while player.autoplaylist may contain links expanded from playlists.
             #  the only issue is that links from a playlist might fail and fire
             #  remove event, but no link will be removed since none will match.
@@ -3405,7 +3406,9 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
-        if not isinstance(_player.current_entry, URLPlaylistEntry):
+        if not isinstance(
+            _player.current_entry, (URLPlaylistEntry, LocalFilePlaylistEntry)
+        ):
             raise exceptions.CommandError(
                 "Seeking is not supported for streams.",
                 expire_in=30,
@@ -3792,6 +3795,13 @@ class MusicBot(discord.Client):
                 f"Use {prefix}summon to summon it to your voice channel."
             )
 
+        if not self.config.enable_local_media and song_url.lower().startswith(
+            "file://"
+        ):
+            raise exceptions.CommandError(
+                "Local media playback is not enabled.",
+            )
+
         # Validate song_url is actually a URL, or otherwise a search string.
         valid_song_url = self.downloader.get_url_or_none(song_url)
         if valid_song_url:
@@ -3811,7 +3821,14 @@ class MusicBot(discord.Client):
                 head,
             )
 
-        if not valid_song_url and leftover_args:
+        if (
+            not valid_song_url
+            and leftover_args
+            and not (
+                self.config.enable_local_media
+                and song_url.lower().startswith("file://")
+            )
+        ):
             # treat all arguments as a search string.
             song_url = " ".join([song_url, *leftover_args])
             leftover_args = []  # prevent issues later.
@@ -5166,7 +5183,9 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
-        if not isinstance(player.current_entry, URLPlaylistEntry):
+        if not isinstance(
+            player.current_entry, (URLPlaylistEntry, LocalFilePlaylistEntry)
+        ):
             raise exceptions.CommandError(
                 "Speed cannot be applied to streamed media.",
                 expire_in=30,
@@ -5341,8 +5360,11 @@ class MusicBot(discord.Client):
                 ) from e
 
         # sub commands beyond here need 2 leftover_args
-        if option in ["help", "show", "save"]:
-            if self.config.register.resolver_available and len(leftover_args) < 2:
+        if option in ["help", "show", "save", "set"]:
+            largs = len(leftover_args)
+            if self.config.register.resolver_available and (
+                (option == "set" and largs < 3) or largs < 2
+            ):
                 # assume that section is omitted.
                 possible_sections = self.config.register.get_sections_from_option(
                     leftover_args[0]
@@ -5359,7 +5381,7 @@ class MusicBot(discord.Client):
                     )
                 # adjust the command arguments to include the resolved section.
                 leftover_args = [list(possible_sections)[0]] + leftover_args
-            elif len(leftover_args) < 2:
+            elif largs < 2 or (option == "set" and largs < 3):
                 raise exceptions.CommandError(
                     "You must provide a section name and option name for this command.",
                     expire_in=30,

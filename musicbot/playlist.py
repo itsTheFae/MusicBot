@@ -19,7 +19,7 @@ from typing import (
 import discord
 
 from .constructs import Serializable
-from .entry import StreamPlaylistEntry, URLPlaylistEntry
+from .entry import LocalFilePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
 from .exceptions import ExtractionError, InvalidDataError, WrongEntryTypeError
 from .lib.event_emitter import EventEmitter
 
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from .player import MusicPlayer
 
 # type aliases
-EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry]
+EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry, LocalFilePlaylistEntry]
 
 GuildMessageableChannels = Union[
     discord.VoiceChannel,
@@ -164,10 +164,26 @@ class Playlist(EventEmitter, Serializable):
                 info.webpage_url or info.url,
             )
 
+        # check if this is a local file entry.
+        if info.ytdl_type == "local":
+            return await self.add_local_file_entry(
+                info,
+                author=author,
+                channel=channel,
+                head=head,
+                defer_serialize=defer_serialize,
+            )
+
         # check if this is a stream, just in case.
         if info.is_stream:
             log.debug("Entry info appears to be a stream, adding stream entry...")
-            return await self.add_stream_from_info(info, head=head)
+            return await self.add_stream_from_info(
+                info,
+                author=author,
+                channel=channel,
+                head=head,
+                defer_serialize=defer_serialize,
+            )
 
         # TODO: Extract this to its own function
         if info.extractor in ["generic", "Dropbox"]:
@@ -201,6 +217,22 @@ class Playlist(EventEmitter, Serializable):
             f"Adding URLPlaylistEntry for: {info.get('__input_subject')}"
         )
         entry = URLPlaylistEntry(self, info, author=author, channel=channel)
+        self._add_entry(entry, head=head, defer_serialize=defer_serialize)
+        return entry, (1 if head else len(self.entries))
+
+    async def add_local_file_entry(
+        self,
+        info: "YtdlpResponseDict",
+        *,
+        author: Optional["discord.Member"] = None,
+        channel: Optional[GuildMessageableChannels] = None,
+        head: bool = False,
+        defer_serialize: bool = False,
+    ) -> Tuple[LocalFilePlaylistEntry, int]:
+        log.noise(  # type: ignore[attr-defined]
+            f"Adding LocalFilePlaylistEntry for: {info.get('__input_subject')}"
+        )
+        entry = LocalFilePlaylistEntry(self, info, author=author, channel=channel)
         self._add_entry(entry, head=head, defer_serialize=defer_serialize)
         return entry, (1 if head else len(self.entries))
 
