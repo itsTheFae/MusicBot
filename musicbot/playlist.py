@@ -229,6 +229,9 @@ class Playlist(EventEmitter, Serializable):
         head: bool = False,
         defer_serialize: bool = False,
     ) -> Tuple[LocalFilePlaylistEntry, int]:
+        """
+        Adds a local media file entry to the playlist.
+        """
         log.noise(  # type: ignore[attr-defined]
             f"Adding LocalFilePlaylistEntry for: {info.get('__input_subject')}"
         )
