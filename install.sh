@@ -186,8 +186,6 @@ function pull_musicbot_git() {
 }
 
 function setup_as_service() {
-    local DIR
-    DIR="$(pwd)"
     echo ""
     echo "The installer can also install MusicBot as a system service file."
     echo "This starts the MusicBot at boot and after failures."
@@ -218,7 +216,7 @@ function setup_as_service() {
         sed -i "s,#User=mbuser,User=${BotSysUserName},g" ./musicbot.service
         sed -i "s,#Group=mbusergroup,Group=${BotSysGroupName},g" ./musicbot.service
         sed -i "s,/usr/bin/pythonversionnum,${PyBinPath},g" ./musicbot.service
-        sed -i "s,mbdirectory,${DIR},g" ./musicbot.service
+        sed -i "s,mbdirectory,${PWD},g" ./musicbot.service
 
         # Copy the service file into place and enable it.
         sudo cp ~/${CloneDir}/musicbot.service /etc/systemd/system/
