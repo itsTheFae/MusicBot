@@ -260,6 +260,17 @@ class AutoPlaylistManager:
     @property
     def _usercopy_pl(self) -> Optional[AutoPlaylist]:
         """Returns the copied autoplaylist.txt playlist if it exists."""
+        # return mapped copy if possible.
+        if self._apl_file_usercopy.stem in self._playlists:
+            return self._playlists[self._apl_file_usercopy.stem]
+
+        # if no mapped copy, check if file exists and map it.
+        elif self._apl_file_usercopy.is_file():
+            self._playlists[self._apl_file_usercopy.stem] = AutoPlaylist(
+                filename=self._apl_file_usercopy,
+                bot=self._bot,
+            )
+
         return self._playlists.get(self._apl_file_usercopy.stem, None)
 
     @property
