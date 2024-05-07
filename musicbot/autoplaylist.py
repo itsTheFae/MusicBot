@@ -265,7 +265,7 @@ class AutoPlaylistManager:
             return self._playlists[self._apl_file_usercopy.stem]
 
         # if no mapped copy, check if file exists and map it.
-        elif self._apl_file_usercopy.is_file():
+        if self._apl_file_usercopy.is_file():
             self._playlists[self._apl_file_usercopy.stem] = AutoPlaylist(
                 filename=self._apl_file_usercopy,
                 bot=self._bot,
