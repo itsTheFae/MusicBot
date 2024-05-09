@@ -326,7 +326,7 @@ class AutoPlaylistManager:
         Gets the appropriate default playlist based on which files exist.
         """
         # If the old autoplaylist.txt was copied, use it.
-        if self._usercopy_pl:
+        if self._usercopy_pl is not None:
             return self._usercopy_pl
         return self._default_pl
 
