@@ -5362,7 +5362,7 @@ class MusicBot(discord.Client):
         # sub commands beyond here need 2 leftover_args
         if option in ["help", "show", "save", "set"]:
             largs = len(leftover_args)
-            if self.config.register.resolver_available and (
+            if self.config.register.resolver_available and largs != 0 and (
                 (option == "set" and largs < 3) or largs < 2
             ):
                 # assume that section is omitted.

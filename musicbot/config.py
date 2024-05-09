@@ -716,7 +716,7 @@ class Config:
                 "An optional directory path where playable media files can be stored.\n"
                 "All files and sub-directories can then be accessed by using 'file://' as a protocol.\n"
                 "Example:  file://some/folder/name/file.ext\n"
-                "Maps to:  ./config/music/some/folder/name/file.ext"
+                "Maps to:  ./media/some/folder/name/file.ext"
             ),
         )
 
