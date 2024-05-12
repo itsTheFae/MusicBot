@@ -44,6 +44,7 @@ from .constants import (
     EMOJI_IDLE_ICON,
     EMOJI_NEXT_ICON,
     EMOJI_PREV_ICON,
+    EMOJI_STOP_SIGN,
     FALLBACK_PING_SLEEP,
     FALLBACK_PING_TIMEOUT,
 )
@@ -4416,19 +4417,20 @@ class MusicBot(discord.Client):
                         user == message.author and reaction.message.id in res_msg_ids
                     )  # why can't these objs be compared directly?
 
-                reactions = ["\u2705", "\U0001F6AB", "\U0001F3C1"]
+                reactions = [EMOJI_CHECK_MARK_BUTTON, EMOJI_CROSS_MARK_BUTTON, EMOJI_STOP_SIGN]
                 for r in reactions:
                     await result_message.add_reaction(r)
 
                 try:
                     reaction, _user = await self.wait_for(
-                        "reaction_add", timeout=30.0, check=check_react
+                        "reaction_add", timeout=60.0, check=check_react
                     )
                 except asyncio.TimeoutError:
                     await self.safe_delete_message(result_message)
                     return None
 
-                if str(reaction.emoji) == "\u2705":  # check
+                if str(reaction.emoji) == EMOJI_CHECK_MARK_BUTTON:  # check
+                    # play the next and respond, stop the search entry loop.
                     await self.safe_delete_message(result_message)
                     await self.cmd_play(
                         message,
@@ -4445,14 +4447,14 @@ class MusicBot(discord.Client):
                         delete_after=30,
                     )
 
-                if str(reaction.emoji) == "\U0001F6AB":  # cross
+                if str(reaction.emoji) == EMOJI_CROSS_MARK_BUTTON:  # cross
+                    # delete last result and move on to next
                     await self.safe_delete_message(result_message)
-                else:
+                else:  # stop
+                    # delete last result and stop showing results.
                     await self.safe_delete_message(result_message)
-
-        return Response(
-            self.str.get("cmd-search-decline", "Oh well :("), delete_after=30
-        )
+                    break
+        return None
 
     async def cmd_np(
         self,
