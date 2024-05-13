@@ -4417,7 +4417,11 @@ class MusicBot(discord.Client):
                         user == message.author and reaction.message.id in res_msg_ids
                     )  # why can't these objs be compared directly?
 
-                reactions = [EMOJI_CHECK_MARK_BUTTON, EMOJI_CROSS_MARK_BUTTON, EMOJI_STOP_SIGN]
+                reactions = [
+                    EMOJI_CHECK_MARK_BUTTON,
+                    EMOJI_CROSS_MARK_BUTTON,
+                    EMOJI_STOP_SIGN,
+                ]
                 for r in reactions:
                     await result_message.add_reaction(r)
 
