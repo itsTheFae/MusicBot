@@ -107,6 +107,7 @@ MessageAuthor = Union[
     discord.User,
     discord.Member,
 ]
+UserMentions = List[Union[discord.Member, discord.User]]
 EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry, LocalFilePlaylistEntry]
 CommandResponse = Union[Response, None]
 
@@ -2684,26 +2685,42 @@ class MusicBot(discord.Client):
 
     async def cmd_blockuser(
         self,
-        user_mentions: List[discord.Member],
+        user_mentions: UserMentions,
         option: str,
+        leftover_args: List[str],
     ) -> CommandResponse:
         """
         Usage:
-            {command_prefix}blockuser [ + | - | add | remove ] @UserName [@UserName2 ...]
+            {command_prefix}blockuser [ + | - | ? | add | remove | status ] @UserName [@UserName2 ...]
 
         Manage users in the block list.
         Blocked users are forbidden from using all bot commands.
         """
 
-        if not user_mentions:
-            raise exceptions.CommandError("No users listed.", expire_in=20)
+        if not user_mentions and not leftover_args:
+            raise exceptions.CommandError(
+                "You must mention a user or provide their ID number.",
+                expire_in=20,
+            )
 
-        if option not in ["+", "-", "add", "remove"]:
+        if option not in ["+", "-", "?", "add", "remove", "status"]:
             raise exceptions.CommandError(
                 self.str.get(
                     "cmd-blacklist-invalid",
                     'Invalid option "{0}" specified, use +, -, add, or remove',
                 ).format(option),
+                expire_in=20,
+            )
+
+        for p_user in leftover_args:
+            if p_user.isdigit():
+                u = self.get_user(int(p_user))
+                if u:
+                    user_mentions.append(u)
+
+        if not user_mentions:
+            raise exceptions.CommandError(
+                "MusicBot could not find the user(s) you specified.",
                 expire_in=20,
             )
 
@@ -2764,6 +2781,18 @@ class MusicBot(discord.Client):
                 ),
                 reply=True,
                 delete_after=10,
+            )
+
+        if option in ["?", "status"]:
+            ustatus = ""
+            for user in user_mentions:
+                blocked = "not blocked"
+                if self.config.user_blocklist.is_blocked(user):
+                    blocked = "blocked"
+                ustatus += f"User: `{user.name}` is {blocked}\n"
+            return Response(
+                f"**Block list status:**\n{ustatus}\n{status_msg}",
+                delete_after=30,
             )
 
         async with self.aiolocks["user_blocklist"]:
@@ -2869,7 +2898,7 @@ class MusicBot(discord.Client):
         )
 
     async def cmd_id(
-        self, author: discord.Member, user_mentions: List[discord.Member]
+        self, author: discord.Member, user_mentions: UserMentions
     ) -> CommandResponse:
         """
         Usage:
@@ -4645,7 +4674,7 @@ class MusicBot(discord.Client):
         self,
         guild: discord.Guild,
         author: discord.Member,
-        user_mentions: List[discord.Member],
+        user_mentions: UserMentions,
     ) -> CommandResponse:
         """
         Usage:
@@ -4677,7 +4706,13 @@ class MusicBot(discord.Client):
         # If owner mentioned a user, bind to the mentioned user instead.
         bind_to_member = author
         if author.id == self.config.owner_id and user_mentions:
-            bind_to_member = user_mentions.pop(0)
+            m = user_mentions.pop(0)
+            if not isinstance(m, discord.Member):
+                raise exceptions.CommandError(
+                    "MusicBot cannot follow a user that is not a member of the server.",
+                    expire_in=30,
+                )
+            bind_to_member = m
 
         self.server_data[guild.id].follow_user = bind_to_member
         return Response(
@@ -4790,7 +4825,7 @@ class MusicBot(discord.Client):
 
     async def cmd_remove(
         self,
-        user_mentions: List[discord.Member],
+        user_mentions: UserMentions,
         author: discord.Member,
         permissions: PermissionGroup,
         guild: discord.Guild,
@@ -5236,7 +5271,7 @@ class MusicBot(discord.Client):
     @owner_only
     async def cmd_config(
         self,
-        user_mentions: List[discord.Member],
+        user_mentions: UserMentions,
         channel_mentions: List[discord.abc.GuildChannel],
         option: str,
         leftover_args: List[str],
@@ -6079,7 +6114,7 @@ class MusicBot(discord.Client):
         self,
         author: discord.Member,
         channel: MessageableChannel,
-        user_mentions: List[discord.Member],
+        user_mentions: UserMentions,
         guild: discord.Guild,
         permissions: PermissionGroup,
         target: str = "",
@@ -6129,7 +6164,7 @@ class MusicBot(discord.Client):
     @owner_only
     async def cmd_setperms(
         self,
-        user_mentions: List[discord.Member],
+        user_mentions: UserMentions,
         leftover_args: List[str],
         option: str = "list",
     ) -> CommandResponse:
@@ -7208,12 +7243,21 @@ class MusicBot(discord.Client):
 
             # this arg only works in guilds.
             if params.pop("user_mentions", None):
-                if message.guild:
-                    handler_kwargs["user_mentions"] = list(
-                        map(message.guild.get_member, message.raw_mentions)
-                    )
-                else:
-                    handler_kwargs["user_mentions"] = []
+
+                def member_or_user(
+                    uid: int,
+                ) -> Optional[Union[discord.Member, discord.User]]:
+                    if message.guild:
+                        m = message.guild.get_member(uid)
+                        if m:
+                            return m
+                    return self.get_user(uid)
+
+                handler_kwargs["user_mentions"] = []
+                for um_id in message.raw_mentions:
+                    m = member_or_user(um_id)
+                    if m is not None:
+                        handler_kwargs["user_mentions"].append(m)
 
             # this arg only works in guilds.
             if params.pop("channel_mentions", None):
