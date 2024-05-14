@@ -7585,27 +7585,34 @@ class MusicBot(discord.Client):
             return False
 
         o_guild = self.get_guild(before.channel.guild.id)
-        # These conditions are usually met when a user disconnects bot via menus.
-        if (
-            o_guild is not None
-            and o_guild.id in self.players
-            and isinstance(o_guild.voice_client, discord.VoiceClient)
-            and not o_guild.voice_client.is_connected()
+        o_vc: Optional[discord.VoiceClient] = None
+        close_code: Optional[int] = None
+        state: Optional[Any] = None
+        if o_guild is not None and isinstance(
+            o_guild.voice_client, discord.VoiceClient
         ):
-            log.info(
-                "MusicBot was disconnected from the voice channel, likely by a user."
+            o_vc = o_guild.voice_client
+            # borrow this for logging sake.
+            close_code = (
+                o_vc._connection.ws._close_code  # pylint: disable=protected-access
             )
-            await self.disconnect_voice_client(o_guild)
-            return True
+            state = o_vc._connection.state  # pylint: disable=protected-access
 
         # These conditions are met when API terminates a voice client.
+        # This could be a user initiated disconnect, but we have no way to tell.
+        # Normally VoiceClients should auto-reconnect. However attempting to wait
+        # by using VoiceClient.wait_until_connected() never seems to resolve.
         if (
             o_guild is not None
+            and ((o_vc and not o_vc.is_connected()) or o_vc is None)
             and o_guild.id in self.players
-            and o_guild.voice_client is None
         ):
             log.info(
-                "MusicBot was disconnected from the voice channel, likely by Discord API."
+                "Disconnected from voice by Discord API in: %s/%s (Code: %s) [S:%s]",
+                o_guild.name,
+                before.channel.name,
+                close_code,
+                state.name.upper() if state else None,
             )
             await self.disconnect_voice_client(o_guild)
 
@@ -7713,13 +7720,6 @@ class MusicBot(discord.Client):
         log.info('Guild "%s" has become available.', guild.name)
 
         player = self.get_player_in(guild)
-
-        """
-        if player and player.voice_client and not player.voice_client.is_connected():
-            # TODO: really test this, I hope and pray I need not bother here...
-            log.warning("MusicBot has a MusicPlayer with no VoiceClient!")
-            return
-        #"""
 
         if player and player.is_paused and player.guild_or_net_unavailable:
             log.debug(
