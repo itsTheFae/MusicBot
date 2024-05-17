@@ -503,6 +503,7 @@ def req_ensure_env() -> None:
         shutil.rmtree("musicbot-test-folder", True)
 
     if sys.platform.startswith("win"):
+        # TODO: this should probably be conditional, in favor of system installed exe.
         log.info("Adding local bins/ folder to path")
         os.environ["PATH"] += ";" + os.path.abspath("bin/")
         sys.path.append(os.path.abspath("bin/"))  # might as well
@@ -649,7 +650,7 @@ def parse_cli_args() -> argparse.Namespace:
         help="Skip all optional startup checks, including the update check.",
     )
 
-    # Skip update checks option.
+    # Skip disk checks option.
     ap.add_argument(
         "--no-disk-check",
         dest="no_disk_check",

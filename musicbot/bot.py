@@ -1866,7 +1866,6 @@ class MusicBot(discord.Client):
             while True:
                 if self.logout_called:
                     break
-
                 if self._os_signal is None:
                     try:
                         await asyncio.sleep(1)
@@ -6982,6 +6981,20 @@ class MusicBot(discord.Client):
             delete_after=60,
         )
 
+    async def cmd_uptime(self) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}uptime
+
+        Displays the MusicBot uptime, since last start/restart.
+        """
+        uptime = time.time() - self._init_time
+        delta = format_song_duration(uptime)
+        return Response(
+            f"MusicBot has been up for `{delta}`",
+            delete_after=30,
+        )
+
     @owner_only
     async def cmd_botlatency(self) -> CommandResponse:
         """
@@ -7032,20 +7045,6 @@ class MusicBot(discord.Client):
         sl = self.latency * 1000
         return Response(
             f"**API Latency:** `{sl:.0f} ms`{voice_lat}",
-            delete_after=30,
-        )
-
-    async def cmd_uptime(self) -> CommandResponse:
-        """
-        Usage:
-            {command_prefix}uptime
-
-        Displays the MusicBot uptime, since last start/restart.
-        """
-        uptime = time.time() - self._init_time
-        delta = format_song_duration(uptime)
-        return Response(
-            f"MusicBot has been up for `{delta}`",
             delete_after=30,
         )
 
