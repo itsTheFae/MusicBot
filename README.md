@@ -34,19 +34,22 @@ This fork contains changes that may or may not be merged into upstream.
 Cherry-picking (or otherwise copying) is welcome should you feel inclined.  
 Here is a list of changes made so far, with most recent first:
 
-- Added local media file playback feature by using `file://` as a protocol scheme.
+
+- **NOTICE:**  *As of May 17th, 2024 - all major changes under this marker have been merged upstream!* 
+  - Please use the upstream [`dev`](https://github.com/Just-Some-Bots/MusicBot/tree/dev) or [`review`](https://github.com/Just-Some-Bots/MusicBot/tree/review) branches.
+- Added local media file playback feature by using `file://` as a protocol scheme.  **[merged]**
   - Adds config options `EnableLocalMedia` and `MediaFileDirectory` to control the feature.
-- Improved command `config` to work without section name being provided.
-- Improve custom `StatusMessage` option with dynamic variables. Docs in example_options.ini
-- Update autoplaylist feature to add multi-playlist and play history support.
+- Improved command `config` to work without section name being provided.  **[merged]**
+- Improve custom `StatusMessage` option with dynamic variables. Docs in example_options.ini  **[merged]**
+- Update autoplaylist feature to add multi-playlist and play history support.  **[merged]**
   - Adds config `SavePlayedHistoryGlobal` for global play history.
   - Adds config `SavePlayedHistoryGuilds` for per-guild play history.
   - Adds config `AutoPlaylistDirectory` to optionally set an alternative playlist storage path.
   - Adds new sub-commands to `autoplaylist` command to allow listing and changing playlists.
-- Add new command `follow` to allow MusicBot to follow a single user between guild channels.
-- Add new config `CommandsByMention` to enable @ mentions instead of prefix for commands.
-- Add new config `DefaultSpeed` to enable speed for all tracks.
-- Add new command `speed` to set playback speed of current track.
+- Add new command `follow` to allow MusicBot to follow a single user between guild channels.  **[merged]**
+- Add new config `CommandsByMention` to enable @ mentions instead of prefix for commands.  **[merged]**
+- Add new config `DefaultSpeed` to enable speed for all tracks.  **[merged]**
+- Add new command `speed` to set playback speed of current track.  **[merged]**
 - Improve and test various aspects of Install and Update scripts.  **[merged]**
   - All installers now ask before proceeding to install packages.
   - Linux install.sh now supports `--list` flag to show possible supported distros.
@@ -66,10 +69,10 @@ Here is a list of changes made so far, with most recent first:
     - Tested Raspberry Pi OS (Desktop i386, reported as Debian 11).
 - Update update.sh python detection to the same as in run.sh.  **[merged]**
 - Update run.sh python detection to account for name conventions between distros.  **[merged]**
-- Adds `uptime` command to show time since last start/restart.
-- Adds `seek` command to restart the current playing track at the given time.
-- Adds commands `latency` for users and `botlatency` for owners.
-- Adds playback progress to saved queue, and starts playback at the saved position.
+- Adds `uptime` command to show time since last start/restart.  **[merged]**
+- Adds `seek` command to restart the current playing track at the given time.  **[merged]**
+- Adds commands `latency` for users and `botlatency` for owners.  **[merged]**
+- Adds playback progress to saved queue, and starts playback at the saved position.  **[merged]**
 - Adds an offline status update to logout/shutdown process.  **[merged]**
 - Fix logging on Windows so module names are not `<string>` placeholder.  **[merged]**
 - Adds bootleg Voice connection resume from network outages.  **[merged]**
