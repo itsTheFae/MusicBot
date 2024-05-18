@@ -4096,9 +4096,7 @@ class MusicBot(discord.Client):
 
         await self._do_cmd_unpause_check(_player, channel, author, message)
 
-        if _player:
-            player = _player
-        elif permissions.summonplay:
+        if permissions.summonplay:
             response = await self.cmd_summon(guild, author, message)
             if response:
                 if self.config.embeds:
@@ -4122,9 +4120,9 @@ class MusicBot(discord.Client):
                     )
                 p = self.get_player_in(guild)
                 if p:
-                    player = p
+                    _player = p
 
-        if not player:
+        if not _player:
             prefix = self.server_data[guild.id].command_prefix
             raise exceptions.CommandError(
                 "The bot is not in a voice channel.  "
@@ -4133,7 +4131,7 @@ class MusicBot(discord.Client):
 
         if (
             permissions.max_songs
-            and player.playlist.count_for_user(author) >= permissions.max_songs
+            and _player.playlist.count_for_user(author) >= permissions.max_songs
         ):
             raise exceptions.PermissionsError(
                 self.str.get(
@@ -4143,7 +4141,7 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
-        if player.karaoke_mode and not permissions.bypass_karaoke_mode:
+        if _player.karaoke_mode and not permissions.bypass_karaoke_mode:
             raise exceptions.PermissionsError(
                 self.str.get(
                     "karaoke-enabled",
@@ -4177,7 +4175,7 @@ class MusicBot(discord.Client):
             if info.url != info.title:
                 self._do_song_blocklist_check(info.title)
 
-            await player.playlist.add_stream_from_info(
+            await _player.playlist.add_stream_from_info(
                 info, channel=channel, author=author, head=False
             )
 
@@ -6137,8 +6135,9 @@ class MusicBot(discord.Client):
         Sends the user a list of their permissions, or the permissions of the user specified.
         """
 
+        user: Optional[MessageAuthor] = None
         if user_mentions:
-            user = user_mentions[0]  # type: Union[discord.User, discord.Member]
+            user = user_mentions[0]
 
         if not user_mentions and not target:
             user = author
@@ -6148,14 +6147,19 @@ class MusicBot(discord.Client):
             if getuser is None:
                 try:
                     user = await self.fetch_user(int(target))
-                except (discord.NotFound, ValueError):
-                    return Response(
-                        "Invalid user ID or server nickname, please double check all typing and try again.",
-                        reply=False,
-                        delete_after=30,
-                    )
+                except (discord.NotFound, ValueError) as e:
+                    raise exceptions.CommandError(
+                        "Invalid user ID or server nickname, please double check the ID and try again.",
+                        expire_in=30,
+                    ) from e
             else:
                 user = getuser
+
+        if not user:
+            raise exceptions.CommandError(
+                "Could not determine the discord User.  Try again.",
+                expire_in=30,
+            )
 
         permissions = self.permissions.for_user(user)
 

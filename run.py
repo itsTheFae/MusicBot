@@ -908,7 +908,9 @@ def main() -> None:
             asyncio.set_event_loop(event_loop)
 
             # init some of bot, but don't run it yet.
-            m = MusicBot(use_certifi=use_certifi)
+            m = MusicBot(  # pylint: disable=possibly-used-before-assignment
+                use_certifi=use_certifi
+            )
 
             # register system signal handlers with the event loop.
             if not getattr(event_loop, "_sig_handler_set", False):
