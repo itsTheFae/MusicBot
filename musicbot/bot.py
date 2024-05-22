@@ -3427,6 +3427,7 @@ class MusicBot(discord.Client):
         Time should be given in seconds, fractional seconds are accepted.
         Due to codec specifics in ffmpeg, this may not be accurate.
         """
+        # TODO: perhaps a means of listing chapters and seeking to them. like `seek ch1` & `seek list`
         if not _player or not _player.current_entry:
             raise exceptions.CommandError(
                 "Cannot use seek if there is nothing playing.",
