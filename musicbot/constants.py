@@ -45,7 +45,10 @@ MUSICBOT_USER_AGENT_AIOHTTP: str = f"MusicBot/{VERSION}"
 # File path constants
 DEFAULT_OPTIONS_FILE: str = "config/options.ini"
 DEFAULT_PERMS_FILE: str = "config/permissions.ini"
+# TODO: Remove this file constant in favor of gettext messages.
 DEFAULT_I18N_FILE: str = "config/i18n/en.json"
+DEFAULT_I18N_DIR: str = "i18n/"
+DEFAULT_I18N_LANG: str = "en"  # GNU gettext suggests ISO 639 language codes.
 DEFAULT_COMMAND_ALIAS_FILE: str = "config/aliases.json"
 DEFAULT_USER_BLOCKLIST_FILE: str = "config/blocklist_users.txt"
 DEFAULT_SONG_BLOCKLIST_FILE: str = "config/blocklist_songs.txt"
@@ -65,6 +68,9 @@ DATA_FILE_YTDLP_OAUTH2: str = "oauth2.token"
 DATA_GUILD_FILE_QUEUE: str = "queue.json"
 DATA_GUILD_FILE_CUR_SONG: str = "current.txt"
 DATA_GUILD_FILE_OPTIONS: str = "options.json"
+
+I18N_DISCORD_TEXT_DOMAIN: str = "musicbot_messages"
+I18N_LOGFILE_TEXT_DOMAIN: str = "musicbot_logs"
 
 # Example config files.
 EXAMPLE_OPTIONS_FILE: str = "config/example_options.ini"
