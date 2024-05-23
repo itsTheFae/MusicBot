@@ -155,10 +155,11 @@ class MusicPlayer(EventEmitter, Serializable):
         """
         Event dispatched by Playlist when an entry is added to the queue.
         """
+        # TODO: this is probably a source of problems...
         if self.is_stopped and not self.current_entry and not self._pending_call_later:
-            log.noise("calling-later, self.play from player.")  # type: ignore[attr-defined]
-            self._pending_call_later = entry
-            self.loop.call_later(2, self.play)
+            log.noise("[WOULD-HAVE] calling-later, self.play from player.")  # type: ignore[attr-defined]
+            # self._pending_call_later = entry
+            # self.loop.call_later(2, self.play)
 
         self.emit(
             "entry-added",
@@ -607,6 +608,7 @@ def filter_stderr(stderr: io.BytesIO, future: AsyncFuture) -> None:
     last_ex = None
 
     while True:
+        log.everything("FFMpeg looping on stderr...")
         data = stderr.readline()
         if data:
             log.ffmpeg(  # type: ignore[attr-defined]

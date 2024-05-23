@@ -725,6 +725,7 @@ class MusicBot(discord.Client):
         max_timeout = VOICE_CLIENT_RECONNECT_TIMEOUT * VOICE_CLIENT_MAX_RETRY_CONNECT
         attempts = 0
         while True:
+            log.everything("MusicPlayer connection looping...")
             attempts += 1
             timeout = attempts * VOICE_CLIENT_RECONNECT_TIMEOUT
             if timeout > max_timeout:
@@ -1217,6 +1218,7 @@ class MusicBot(discord.Client):
         # avoid downloading the next entries if the user is absent and we are configured to skip.
         notice_sent = False  # set a flag to avoid message spam.
         while True:
+            log.everything("Loop1 in on_player_finished_playing...")
             next_entry = player.playlist.peek()
 
             if not next_entry:
@@ -1275,6 +1277,7 @@ class MusicBot(discord.Client):
                     )
 
             while player.autoplaylist:
+                log.everything("Loop2 in on_player_finished_playing - APL loop...")
                 if self.config.auto_playlist_random:
                     random.shuffle(player.autoplaylist)
                     song_url = random.choice(player.autoplaylist)
@@ -1864,6 +1867,7 @@ class MusicBot(discord.Client):
         # method used to periodically check for a signal, and process it.
         async def check_windows_signal() -> None:
             while True:
+                
                 if self.logout_called:
                     break
                 if self._os_signal is None:
