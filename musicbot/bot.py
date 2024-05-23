@@ -1219,6 +1219,15 @@ class MusicBot(discord.Client):
         notice_sent = False  # set a flag to avoid message spam.
         while True:
             log.everything("Loop1 in on_player_finished_playing...")
+
+            if not self.loop or (self.loop and self.loop.is_closed()):
+                log.debug("Event loop is closed, nothing else to do here.")
+                return
+
+            if self.logout_called:
+                log.debug("Logout under way, ignoring this event.")
+                return
+
             next_entry = player.playlist.peek()
 
             if not next_entry:
@@ -1278,6 +1287,15 @@ class MusicBot(discord.Client):
 
             while player.autoplaylist:
                 log.everything("Loop2 in on_player_finished_playing - APL loop...")
+                
+                if not self.loop or (self.loop and self.loop.is_closed()):
+                    log.debug("Event loop is closed, nothing else to do here.")
+                    return
+
+                if self.logout_called:
+                    log.debug("Logout under way, ignoring this event.")
+                    return
+                
                 if self.config.auto_playlist_random:
                     random.shuffle(player.autoplaylist)
                     song_url = random.choice(player.autoplaylist)
@@ -1373,6 +1391,7 @@ class MusicBot(discord.Client):
                     log.debug("Exception data for above error:", exc_info=True)
                     continue
                 break
+            # end of autoplaylist loop.
 
             if not self.server_data[guild.id].autoplaylist:
                 log.warning("No playable songs in the autoplaylist, disabling.")
@@ -1381,7 +1400,7 @@ class MusicBot(discord.Client):
         else:  # Don't serialize for autoplaylist events
             await self.serialize_queue(guild)
 
-        if not player.is_stopped and not player.is_dead:
+        if not player.is_dead and (self.config.auto_playlist or not player.is_stopped):
             player.play(_continue=True)
 
     async def on_player_entry_added(

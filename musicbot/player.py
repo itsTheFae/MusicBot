@@ -129,7 +129,6 @@ class MusicPlayer(EventEmitter, Serializable):
         self._stderr_future: Optional[AsyncFuture] = None
 
         self._source: Optional[SourcePlaybackCounter] = None
-        self._pending_call_later: Optional[EntryTypes] = None
 
         self.playlist.on("entry-added", self.on_entry_added)
         self.playlist.on("entry-failed", self.on_entry_failed)
@@ -155,10 +154,9 @@ class MusicPlayer(EventEmitter, Serializable):
         """
         Event dispatched by Playlist when an entry is added to the queue.
         """
-        # TODO: this is probably a source of problems...
-        if self.is_stopped and not self.current_entry and not self._pending_call_later:
+        # TODO: this is probably a source of problems...  update post verification.
+        if self.is_stopped and not self.current_entry:
             log.noise("[WOULD-HAVE] calling-later, self.play from player.")  # type: ignore[attr-defined]
-            # self._pending_call_later = entry
             # self.loop.call_later(2, self.play)
 
         self.emit(
@@ -378,9 +376,6 @@ class MusicPlayer(EventEmitter, Serializable):
                 if not entry:
                     self.stop()
                     return
-
-                if self._pending_call_later == entry:
-                    self._pending_call_later = None
 
                 # In-case there was a player, kill it. RIP.
                 self._kill_current_player()
