@@ -5545,6 +5545,43 @@ class MusicBot(discord.Client):
                 f"To save the change use `config save {opt.section} {opt.option}`",
                 delete_after=30,
             )
+        
+        # reset an option to default value as defined in ConfigDefaults
+        if option == "reset":
+            if not opt.editable:
+                raise exceptions.CommandError(
+                    f"Option `{opt}` is not editable. Cannot reset to default.",
+                    expire_in=30,
+                )
+
+            # Use the default value from the option object
+            default_value = opt.default
+
+            # Handle different types of default values
+            if isinstance(default_value, set):
+                # If the default is a blank set, represent it as an empty string
+                default_value = ",".join(default_value) if default_value else ""  # type: ignore
+            elif isinstance(default_value, pathlib.Path):
+                default_value = str(default_value)
+            elif not isinstance(default_value, str):
+                default_value = str(default_value)
+
+            # Prepare a user-friendly message for the reset operation
+            reset_value_display = default_value if default_value else "an empty set"
+
+            log.debug("Resetting %s to default %s", opt, default_value)
+            async with self.aiolocks["config_update"]:
+                updated = self.config.update_option(opt, default_value)
+            if not updated:
+                raise exceptions.CommandError(
+                    f"Option `{opt}` was not reset to default!",
+                    expire_in=30,
+                )
+            return Response(
+                f"Option `{opt}` was reset to its default value `{reset_value_display}`.\n"
+                f"To save the change use `config save {opt.section} {opt.option}`",
+                delete_after=30,
+            )
 
         return None
 
