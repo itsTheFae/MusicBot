@@ -1867,7 +1867,7 @@ class MusicBot(discord.Client):
         # method used to periodically check for a signal, and process it.
         async def check_windows_signal() -> None:
             while True:
-                
+
                 if self.logout_called:
                     break
                 if self._os_signal is None:
@@ -5335,6 +5335,7 @@ class MusicBot(discord.Client):
             "show",
             "set",
             "reload",
+            reset,
         ]
         if option not in valid_options:
             raise exceptions.CommandError(
@@ -5416,7 +5417,7 @@ class MusicBot(discord.Client):
                 ) from e
 
         # sub commands beyond here need 2 leftover_args
-        if option in ["help", "show", "save", "set"]:
+        if option in ["help", "show", "save", "set", "reset"]:
             largs = len(leftover_args)
             if (
                 self.config.register.resolver_available
@@ -5545,7 +5546,7 @@ class MusicBot(discord.Client):
                 f"To save the change use `config save {opt.section} {opt.option}`",
                 delete_after=30,
             )
-        
+
         # reset an option to default value as defined in ConfigDefaults
         if option == "reset":
             if not opt.editable:
@@ -5555,18 +5556,10 @@ class MusicBot(discord.Client):
                 )
 
             # Use the default value from the option object
-            default_value = opt.default
-
-            # Handle different types of default values
-            if isinstance(default_value, set):
-                # If the default is a blank set, represent it as an empty string
-                default_value = ",".join(default_value) if default_value else ""  # type: ignore
-            elif isinstance(default_value, pathlib.Path):
-                default_value = str(default_value)
-            elif not isinstance(default_value, str):
-                default_value = str(default_value)
+            default_value = self.config.register.to_ini(opt, use_default=True)
 
             # Prepare a user-friendly message for the reset operation
+            # TODO look into option registry display code for use here
             reset_value_display = default_value if default_value else "an empty set"
 
             log.debug("Resetting %s to default %s", opt, default_value)
