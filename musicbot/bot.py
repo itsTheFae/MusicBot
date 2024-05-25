@@ -5335,7 +5335,7 @@ class MusicBot(discord.Client):
             "show",
             "set",
             "reload",
-            reset,
+            "reset",
         ]
         if option not in valid_options:
             raise exceptions.CommandError(
