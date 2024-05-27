@@ -4641,7 +4641,8 @@ class MusicBot(discord.Client):
         Call the bot to the summoner's voice channel.
         """
 
-        # @TheerapakG: Maybe summon should have async lock?
+        if guild.id not in self.summon_locks:
+            self.summon_locks[guild.id] = asyncio.Lock()
 
         if not author.voice or not author.voice.channel:
             raise exceptions.CommandError(
