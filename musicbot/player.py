@@ -608,7 +608,7 @@ def filter_stderr(stderr: io.BytesIO, future: AsyncFuture) -> None:
     last_ex = None
 
     while True:
-        log.everything("FFMpeg looping on stderr...")
+        log.everything("FFMpeg looping on stderr...")  # type: ignore[attr-defined]
         data = stderr.readline()
         if data:
             log.ffmpeg(  # type: ignore[attr-defined]

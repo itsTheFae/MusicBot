@@ -669,7 +669,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
         retry = 2
         info = None
         while True:
-            log.everything("Loop started in URLPlaylistEntry._download()...")
+            log.everything("Loop started in URLPlaylistEntry._download()...")  # type: ignore[attr-defined]
             try:
                 info = await self.downloader.extract_info(self.url, download=True)
                 break
