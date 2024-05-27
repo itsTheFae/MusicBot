@@ -725,7 +725,7 @@ class MusicBot(discord.Client):
         max_timeout = VOICE_CLIENT_RECONNECT_TIMEOUT * VOICE_CLIENT_MAX_RETRY_CONNECT
         attempts = 0
         while True:
-            log.everything("MusicPlayer connection looping...")
+            log.everything("MusicPlayer connection looping...")  # type: ignore[attr-defined]
             attempts += 1
             timeout = attempts * VOICE_CLIENT_RECONNECT_TIMEOUT
             if timeout > max_timeout:
@@ -1218,7 +1218,7 @@ class MusicBot(discord.Client):
         # avoid downloading the next entries if the user is absent and we are configured to skip.
         notice_sent = False  # set a flag to avoid message spam.
         while True:
-            log.everything("Loop1 in on_player_finished_playing...")
+            log.everything("Loop1 in on_player_finished_playing...")  # type: ignore[attr-defined]
             next_entry = player.playlist.peek()
 
             if not next_entry:
@@ -1277,7 +1277,7 @@ class MusicBot(discord.Client):
                     )
 
             while player.autoplaylist:
-                log.everything("Loop2 in on_player_finished_playing - APL loop...")
+                log.everything("Loop2 in on_player_finished_playing - APL loop...")  # type: ignore[attr-defined]
                 if self.config.auto_playlist_random:
                     random.shuffle(player.autoplaylist)
                     song_url = random.choice(player.autoplaylist)
