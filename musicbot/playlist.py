@@ -384,7 +384,9 @@ class Playlist(EventEmitter, Serializable):
         request_counter = 0
         song: Optional[EntryTypes] = None
         while self.entries:
-            log.everything("Reorder looping over entries.")
+            log.everything(  # type: ignore[attr-defined]
+                "Reorder looping over entries."
+            )
             # Do not continue if we have no more authors.
             if len(all_authors) == 0:
                 break

@@ -756,7 +756,6 @@ class MusicBot(discord.Client):
         # Otherwise we need to connect to the given channel.
         max_timeout = VOICE_CLIENT_RECONNECT_TIMEOUT * VOICE_CLIENT_MAX_RETRY_CONNECT
         for attempt in range(1, (VOICE_CLIENT_MAX_RETRY_CONNECT + 1)):
-            log.everything("MusicPlayer connection looping...")
             timeout = attempt * VOICE_CLIENT_RECONNECT_TIMEOUT
             if timeout > max_timeout:
                 log.critical(
@@ -1252,7 +1251,9 @@ class MusicBot(discord.Client):
         # avoid downloading the next entries if the user is absent and we are configured to skip.
         notice_sent = False  # set a flag to avoid message spam.
         while len(player.playlist):
-            log.everything("Loop1 in on_player_finished_playing...")
+            log.everything(  # type: ignore[attr-defined]
+                "Looping over queue to expunge songs with missing author..."
+            )
 
             if not self.loop or (self.loop and self.loop.is_closed()):
                 log.debug("Event loop is closed, nothing else to do here.")
@@ -1320,7 +1321,9 @@ class MusicBot(discord.Client):
                     )
 
             while player.autoplaylist:
-                log.everything("Loop2 in on_player_finished_playing - APL loop...")
+                log.everything(  # type: ignore[attr-defined]
+                    "Looping over player autoplaylist..."
+                )
 
                 if not self.loop or (self.loop and self.loop.is_closed()):
                     log.debug("Event loop is closed, nothing else to do here.")

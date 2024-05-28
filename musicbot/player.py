@@ -363,6 +363,7 @@ class MusicPlayer(EventEmitter, Serializable):
 
         async with self._play_lock:
             if self.is_stopped or _continue:
+                # Get the entry before we try to ready it, so it can be passed to error callbacks.
                 entry_up_next = self.playlist.peek()
                 try:
                     entry = await self.playlist.get_next_entry()
@@ -370,7 +371,7 @@ class MusicPlayer(EventEmitter, Serializable):
                     log.warning("Failed to get next entry.", exc_info=e)
                     self.emit("error", player=self, entry=entry_up_next, ex=e)
                     entry = None
-                except Exception as e:
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     log.warning("Failed to process entry for playback.", exc_info=e)
                     self.emit("error", player=self, entry=entry_up_next, ex=e)
                     entry = None
@@ -603,10 +604,11 @@ def filter_stderr(stderr: io.BytesIO, future: AsyncFuture) -> None:
     Set the given `future` with either an error found in the stream or
     set the future with a successful result.
     """
+    # NOTE:  This effectiveness of this loop is questionable. Any empty line from
+    # FFmpeg will break the loop, meaning we could be missing errors.
+    # If we care about all errors for the scope of playback, we should change this.
     last_ex = None
-
     while True:
-        log.everything("FFMpeg looping on stderr...")
         data = stderr.readline()
         if data:
             log.ffmpeg(  # type: ignore[attr-defined]

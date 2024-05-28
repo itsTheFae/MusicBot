@@ -143,7 +143,9 @@ class BasePlaylistEntry(Serializable):
         futures = self._waiting_futures
         self._waiting_futures = []
 
-        log.everything("Completed futures for %r with %r", self, cb)
+        log.everything(  # type: ignore[attr-defined]
+            "Completed futures for %r with %r", self, cb
+        )
         for future in futures:
             if future.cancelled():
                 continue
@@ -677,7 +679,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         info = None
         for attempt in range(1, 4):
-            log.everything("Download attempt %s of 3...", attempt)
+            log.everything(  # type: ignore[attr-defined]
+                "Download attempt %s of 3...", attempt
+            )
             try:
                 info = await self.downloader.extract_info(self.url, download=True)
                 break
