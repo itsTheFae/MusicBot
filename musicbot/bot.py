@@ -755,11 +755,9 @@ class MusicBot(discord.Client):
 
         # Otherwise we need to connect to the given channel.
         max_timeout = VOICE_CLIENT_RECONNECT_TIMEOUT * VOICE_CLIENT_MAX_RETRY_CONNECT
-        attempts = 0
-        while True:
+        for attempt in range(1, (VOICE_CLIENT_MAX_RETRY_CONNECT + 1)):
             log.everything("MusicPlayer connection looping...")
-            attempts += 1
-            timeout = attempts * VOICE_CLIENT_RECONNECT_TIMEOUT
+            timeout = attempt * VOICE_CLIENT_RECONNECT_TIMEOUT
             if timeout > max_timeout:
                 log.critical(
                     "MusicBot is unable to connect to the channel right now:  %s",
@@ -782,7 +780,7 @@ class MusicBot(discord.Client):
             except asyncio.exceptions.TimeoutError:
                 log.warning(
                     "Retrying connection after a timeout error (%s) while trying to connect to:  %s",
-                    attempts,
+                    attempt,
                     channel,
                 )
             except asyncio.exceptions.CancelledError as e:
@@ -832,7 +830,7 @@ class MusicBot(discord.Client):
                     asyncio.exceptions.TimeoutError,
                 ):
                     if self.config.debug_mode:
-                        log.warning("The disconnect failed or was cancelledd.")
+                        log.warning("The disconnect failed or was cancelled.")
 
             # ensure the player is dead and gone.
             player.kill()
