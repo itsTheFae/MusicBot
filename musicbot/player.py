@@ -301,7 +301,9 @@ class MusicPlayer(EventEmitter, Serializable):
             return
 
         if not self.bot.config.save_videos and entry:
-            self.loop.create_task(self._handle_file_cleanup(entry))
+            self.bot.create_task(
+                self._handle_file_cleanup(entry), name="MB_CacheCleanup"
+            )
 
         self.emit("finished-playing", player=self, entry=entry)
 
@@ -336,7 +338,7 @@ class MusicPlayer(EventEmitter, Serializable):
         log.noise(  # type: ignore[attr-defined]
             "MusicPlayer.play() is called:  %s", repr(self)
         )
-        self.loop.create_task(self._play(_continue=_continue))
+        self.bot.create_task(self._play(_continue=_continue), name="MB_Play")
 
     async def _play(self, _continue: bool = False) -> None:
         """
@@ -428,7 +430,7 @@ class MusicPlayer(EventEmitter, Serializable):
                 stderr_thread = Thread(
                     target=filter_stderr,
                     args=(stderr_io, self._stderr_future),
-                    name="stderr reader",
+                    name="MB_FFmpegStdErrReader",
                 )
 
                 stderr_thread.start()

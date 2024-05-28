@@ -79,7 +79,10 @@ class Downloader:
         self.bot: "MusicBot" = bot
         self.download_folder: pathlib.Path = bot.config.audio_cache_path
         # NOTE: this executor may not be good for long-running downloads...
-        self.thread_pool = ThreadPoolExecutor(max_workers=DEFAULT_MAX_INFO_DL_THREADS)
+        self.thread_pool = ThreadPoolExecutor(
+            max_workers=DEFAULT_MAX_INFO_DL_THREADS,
+            thread_name_prefix="MB_Downloader",
+        )
 
         # force ytdlp and HEAD requests to use the same UA string.
         self.http_req_headers = {

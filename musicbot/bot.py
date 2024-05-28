@@ -17,7 +17,7 @@ import traceback
 from collections import defaultdict
 from io import BytesIO, StringIO
 from textwrap import dedent
-from typing import Any, DefaultDict, Dict, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, DefaultDict, Dict, List, Optional, Set, Union
 
 import aiohttp
 import certifi  # type: ignore[import-untyped, unused-ignore]
@@ -79,6 +79,14 @@ try:
 except ImportError:
     objgraph = None
 
+
+if TYPE_CHECKING:
+    from collections.abc import Coroutine
+    from contextvars import Context as CtxVars
+
+    AsyncTask = asyncio.Task[Any]
+else:
+    AsyncTask = asyncio.Task
 
 # Type aliases
 ExitSignals = Union[None, exceptions.RestartSignal, exceptions.TerminateSignal]
@@ -155,6 +163,7 @@ class MusicBot(discord.Client):
         self.cached_app_info: Optional[discord.AppInfo] = None
         self.last_status: Optional[discord.BaseActivity] = None
         self.players: Dict[int, MusicPlayer] = {}
+        self.task_pool: Set[AsyncTask] = set()
 
         self.config = Config(self._config_file)
 
@@ -188,6 +197,29 @@ class MusicBot(discord.Client):
         intents.typing = False
         intents.presences = False
         super().__init__(intents=intents)
+
+    def create_task(
+        self,
+        coro: "Coroutine[Any, Any, Any]",
+        *,
+        name: Optional[str] = None,
+        ctx: Optional["CtxVars"] = None,
+    ) -> None:
+        """
+        Same as asyncio.create_task() but manages the task reference.
+        This prevents garbage collection of tasks until they are finished.
+        """
+        if not self.loop:
+            log.error("Loop is closed, cannot create task for: %r", coro)
+            return
+
+        # context was not added until python 3.11
+        if sys.version_info >= (3, 11):
+            t = self.loop.create_task(coro, name=name, context=ctx)
+        else:  # assume 3.8 +
+            t = self.loop.create_task(coro, name=name)
+        self.task_pool.add(t)
+        t.add_done_callback(self.task_pool.discard)
 
     async def setup_hook(self) -> None:
         """async init phase that is called by d.py before login."""
@@ -258,7 +290,7 @@ class MusicBot(discord.Client):
         log.info("Initialized, now connecting to discord.")
         # this creates an output similar to a progress indicator.
         muffle_discord_console_log()
-        self.loop.create_task(self._test_network(), name="MB_PingTest")
+        self.create_task(self._test_network(), name="MB_PingTest")
 
     async def _test_network(self) -> None:
         """
@@ -315,8 +347,8 @@ class MusicBot(discord.Client):
             return
 
         # set up the next ping task if possible.
-        if self.loop and not self.logout_called:
-            self.loop.create_task(self._test_network(), name="MB_PingTest")
+        if not self.logout_called:
+            self.create_task(self._test_network(), name="MB_PingTest")
 
     async def _test_network_via_http(self, ping_target: str) -> int:
         """
@@ -1160,7 +1192,9 @@ class MusicBot(discord.Client):
         if player.session_progress > 1:
             await self.serialize_queue(player.voice_client.channel.guild)
 
-        self.loop.create_task(self.handle_player_inactivity(player))
+        self.create_task(
+            self.handle_player_inactivity(player), name="MB_HandleInactivePlayer"
+        )
 
     async def on_player_stop(self, player: MusicPlayer, **_: Any) -> None:
         """
@@ -1169,7 +1203,9 @@ class MusicBot(discord.Client):
         """
         log.debug("Running on_player_stop")
         await self.update_now_playing_status()
-        self.loop.create_task(self.handle_player_inactivity(player))
+        self.create_task(
+            self.handle_player_inactivity(player), name="MB_HandleInactivePlayer"
+        )
 
     async def on_player_finished_playing(self, player: MusicPlayer, **_: Any) -> None:
         """
@@ -1740,11 +1776,11 @@ class MusicBot(discord.Client):
         finally:
             if not retry_after and self.config.delete_messages:
                 if msg and expire_in:
-                    asyncio.ensure_future(self._wait_delete_msg(msg, expire_in))
+                    self.create_task(self._wait_delete_msg(msg, expire_in))
 
             if not retry_after and self.config.delete_invoking:
                 if also_delete and isinstance(also_delete, discord.Message):
-                    asyncio.ensure_future(self._wait_delete_msg(also_delete, expire_in))
+                    self.create_task(self._wait_delete_msg(also_delete, expire_in))
 
         return msg
 
@@ -1790,7 +1826,7 @@ class MusicBot(discord.Client):
                         "Rate limited message delete, retrying in %s seconds.",
                         retry_after,
                     )
-                    asyncio.ensure_future(self._wait_delete_msg(message, retry_after))
+                    self.create_task(self._wait_delete_msg(message, retry_after))
                 else:
                     log.error("Rate limited message delete, but cannot retry!")
 
@@ -1901,7 +1937,10 @@ class MusicBot(discord.Client):
         # register interrupt signal Ctrl+C to be trapped.
         signal.signal(signal.SIGINT, set_windows_signal)
         # and start the signal checking loop.
-        asyncio.create_task(check_windows_signal())
+        task_ref = asyncio.create_task(
+            check_windows_signal(), name="MB_WinInteruptChecker"
+        )
+        setattr(self, "_mb_win_sig_checker_task", task_ref)
 
     async def on_os_signal(
         self, sig: signal.Signals, _loop: asyncio.AbstractEventLoop
@@ -2264,7 +2303,7 @@ class MusicBot(discord.Client):
         """
         if self.on_ready_count > 0:
             log.debug("Event on_ready has fired %s times", self.on_ready_count)
-        self.loop.create_task(self._on_ready_call_later())
+        self.create_task(self._on_ready_call_later(), name="MB_PostOnReady")
 
     async def _on_ready_call_later(self) -> None:
         """
@@ -3218,8 +3257,9 @@ class MusicBot(discord.Client):
                         return
 
                     if f_player is not None:
-                        self.loop.create_task(
-                            self._handle_guild_auto_pause(f_player, _lc=_lc)
+                        self.create_task(
+                            self._handle_guild_auto_pause(f_player, _lc=_lc),
+                            name="MB_HandleGuildAutoPause",
                         )
                 return
 
@@ -3793,7 +3833,7 @@ class MusicBot(discord.Client):
         if matches:
             pl_url = "https://www.youtube.com/playlist?" + matches.group(2)
             ignore_vid = matches.group(1)
-            asyncio.ensure_future(
+            self.create_task(
                 _prompt_for_playing(
                     # TODO: i18n / UI stuff
                     f"This link contains a Playlist ID:\n`{song_url}`\n\nDo you want to queue the playlist too?",
@@ -7576,7 +7616,9 @@ class MusicBot(discord.Client):
                         "%s has been detected as empty. Handling timeouts.",
                         before.channel.name,
                     )
-                    self.loop.create_task(self.handle_vc_inactivity(guild))
+                    self.create_task(
+                        self.handle_vc_inactivity(guild), name="MB_HandleInactiveVC"
+                    )
             elif after.channel and member != self.user:
                 if self.user in after.channel.members:
                     if event.is_active():
@@ -7598,7 +7640,9 @@ class MusicBot(discord.Client):
                         "The bot got moved and the voice channel %s is empty. Handling timeouts.",
                         after.channel.name,
                     )
-                    self.loop.create_task(self.handle_vc_inactivity(guild))
+                    self.create_task(
+                        self.handle_vc_inactivity(guild), name="MB_HandleInactiveVC"
+                    )
                 else:
                     if event.is_active():
                         log.info(
