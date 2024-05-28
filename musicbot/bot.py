@@ -1993,6 +1993,16 @@ class MusicBot(discord.Client):
             ) from e
 
         finally:
+            # Shut down the thread pool executor.
+            log.info("Waiting for download threads to finish up...")
+            # We can't kill the threads in ThreadPoolExecutor.  User can Ctrl+C though.
+            # We can pass `wait=False` and carry on with "shutdown" but threads
+            # will stay until they're done.  We wait to keep it clean...
+            if sys.version_info < (3, 9):
+                self.downloader.thread_pool.shutdown()
+            else:
+                self.downloader.thread_pool.shutdown(cancel_futures=True)
+
             # Inspect all waiting tasks and either cancel them or let them finish.
             pending_tasks = []
             for task in asyncio.all_tasks(loop=self.loop):
@@ -2006,9 +2016,8 @@ class MusicBot(discord.Client):
                 if coro and hasattr(coro, "__qualname__"):
                     coro_name = getattr(coro, "__qualname__", "[unknown]")
 
-                if (
-                    tname.startswith("Signal_SIG")
-                    or coro_name == "URLPlaylistEntry._download"
+                if tname.startswith("Signal_SIG") or coro_name.startswith(
+                    "Client.close."
                 ):
                     log.debug("Will wait for task:  %s  (%s)", tname, coro_name)
                     pending_tasks.append(task)
