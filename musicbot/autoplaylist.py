@@ -28,7 +28,7 @@ class AutoPlaylist(StrUserList):
     def __init__(self, filename: pathlib.Path, bot: "MusicBot") -> None:
         super().__init__()
 
-        self._bot: "MusicBot" = bot
+        self._bot: MusicBot = bot
         self._file: pathlib.Path = filename
         self._removed_file = filename.with_name(f"{filename.stem}.removed.log")
 
@@ -207,7 +207,7 @@ class AutoPlaylistManager:
         """
         Initialize the manager, checking the file system for usable playlists.
         """
-        self._bot: "MusicBot" = bot
+        self._bot: MusicBot = bot
         self._apl_dir: pathlib.Path = bot.config.auto_playlist_dir
         self._apl_file_default = self._apl_dir.joinpath(APL_FILE_DEFAULT)
         self._apl_file_history = self._apl_dir.joinpath(APL_FILE_HISTORY)

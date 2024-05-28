@@ -74,9 +74,9 @@ class GuildSpecificData:
         Initialize a managed server specific data set.
         """
         # Members for internal use only.
-        self._ssd: DefaultDict[int, "GuildSpecificData"] = bot.server_data
-        self._bot_config: "Config" = bot.config
-        self._bot: "MusicBot" = bot
+        self._ssd: DefaultDict[int, GuildSpecificData] = bot.server_data
+        self._bot_config: Config = bot.config
+        self._bot: MusicBot = bot
         self._guild_id: int = 0
         self._guild_name: str = ""
         self._command_prefix: str = ""
@@ -87,20 +87,19 @@ class GuildSpecificData:
         self._is_file_loaded: bool = False
 
         # Members below are available for public use.
-        self.last_np_msg: Optional["discord.Message"] = None
+        self.last_np_msg: Optional[discord.Message] = None
         self.last_played_song_subject: str = ""
-        self.follow_user: Optional["discord.Member"] = None
+        self.follow_user: Optional[discord.Member] = None
         self.auto_join_channel: Optional[
-            Union["discord.VoiceChannel", "discord.StageChannel"]
+            Union[discord.VoiceChannel, discord.StageChannel]
         ] = None
-        self.autoplaylist: "AutoPlaylist" = self._bot.playlist_mgr.get_default()
+        self.autoplaylist: AutoPlaylist = self._bot.playlist_mgr.get_default()
         self.current_playing_url: str = ""
 
         # create a task to load any persistent guild options.
         # in theory, this should work out fine.
-        if bot.loop:
-            bot.loop.create_task(self.load_guild_options_file())
-            bot.loop.create_task(self.autoplaylist.load())
+        bot.create_task(self.load_guild_options_file(), name="MB_LoadGuildOptions")
+        bot.create_task(self.autoplaylist.load(), name="MB_LoadAPL")
 
     def is_ready(self) -> bool:
         """A status indicator for fully loaded server data."""
@@ -297,7 +296,7 @@ class SkipState:
         enable counting votes for skipping a song.
         """
         self.skippers: Set[int] = set()
-        self.skip_msgs: Set["discord.Message"] = set()
+        self.skip_msgs: Set[discord.Message] = set()
 
     @property
     def skip_count(self) -> int:
