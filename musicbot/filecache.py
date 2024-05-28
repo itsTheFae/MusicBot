@@ -29,8 +29,8 @@ class AudioFileCache:
         Manage data related to the audio cache, such as its current size,
         file count, file paths, and synchronization locks.
         """
-        self.bot: "MusicBot" = bot
-        self.config: "Config" = bot.config
+        self.bot: MusicBot = bot
+        self.config: Config = bot.config
         self.cache_path: pathlib.Path = bot.config.audio_cache_path
         self.cachemap_file = pathlib.Path(DEFAULT_DATA_DIR).joinpath(DATA_FILE_CACHEMAP)
 

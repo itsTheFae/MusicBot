@@ -109,12 +109,12 @@ class MusicPlayer(EventEmitter, Serializable):
         :param: playlist:  a collection of playable entries to be played.
         """
         super().__init__()
-        self.bot: "MusicBot" = bot
+        self.bot: MusicBot = bot
         self.loop: asyncio.AbstractEventLoop = bot.loop
         self.loopqueue: bool = False
         self.repeatsong: bool = False
         self.voice_client: VoiceClient = voice_client
-        self.playlist: "Playlist" = playlist
+        self.playlist: Playlist = playlist
         self.autoplaylist: List[str] = []
         self.state: MusicPlayerState = MusicPlayerState.STOPPED
         self.skip_state: SkipState = SkipState()

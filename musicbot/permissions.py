@@ -108,7 +108,7 @@ class Permissions:
         self.perms_file = perms_file
         self.config = ExtendedConfigParser()
         self.register = PermissionOptionRegistry(self, self.config)
-        self.groups: Dict[str, "PermissionGroup"] = {}
+        self.groups: Dict[str, PermissionGroup] = {}
 
         if not self.config.read(self.perms_file, encoding="utf-8"):
             example_file = PermissionsDefaults.example_perms_file

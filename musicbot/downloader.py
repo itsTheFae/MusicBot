@@ -76,7 +76,7 @@ class Downloader:
         Set up YoutubeDL and related config as well as a thread pool executor
         to run concurrent extractions.
         """
-        self.bot: "MusicBot" = bot
+        self.bot: MusicBot = bot
         self.download_folder: pathlib.Path = bot.config.audio_cache_path
         # NOTE: this executor may not be good for long-running downloads...
         self.thread_pool = ThreadPoolExecutor(

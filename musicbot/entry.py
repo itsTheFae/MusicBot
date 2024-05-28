@@ -210,9 +210,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
         self._start_time: Optional[float] = None
         self._playback_rate: Optional[float] = None
-        self.playlist: "Playlist" = playlist
-        self.downloader: "Downloader" = playlist.bot.downloader
-        self.filecache: "AudioFileCache" = playlist.bot.filecache
+        self.playlist: Playlist = playlist
+        self.downloader: Downloader = playlist.bot.downloader
+        self.filecache: AudioFileCache = playlist.bot.filecache
 
         self.info: YtdlpResponseDict = info
 
@@ -224,7 +224,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 self.title,
             )
 
-        self.author: Optional["discord.Member"] = author
+        self.author: Optional[discord.Member] = author
         self.channel: Optional[GuildMessageableChannels] = channel
 
         self._aopt_eq: str = ""
@@ -745,10 +745,10 @@ class StreamPlaylistEntry(BasePlaylistEntry):
         """
         super().__init__()
 
-        self.playlist: "Playlist" = playlist
+        self.playlist: Playlist = playlist
         self.info: YtdlpResponseDict = info
 
-        self.author: Optional["discord.Member"] = author
+        self.author: Optional[discord.Member] = author
         self.channel: Optional[GuildMessageableChannels] = channel
 
         self.filename: str = self.url
@@ -929,14 +929,14 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
 
         self._start_time: Optional[float] = None
         self._playback_rate: Optional[float] = None
-        self.playlist: "Playlist" = playlist
+        self.playlist: Playlist = playlist
 
         self.info: YtdlpResponseDict = info
         self.filename = self.expected_filename or ""
 
         # TODO: maybe it is worth getting duration as early as possible...
 
-        self.author: Optional["discord.Member"] = author
+        self.author: Optional[discord.Member] = author
         self.channel: Optional[GuildMessageableChannels] = channel
 
         self._aopt_eq: str = ""

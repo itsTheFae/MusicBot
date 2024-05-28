@@ -52,7 +52,7 @@ class Playlist(EventEmitter, Serializable):
         of validated extraction information.
         """
         super().__init__()
-        self.bot: "MusicBot" = bot
+        self.bot: MusicBot = bot
         self.loop: asyncio.AbstractEventLoop = bot.loop
         self.entries: Deque[EntryTypes] = deque()
 
@@ -368,7 +368,7 @@ class Playlist(EventEmitter, Serializable):
         Entries added by the auto playlist will be removed.
         """
         new_queue: Deque[EntryTypes] = deque()
-        all_authors: List["discord.abc.User"] = []
+        all_authors: List[discord.abc.User] = []
 
         # Make a list of unique authors from the current queue.
         for entry in self.entries:

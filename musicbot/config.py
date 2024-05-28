@@ -680,7 +680,7 @@ class Config:
             getter="getpathlike",
             comment="An optional file path to a text file listing Discord User IDs, one per line.",
         )
-        self.user_blocklist: "UserBlocklist" = UserBlocklist(self.user_blocklist_file)
+        self.user_blocklist: UserBlocklist = UserBlocklist(self.user_blocklist_file)
 
         self.song_blocklist_enabled: bool = self.register.init_option(
             section="MusicBot",
@@ -701,7 +701,7 @@ class Config:
                 "Any song title or URL that contains any line in the list will be blocked."
             ),
         )
-        self.song_blocklist: "SongBlocklist" = SongBlocklist(self.song_blocklist_file)
+        self.song_blocklist: SongBlocklist = SongBlocklist(self.song_blocklist_file)
 
         self.auto_playlist_dir: pathlib.Path = self.register.init_option(
             section="Files",
