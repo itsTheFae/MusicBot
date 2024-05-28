@@ -575,6 +575,14 @@ class YtdlpResponseDict(YUserDict):
         return default
 
     @property
+    def input_subject(self) -> str:
+        """Get the input subject used to create this data."""
+        subject = self.data.get("__input_subject", "")
+        if isinstance(subject, str):
+            return subject
+        return ""
+
+    @property
     def expected_filename(self) -> Optional[str]:
         """get expected filename for this info data, or None if not available"""
         fn = self.data.get("__expected_filename", None)

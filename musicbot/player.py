@@ -154,11 +154,6 @@ class MusicPlayer(EventEmitter, Serializable):
         """
         Event dispatched by Playlist when an entry is added to the queue.
         """
-        # TODO: this is probably a source of problems...  update post verification.
-        if self.is_stopped and not self.current_entry:
-            log.noise("[WOULD-HAVE] calling-later, self.play from player.")  # type: ignore[attr-defined]
-            # self.loop.call_later(2, self.play)
-
         self.emit(
             "entry-added",
             player=self,
@@ -368,10 +363,16 @@ class MusicPlayer(EventEmitter, Serializable):
 
         async with self._play_lock:
             if self.is_stopped or _continue:
+                entry_up_next = self.playlist.peek()
                 try:
                     entry = await self.playlist.get_next_entry()
-                except IndexError:
-                    log.warning("Failed to get entry.", exc_info=True)
+                except IndexError as e:
+                    log.warning("Failed to get next entry.", exc_info=e)
+                    self.emit("error", player=self, entry=entry_up_next, ex=e)
+                    entry = None
+                except Exception as e:
+                    log.warning("Failed to process entry for playback.", exc_info=e)
+                    self.emit("error", player=self, entry=entry_up_next, ex=e)
                     entry = None
 
                 # If nothing left to play, transition to the stopped state.

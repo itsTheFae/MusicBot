@@ -1251,7 +1251,7 @@ class MusicBot(discord.Client):
 
         # avoid downloading the next entries if the user is absent and we are configured to skip.
         notice_sent = False  # set a flag to avoid message spam.
-        while True:
+        while len(player.playlist):
             log.everything("Loop1 in on_player_finished_playing...")
 
             if not self.loop or (self.loop and self.loop.is_closed()):
@@ -1321,7 +1321,7 @@ class MusicBot(discord.Client):
 
             while player.autoplaylist:
                 log.everything("Loop2 in on_player_finished_playing - APL loop...")
-                
+
                 if not self.loop or (self.loop and self.loop.is_closed()):
                     log.debug("Event loop is closed, nothing else to do here.")
                     return
@@ -1329,7 +1329,7 @@ class MusicBot(discord.Client):
                 if self.logout_called:
                     log.debug("Logout under way, ignoring this event.")
                     return
-                
+
                 if self.config.auto_playlist_random:
                     random.shuffle(player.autoplaylist)
                     song_url = random.choice(player.autoplaylist)
@@ -1357,7 +1357,7 @@ class MusicBot(discord.Client):
 
                 except youtube_dl.utils.DownloadError as e:
                     log.error(
-                        'Error while downloading song "%s":  %s',
+                        'Error while processing song "%s":  %s',
                         song_url,
                         e,
                     )
@@ -1434,7 +1434,7 @@ class MusicBot(discord.Client):
         else:  # Don't serialize for autoplaylist events
             await self.serialize_queue(guild)
 
-        if not player.is_dead and (self.config.auto_playlist or not player.is_stopped):
+        if not player.is_dead and not player.current_entry and len(player.playlist):
             player.play(_continue=True)
 
     async def on_player_entry_added(
@@ -1467,7 +1467,7 @@ class MusicBot(discord.Client):
 
     async def on_player_error(
         self,
-        player: MusicPlayer,  # pylint: disable=unused-argument
+        player: MusicPlayer,
         entry: Optional[EntryTypes],
         ex: Optional[Exception],
         **_: Any,
@@ -1475,15 +1475,43 @@ class MusicBot(discord.Client):
         """
         Event called by MusicPlayer when an entry throws an error.
         """
+        # Log the exception according to entry or bare error.
+        if entry is not None:
+            log.exception(
+                "MusicPlayer exception for entry: %r",
+                entry,
+                exc_info=ex,
+            )
+        else:
+            log.exception(
+                "MusicPlayer exception.",
+                exc_info=ex,
+            )
+
+        # Send a message to the calling channel if we can.
         if entry and entry.channel:
             song = entry.title or entry.url
             await self.safe_send_message(
                 entry.channel,
                 # TODO: i18n / UI stuff
                 f"Playback failed for song: `{song}` due to error:\n```\n{ex}\n```",
+                expire_in=90,
             )
-        else:
-            log.exception("Player error", exc_info=ex)
+
+        # Take care of auto-playlist related issues.
+        if entry and entry.from_auto_playlist:
+            log.info("Auto playlist track could not be played:  %r", entry)
+            guild = player.voice_client.guild
+            await self.server_data[guild.id].autoplaylist.remove_track(
+                entry.info.input_subject, ex=ex, delete_from_ap=self.config.remove_ap
+            )
+
+        # If the party isn't rockin', don't bother knockin on my door.
+        if not player.is_dead:
+            if len(player.playlist):
+                player.play(_continue=True)
+            elif self.config.auto_playlist:
+                await self.on_player_finished_playing(player)
 
     async def update_now_playing_status(self, set_offline: bool = False) -> None:
         """Inspects available players and ultimately fire change_presence()"""
@@ -1920,7 +1948,7 @@ class MusicBot(discord.Client):
         # method used to periodically check for a signal, and process it.
         async def check_windows_signal() -> None:
             while True:
-                
+
                 if self.logout_called:
                     break
                 if self._os_signal is None:
@@ -4106,6 +4134,7 @@ class MusicBot(discord.Client):
             if position == 1 and player.is_stopped:
                 position = self.str.get("cmd-play-next", "Up next!")
                 reply_text %= (btext, position)
+                player.play()
 
             # shift the playing track to the end of queue and skip current playback.
             elif skip_playing and player.is_playing and player.current_entry:
@@ -4249,6 +4278,9 @@ class MusicBot(discord.Client):
             await _player.playlist.add_stream_from_info(
                 info, channel=channel, author=author, head=False
             )
+
+            if _player.is_stopped:
+                _player.play()
 
         return Response(
             self.str.get("cmd-stream-success", "Streaming."), delete_after=6
