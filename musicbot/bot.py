@@ -4743,9 +4743,13 @@ class MusicBot(discord.Client):
         """
 
         lock_key = f"summon:{guild.id}"
-        log.info("Attempting to acquire lock for %s", lock_key)
+
+        if self.aiolocks[lock_key].locked():
+            log.debug("Waiting for summon lock: %s", lock_key)
+
         async with self.aiolocks[lock_key]:
-            log.info("Attempting to acquire lock for %s", lock_key)
+            log.debug("Summon lock acquired for: %s", lock_key)
+
             if not author.voice or not author.voice.channel:
                 raise exceptions.CommandError(
                     self.str.get(
