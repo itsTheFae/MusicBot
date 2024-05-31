@@ -4769,49 +4769,55 @@ class MusicBot(discord.Client):
         Call the bot to the summoner's voice channel.
         """
 
-        # @TheerapakG: Maybe summon should have async lock?
+        lock_key = f"summon:{guild.id}"
 
-        if not author.voice or not author.voice.channel:
-            raise exceptions.CommandError(
-                self.str.get(
-                    "cmd-summon-novc",
-                    "You are not connected to voice. Try joining a voice channel!",
+        if self.aiolocks[lock_key].locked():
+            log.debug("Waiting for summon lock: %s", lock_key)
+
+        async with self.aiolocks[lock_key]:
+            log.debug("Summon lock acquired for: %s", lock_key)
+
+            if not author.voice or not author.voice.channel:
+                raise exceptions.CommandError(
+                    self.str.get(
+                        "cmd-summon-novc",
+                        "You are not connected to voice. Try joining a voice channel!",
+                    )
                 )
+
+            player = self.get_player_in(guild)
+            if player and player.voice_client and guild == author.voice.channel.guild:
+                # NOTE:  .move_to() does not support setting self-deafen flag,
+                # nor respect flags set in initial connect call.
+                # await player.voice_client.move_to(author.voice.channel)
+                await guild.change_voice_state(
+                    channel=author.voice.channel,
+                    self_deaf=self.config.self_deafen,
+                )
+            else:
+                player = await self.get_player(
+                    author.voice.channel,
+                    create=True,
+                    deserialize=self.config.persistent_queue,
+                )
+
+                if player.is_stopped:
+                    player.play()
+
+            log.info(
+                "Joining %s/%s",
+                author.voice.channel.guild.name,
+                author.voice.channel.name,
             )
 
-        player = self.get_player_in(guild)
-        if player and player.voice_client and guild == author.voice.channel.guild:
-            # NOTE:  .move_to() does not support setting self-deafen flag,
-            # nor respect flags set in initial connect call.
-            # await player.voice_client.move_to(author.voice.channel)
-            await guild.change_voice_state(
-                channel=author.voice.channel,
-                self_deaf=self.config.self_deafen,
+            self.server_data[guild.id].last_np_msg = message
+
+            return Response(
+                self.str.get("cmd-summon-reply", "Connected to `{0.name}`").format(
+                    author.voice.channel
+                ),
+                delete_after=30,
             )
-        else:
-            player = await self.get_player(
-                author.voice.channel,
-                create=True,
-                deserialize=self.config.persistent_queue,
-            )
-
-            if player.is_stopped:
-                player.play()
-
-        log.info(
-            "Joining %s/%s",
-            author.voice.channel.guild.name,
-            author.voice.channel.name,
-        )
-
-        self.server_data[guild.id].last_np_msg = message
-
-        return Response(
-            self.str.get("cmd-summon-reply", "Connected to `{0.name}`").format(
-                author.voice.channel
-            ),
-            delete_after=30,
-        )
 
     async def cmd_follow(
         self,
