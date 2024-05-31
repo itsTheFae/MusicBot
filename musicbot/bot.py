@@ -219,7 +219,25 @@ class MusicBot(discord.Client):
         else:  # assume 3.8 +
             t = self.loop.create_task(coro, name=name)
         self.task_pool.add(t)
-        t.add_done_callback(self.task_pool.discard)
+
+        def discard_task(task: AsyncTask) -> None:
+            """Clean up the spawned task and handle its exceptions."""
+            ex = task.exception()
+            if ex:
+                if log.getEffectiveLevel() <= logging.DEBUG:
+                    log.exception(
+                        "Unhandled exception for task:  %r", task, exc_info=ex
+                    )
+                else:
+                    log.error(
+                        "Unhandled exception for task:  %r  --  %s",
+                        task,
+                        str(ex),
+                    )
+
+            self.task_pool.discard(task)
+
+        t.add_done_callback(discard_task)
 
     async def setup_hook(self) -> None:
         """async init phase that is called by d.py before login."""
@@ -1802,6 +1820,9 @@ class MusicBot(discord.Client):
                     "Got HTTPException trying to send message to %s: %s", dest, content
                 )
 
+        except aiohttp.client_exceptions.ClientError:
+            lfunc("Failed to send due to an HTTP error.")
+
         finally:
             if not retry_after and self.config.delete_messages:
                 if msg and expire_in:
@@ -1864,6 +1885,9 @@ class MusicBot(discord.Client):
                 log.noise(  # type: ignore[attr-defined]
                     "Got HTTPException trying to delete message: %s", message
                 )
+
+        except aiohttp.client_exceptions.ClientError:
+            lfunc("Failed to send due to an HTTP error.")
 
         return None
 
@@ -1932,6 +1956,9 @@ class MusicBot(discord.Client):
                 log.noise(  # type: ignore[attr-defined]
                     "Got HTTPException trying to edit message %s to: %s", message, new
                 )
+
+        except aiohttp.client_exceptions.ClientError:
+            lfunc("Failed to send due to an HTTP error.")
 
         return None
 

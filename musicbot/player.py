@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import sys
+import time
 from enum import Enum
 from threading import Thread
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
@@ -269,6 +270,7 @@ class MusicPlayer(EventEmitter, Serializable):
         elif self.loopqueue:
             self.playlist.entries.append(entry)
 
+        # TODO: investigate if this is cruft code or not.
         if self._current_player:
             if hasattr(self._current_player, "after"):
                 self._current_player.after = None
@@ -276,9 +278,9 @@ class MusicPlayer(EventEmitter, Serializable):
 
         self._current_entry = None
         self._source = None
+        self.stop()
 
         if error:
-            self.stop()
             self.emit("error", player=self, entry=entry, ex=error)
             return
 
@@ -289,11 +291,16 @@ class MusicPlayer(EventEmitter, Serializable):
         ):
             # I'm not sure that this would ever not be done if it gets to this point
             # unless ffmpeg is doing something highly questionable
-            self.stop()
             self.emit(
                 "error", player=self, entry=entry, ex=self._stderr_future.exception()
             )
             return
+
+        if (
+            isinstance(self._stderr_future, asyncio.Future)
+            and not self._stderr_future.done()
+        ):
+            self._stderr_future.set_result(True)
 
         if not self.bot.config.save_videos and entry:
             self.bot.create_task(
@@ -604,11 +611,8 @@ def filter_stderr(stderr: io.BytesIO, future: AsyncFuture) -> None:
     Set the given `future` with either an error found in the stream or
     set the future with a successful result.
     """
-    # NOTE:  This effectiveness of this loop is questionable. Any empty line from
-    # FFmpeg will break the loop, meaning we could be missing errors.
-    # If we care about all errors for the scope of playback, we should change this.
     last_ex = None
-    while True:
+    while not future.done():
         data = stderr.readline()
         if data:
             log.ffmpeg(  # type: ignore[attr-defined]
@@ -625,18 +629,21 @@ def filter_stderr(stderr: io.BytesIO, future: AsyncFuture) -> None:
                     "Error from ffmpeg: %s", str(e).strip()
                 )
                 last_ex = e
+                if not future.done():
+                    future.set_exception(e)
 
             except FFmpegWarning as e:
                 log.ffmpeg(  # type: ignore[attr-defined]
                     "Warning from ffmpeg:  %s", str(e).strip()
                 )
         else:
-            break
+            time.sleep(0.5)
 
-    if last_ex:
-        future.set_exception(last_ex)
-    else:
-        future.set_result(True)
+    if not future.done():
+        if last_ex:
+            future.set_exception(last_ex)
+        else:
+            future.set_result(True)
 
 
 def check_stderr(data: bytes) -> bool:
