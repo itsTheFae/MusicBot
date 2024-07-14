@@ -16,4 +16,4 @@ black
 isort[colors]
 mypy
 pylint
-pre-commit
+
