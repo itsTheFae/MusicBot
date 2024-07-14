@@ -1684,10 +1684,10 @@ class ConfigOptionRegistry:
 
             # fmt: off
             md_option = (
-                "#### %s\n"
-                "%s  \n"
-                "**Default Value:** %s  \n\n"
-            ) % (opt.option, opt.comment, dval)
+                f"#### {opt.option}\n"
+                f"{opt.comment}  \n"
+                f"**Default Value:** {dval}  \n\n"
+            )
             # fmt: on
             if opt.section not in md_sections:
                 md_sections[opt.section] = [md_option]
@@ -1697,7 +1697,7 @@ class ConfigOptionRegistry:
         markdown = ""
         for sect in self._parser.sections():
             opts = md_sections[sect]
-            markdown += "### [%s]\n%s" % (sect, "".join(opts))
+            markdown += f"### [{sect}]\n{''.join(opts)}"
 
         return markdown
 

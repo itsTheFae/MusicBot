@@ -7054,7 +7054,7 @@ class MusicBot(discord.Client):
         valid_opts = ["opts", "perms"]
         if cfg not in valid_opts:
             opts = ", ".join([f"`{o}`" for o in valid_opts])
-            raise exceptions.CommandError("Option must be one of: %s" % (opts))
+            raise exceptions.CommandError(f"Option must be one of: {opts}")
 
         filename = "config_options.md"
         msg_str = "Config options described in Markdown:\n"
