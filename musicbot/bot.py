@@ -124,6 +124,8 @@ CommandResponse = Union[Response, None]
 log = logging.getLogger(__name__)
 
 # TODO:  add an aliases command to manage command aliases.
+# TODO:  add support for local file playback via indexed data.
+#  --  Using tinytag to extract meta data from files and index it.
 
 
 class MusicBot(discord.Client):
