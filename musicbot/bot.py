@@ -7423,9 +7423,7 @@ class MusicBot(discord.Client):
             try:
                 self.config.disabled_cookies_path.unlink()
             except OSError as e:
-                log.warning(
-                    "Could not remove old, disabled cookies file:  %s", str(e)
-                )
+                log.warning("Could not remove old, disabled cookies file:  %s", str(e))
 
         # simply save the uploaded file in attachment 1 as cookies.txt.
         try:
