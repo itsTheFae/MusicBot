@@ -3679,7 +3679,7 @@ class MusicBot(discord.Client):
         _player.skip()
 
         return Response(
-            f"Seeking to time `{seek_time}` (`{f_seek_time}:.2f` seconds) in the current song.",
+            f"Seeking to time `{seek_time}` (`{f_seek_time:.2f}` seconds) in the current song.",
             delete_after=30,
         )
 
