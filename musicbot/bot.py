@@ -2652,7 +2652,7 @@ class MusicBot(discord.Client):
         else:
             log.info(
                 "Channel activity timer canceled for: %s in %s",
-                guild.voice_client.channel.name,
+                getattr(guild.voice_client.channel, "name", guild.voice_client.channel),
                 guild.name,
             )
         finally:

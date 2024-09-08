@@ -8,9 +8,10 @@ import sys
 import time
 from typing import (
     TYPE_CHECKING,
-    Dict,
+    Any,
     Iterable,
     List,
+    Mapping,
     Optional,
     Set,
     Tuple,
@@ -57,7 +58,7 @@ if TYPE_CHECKING:
     from .permissions import Permissions
 
 # Type for ConfigParser.get(... vars) argument
-ConfVars = Optional[Dict[str, str]]
+ConfVars = Optional[Mapping[str, str]]
 # Types considered valid for config options.
 DebugLevel = Tuple[str, int]
 RegTypes = Union[str, int, bool, float, Set[int], Set[str], DebugLevel, pathlib.Path]
@@ -1867,7 +1868,7 @@ class ExtendedConfigParser(configparser.ConfigParser):
         section: str,
         key: str,
         raw: bool = False,
-        vars: ConfVars = None,
+        vars: ConfVars = None,  # pylint: disable=redefined-builtin
         fallback: str = "",
     ) -> str:
         """A version of get which strips spaces and uses fallback / default for empty values."""
@@ -1879,19 +1880,20 @@ class ExtendedConfigParser(configparser.ConfigParser):
     def getboolean(  # type: ignore[override]
         self,
         section: str,
-        key: str,
+        option: str,
         *,
         raw: bool = False,
         vars: ConfVars = None,  # pylint: disable=redefined-builtin
-        fallback: bool,
+        fallback: bool = False,
+        **kwargs: Optional[Mapping[str, Any]],
     ) -> bool:
         """Make getboolean less bitchy about empty values, so it uses fallback instead."""
-        val = self.get(section, key, fallback="", raw=raw, vars=vars).strip()
+        val = self.get(section, option, fallback="", raw=raw, vars=vars).strip()
         if not val:
             return fallback
 
         try:
-            return super().getboolean(section, key, fallback=fallback)
+            return super().getboolean(section, option, fallback=fallback)
         except ValueError:
             return fallback
 
