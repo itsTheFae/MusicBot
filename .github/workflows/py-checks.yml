@@ -3,7 +3,15 @@ name: Code Checks
 on: [push, pull_request]
 
 jobs:
-  build:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run ShellCheck
+      uses: ludeeus/action-shellcheck@2.0.0
+  pychecks:
+    name: Python Checks
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
