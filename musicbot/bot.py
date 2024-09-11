@@ -3131,7 +3131,7 @@ class MusicBot(discord.Client):
                     expire_in=20,
                 )
             return url
-        
+
         if option in ["+all", "add_all"]:
             if not player.playlist.entries:
                 raise exceptions.CommandError(
