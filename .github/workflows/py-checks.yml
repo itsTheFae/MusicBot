@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
         python-version: ["3.8", "3.9", "3.10","3.11","3.12"]
     steps:
@@ -40,7 +41,7 @@ jobs:
         python -m flake8 ./
     - name: Check with MyPy
       run: |
-        mypy --python-version 3.8 --warn-unused-ignores ./*.py
+        mypy --python-version ${{ matrix.python-version }} --warn-unused-ignores ./*.py
     - name: Check with Pylint
       run: |
         pylint --recursive=y .
