@@ -405,7 +405,10 @@ class MusicBot(discord.Client):
 
         try:
             ping_host = f"http://{ping_target}{DEFAULT_PING_HTTP_URI}"
-            async with self.session.head(ping_host, timeout=FALLBACK_PING_TIMEOUT):
+            async with self.session.head(
+                ping_host,
+                timeout=FALLBACK_PING_TIMEOUT,  # type: ignore[arg-type,unused-ignore]
+            ):
                 return 0
         except (aiohttp.ClientError, asyncio.exceptions.TimeoutError, OSError):
             return 1
