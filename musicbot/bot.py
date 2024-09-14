@@ -126,6 +126,8 @@ log = logging.getLogger(__name__)
 
 # TODO:  add an aliases command to manage command aliases.
 # TODO:  add support for local file playback via indexed data.
+# TODO: autoplaylist remove all.
+# TODO: an option to have help show aliases?
 #  --  Using tinytag to extract meta data from files and index it.
 
 
@@ -3099,13 +3101,17 @@ class MusicBot(discord.Client):
         guild: discord.Guild,
         author: discord.Member,
         _player: Optional[MusicPlayer],
+        player: MusicPlayer,
         option: str,
         opt_url: str = "",
     ) -> CommandResponse:
         """
         Usage:
-            {command_prefix}autoplaylist [ + | - | add | remove] [url]
+            {command_prefix}autoplaylist [+ | - | add | remove] [url]
                 Adds or removes the specified song or currently playing song to/from the current playlist.
+
+            {command_prefix}autoplaylist [+ all | add all]
+                Adds the entire queue to the guilds playlist.
 
             {command_prefix}autoplaylist show
                 Show a list of existing playlist files.
@@ -3131,6 +3137,39 @@ class MusicBot(discord.Client):
                     expire_in=20,
                 )
             return url
+
+        if option in ["+", "add"] and opt_url.lower() == "all":
+            if not player.playlist.entries:
+                raise exceptions.CommandError(
+                    self.str.get(
+                        "cmd-autoplaylist-add-all-empty-queue",
+                        "The queue is empty. Add some songs with `{0}play`!",
+                    ).format(self.server_data[guild.id].command_prefix),
+                    expire_in=30,
+                )
+
+            added_songs = set()
+            for e in player.playlist.entries:
+                if e.url not in self.server_data[guild.id].autoplaylist:
+                    await self.server_data[guild.id].autoplaylist.add_track(e.url)
+                    added_songs.add(e.url)
+
+            if not added_songs:
+                return Response(
+                    self.str.get(
+                        "cmd-save-all-exist",
+                        "All songs in the queue are already in the autoplaylist.",
+                    ),
+                    delete_after=20,
+                )
+
+            return Response(
+                self.str.get(
+                    "cmd-save-success-multiple",
+                    "Added {0} songs to the autoplaylist.",
+                ).format(len(added_songs)),
+                delete_after=30,
+            )
 
         if option in ["+", "add"]:
             url = _get_url()
@@ -5016,7 +5055,7 @@ class MusicBot(discord.Client):
         player.playlist.clear()
 
         return Response(
-            self.str.get("cmd-clear-reply", "Cleared `{0}`'s queue").format(
+            self.str.get("cmd-clear-reply", "Cleared `{0}'s` queue").format(
                 player.voice_client.channel.guild
             ),
             delete_after=20,
