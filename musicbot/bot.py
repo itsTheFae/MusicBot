@@ -3104,9 +3104,11 @@ class MusicBot(discord.Client):
     ) -> CommandResponse:
         """
         Usage:
-            {command_prefix}autoplaylist [ + | +all | - | add | add_all | remove] [url]
+            {command_prefix}autoplaylist [+ | - | add | remove] [url]
                 Adds or removes the specified song or currently playing song to/from the current playlist.
 
+            {command_prefix}autoplaylist [+ all | add all]
+                Adds the entire queue to the guilds playlist.
             {command_prefix}autoplaylist show
                 Show a list of existing playlist files.
 
@@ -3114,9 +3116,9 @@ class MusicBot(discord.Client):
                 Set a playlist as default for this guild and reloads the guild auto playlist.
         """
         option = option.lower()
-        if option not in ["+", "-", "add", "add_all", "+all", "remove", "show", "set"]:
+        if option not in ["+", "-", "add", "remove", "show", "set"]:
             raise exceptions.CommandError(
-                "You must provide one of the following options:  `add`, `add_all`, `+all`, `remove`, `show`, or `set`",
+                "You must provide one of the following options:  `add`, `remove`, `show`, or `set`",
                 expire_in=30,
             )
 
@@ -3132,7 +3134,7 @@ class MusicBot(discord.Client):
                 )
             return url
 
-        if option in ["+all", "add_all"]:
+        if opt_url == "all":
             if not player.playlist.entries:
                 raise exceptions.CommandError(
                     self.str.get(
@@ -3144,11 +3146,9 @@ class MusicBot(discord.Client):
 
             added_songs = set()
             for e in player.playlist.entries:
-                url = e.url
-                self._do_song_blocklist_check(url)
                 if e.url not in self.server_data[guild.id].autoplaylist:
-                    await self.server_data[guild.id].autoplaylist.add_track(url)
-                    added_songs.add(url)
+                    await self.server_data[guild.id].autoplaylist.add_track(e.url)
+                    added_songs.add(e.url)
 
             if not added_songs:
                 return Response(
