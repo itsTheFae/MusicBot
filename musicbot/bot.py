@@ -3109,6 +3109,7 @@ class MusicBot(discord.Client):
 
             {command_prefix}autoplaylist [+ all | add all]
                 Adds the entire queue to the guilds playlist.
+
             {command_prefix}autoplaylist show
                 Show a list of existing playlist files.
 
@@ -3134,7 +3135,7 @@ class MusicBot(discord.Client):
                 )
             return url
 
-        if opt_url == "all":
+        if option in ["+", "add"] and opt_url.lower() == "all":
             if not player.playlist.entries:
                 raise exceptions.CommandError(
                     self.str.get(
