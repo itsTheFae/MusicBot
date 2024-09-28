@@ -2774,11 +2774,23 @@ class MusicBot(discord.Client):
         commands = []
         is_all = False
         is_emoji = False
+        alias_of = ""
         prefix = self.server_data[guild.id].command_prefix
         # Its OK to skip unicode emoji here, they render correctly inside of code boxes.
         emoji_regex = re.compile(r"^(<a?:.+:\d+>|:.+:)$")
         if emoji_regex.match(prefix):
             is_emoji = True
+
+        def _get_aliases(cmd: str) -> str:
+            aliases = ""
+            if cmd and self.config.usealias:
+                alias_list = self.aliases.for_command(cmd)
+                if alias_list:
+                    aliases = "Aliases for command:\n```\n"
+                    for alias in alias_list:
+                        aliases += f"  {alias[0]} >> {cmd} {alias[1]}\n"
+                    aliases += "```"
+            return aliases
 
         if command:
             if command.lower() == "all":
@@ -2787,9 +2799,26 @@ class MusicBot(discord.Client):
 
             else:
                 cmd = getattr(self, "cmd_" + command, None)
-                if cmd and not hasattr(cmd, "dev_cmd"):
+                # check for aliases if natural command is not found.
+                if not cmd and self.config.usealias:
+                    a_command, alias_arg_str = self.aliases.from_alias(command)
+                    cmd = getattr(self, "cmd_" + a_command, None)
+                    if cmd:
+                        alias_of = " ".join([a_command, alias_arg_str]).strip()
+
+                aid = message.author.id
+                if cmd and (
+                    not hasattr(cmd, "dev_cmd")
+                    or self.config.owner_id == aid
+                    or aid in self.config.dev_ids
+                ):
+                    alias_usage = ""
+                    if alias_of:
+                        alias_usage = f"Alias of command:\n  `{alias_of}`\n"
+
                     return Response(
-                        "```\n{0}```{1}".format(
+                        "{0}```\n{1}```{2}{3}".format(
+                            alias_usage,
                             dedent(cmd.__doc__),
                             (
                                 self.str.get(
@@ -2799,6 +2828,7 @@ class MusicBot(discord.Client):
                                 if is_emoji
                                 else ""
                             ),
+                            _get_aliases(a_command),
                         ).format(
                             command_prefix=prefix if not is_emoji else "",
                         ),
@@ -5512,6 +5542,88 @@ class MusicBot(discord.Client):
         )
 
     @owner_only
+    async def cmd_setalias(
+        self,
+        opt: str,
+        leftover_args: List[str],
+        alias: str = "",
+        cmd: str = "",
+    ) -> CommandResponse:
+        """
+        Usage:
+            {command_prefix}setalias + [alias] [cmd] [args]
+                Add a named alias for the command cmd, with optional args.
+            {command_prefix}setalias - [alias]
+                Remove an alias with the given name.
+            {command_prefix}setalias load
+                Reload aliases from the config file.
+            {command_prefix}setalias save
+                Save aliases to the config file.
+        """
+        opt = opt.lower()
+        cmd = cmd.strip()
+        args = " ".join(leftover_args)
+        alias = alias.strip()
+        if opt not in ["+", "-", "save", "load"]:
+            raise exceptions.CommandError(
+                f"Invalid option for command: `{opt}`",
+                expire_in=30,
+            )
+
+        if opt == "load":
+            self.aliases.load()
+            return Response(
+                "Aliases reloaded from config file.",
+                delete_after=30,
+            )
+
+        if opt == "save":
+            try:
+                self.aliases.save()
+                return Response(
+                    "Aliases saved to config file.",
+                    delete_after=30,
+                )
+            except (RuntimeError, OSError) as e:
+                raise exceptions.CommandError(
+                    f"Failed to save aliases due to error:\n`{e}`",
+                    expire_in=30,
+                ) from e
+
+        if opt == "+":
+            if not alias or not cmd:
+                raise exceptions.CommandError(
+                    "You must supply an alias and a command to alias",
+                    expire_in=30,
+                )
+            self.aliases.make_alias(alias, cmd, args)
+            cmdstr = " ".join([cmd, args]).strip()
+            return Response(
+                f"New alias added. `{alias}` > `{cmdstr}`",
+                delete_after=30,
+            )
+
+        if opt == "-":
+            if not alias:
+                raise exceptions.CommandError(
+                    "You must supply an alias name to remove.",
+                    expire_in=30,
+                )
+
+            if not self.aliases.exists(alias):
+                raise exceptions.CommandError(
+                    f"The alias `{alias}` does not exist.",
+                    expire_in=30,
+                )
+
+            self.aliases.remove_alias(alias)
+            return Response(
+                f"Alias `{alias}` was removed.",
+                delete_after=30,
+            )
+        return None
+
+    @owner_only
     async def cmd_config(
         self,
         user_mentions: UserMentions,
@@ -7607,7 +7719,7 @@ class MusicBot(discord.Client):
             # If no natural command was found, check for aliases when enabled.
             if self.config.usealias:
                 # log.debug("Checking for alias with: %s", command)
-                command, alias_arg_str = self.aliases.get(command)
+                command, alias_arg_str = self.aliases.from_alias(command)
                 handler = getattr(self, "cmd_" + command, None)
                 if not handler:
                     return
