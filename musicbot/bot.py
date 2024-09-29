@@ -7053,6 +7053,18 @@ class MusicBot(discord.Client):
         )
 
     @dev_only
+    async def cmd_testready(
+        self, channel: GuildMessageableChannels, message: discord.Message
+    ) -> None:
+        """Command used to signal command testing."""
+        cmd_list = ",".join(await self.gen_cmd_list(message, list_all_cmds=True))
+        await self.safe_send_message(
+            channel,
+            f"CMD_TEST_LIST:[{cmd_list}]",
+            expire_in=30,
+        )
+
+    @dev_only
     async def cmd_breakpoint(self) -> CommandResponse:
         """
         Do nothing but print a critical level error to the log.
