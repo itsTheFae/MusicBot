@@ -9,6 +9,7 @@ echo "Extracting strings for translation from MusicBot $MB_Version"
 
 echo "Log domain..."
 xgettext -v -F --language=Python --no-wrap \
+    --add-comments="TRANSLATORS:" \
     --package-name="Just-Some-Bots/MusicBot" \
     --package-version="${MB_Version}" \
     --keyword="_L" \
@@ -29,6 +30,7 @@ xgettext -v -F --language=Python --no-wrap \
 
 echo "Discord domain..."
 xgettext -v -F -k --language=Python --no-wrap \
+    --add-comments="TRANSLATORS:" \
     --package-name="Just-Some-Bots/MusicBot" \
     --package-version="${MB_Version}" \
     --keyword="_D" \
