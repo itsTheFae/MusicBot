@@ -15,7 +15,7 @@ try:
     )
     # Check if any tracked files are modified for -modded version flag.
     _VERSION_P2 = (
-        subprocess.check_output(["git", "status", "-suno", "--porcelain"])
+        subprocess.check_output(["git", "-c", "core.fileMode=false", "status", "-suno", "--porcelain"])
         .decode("ascii")
         .strip()
     )
