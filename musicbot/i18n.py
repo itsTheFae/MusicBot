@@ -26,29 +26,47 @@ Translations = Union[gettext.GNUTranslations, gettext.NullTranslations]
 
 def _L(msg: str) -> str:  # pylint: disable=invalid-name
     """
-    Global method overloaded by I18n.install() for translations.
+    Marks strings for translation as part of logs domain.
+    Is a shorthand for gettext() in the log domain.
+    Overloaded by I18n.install() for translations.
     """
+    if builtins.__dict__["_L"]:
+        return str(builtins.__dict__["_L"](msg))
     return msg
 
 
-def _Ln(msg: str) -> str:  # pylint: disable=invalid-name
+def _Ln(msg: str, plural: str, n: int) -> str:  # pylint: disable=invalid-name
     """
-    Global method overloaded by I18n.install() for translations.
+    Marks plurals for translation as part of logs domain.
+    Is a shorthand for ngettext() in the logs domain.
+    Overloaded by I18n.install() for translations.
     """
+    if builtins.__dict__["_Ln"]:
+        return str(builtins.__dict__["_Ln"](msg, plural, n))
     return msg
 
 
-def _D(msg: str) -> str:  # pylint: disable=invalid-name
+def _D(msg: str, ssd: "GuildSpecificData") -> str:  # pylint: disable=invalid-name
     """
-    Global method overloaded by I18n.install() for translations.
+    Marks strings for translation as part of discord domain.
+    Is a shorthand for I18n.sgettext() in the discord domain.
+    Overloaded by I18n.install() for translations.
     """
+    if builtins.__dict__["_D"]:
+        return str(builtins.__dict__["_D"](msg, ssd))
     return msg
 
 
-def _Dn(msg: str) -> str:  # pylint: disable=invalid-name
+def _Dn(  # pylint: disable=invalid-name
+    msg: str, plural: str, n: int, ssd: "GuildSpecificData"
+) -> str:
     """
-    Global method overloaded by I18n.install() for translations.
+    Marks strings for translation as part of discord domain.
+    Is a shorthand for I18n.sngettext() in the discord domain.
+    Overloaded by I18n.install() for translations.
     """
+    if builtins.__dict__["_Dn"]:
+        return str(builtins.__dict__["_Dn"](msg, plural, n, ssd))
     return msg
 
 
@@ -71,7 +89,7 @@ class I18n:
     available in global space to enable translations.
     These enable marking translations in different domains as well as providing
     for language selection in server-specific cases.
-    See I18n.install() for detauls on global functions.
+    See I18n.install() for details on global functions.
     """
 
     def __init__(
@@ -95,6 +113,7 @@ class I18n:
         else:
             self._locale_dir = pathlib.Path(DEFAULT_I18N_DIR)
         self._locale_dir = self._locale_dir.absolute()
+        self._show_sys_lang: bool = False
 
         # system default lanaguage code(s) if any.
         self._sys_langs: List[str] = []
@@ -165,6 +184,8 @@ class I18n:
                 if val:
                     self._sys_langs = val.lower().split(":")
                     break
+        if self._show_sys_lang:
+            print(f"System language code(s):  {self._sys_langs}")
 
     def _get_lang_args(self) -> None:
         """
@@ -212,19 +233,27 @@ class I18n:
             help="",
             default=DEFAULT_I18N_LANG,
         )
+        ap.add_argument(
+            "--show_sys_lang",
+            dest="show_sys_lang",
+            action="store_true",
+            help="",
+        )
 
         # parse the lang args.
         args = ap.parse_args()
+        if args.show_sys_lang:
+            self._show_sys_lang = True
         if args.lang_both and args.lang_both != DEFAULT_I18N_LANG:
             self._log_lang = args.lang_both.lower()
             self._msg_lang = args.lang_both.lower()
-            print(f"Lang Both:  {args.lang_both}")
+            # print(f"Lang Both:  {args.lang_both}")
         if args.lang_logs and args.lang_logs != DEFAULT_I18N_LANG:
             self._log_lang = args.lang_logs.lower()
-            print(f"Lang Logs:  {args.lang_logs}")
+            # print(f"Lang Logs:  {args.lang_logs}")
         if args.lang_msgs and args.lang_msgs != DEFAULT_I18N_LANG:
             self._msg_lang = args.lang_msgs.lower()
-            print(f"Lang Msgs:  {args.lang_msgs}")
+            # print(f"Lang Msgs:  {args.lang_msgs}")
 
     def get_log_translations(self) -> Translations:
         """
@@ -245,7 +274,7 @@ class I18n:
                 self._locale_dir,
             )
 
-        print(f"Logs using lanaguage: {t.info()['language']}")
+        # print(f"Logs using lanaguage: {t.info()['language']}")
 
         return t
 

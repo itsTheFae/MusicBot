@@ -42,14 +42,12 @@ from .constants import (
     MAXIMUM_LOGS_LIMIT,
 )
 from .exceptions import HelpfulError
-from .utils import (
-    format_size_from_bytes,
-    format_size_to_bytes,
-    format_time_to_seconds,
+from .logs import (
     set_logging_level,
     set_logging_max_kept_logs,
     set_logging_rotate_date_format,
 )
+from .utils import format_size_from_bytes, format_size_to_bytes, format_time_to_seconds
 
 if TYPE_CHECKING:
     import discord

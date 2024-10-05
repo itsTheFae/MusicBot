@@ -1179,9 +1179,8 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
                     )
                 else:
                     log.debug(
-                        "Got duration of %s seconds for file:  %s",
-                        self.duration,
-                        self.filename,
+                        "Got duration of %(seconds)s seconds for file:  %(file)s",
+                        {"seconds": self.duration, "file": self.filename},
                     )
 
             if self.playlist.bot.config.use_experimental_equalization:
