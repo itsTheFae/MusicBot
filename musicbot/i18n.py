@@ -24,6 +24,13 @@ log = logging.getLogger(__name__)
 Translations = Union[gettext.GNUTranslations, gettext.NullTranslations]
 
 
+def _X(msg: str) -> str:  # pylint: disable=invalid-name
+    """
+    Mark a string for translation in all message domains.
+    Strings marked are extractable but must be translated explicitly at runtime.
+    """
+    return msg
+
 def _L(msg: str) -> str:  # pylint: disable=invalid-name
     """
     Marks strings for translation as part of logs domain.
