@@ -102,7 +102,7 @@ After configuring you can use the command <code>./run.sh</code> to start the bot
 For Raspbian version 10 (buster) and earlier versions, you will need to compile a version of Python 3.8 or higher as well as installing pip.<br>  
 This can take a bit of time to complete and may require a little troubleshooting know-how if these steps are out-of-date or incomplete in some way.<br>  
 <br>
-If you're willing to carefully follow along, these steps *should* get MusicBot working:
+If you're willing to carefully follow along, these steps _should_ get MusicBot working:
 
 {% highlight bash %}
 # Update system packages.
