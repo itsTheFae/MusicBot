@@ -95,6 +95,7 @@ class GuildSpecificData:
         ] = None
         self.autoplaylist: AutoPlaylist = self._bot.playlist_mgr.get_default()
         self.current_playing_url: str = ""
+        self.lang_code: str = ""
 
         # create a task to load any persistent guild options.
         # in theory, this should work out fine.
@@ -134,6 +135,11 @@ class GuildSpecificData:
         if not pl.loaded:
             await pl.load()
         return pl
+
+    @property
+    def guild_id(self) -> int:
+        """Guild ID if available, may return 0 before loading is complete."""
+        return self._guild_id
 
     @property
     def command_prefix(self) -> str:

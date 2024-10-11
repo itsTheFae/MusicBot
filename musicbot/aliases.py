@@ -55,8 +55,7 @@ class Aliases:
             else:
                 raise HelpfulError(
                     "Your aliases files are missing. Neither aliases.json nor example_aliases.json were found.",
-                    "Grab the files back from the archive or remake them yourself and copy paste the content "
-                    "from the repo. Stop removing important files!",
+                    "Replace the aliases.json config file(s) or copy them from https://github.com/Just-Some-Bots/MusicBot/",
                 )
 
         # parse json

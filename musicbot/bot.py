@@ -55,7 +55,9 @@ from .constants import VOICE_CLIENT_MAX_RETRY_CONNECT, VOICE_CLIENT_RECONNECT_TI
 from .constructs import GuildSpecificData, Response
 from .entry import LocalFilePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
 from .filecache import AudioFileCache
-from .json import I18nJson
+from .i18n import _L
+from .json import I18nJson  # TODO: remove this
+from .logs import muffle_discord_console_log, mute_discord_console_log
 from .opus_loader import load_opus_lib
 from .permissions import PermissionGroup, Permissions, PermissionsDefaults
 from .player import MusicPlayer
@@ -69,8 +71,6 @@ from .utils import (
     format_song_duration,
     format_time_to_seconds,
     is_empty_voice_channel,
-    muffle_discord_console_log,
-    mute_discord_console_log,
     owner_only,
     slugify,
 )
@@ -121,14 +121,14 @@ UserMentions = List[Union[discord.Member, discord.User]]
 EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry, LocalFilePlaylistEntry]
 CommandResponse = Union[Response, None]
 
-
 log = logging.getLogger(__name__)
 
 # TODO:  add an aliases command to manage command aliases.
 # TODO:  add support for local file playback via indexed data.
+#  --  Using tinytag to extract meta data from files and index it.
 # TODO: autoplaylist remove all.
 # TODO: an option to have help show aliases?
-#  --  Using tinytag to extract meta data from files and index it.
+# TODO: change all formatted strings to use named substitution instead.
 
 
 class MusicBot(discord.Client):
@@ -1690,7 +1690,8 @@ class MusicBot(discord.Client):
         async with self.aiolocks[_func_()]:
             if activity != self.last_status:
                 log.noise(  # type: ignore[attr-defined]
-                    f"Update Bot Status:  {status} -- {repr(activity)}"
+                    "Update bot status:  %(status)s -- %(activity)r",
+                    {"status": status, "activity": activity},
                 )
                 await self.change_presence(status=status, activity=activity)
                 self.last_status = activity
@@ -2366,7 +2367,10 @@ class MusicBot(discord.Client):
             if vc_chlist:
                 log.info("Autojoining voice channels:")
                 for ch in vc_chlist:
-                    log.info(" - %s/%s", ch.guild.name.strip(), ch.name.strip())
+                    log.info(
+                        " - %(guild)s/%(channel)s",
+                        {"guild": ch.guild.name.strip(), "channel": ch.name.strip()},
+                    )
 
             else:
                 log.info("Not autojoining any voice channels")
@@ -2384,13 +2388,18 @@ class MusicBot(discord.Client):
                 sorted(str(o) for o in self.config.register.ini_missing_options)
             )
             conf_warn = exceptions.HelpfulError(
-                preface="Detected missing config options!",
-                issue=(
+                preface=_L("Detected missing config options!"),
+                issue=_L(
                     "Your config file is missing some options. Defaults will be used for this session.\n"
-                    f"Here is a list of options we think are missing:\n{missing_list}"
+                    "Here is a list of options we think are missing:\n%(missing)s"
+                )
+                % {"missing": missing_list},
+                solution=_L(
+                    "Check the example_options.ini file for newly added options and copy them to your config."
                 ),
-                solution="Check the example_options.ini file for newly added options and copy them to your config.",
-                footnote="You can also use the `config` command to set the missing options.",
+                footnote=_L(
+                    "You can also use the `config` command to set the missing options."
+                ),
             )
             log.warning(str(conf_warn)[1:])
 
@@ -2469,6 +2478,9 @@ class MusicBot(discord.Client):
         No validation is done in this method, only display/logs.
         """
 
+        def on_or_off(test: bool) -> str:
+            return [_L("Disabled"), _L("Enabled")][test]
+
         print(flush=True)
         log.info("Options:")
 
@@ -2481,29 +2493,33 @@ class MusicBot(discord.Client):
         )
         log.info(
             "  Now Playing @mentions: %s",
-            ["Disabled", "Enabled"][self.config.now_playing_mentions],
+            on_or_off(self.config.now_playing_mentions),
         )
-        log.info("  Auto-Summon: %s", ["Disabled", "Enabled"][self.config.auto_summon])
+        log.info("  Auto-Summon: %s", on_or_off(self.config.auto_summon))
         log.info(
-            "  Auto-Playlist: %s (order: %s)",
-            ["Disabled", "Enabled"][self.config.auto_playlist],
-            ["sequential", "random"][self.config.auto_playlist_random],
+            "  Auto-Playlist: %(status)s (order: %(order)s)",
+            {
+                "status": on_or_off(self.config.auto_playlist),
+                "order": [_L("sequential"), _L("random")][
+                    self.config.auto_playlist_random
+                ],
+            },
         )
-        log.info("  Auto-Pause: %s", ["Disabled", "Enabled"][self.config.auto_pause])
+        log.info("  Auto-Pause: %s", on_or_off(self.config.auto_pause))
         log.info(
             "  Delete Messages: %s",
-            ["Disabled", "Enabled"][self.config.delete_messages],
+            on_or_off(self.config.delete_messages),
         )
         if self.config.delete_messages:
             log.info(
                 "    Delete Invoking: %s",
-                ["Disabled", "Enabled"][self.config.delete_invoking],
+                on_or_off(self.config.delete_invoking),
             )
             log.info(
                 "    Delete Nowplaying: %s",
-                ["Disabled", "Enabled"][self.config.delete_nowplaying],
+                on_or_off(self.config.delete_nowplaying),
             )
-        log.info("  Debug Mode: %s", ["Disabled", "Enabled"][self.config.debug_mode])
+        log.info("  Debug Mode: %s", on_or_off(self.config.debug_mode))
         log.info(
             "  Downloaded songs will be %s",
             ["deleted", "saved"][self.config.save_videos],
@@ -2518,25 +2534,25 @@ class MusicBot(discord.Client):
             log.info("  Status message: %s", self.config.status_message)
         log.info(
             "  Write current songs to file: %s",
-            ["Disabled", "Enabled"][self.config.write_current_song],
+            on_or_off(self.config.write_current_song),
         )
         log.info(
             "  Author insta-skip: %s",
-            ["Disabled", "Enabled"][self.config.allow_author_skip],
+            on_or_off(self.config.allow_author_skip),
         )
-        log.info("  Embeds: %s", ["Disabled", "Enabled"][self.config.embeds])
+        log.info("  Embeds: %s", on_or_off(self.config.embeds))
         log.info(
             "  Spotify integration: %s",
-            ["Disabled", "Enabled"][self.config.spotify_enabled],
+            on_or_off(self.config.spotify_enabled),
         )
-        log.info("  Legacy skip: %s", ["Disabled", "Enabled"][self.config.legacy_skip])
+        log.info("  Legacy skip: %s", on_or_off(self.config.legacy_skip))
         log.info(
             "  Leave non owners: %s",
-            ["Disabled", "Enabled"][self.config.leavenonowners],
+            on_or_off(self.config.leavenonowners),
         )
         log.info(
             "  Leave inactive VC: %s",
-            ["Disabled", "Enabled"][self.config.leave_inactive_channel],
+            on_or_off(self.config.leave_inactive_channel),
         )
         if self.config.leave_inactive_channel:
             log.info(
@@ -2545,7 +2561,7 @@ class MusicBot(discord.Client):
             )
         log.info(
             "  Leave at song end/empty queue: %s",
-            ["Disabled", "Enabled"][self.config.leave_after_queue_empty],
+            on_or_off(self.config.leave_after_queue_empty),
         )
         log.info(
             "  Leave when player idles: %s",
@@ -2553,15 +2569,15 @@ class MusicBot(discord.Client):
         )
         if self.config.leave_player_inactive_for:
             log.info("    Timeout: %d seconds", self.config.leave_player_inactive_for)
-        log.info("  Self Deafen: %s", ["Disabled", "Enabled"][self.config.self_deafen])
+        log.info("  Self Deafen: %s", on_or_off(self.config.self_deafen))
         log.info(
             "  Per-server command prefix: %s",
-            ["Disabled", "Enabled"][self.config.enable_options_per_guild],
+            on_or_off(self.config.enable_options_per_guild),
         )
-        log.info("  Search List: %s", ["Disabled", "Enabled"][self.config.searchlist])
+        log.info("  Search List: %s", on_or_off(self.config.searchlist))
         log.info(
             "  Round Robin Queue: %s",
-            ["Disabled", "Enabled"][self.config.round_robin_queue],
+            on_or_off(self.config.round_robin_queue),
         )
         print(flush=True)
 
@@ -2722,9 +2738,8 @@ class MusicBot(discord.Client):
                 )
         else:
             log.info(
-                "Player activity timer canceled for: %s in %s",
-                channel.name,
-                guild.name,
+                "Player activity timer canceled for: %(channel)s in %(guild)s",
+                {"channel": channel.name, "guild": guild.name},
             )
         finally:
             event.deactivate()
@@ -6797,7 +6812,10 @@ class MusicBot(discord.Client):
                     expire_in=30,
                 )
 
-            log.debug("Doing set with on %s == %s", opt, value_arg)
+            log.debug(
+                "Doing set on %(option)s with value: %(value)s",
+                {"option": opt, "value": value_arg},
+            )
             async with self.aiolocks["permission_update"]:
                 updated = self.permissions.update_option(opt, value_arg)
             if not updated:

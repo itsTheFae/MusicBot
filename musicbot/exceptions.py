@@ -1,23 +1,42 @@
 import shutil
 import textwrap
 from enum import Enum
+from typing import Any, List, Optional
 
 
-# Base class for exceptions
 class MusicbotException(Exception):
-    def __init__(self, message: str, *, expire_in: int = 0) -> None:
-        super().__init__(message)  # ???
+    """
+    MusicbotException is a generic base exception class.
+    It allows exceptions to be translated as needed by deferring formatting.
+
+    Examples:
+    ex = MusicbotException("some message here: %s", ["arg1"])
+    ex.message == "some message here: %s"
+    ex.format_args = ["arg1"]
+    str(ex)  ==  "some message here: %s"
+    """
+
+    def __init__(
+        self, message: str, *, expire_in: int = 0, fmt_args: Optional[Dict[str, Any]] = None
+    ) -> None:
+        if fmt_args:
+            super().__init__((message, fmt_args))
+        else:
+            super().__init__(message)
         self._message = message
+        self._fmt_args = fmt_args
         self.expire_in = expire_in
 
     @property
     def message(self) -> str:
-        """Get message text with additional formatting as needed."""
+        """Get raw message text."""
         return self._message
 
     @property
-    def message_no_format(self) -> str:
-        """Get raw message text with no formatting."""
+    def message_formatted(self) -> str:
+        """Get message text with variables replaced."""
+        if self._fmt_args:
+            return self._message % self._fmt_args
         return self._message
 
 
