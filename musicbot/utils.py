@@ -5,7 +5,17 @@ import pathlib
 import re
 import unicodedata
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Iterable, List, Set, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    TypeVar,
+    Union,
+)
 
 from .constants import DISCORD_MSG_CHAR_LIMIT
 from .exceptions import PermissionsError
@@ -14,6 +24,8 @@ if TYPE_CHECKING:
     from discord import Member, StageChannel, VoiceChannel
 
     from .bot import MusicBot
+
+CmdFunc = TypeVar("CmdFunc", bound=Callable[..., Any])
 
 log = logging.getLogger(__name__)
 
@@ -161,6 +173,7 @@ def owner_only(func: Callable[..., Any]) -> Any:
             return await func(self, *args, **kwargs)
         raise PermissionsError("Only the owner can use this command.", expire_in=30)
 
+    setattr(wrapper, "admin_only", True)
     return wrapper
 
 
@@ -182,6 +195,36 @@ def dev_only(func: Callable[..., Any]) -> Any:
 
     setattr(wrapper, "dev_cmd", True)
     return wrapper
+
+
+def command_help(
+    usage: Optional[List[str]] = None, desc: str = ""
+) -> Callable[[CmdFunc], CmdFunc]:
+    """
+    Decorator which enables command help to be translated and retires the doc-block.
+    The usage strings are filtered and will replace "{cmd}" with "{prefix}cmd_name"
+    for even less typos when writing usage strings.
+
+    :param: usage:  A list of usage patterns with descriptions.
+                    If omitted, will default to the prefix and command name alone.
+                    Set to an empty list if you want no usage examples.
+    :param: desc:  A general description of the command.
+    """
+    if usage is None:
+        usage = ["{cmd}"]
+
+    def deco(func: Callable[..., Any]) -> Any:
+        u = [u.replace("{cmd}", f"{{prefix}}{func.__name__}") for u in usage]
+
+        @wraps(func)
+        async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:
+            return func(self, *args, **kwargs)
+
+        setattr(wrapper, "help_usage", u)
+        setattr(wrapper, "help_desc", desc)
+        return wrapper
+
+    return deco
 
 
 def is_empty_voice_channel(  # pylint: disable=dangerous-default-value

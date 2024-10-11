@@ -1848,8 +1848,8 @@ class ConfigOptionRegistry:
 
     def export_markdown(self) -> str:
         """
-        Transform registered config options into markdown.
-        This is intended to generate documentation from the code.
+        Transform registered config / permissions options into "markdown".
+        This is intended to generate documentation from the code for publishing to pages.
         Currently will print options in order they are registered.
         But prints sections in the order ConfigParser loads them.
         """
@@ -1858,17 +1858,19 @@ class ConfigOptionRegistry:
             dval = self.to_ini(opt, use_default=True)
             if dval.strip() == "":
                 if opt.empty_display_val:
-                    dval = f"`{opt.empty_display_val}`"
+                    dval = f"<code>{opt.empty_display_val}</code>"
                 else:
-                    dval = "*empty*"
+                    dval = "<i>*empty*</i>"
             else:
-                dval = f"`{dval}`"
+                dval = f"<code>{dval}</code>"
 
+            # TODO: default values need to be consistent i18n will probably change this.
             # fmt: off
+            comment = opt.comment.replace("\n", "<br>\n")
             md_option = (
-                f"#### {opt.option}\n"
-                f"{opt.comment}  \n"
-                f"**Default Value:** {dval}  \n\n"
+                f"<details>\n  <summary>{opt.option}</summary>\n\n"
+                f"{comment}<br>  \n"
+                f"<strong>Default Value:</strong> {dval}  \n</details>  \n"
             )
             # fmt: on
             if opt.section not in md_sections:
@@ -1879,7 +1881,7 @@ class ConfigOptionRegistry:
         markdown = ""
         for sect in self._parser.sections():
             opts = md_sections[sect]
-            markdown += f"### [{sect}]\n{''.join(opts)}"
+            markdown += f"### [{sect}]\n\n{''.join(opts)}\n\n"
 
         return markdown
 
