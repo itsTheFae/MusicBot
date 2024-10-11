@@ -1,7 +1,7 @@
 import shutil
 import textwrap
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class MusicbotException(Exception):
@@ -17,7 +17,11 @@ class MusicbotException(Exception):
     """
 
     def __init__(
-        self, message: str, *, expire_in: int = 0, fmt_args: Optional[Dict[str, Any]] = None
+        self,
+        message: str,
+        *,
+        expire_in: int = 0,
+        fmt_args: Optional[Dict[str, Any]] = None,
     ) -> None:
         if fmt_args:
             super().__init__((message, fmt_args))

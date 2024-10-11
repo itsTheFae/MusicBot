@@ -31,6 +31,7 @@ def _X(msg: str) -> str:  # pylint: disable=invalid-name
     """
     return msg
 
+
 def _L(msg: str) -> str:  # pylint: disable=invalid-name
     """
     Marks strings for translation as part of logs domain.
