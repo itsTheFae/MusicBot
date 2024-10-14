@@ -33,6 +33,7 @@ class PermissionsDefaults:
 
     command_whitelist: Set[str] = set()
     command_blacklist: Set[str] = set()
+    advanced_commandlists: bool = False
     ignore_non_voice: Set[str] = set()
     grant_to_roles: Set[int] = set()
     user_list: Set[int] = set()
@@ -74,6 +75,7 @@ class PermissiveDefaults(PermissionsDefaults):
 
     command_whitelist: Set[str] = set()
     command_blacklist: Set[str] = set()
+    advanced_commandlists: bool = False
     ignore_non_voice: Set[str] = set()
     grant_to_roles: Set[int] = set()
     user_list: Set[int] = set()
@@ -323,7 +325,9 @@ class PermissionGroup:
             default=defaults.command_whitelist,
             comment=(
                 "List of command names allowed for use, separated by spaces.\n"
-                "This option overrides CommandBlacklist if set."
+                "Sub-command access can be controlled by adding _ and the sub-command name.\n"
+                "That is `config_set` grants only the `set` sub-command of the config command.\n"
+                "This option overrides CommandBlacklist if set.\n"
             ),
             empty_display_val="(All allowed)",
         )
@@ -338,6 +342,17 @@ class PermissionGroup:
                 "Will not work if CommandWhitelist is set!"
             ),
             empty_display_val="(None denied)",
+        )
+        self.advanced_commandlists = self._mgr.register.init_option(
+            section=name,
+            option="AdvancedCommandLists",
+            dest="advanced_commandlists",
+            getter="getboolean",
+            default=defaults.advanced_commandlists,
+            comment=(
+                "When enabled, CommandBlacklist and CommandWhitelist are used together.\n"
+                "Only commands in the whitelist are allowed, however sub-commands may be denied by the blacklist.\n"
+            )
         )
         self.ignore_non_voice = self._mgr.register.init_option(
             section=name,
@@ -510,23 +525,37 @@ class PermissionGroup:
         if uid in self.user_list:
             self.user_list.remove(uid)
 
-    def can_use_command(self, command: str) -> None:
+    def can_use_command(self, command: str, sub: str = "") -> bool:
         """
-        Test if command is enabled in this permission group.
+        Test if the group can use the given command or sub-command.
 
-        :raises:  PermissionsError  if command is denied from use.
+        :param: command:  The command name to test.
+        :param: sub:      The sub-command argument of the command being tested.
+        
+        :returns:  boolean:  False if not allowed, True otherwise.
         """
-        if self.command_whitelist and command not in self.command_whitelist:
-            raise PermissionsError(
-                f"This command is not enabled for your group ({self.name}).",
-                expire_in=20,
-            )
+        csub = f"{command}_{sub}"
+        terms = [command]
+        if sub:
+            terms.append(csub)
 
-        if self.command_blacklist and command in self.command_blacklist:
-            raise PermissionsError(
-                f"This command is disabled for your group ({self.name}).",
-                expire_in=20,
-            )
+        if not self.advanced_commandlists:
+            if self.command_whitelist and all(c not in self.command_whitelist for c in terms):
+                return False
+            
+            if self.command_blacklist and any(c in self.command_blacklist for c in terms):
+                return False
+
+        else:
+            if self.command_whitelist and all(x not in self.command_whitelist for x in terms):
+                return False
+
+            if sub and command in self.command_whitelist and csub in self.command_blacklist:
+                return False
+
+            if any(c in self.command_blacklist and c in self.command_whitelist for c in terms):
+                return False
+        return True
 
     def can_use_extractor(self, extractor: str) -> None:
         """

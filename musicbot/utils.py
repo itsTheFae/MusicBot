@@ -9,6 +9,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
+    Dict,
     Iterable,
     List,
     Optional,
@@ -197,31 +198,63 @@ def dev_only(func: Callable[..., Any]) -> Any:
     return wrapper
 
 
-def command_help(
-    usage: Optional[List[str]] = None, desc: str = ""
+def command_helper(
+    usage: Optional[List[str]] = None,
+    desc: str = "",
+    remap_subs: Optional[Dict[str, str]] = None,
+    allow_dm: bool = False,
 ) -> Callable[[CmdFunc], CmdFunc]:
     """
     Decorator which enables command help to be translated and retires the doc-block.
-    The usage strings are filtered and will replace "{cmd}" with "{prefix}cmd_name"
-    for even less typos when writing usage strings.
+    The usage strings are filtered and will replace "{cmd}" with "{prefix}cmd_name" where
+    {prefix} is replaced only while formatting help for display.
+    Filtered usage should reduce typos when writing usage strings. :)
+
+    Usage command parameters should adhear to these rules:
+    1. All literal parameters must be lower case and alphanumeric.
+    2. All placeholder parameters must be upper case and alphanumeric.
+    3. < > denotes a required parameter.
+    4. [ ] denotes an optional parameter.
+    5.  |  denotes multiple choices for the parameter.
+    6. Literal terms may appear without parameter marks.
 
     :param: usage:  A list of usage patterns with descriptions.
                     If omitted, will default to the prefix and command name alone.
                     Set to an empty list if you want no usage examples.
-    :param: desc:  A general description of the command.
+
+    :param: desc:   A general description of the command.
+
+    :param: remap_subs:  A dictionary for normalizing alternate sub-commands into a standard sub-command.
+                         This allows users to simplify permissions for these commands.
+                         It should be avoided for all new commands, deprecated and reserved for backwards compat.
+                         Ex:  {"alt": "standard"}
+
+    :param: allow_dm:  Allow the command to be used in DM.
+                       This wont work for commands that need guild data.
     """
     if usage is None:
         usage = ["{cmd}"]
 
+    def remap_subcommands(args: List[str]) -> List[str]:
+        """Remaps the first argument in the list according to an external map."""
+        if not remap_subs or not args:
+            return args
+        if args[0] in remap_subs.keys():
+            args[0] = remap_subs[args[0]]
+            return args
+        return args
+
     def deco(func: Callable[..., Any]) -> Any:
-        u = [u.replace("{cmd}", f"{{prefix}}{func.__name__}") for u in usage]
+        u = [u.replace("{cmd}", f"{{prefix}}{func.__name__.replace('cmd_', '')}") for u in usage]
 
         @wraps(func)
         async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:
-            return func(self, *args, **kwargs)
+            return await func(self, *args, **kwargs)
 
         setattr(wrapper, "help_usage", u)
         setattr(wrapper, "help_desc", desc)
+        setattr(wrapper, "remap_subcommands", remap_subcommands)
+        setattr(wrapper, "cmd_in_dm", allow_dm)
         return wrapper
 
     return deco
