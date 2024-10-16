@@ -340,7 +340,7 @@ def enable_ytdlp_oauth2_plugin(config: "Config") -> None:
             _NETRC_MACHINE = "youtube"
             _use_oauth2 = False
 
-            def _perform_login(self, username: str, password: str) -> None:
+            def _perform_login(self, username: str, password: str) -> Any:
                 if username == "oauth2":
                     # Ensure clients are supported.
                     self._DEFAULT_CLIENTS = tuple(
@@ -354,6 +354,8 @@ def enable_ytdlp_oauth2_plugin(config: "Config") -> None:
 
                     self._use_oauth2 = True
                     self.initialize_oauth()
+                    return None
+                return super()._perform_login(username, password)
 
             def _create_request(self, *args, **kwargs):  # type: ignore[no-untyped-def]
                 request = super()._create_request(*args, **kwargs)
