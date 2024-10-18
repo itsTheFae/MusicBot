@@ -245,7 +245,10 @@ def command_helper(
         return args
 
     def deco(func: Callable[..., Any]) -> Any:
-        u = [u.replace("{cmd}", f"{{prefix}}{func.__name__.replace('cmd_', '')}") for u in usage]
+        u = [
+            u.replace("{cmd}", f"{{prefix}}{func.__name__.replace('cmd_', '')}")
+            for u in usage
+        ]
 
         @wraps(func)
         async def wrapper(self: "MusicBot", *args: Any, **kwargs: Any) -> Any:

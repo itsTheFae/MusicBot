@@ -2810,7 +2810,7 @@ class MusicBot(discord.Client):
             if cmd and self.config.usealias:
                 alias_list = self.aliases.for_command(cmd)
                 if alias_list:
-                    aliases = "Aliases for command:\n```\n"
+                    aliases = "**Aliases for command:**\n```\n"
                     for alias in alias_list:
                         aliases += f"  {alias[0]} >> {cmd} {alias[1]}\n"
                     aliases += "```"
@@ -7493,7 +7493,7 @@ class MusicBot(discord.Client):
         if cfg == "help":
             filename = "commands_help.md"
             msg_str = "All the commands and their usage attached."
-            config_md = "# Command List  \n\n"
+            config_md = "### General Commands  \n\n"
             admin_commands = []
             dev_commands = []
             for att in dir(self):
@@ -7513,8 +7513,8 @@ class MusicBot(discord.Client):
                         dev_commands.append(command_text)
                         continue
                     config_md += command_text
-            config_md += f"# Admin Commands  \n\n{''.join(admin_commands)}"
-            config_md += f"# Dev Commands  \n\n{''.join(dev_commands)}"
+            config_md += f"### Owner Commands  \n\n{''.join(admin_commands)}"
+            config_md += f"### Dev Commands  \n\n{''.join(dev_commands)}"
 
         sent_to_channel = None
 
@@ -7543,6 +7543,29 @@ class MusicBot(discord.Client):
                 "Sent a message with the requested config markdown.", delete_after=20
             )
         return None
+
+    @dev_only
+    @command_helper(desc="Makes default INI files.")
+    async def cmd_makeini(
+        self,
+        cfg: str = "opts",
+    ) -> CommandResponse:
+        """Generates an example ini file, used for comparing example_options.ini to documentation in code."""
+        valid_opts = ["opts", "perms"]
+        if cfg not in valid_opts:
+            opts = ", ".join([f"`{o}`" for o in valid_opts])
+            raise exceptions.CommandError(f"Option must be one of: {opts}")
+
+        if cfg == "opts":
+            self.config.register.write_default_ini(pathlib.Path("./config/ex_opts.ini"))
+
+        if cfg == "perms":
+            self.permissions.register.write_default_ini(pathlib.Path("./config/ex_perms.ini"))
+
+        return Response(
+            "Saved the requested INI file to disk. Go check it", delete_after=20
+        )
+
 
     @owner_only
     @command_helper(

@@ -21,12 +21,15 @@ from typing import (
 )
 
 import configupdater
+from configupdater.block import Comment, Space
 
 from .constants import (
+    APL_FILE_HISTORY,
     DATA_FILE_COOKIES,
     DATA_FILE_SERVERS,
     DATA_FILE_YTDLP_OAUTH2,
     DEFAULT_AUDIO_CACHE_DIR,
+    DEFAULT_COMMAND_ALIAS_FILE,
     DEFAULT_DATA_DIR,
     DEFAULT_FOOTER_TEXT,
     DEFAULT_I18N_FILE,
@@ -83,10 +86,6 @@ def create_file_ifnoexist(
             log.warning("Creating %s", path)
 
 
-# TODO: maybe add a means of generating default or first-run config.
-# TODO: maybe rename configs into proper sections, with migration for old config.
-
-
 class Config:
     """
     This object is responsible for loading and validating config, using default
@@ -107,7 +106,11 @@ class Config:
         """
         log.info("Loading config from:  %s", config_file)
         self.config_file = config_file
-        self.find_config()
+        self.find_config()  # this makes sure the config exists.
+
+        # TODO:  decide on this lil feature.
+        # Make updates to config file before loading it in.
+        # ConfigRenameManager(self.config_file)
 
         config = ExtendedConfigParser()
         config.read(config_file, encoding="utf-8")
@@ -137,6 +140,8 @@ class Config:
 
         # This gets filled in later while checking for token in the environment vars.
         self.auth: Tuple[str] = ("",)
+
+        # Credentials
         self._login_token: str = self.register.init_option(
             section="Credentials",
             option="Token",
@@ -144,7 +149,9 @@ class Config:
             getter="get",
             default=ConfigDefaults.token,
             comment=_X(
-                "Discord bot authentication token for your Bot. Visit Discord Developer Portal to create a bot App and generate your Token. Never publish your bot token!"
+                "Discord bot authentication token for your Bot.\n"
+                "Visit Discord Developer Portal to create a bot App and generate your Token.\n"
+                "Never publish your bot token!"
             ),
             editable=False,
         )
@@ -155,7 +162,9 @@ class Config:
             dest="spotify_clientid",
             default=ConfigDefaults.spotify_clientid,
             comment=_X(
-                "Provide an optional Spotify Client ID to enable MusicBot to interact with Spotify API."
+                "Provide your own Spotify Client ID to enable MusicBot to interact with Spotify API.\n"
+                "MusicBot will try to use the web player API (guest mode) if nothing is set here.\n"
+                "Using your own API credentials grants higher usage limits than guest mode."
             ),
             editable=False,
         )
@@ -165,11 +174,13 @@ class Config:
             dest="spotify_clientsecret",
             default=ConfigDefaults.spotify_clientsecret,
             comment=_X(
-                "Provide an optional Spotify Client Secret to enable MusicBot to interact with Spotify API."
+                "Provide your Spotify Client Secret to enable MusicBot to interact with Spotify API.\n"
+                "This is required if you set the Spotify_ClientID option above."
             ),
             editable=False,
         )
 
+        # Permissions
         self.owner_id: int = self.register.init_option(
             section="Permissions",
             option="OwnerID",
@@ -177,7 +188,9 @@ class Config:
             default=ConfigDefaults.owner_id,
             # TRANSLATORS: 'auto' should not be translated.
             comment=_X(
-                "Provide a Discord User ID number or the word 'auto' to set the owner of this bot."
+                "Provide a Discord User ID number to set the owner of this bot.\n"
+                "The word 'auto' or number 0 will set the owner based on App information.\n"
+                "Only one owner ID can be set here. Generally, setting 'auto' is recommended."
             ),
             getter="getownerid",
             editable=False,
@@ -188,8 +201,10 @@ class Config:
             dest="dev_ids",
             default=ConfigDefaults.dev_ids,
             comment=_X(
-                "A list of Discord User ID numbers who can remotely execute code using MusicBot dev-only commands. "
-                "Warning, you should only set this if you plan to do development of MusicBot!"
+                "A list of Discord User IDs who can use the dev-only commands.\n"
+                "Warning: dev-only commands can allow arbitrary remote code execution.\n"
+                "Use spaces to separate multiple IDs.\n"
+                "Most users should leave this setting blank."
             ),
             getter="getidset",
             editable=False,
@@ -202,16 +217,22 @@ class Config:
             getter="getidset",
             default=ConfigDefaults.bot_exception_ids,
             comment=_X(
-                "Discord Member IDs for other bots that MusicBot should not ignore.  All bots are ignored by default."
+                "Discord Member IDs for other bots that MusicBot should not ignore.\n"
+                "Use spaces to separate multiple IDs.\n"
+                "All bots are ignored by default."
             ),
         )
 
+        # Chat
         self.command_prefix: str = self.register.init_option(
             section="Chat",
             option="CommandPrefix",
             dest="command_prefix",
             default=ConfigDefaults.command_prefix,
-            comment=_X("Command prefix is how all MusicBot commands must be started"),
+            comment=_X(
+                "Command prefix is how all MusicBot commands must be started in Discord messages.\n"
+                "E.g., if you set this to * the play command is trigger by *play ..."
+            ),
         )
         self.commands_via_mention: bool = self.register.init_option(
             section="Chat",
@@ -232,8 +253,10 @@ class Config:
             default=ConfigDefaults.bound_channels,
             getter="getidset",
             comment=_X(
-                "ID numbers for text channels that MusicBot should exclusively use for commands."
-                " All channels are used if this is not set."
+                "ID numbers for text channels that MusicBot should exclusively use for commands.\n"
+                "This can contain IDs for channels in multiple servers.\n"
+                "Use spaces to separate multiple IDs.\n"
+                "All channels are used if this is not set."
             ),
         )
         self.unbound_servers: bool = self.register.init_option(
@@ -244,7 +267,8 @@ class Config:
             getter="getboolean",
             # TRANSLATORS: BindToChannels should not be translated.
             comment=_X(
-                "Allow MusicBot to respond in all text channels of a server, when no channels are set in BindToChannels option."
+                "Allow responses in all channels while no specific channel is set for a server.\n"
+                "Only used when BindToChannels is missing an ID for a server."
             ),
         )
         self.autojoin_channels: Set[int] = self.register.init_option(
@@ -254,7 +278,8 @@ class Config:
             default=ConfigDefaults.autojoin_channels,
             getter="getidset",
             comment=_X(
-                "A list of Voice Channel IDs that MusicBot should automatically join on start up."
+                "A list of Voice Channel IDs that MusicBot should automatically join on start up.\n"
+                "Use spaces to separate multiple IDs."
             ),
         )
         self.dm_nowplaying: bool = self.register.init_option(
@@ -264,7 +289,7 @@ class Config:
             default=ConfigDefaults.dm_nowplaying,
             getter="getboolean",
             comment=_X(
-                "MusicBot will try to send Now Playing notices directly to the member who requested the song instead of posting in server channel."
+                "MusicBot will try to send Now Playing notices directly to the member who requested the song instead of posting in a server channel."
             ),
         )
         self.no_nowplaying_auto: bool = self.register.init_option(
@@ -282,7 +307,8 @@ class Config:
             default=ConfigDefaults.nowplaying_channels,
             getter="getidset",
             comment=_X(
-                "Forces MusicBot to use a specific channel to send now playing messages. One text channel ID per server."
+                "Forces MusicBot to use a specific channel to send now playing messages.\n"
+                "Only one text channel ID can be used per server."
             ),
         )
         self.delete_nowplaying: bool = self.register.init_option(
@@ -301,8 +327,8 @@ class Config:
             default=ConfigDefaults.default_volume,
             getter="getpercent",
             comment=_X(
-                "Sets the default volume level MusicBot will play songs at. "
-                "Must be a value from 0 to 1 inclusive."
+                "Sets the default volume level MusicBot will play songs at.\n"
+                "You can use any value from 0 to 1, or 0% to 100% volume."
             ),
         )
         self.default_speed: float = self.register.init_option(
@@ -313,7 +339,9 @@ class Config:
             getter="getfloat",
             comment=_X(
                 "Sets the default speed MusicBot will play songs at.\n"
-                "Must be a value from 0.5 to 100.0 for ffmpeg to use it."
+                "Must be a value from 0.5 to 100.0 for ffmpeg to use it.\n"
+                "A value of 1 is normal playback speed.\n"
+                "Note: Streamed media does not support speed adjustments."
             ),
         )
         self.skips_required: int = self.register.init_option(
@@ -324,7 +352,7 @@ class Config:
             getter="getint",
             # TRANSLATORS: SkipRatio should not be translated.
             comment=_X(
-                "Number of members required to skip a song. "
+                "Number of channel member votes required to skip a song.\n"
                 "Acts as a minimum when SkipRatio would require more votes."
             ),
         )
@@ -336,7 +364,9 @@ class Config:
             getter="getpercent",
             # TRANSLATORS: SkipsRequired is not translated
             comment=_X(
-                "This percent of listeners must vote for skip. If SkipsRequired is lower it will be used instead."
+                "This percent of listeners in voice must vote for skip.\n"
+                "If SkipsRequired is lower than the computed value, it will be used instead.\n"
+                "You can set this from 0 to 1, or 0% to 100%."
             ),
         )
         self.save_videos: bool = self.register.init_option(
@@ -372,7 +402,7 @@ class Config:
             default=ConfigDefaults.storage_retain_autoplay,
             getter="getboolean",
             # TRANSLATORS: SaveVideos should not be translated
-            comment=_X("If SaveVideos is enabled, never purge auto playlist songs from the cache."),
+            comment=_X("If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."),
         )
         self.now_playing_mentions: bool = self.register.init_option(
             section="MusicBot",
@@ -398,7 +428,7 @@ class Config:
             dest="auto_playlist",
             default=ConfigDefaults.auto_playlist,
             getter="getboolean",
-            comment=_X("Enable MusicBot to automatically play music from the autoplaylist.txt"),
+            comment=_X("Enable MusicBot to automatically play music from the auto playlist when the queue is empty."),
         )
         self.auto_playlist_random: bool = self.register.init_option(
             section="MusicBot",
@@ -406,7 +436,7 @@ class Config:
             dest="auto_playlist_random",
             default=ConfigDefaults.auto_playlist_random,
             getter="getboolean",
-            comment=_X("Shuffles the autoplaylist tracks before playing them."),
+            comment=_X("Shuffles the auto playlist tracks before playing them."),
         )
         self.auto_playlist_autoskip: bool = self.register.init_option(
             section="MusicBot",
@@ -415,8 +445,8 @@ class Config:
             default=ConfigDefaults.auto_playlist_autoskip,
             getter="getboolean",
             comment=_X(
-                "Enable automatic skip of auto-playlist songs when a user plays a new song.\n"
-                "This only applies to the current playing song if it was added by the auto-playlist."
+                "Enable automatic skip of auto playlist songs when a user plays a new song.\n"
+                "This only applies to the current playing song if it was added by the auto playlist."
             ),
         )
         # TODO:  this option needs more implementation to ensure blocked tracks are removed.
@@ -426,7 +456,7 @@ class Config:
             dest="auto_playlist_remove_on_block",
             default=ConfigDefaults.auto_playlist_remove_on_block,
             getter="getboolean",
-            comment=_X("Remove songs from the auto-playlist if they are found in the song blocklist."),
+            comment=_X("Remove songs from the auto playlist if they are found in the song blocklist."),
         )
         self.auto_pause: bool = self.register.init_option(
             section="MusicBot",
@@ -444,6 +474,8 @@ class Config:
             getter="getboolean",
             comment=_X("Allow MusicBot to automatically delete messages it sends, after a short delay."),
         )
+        # TODO:  add a means of setting the above delay period.
+        # The DeleteInvoking should be tied to this same delay.
         self.delete_invoking: bool = self.register.init_option(
             section="MusicBot",
             option="DeleteInvoking",
@@ -458,7 +490,7 @@ class Config:
             dest="persistent_queue",
             default=ConfigDefaults.persistent_queue,
             getter="getboolean",
-            comment=_X("Allow MusicBot to save the song queue, so they will survive restarts."),
+            comment=_X("Allow MusicBot to save the song queue, so queued songs will survive restarts."),
         )
         self.pre_download_next_song: bool = self.register.init_option(
             section="MusicBot",
@@ -468,7 +500,7 @@ class Config:
             getter="getboolean",
             comment=_X(
                 "Enable MusicBot to download the next song in the queue while a song is playing.\n"
-                "Currently this option does not apply to auto-playlist or songs added to an empty queue."
+                "Currently this option does not apply to auto playlist or songs added to an empty queue."
             ),
         )
         self.status_message: str = self.register.init_option(
@@ -505,8 +537,8 @@ class Config:
             dest="write_current_song",
             default=ConfigDefaults.write_current_song,
             getter="getboolean",
-            # TRANSLATORS: {server_ID} may be translated as needed.
-            comment=_X("If enabled, MusicBot will save the track title to:  data/{server_ID}/current.txt"),
+            # TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
+            comment=_X("If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"),
         )
         self.allow_author_skip: bool = self.register.init_option(
             section="MusicBot",
@@ -522,7 +554,10 @@ class Config:
             dest="use_experimental_equalization",
             default=ConfigDefaults.use_experimental_equalization,
             getter="getboolean",
-            comment=_X("Tries to use ffmpeg to get volume normalizing options for use in playback."),
+            comment=_X(
+                "Tries to use ffmpeg to get volume normalizing options for use in playback.\n"
+                "This option can cause delay between playing songs, as the whole track must be processed."
+            ),
         )
         self.embeds: bool = self.register.init_option(
             section="MusicBot",
@@ -579,7 +614,10 @@ class Config:
             dest="usealias",
             default=ConfigDefaults.usealias,
             getter="getboolean",
-            comment=_X("If enabled, MusicBot will allow commands to have multiple names using data in:  config/aliases.json"),
+            comment=_X(
+                "If enabled, MusicBot will allow commands to have multiple names using data in:  config/aliases.json"
+            ),
+            comment_args={"filepath": DEFAULT_COMMAND_ALIAS_FILE},
         )
         self.footer_text: str = self.register.init_option(
             section="MusicBot",
@@ -587,7 +625,10 @@ class Config:
             dest="footer_text",
             default=ConfigDefaults.footer_text,
             # TRANSLATORS: UseEmbeds should not be translated.
-            comment=_X("Replace MusicBot name/version in embed footer with custom text. Only applied when UseEmbeds is enabled and it is not blank."),
+            comment=_X(
+                "Replace MusicBot name/version in embed footer with custom text.\n"
+                "Only applied when UseEmbeds is enabled and it is not blank."
+            ),
         )
         self.self_deafen: bool = self.register.init_option(
             section="MusicBot",
@@ -604,7 +645,11 @@ class Config:
             default=ConfigDefaults.leave_inactive_channel,
             getter="getboolean",
             # TRANSLATORS: LeaveInactiveVCTimeOut should not be translated.
-            comment=_X("If enabled, MusicBot will leave a voice channel when no users are listening, after waiting for a period set in LeaveInactiveVCTimeOut."),
+            comment=_X(
+                "If enabled, MusicBot will leave a voice channel when no users are listening,\n"
+                "after waiting for a period set in LeaveInactiveVCTimeOut option.\n"
+                "Listeners are channel members, excluding bots, who are not deafened."
+            ),
         )
         self.leave_inactive_channel_timeout: float = self.register.init_option(
             section="MusicBot",
@@ -613,7 +658,7 @@ class Config:
             default=ConfigDefaults.leave_inactive_channel_timeout,
             getter="getduration",
             comment=_X(
-                "Set a period of time to wait before leaving an inactive voice channel. "
+                "Set a period of time to wait before leaving an inactive voice channel.\n"
                 "You can set this to a number of seconds or phrase like:  4 hours"
             ),
         )
@@ -631,7 +676,11 @@ class Config:
             dest="leave_player_inactive_for",
             default=ConfigDefaults.leave_player_inactive_for,
             getter="getduration",
-            comment=_X("MusicBot will wait for this period of time before leaving voice channel when player is not playing or is paused. Set to 0 to disable."),
+            comment=_X(
+                "When paused or no longer playing, wait for this amount of time then leave voice.\n"
+                "You can set this to a number of seconds of phrase like:  15 minutes\n"
+                "Set it to 0 to disable leaving in this way."
+            ),
         )
         self.searchlist: bool = self.register.init_option(
             section="MusicBot",
@@ -639,7 +688,9 @@ class Config:
             dest="searchlist",
             default=ConfigDefaults.searchlist,
             getter="getboolean",
-            comment=_X("If enabled, users must indicate search result choices by sending a message instead of using reactions."),
+            comment=_X(
+                "If enabled, users must indicate search result choices by sending a message instead of using reactions."
+            ),
         )
         self.defaultsearchresults: int = self.register.init_option(
             section="MusicBot",
@@ -647,7 +698,9 @@ class Config:
             dest="defaultsearchresults",
             default=ConfigDefaults.defaultsearchresults,
             getter="getint",
-            comment=_X("Sets the default number of search results to fetch when using search command without a specific number."),
+            comment=_X(
+                "Sets the default number of search results to fetch when using the search command without a specific number."
+            ),
         )
 
         self.enable_options_per_guild: bool = self.register.init_option(
@@ -657,7 +710,9 @@ class Config:
             default=ConfigDefaults.enable_options_per_guild,
             getter="getboolean",
             # TRANSLATORS: setprefix should not be translated.
-            comment=_X("Allow MusicBot to save a per-server command prefix, and enables setprefix command."),
+            comment=_X(
+                "Allow MusicBot to save a per-server command prefix, and enables the setprefix command."
+            ),
         )
 
         self.round_robin_queue: bool = self.register.init_option(
@@ -666,7 +721,9 @@ class Config:
             dest="round_robin_queue",
             default=ConfigDefaults.defaultround_robin_queue,
             getter="getboolean",
-            comment=_X("If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member."),
+            comment=_X(
+                "If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member."
+            ),
         )
 
         self.enable_network_checker: bool = self.register.init_option(
@@ -676,8 +733,8 @@ class Config:
             default=ConfigDefaults.enable_network_checker,
             getter="getboolean",
             comment=_X(
-                "Allow MusicBot to use system ping command to detect network outage and availability.\n"
-                "This is useful if you keep the bot joined to a channel or playing music 24/7.\n"
+                "Allow MusicBot to use timed pings to detect network outage and availability.\n"
+                "This may be useful if you keep the bot joined to a channel or playing music 24/7.\n"
                 "MusicBot must be restarted to enable network testing.\n"
                 "By default this is disabled."
             ),
@@ -689,16 +746,25 @@ class Config:
             dest="enable_queue_history_global",
             default=ConfigDefaults.enable_queue_history_global,
             getter="getboolean",
-            comment=_X("Enable saving all songs played by MusicBot to a playlist, history.txt"),
+            comment=_X(
+                "Enable saving all songs played by MusicBot to a global playlist file:  %(filename)s\n"
+                "This will contain all songs from all servers."
+            ),
+            comment_args={"filename": f"{DEFAULT_PLAYLIST_DIR}{APL_FILE_HISTORY}"},
         )
 
+        hist_file = pathlib.Path(APL_FILE_HISTORY)
         self.enable_queue_history_guilds: bool = self.register.init_option(
             section="MusicBot",
             option="SavePlayedHistoryGuilds",
             dest="enable_queue_history_guilds",
             default=ConfigDefaults.enable_queue_history_guilds,
             getter="getboolean",
-            comment=_X("Enable saving songs played per-guild/server to a playlist, history-{guild_id}.txt"),
+            # TRANSLATORS:  [Server ID] is a descriptive placeholder, and can be translated.
+            comment=_X(
+                "Enable saving songs played per-server to a playlist file:  %(basename)s[Server ID]%(ext)s"
+            ),
+            comment_args={"basename": f"{DEFAULT_PLAYLIST_DIR}{hist_file.stem}", "ext": hist_file.suffix},
         )
 
         self.enable_local_media: bool = self.register.init_option(
@@ -768,34 +834,12 @@ class Config:
                 "Experimental option to enable yt-dlp to use a YouTube account via OAuth2.\n"
                 "When enabled, you must use the generated URL and code to authorize an account.\n"
                 "The authorization token is then stored in the "
-                "`%(datapath)s/%(oauthfile)s` file.\n"
+                "`%(oauthfile)s` file.\n"
                 "This option should not be used when cookies are enabled.\n"
                 "Using a personal account may not be recommended.\n"
                 "Set yes to enable or no to disable."
             ),
-            comment_args={"datapath": DEFAULT_DATA_DIR, "oauthfile": DATA_FILE_YTDLP_OAUTH2},
-        )
-        self.ytdlp_oauth2_client_id: str = self.register.init_option(
-            section="Credentials",
-            option="YtdlpOAuth2ClientID",
-            dest="ytdlp_oauth2_client_id",
-            getter="getstr",
-            default=ConfigDefaults.ytdlp_oauth2_client_id,
-            comment=_X(
-                "Sets the YouTube API Client ID, used by Yt-dlp OAuth2 plugin.\n"
-                "Optional, unless built-in credentials are not working."
-            ),
-        )
-        self.ytdlp_oauth2_client_secret: str = self.register.init_option(
-            section="Credentials",
-            option="YtdlpOAuth2ClientSecret",
-            dest="ytdlp_oauth2_client_secret",
-            getter="getstr",
-            default=ConfigDefaults.ytdlp_oauth2_client_secret,
-            comment=_X(
-                "Sets the YouTube API Client Secret key, used by Yt-dlp OAuth2 plugin.\n"
-                "Optional, unless YtdlpOAuth2ClientID is set."
-            ),
+            comment_args={"oauthfile": f"{DEFAULT_DATA_DIR}/{DATA_FILE_YTDLP_OAUTH2}"},
         )
         self.ytdlp_oauth2_url: str = self.register.init_option(
             section="MusicBot",
@@ -810,14 +854,19 @@ class Config:
                 "Authorization must be completed before start-up will continue when this is set."
             ),
         )
+        # Was: [Credentials] >> YtdlpOAuth2ClientID
+        self.ytdlp_oauth2_client_id: str = ConfigDefaults.ytdlp_oauth2_client_id
+        # Was: Credentials] >> YtdlpOAuth2ClientSecret
+        self.ytdlp_oauth2_client_secret: str = ConfigDefaults.ytdlp_oauth2_client_secret
 
+        # Files
         self.user_blocklist_enabled: bool = self.register.init_option(
             section="MusicBot",
             option="EnableUserBlocklist",
             dest="user_blocklist_enabled",
             default=ConfigDefaults.user_blocklist_enabled,
             getter="getboolean",
-            comment=_X("Enable the user block list feature, without emptying the block list."),
+            comment=_X("Toggle the user block list feature, without emptying the block list."),
         )
         self.user_blocklist_file: pathlib.Path = self.register.init_option(
             section="Files",
@@ -872,8 +921,9 @@ class Config:
                 "An optional directory path where playable media files can be stored.\n"
                 "All files and sub-directories can then be accessed by using 'file://' as a protocol.\n"
                 "Example:  file://some/folder/name/file.ext\n"
-                "Maps to:  ./media/some/folder/name/file.ext"
+                "Maps to:  %(path)s/some/folder/name/file.ext"
             ),
+            comment_args={"path": "./media"},
         )
 
         # TODO: remove this, replace with lang option?
@@ -908,7 +958,7 @@ class Config:
             comment=_X(
                 "Configure automatic log file rotation at restart, and limit the number of files kept.\n"
                 "When disabled, only one log is kept and its contents are replaced each run.\n"
-                f"Set to 0 to disable.  Maximum allowed number is %(max)s."
+                "Set to 0 to disable.  Maximum allowed number is %(max)s."
             ),
             comment_args={"max": MAXIMUM_LOGS_LIMIT},
         )
@@ -918,13 +968,18 @@ class Config:
             option="LogsDateFormat",
             dest="logs_date_format",
             default=ConfigDefaults.logs_date_format,
-            comment=(
+            comment=_X(
                 "Configure the log file date format used when LogsMaxKept is enabled.\n"
                 "If left blank, a warning is logged and the default will be used instead.\n"
                 "Learn more about time format codes from the tables and data here:\n"
                 "    https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior"
             ),
         )
+
+        #
+        # end of config registry.
+        #
+
 
         # Convert all path constants into config as pathlib.Path objects.
         self.data_path = pathlib.Path(DEFAULT_DATA_DIR).resolve()
@@ -933,6 +988,7 @@ class Config:
         self.disabled_cookies_path = self.cookies_path.parent.joinpath(
             f"_{self.cookies_path.name}"
         )
+        self.audio_cache_path = self.audio_cache_path.absolute()
 
         # Validate the config settings match destination values.
         self.register.validate_register_destinations()
@@ -1171,11 +1227,9 @@ class Config:
                 )
 
             else:
-                raise HelpfulError(
-                    "Your config files are missing. Neither options.ini nor example_options.ini were found.",
-                    "Grab the files back from the archive or remake them yourself and copy paste the content "
-                    "from the repo. Stop removing important files!",
-                )
+                self.register.write_default_ini(pathlib.Path(EXAMPLE_OPTIONS_FILE))
+                shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
+                log.warning("Generated a new example_options.ini and copied it to options.ini")
 
         # load the config and check if settings are configured.
         if not config.read(self.config_file, encoding="utf-8"):
@@ -1226,7 +1280,6 @@ class Config:
         """
         Converts the current Config value into an INI file value as needed.
         Note: ConfigParser must not use multi-line values. This will break them.
-        Should multi-line values be needed, maybe use ConfigUpdater package instead.
         """
         try:
             cu = configupdater.ConfigUpdater()
@@ -1370,7 +1423,7 @@ class ConfigDefaults:
     auto_playlist_dir: pathlib.Path = pathlib.Path(DEFAULT_PLAYLIST_DIR)
     media_file_dir: pathlib.Path = pathlib.Path(DEFAULT_MEDIA_FILE_DIR)
     i18n_file: pathlib.Path = pathlib.Path(DEFAULT_I18N_FILE)
-    audio_cache_path: pathlib.Path = pathlib.Path(DEFAULT_AUDIO_CACHE_DIR).absolute()
+    audio_cache_path: pathlib.Path = pathlib.Path(DEFAULT_AUDIO_CACHE_DIR)
 
     @staticmethod
     def _debug_level() -> Tuple[str, int]:
@@ -1427,8 +1480,6 @@ class ConfigOption:
 
     def __str__(self) -> str:
         return f"[{self.section}] > {self.option}"
-
-    # def i18n(self, ssd: Optional[GuildSpecificData] = None) -> str:
 
 
 class ConfigOptionRegistry:
@@ -1798,14 +1849,14 @@ class ConfigOptionRegistry:
 
         :param: use_default:  return the default value instead of current config.
         """
+        if not hasattr(self._config, option.dest):
+            raise AttributeError(
+                f"Dev Bug! Attribute `Config.{option.dest}` does not exist."
+            )
+
         if use_default:
             conf_value = option.default
         else:
-            if not hasattr(self._config, option.dest):
-                raise AttributeError(
-                    f"Dev Bug! Attribute `Config.{option.dest}` does not exist."
-                )
-
             conf_value = getattr(self._config, option.dest)
         return self._value_to_ini(conf_value, option.getter)
 
@@ -1882,9 +1933,61 @@ class ConfigOptionRegistry:
         markdown = ""
         for sect in self._parser.sections():
             opts = md_sections[sect]
-            markdown += f"### [{sect}]\n\n{''.join(opts)}\n\n"
+            markdown += f"#### [{sect}]\n\n{''.join(opts)}\n\n"
 
         return markdown
+
+    def write_default_ini(self, filename: pathlib.Path) -> bool:
+        """Uses config registry to generate an example_options.ini file."""
+        try:
+            cu = configupdater.ConfigUpdater()
+            cu.optionxform = str  # type: ignore
+
+            # TODO: shift this to a constant maybe...
+            # I hate hard-coding this, but it maintains the order of sections we want.
+            for section in ["Credentials", "Permissions", "Chat", "MusicBot", "Files"]:
+                cu.add_section(section)
+
+            # add comments to head of file.
+            adder = cu["Credentials"].add_before
+            head_comment = (
+                "This is the configuration file for MusicBot. Do not edit this file using Notepad.\n"
+                "Use Notepad++ or a code editor like Visual Studio Code.\n"
+                "For help, see: https://just-some-bots.github.io/MusicBot/ \n"
+                "\n"
+                "This file was generated by MusicBot, it contains all options set to their default values."
+            )
+            for line in head_comment.split("\n"):
+                adder.comment(line)
+            adder.space()
+
+            for opt in self.option_list:
+                cu[opt.section][opt.option] = self.to_ini(opt, use_default=True)
+                adder = cu[opt.section][opt.option].add_before
+                if opt.comment_args:
+                    comment = opt.comment % opt.comment_args
+                else:
+                    comment = opt.comment
+                c_lines = comment.split("\n")
+                if len(c_lines) > 1:
+                    for line in c_lines:
+                        adder.comment(line)
+                else:
+                    adder.comment(opt.comment)
+                cu[opt.section][opt.option].add_after.space()
+
+            with open(filename, "w", encoding="utf8") as fp:
+                cu.write(fp)
+
+            return True
+        except (
+            OSError,
+            AttributeError,
+            configparser.DuplicateSectionError,
+            configparser.ParsingError,
+        ):
+            log.exception("Failed to save default INI file at:  %s", filename)
+            return False
 
 
 class ExtendedConfigParser(configparser.ConfigParser):
@@ -2162,6 +2265,128 @@ class ExtendedConfigParser(configparser.ConfigParser):
         if not val and fallback:
             return set(fallback)
         return set(x for x in val.replace(",", " ").split())
+
+
+class ConfigRenameManager:
+    """
+    This class provides a method to move or rename config options.
+    All renaming is done sequentially, to ensure that older versions of config
+    can be carried into newer versions with minimal manual edits.
+    """
+
+    def __init__(self, config_file: pathlib.Path) -> None:
+        """Register all config remaps, past or present."""
+        self._cfg_file = config_file
+
+        # The format of config remap items is as follows:
+        # (origin_section, origin_name, new_section, new_name)
+        # These values are case sensitive, and must match existing options.
+        # If not found, no error/warning is raised, it is assumed they are renamed already.
+        self._remap: List[Tuple[str, str, str, str]] = [
+            # fmt: off
+            # Rename LeaveAfterSong and Blacklist options  @  2024/02/21
+            ("MusicBot", "LeaveAfterSong", "MusicBot", "LeaveAfterQueueEmpty"),
+
+            # Move chat-related to Chat section  @  2024/04/02
+            # Also renames UseAlias to UseCommandAlias for clarity.
+            ("MusicBot", "DeleteMessages",       "Chat", "DeleteMessages"),  # noqa: E241
+            ("MusicBot", "DeleteInvoking",       "Chat", "DeleteInvoking"),  # noqa: E241
+            ("MusicBot", "NowPlayingMentions",   "Chat", "NowPlayingMentions"),  # noqa: E241
+            ("MusicBot", "UseEmbeds",            "Chat", "UseEmbeds"),  # noqa: E241
+            ("MusicBot", "UseAlias",             "Chat", "UseCommandAlias"),  # noqa: E241
+            ("MusicBot", "CustomEmbedFooter",    "Chat", "CustomEmbedFooter"),  # noqa: E241
+            ("MusicBot", "EnablePrefixPerGuild", "Chat", "EnablePrefixPerGuild"),
+            ("MusicBot", "SearchList",           "Chat", "SearchList"),  # noqa: E241
+            ("MusicBot", "DefaultSearchResults", "Chat", "DefaultSearchResults"),
+            # fmt: on
+        ]
+        self.update_config_options()
+
+    def _handle_remap_item(
+        self, cu: configupdater.ConfigUpdater, remap: Tuple[str, str, str, str]
+    ) -> None:
+        """Logic for updating one item from the remap."""
+        o_sect, o_opt, n_sect, n_opt = remap
+
+        log.debug(
+            "Renaming INI file entry [%s] > %s  to  [%s] > %s",
+            o_sect,
+            o_opt,
+            n_sect,
+            n_opt,
+        )
+
+        opt = cu.get(o_sect, o_opt)
+        # Simply rename the config in-place if possible.
+        if o_sect == n_sect:
+            cu[n_sect].insert_at(opt.container_idx).option(
+                n_opt,
+                opt.value,
+            )
+            cu.remove_option(o_sect, o_opt)
+
+        # Move the option and comments.
+        else:
+            opt = cu.get(o_sect, o_opt)
+            blocks = []
+            prev_block = opt.previous_block
+            while prev_block is not None:
+                if not isinstance(prev_block, (Comment, Space)):
+                    break
+                # prime the next block to inspect.
+                np_block = prev_block.previous_block
+                # detach this block for reuse.
+                block = prev_block.detach()
+                blocks.append(block)
+                # move on to the next block.
+                prev_block = np_block
+
+            # Remove the old option, add new with the same value.
+            cu.remove_option(o_sect, o_opt)
+            cu[n_sect][n_opt] = opt.value
+            # Add the comments to the new option.
+            blocks.reverse()
+            for block in blocks:
+                if isinstance(block, Comment):
+                    cu[n_sect][n_opt].add_before.comment(str(block))
+                if isinstance(block, Space):
+                    cu[n_sect][n_opt].add_before.space(len(block.lines))
+
+    def update_config_options(self) -> None:
+        """
+        Uses ConfigUpdater to find mapped options and rename them.
+        """
+        try:
+            cu = configupdater.ConfigUpdater()
+            cu.optionxform = str  # type: ignore
+            cu.read(self._cfg_file, encoding="utf8")
+
+            updates = 0
+            for item in self._remap:
+                if cu.has_option(item[0], item[1]):
+                    updates += 1
+                    self._handle_remap_item(cu, item)
+
+            if updates:
+                log.debug("Upgrading config file with renamed options...")
+                # Ensure some spacing exists at the end of sections.
+                for sect in cu.iter_sections():
+                    if not isinstance(sect.last_block, Space):
+                        sect.add_after.space(2)
+
+                # write the changes to file.
+                cu.update_file()
+
+        except (
+            OSError,
+            AttributeError,
+            configparser.DuplicateOptionError,
+            configparser.DuplicateSectionError,
+            configparser.ParsingError,
+        ):
+            log.exception(
+                "Failed to upgrade config.  You'll need to upgrade it manually."
+            )
 
 
 class Blocklist:
