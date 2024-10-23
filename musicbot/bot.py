@@ -124,6 +124,24 @@ CommandResponse = Union[Response, None]
 
 log = logging.getLogger(__name__)
 
+# Set up discord permissions needed by the bot. Used in auth/invite links.
+# We could use the bitmask to save lines, but this documents which perms are needed.
+# Bitmask:  4365610048
+discord_bot_perms = discord.Permissions()
+discord_bot_perms.change_nickname = True
+discord_bot_perms.view_channel = True
+discord_bot_perms.send_messages = True
+discord_bot_perms.manage_messages = True
+discord_bot_perms.embed_links = True
+discord_bot_perms.attach_files = True
+discord_bot_perms.read_message_history = True
+discord_bot_perms.use_external_emojis = True
+discord_bot_perms.add_reactions = True
+discord_bot_perms.connect = True
+discord_bot_perms.speak = True
+discord_bot_perms.request_to_speak = True
+
+
 # TODO:  add an aliases command to manage command aliases.
 # TODO:  add support for local file playback via indexed data.
 #  --  Using tinytag to extract meta data from files and index it.
@@ -732,7 +750,7 @@ class MusicBot(discord.Client):
     async def generate_invite_link(
         self,
         *,
-        permissions: discord.Permissions = discord.Permissions(70380544),
+        permissions: discord.Permissions = discord_bot_perms,
         guild: discord.Guild = discord.utils.MISSING,
     ) -> str:
         """
