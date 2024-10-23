@@ -242,9 +242,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 aopts = f"-af atempo={self.playback_speed:.3f}"
 
         if aopts:
-            return f"{aopts} -vn"
+            return aopts
 
-        return "-vn"
+        return ""
 
     @property
     def boptions(self) -> str:
@@ -959,9 +959,9 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
                 aopts = f"-af atempo={self.playback_speed:.3f}"
 
         if aopts:
-            return f"{aopts} -vn"
+            return aopts
 
-        return "-vn"
+        return ""
 
     @property
     def boptions(self) -> str:

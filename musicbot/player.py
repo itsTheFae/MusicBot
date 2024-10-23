@@ -9,7 +9,7 @@ from enum import Enum
 from threading import Thread
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
-from discord import AudioSource, FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
+from discord import AudioSource, FFmpegOpusAudio, FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 
 from .constructs import Serializable, Serializer, SkipState
 from .entry import LocalFilePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
@@ -26,6 +26,7 @@ else:
 
 # Type alias
 EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry, LocalFilePlaylistEntry]
+FFmpegSources = Union[PCMVolumeTransformer[FFmpegPCMAudio], FFmpegOpusAudio]
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ class MusicPlayerState(Enum):
 class SourcePlaybackCounter(AudioSource):
     def __init__(
         self,
-        source: PCMVolumeTransformer[FFmpegPCMAudio],
+        source: FFmpegSources,
         start_time: float = 0,
         playback_speed: float = 1.0,
     ) -> None:
@@ -149,7 +150,9 @@ class MusicPlayer(EventEmitter, Serializable):
         """
         self._volume = value
         if self._source:
-            self._source._source.volume = value
+            if isinstance(self._source._source, PCMVolumeTransformer):
+                self._source._source.volume = value
+            # if isinstance(self._source._source, FFmpegOpusAudio):
 
     def on_entry_added(
         self, playlist: "Playlist", entry: EntryTypes, defer_serialize: bool = False
@@ -399,14 +402,13 @@ class MusicPlayer(EventEmitter, Serializable):
                 self._kill_current_player()
 
                 boptions = "-nostdin"
-                # aoptions = "-vn -b:a 192k"
+                aoptions = "-vn -sn -dn"  # "-b:a 192k"
                 if isinstance(entry, (URLPlaylistEntry, LocalFilePlaylistEntry)):
-                    aoptions = entry.aoptions
+                    if entry.aoptions:
+                        aoptions += f" {entry.aoptions}"
                     # check for before options, currently just -ss here.
                     if entry.boptions:
                         boptions += f" {entry.boptions}"
-                else:
-                    aoptions = "-vn"
 
                 log.ffmpeg(  # type: ignore[attr-defined]
                     "Creating player with options: %s %s %s",
@@ -417,8 +419,17 @@ class MusicPlayer(EventEmitter, Serializable):
 
                 stderr_io = io.BytesIO()
 
-                self._source = SourcePlaybackCounter(
-                    PCMVolumeTransformer(
+                if self.bot.config.use_opus_probe:
+                    # volume can only be adjusted via ffmpeg args in Opus.
+                    aoptions += f" -af 'volume={self.volume:.3f}'"
+                    source: FFmpegSources = await FFmpegOpusAudio.from_probe(
+                        entry.filename,
+                        before_options=boptions,
+                        options=aoptions,
+                        stderr=stderr_io,
+                    )
+                else:
+                    source = PCMVolumeTransformer(
                         FFmpegPCMAudio(
                             entry.filename,
                             before_options=boptions,
@@ -426,7 +437,10 @@ class MusicPlayer(EventEmitter, Serializable):
                             stderr=stderr_io,
                         ),
                         self.volume,
-                    ),
+                    )
+
+                self._source = SourcePlaybackCounter(
+                    source,
                     start_time=entry.start_time,
                     playback_speed=entry.playback_speed,
                 )
