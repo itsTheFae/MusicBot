@@ -42,7 +42,7 @@ DEFAULT_PERMS_GROUP_NAME: str = "Default"
 # Meaning discord API and spotify API communications.
 # NOT used by ytdlp, they have a dynamic UA selection feature.
 MUSICBOT_USER_AGENT_AIOHTTP: str = f"MusicBot/{VERSION}"
-
+MUSICBOT_GIT_URL: str = "https://github.com/Just-Some-Bots/MusicBot/"
 
 # File path constants
 DEFAULT_OPTIONS_FILE: str = "config/options.ini"
@@ -149,6 +149,10 @@ YTDLP_OAUTH2_CLIENTS: List[str] = ["mweb"]
 # Discord and other API constants
 DISCORD_MSG_CHAR_LIMIT: int = 2000
 
+# Embed specifics
+MUSICBOT_EMBED_COLOR_NORMAL: str = "#7289DA"
+MUSICBOT_EMBED_COLOR_ERROR: str = "#CC0000"
+
 
 EMOJI_CHECK_MARK_BUTTON: str = "\u2705"
 EMOJI_CROSS_MARK_BUTTON: str = "\u274E"
@@ -160,3 +164,8 @@ EMOJI_LAST_ICON: str = "\u23ED\uFE0F"  # next track button
 EMOJI_FIRST_ICON: str = "\u23EE\uFE0F"  # last track button
 EMOJI_NEXT_ICON: str = "\u23E9"  # fast-forward button
 EMOJI_PREV_ICON: str = "\u23EA"  # rewind button
+EMOJI_RESTART_SOFT: str = "\u21A9\uFE0F"  # Right arrow curving left
+EMOJI_RESTART_FULL: str = "\U0001F504"  # counterclockwise arrows
+EMOJI_UPDATE_PIP: str = "\U0001F4E6"  # package / box
+EMOJI_UPDATE_GIT: str = "\U0001F5C3\uFE0F"  # card box
+EMOJI_UPDATE_ALL: str = "\U0001F310"  # globe with meridians

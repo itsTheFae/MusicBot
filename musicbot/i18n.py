@@ -54,7 +54,9 @@ def _Ln(msg: str, plural: str, n: int) -> str:  # pylint: disable=invalid-name
     return msg
 
 
-def _D(msg: str, ssd: "GuildSpecificData") -> str:  # pylint: disable=invalid-name
+def _D(  # pylint: disable=invalid-name
+    msg: str, ssd: Optional["GuildSpecificData"]
+) -> str:
     """
     Marks strings for translation as part of discord domain.
     Is a shorthand for I18n.sgettext() in the discord domain.
@@ -66,7 +68,7 @@ def _D(msg: str, ssd: "GuildSpecificData") -> str:  # pylint: disable=invalid-na
 
 
 def _Dn(  # pylint: disable=invalid-name
-    msg: str, plural: str, n: int, ssd: "GuildSpecificData"
+    msg: str, plural: str, n: int, ssd: Optional["GuildSpecificData"]
 ) -> str:
     """
     Marks strings for translation as part of discord domain.
@@ -286,18 +288,25 @@ class I18n:
 
         return t
 
-    def get_guild_translation(self, ssd: "GuildSpecificData") -> Translations:
+    def get_discord_translation(
+        self, ssd: Optional["GuildSpecificData"]
+    ) -> Translations:
         """
         Get a translation object for the given `lang` in the discord message domain.
         If the language is not available a fallback from msg_langs will be used.
         """
+        # Guild 0 is a fall-back used by non-guild messages.
+        guild_id = 0
+        if ssd:
+            guild_id = ssd.guild_id
+
         # return mapped translations, to avoid lookups.
-        if ssd.guild_id in self._discord_langs:
-            return self._discord_langs[ssd.guild_id]
+        if guild_id in self._discord_langs:
+            return self._discord_langs[guild_id]
 
         # add selected lang as first option.
         msg_langs = self.msg_langs
-        if ssd.lang_code:
+        if ssd and ssd.lang_code:
             msg_langs.insert(0, ssd.lang_code.lower())
 
         # get the translations object.
@@ -308,7 +317,7 @@ class I18n:
             fallback=True,
         )
         # add object to the mapping.
-        self._discord_langs[ssd.guild_id] = tl
+        self._discord_langs[guild_id] = tl
 
         # warn for missing translations.
         if isinstance(tl, gettext.NullTranslations):
@@ -327,12 +336,12 @@ class I18n:
         if guild_id in self._discord_langs:
             del self._discord_langs[guild_id]
 
-    def sgettext(self, msg: str, ssd: "GuildSpecificData") -> str:
+    def sgettext(self, msg: str, ssd: Optional["GuildSpecificData"]) -> str:
         """
         Fetch the translation object using server specific data and provide
         gettext() call for the guild's language.
         """
-        t = self.get_guild_translation(ssd)
+        t = self.get_discord_translation(ssd)
         return t.gettext(msg)
 
     def sngettext(
@@ -342,7 +351,7 @@ class I18n:
         Fetch the translation object using server specific data and provide
         ngettext() call for the guild's language.
         """
-        t = self.get_guild_translation(ssd)
+        t = self.get_discord_translation(ssd)
         return t.ngettext(signular, plural, n)
 
     def install(self) -> None:

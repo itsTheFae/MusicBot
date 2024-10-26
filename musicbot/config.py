@@ -298,7 +298,9 @@ class Config:
             dest="no_nowplaying_auto",
             default=ConfigDefaults.no_nowplaying_auto,
             getter="getboolean",
-            comment=_X("Disable now playing messages for songs played via auto playlist."),
+            comment=_X(
+                "Disable now playing messages for songs played via auto playlist."
+            ),
         )
         self.nowplaying_channels: Set[int] = self.register.init_option(
             section="Chat",
@@ -375,7 +377,9 @@ class Config:
             dest="save_videos",
             default=ConfigDefaults.save_videos,
             getter="getboolean",
-            comment=_X("Allow MusicBot to keep downloaded media, or delete it right away."),
+            comment=_X(
+                "Allow MusicBot to keep downloaded media, or delete it right away."
+            ),
         )
         self.storage_limit_bytes: int = self.register.init_option(
             section="MusicBot",
@@ -384,7 +388,9 @@ class Config:
             default=ConfigDefaults.storage_limit_bytes,
             getter="getdatasize",
             # TRANSLATORS: SaveVideos is not translated.
-            comment=_X("If SaveVideos is enabled, set a limit on how much storage space should be used."),
+            comment=_X(
+                "If SaveVideos is enabled, set a limit on how much storage space should be used."
+            ),
         )
         self.storage_limit_days: int = self.register.init_option(
             section="MusicBot",
@@ -393,7 +399,9 @@ class Config:
             default=ConfigDefaults.storage_limit_days,
             getter="getint",
             # TRANSLATORS: SaveVideos should not be translated.
-            comment=_X("If SaveVideos is enabled, set a limit on how long files should be kept."),
+            comment=_X(
+                "If SaveVideos is enabled, set a limit on how long files should be kept."
+            ),
         )
         self.storage_retain_autoplay: bool = self.register.init_option(
             section="MusicBot",
@@ -402,7 +410,9 @@ class Config:
             default=ConfigDefaults.storage_retain_autoplay,
             getter="getboolean",
             # TRANSLATORS: SaveVideos should not be translated
-            comment=_X("If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."),
+            comment=_X(
+                "If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."
+            ),
         )
         self.now_playing_mentions: bool = self.register.init_option(
             section="MusicBot",
@@ -428,7 +438,9 @@ class Config:
             dest="auto_playlist",
             default=ConfigDefaults.auto_playlist,
             getter="getboolean",
-            comment=_X("Enable MusicBot to automatically play music from the auto playlist when the queue is empty."),
+            comment=_X(
+                "Enable MusicBot to automatically play music from the auto playlist when the queue is empty."
+            ),
         )
         self.auto_playlist_random: bool = self.register.init_option(
             section="MusicBot",
@@ -456,7 +468,9 @@ class Config:
             dest="auto_playlist_remove_on_block",
             default=ConfigDefaults.auto_playlist_remove_on_block,
             getter="getboolean",
-            comment=_X("Remove songs from the auto playlist if they are found in the song blocklist."),
+            comment=_X(
+                "Remove songs from the auto playlist if they are found in the song blocklist."
+            ),
         )
         self.auto_pause: bool = self.register.init_option(
             section="MusicBot",
@@ -472,25 +486,52 @@ class Config:
             dest="delete_messages",
             default=ConfigDefaults.delete_messages,
             getter="getboolean",
-            comment=_X("Allow MusicBot to automatically delete messages it sends, after a short delay."),
+            # TRANSLATORS: DeleteDelayShort and DeleteDelayLong should not be translated.
+            comment=_X(
+                "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
+                "Delay period is controlled by DeleteDelayShort and DeleteDelayLong."
+            ),
         )
-        # TODO:  add a means of setting the above delay period.
-        # The DeleteInvoking should be tied to this same delay.
         self.delete_invoking: bool = self.register.init_option(
             section="MusicBot",
             option="DeleteInvoking",
             dest="delete_invoking",
             default=ConfigDefaults.delete_invoking,
             getter="getboolean",
-            comment=_X("Auto delete valid commands after a short delay."),
+            comment=_X("Auto delete valid commands after a delay."),
         )
+        self.delete_delay_short: float = self.register.init_option(
+            section="MusicBot",
+            option="DeleteDelayShort",
+            dest="delete_invoking",
+            default=ConfigDefaults.delete_delay_short,
+            getter="getduration",
+            comment=_X(
+                "Sets the short period of seconds before deleting messages.\n"
+                "This period is used by messages that require no further interaction."
+            ),
+        )
+        self.delete_delay_long: float = self.register.init_option(
+            section="MusicBot",
+            option="DeleteDelayLong",
+            dest="delete_invoking",
+            default=ConfigDefaults.delete_delay_long,
+            getter="getduration",
+            comment=_X(
+                "Sets the long delay period before deleting messages.\n"
+                "This period is used by interactive or long-winded messages, like search and help."
+            ),
+        )
+
         self.persistent_queue: bool = self.register.init_option(
             section="MusicBot",
             option="PersistentQueue",
             dest="persistent_queue",
             default=ConfigDefaults.persistent_queue,
             getter="getboolean",
-            comment=_X("Allow MusicBot to save the song queue, so queued songs will survive restarts."),
+            comment=_X(
+                "Allow MusicBot to save the song queue, so queued songs will survive restarts."
+            ),
         )
         self.pre_download_next_song: bool = self.register.init_option(
             section="MusicBot",
@@ -529,7 +570,9 @@ class Config:
             dest="status_include_paused",
             default=ConfigDefaults.status_include_paused,
             getter="getboolean",
-            comment=_X("If enabled, status messages will report info on paused players."),
+            comment=_X(
+                "If enabled, status messages will report info on paused players."
+            ),
         )
         self.write_current_song: bool = self.register.init_option(
             section="MusicBot",
@@ -538,7 +581,9 @@ class Config:
             default=ConfigDefaults.write_current_song,
             getter="getboolean",
             # TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
-            comment=_X("If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"),
+            comment=_X(
+                "If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"
+            ),
         )
         self.allow_author_skip: bool = self.register.init_option(
             section="MusicBot",
@@ -546,7 +591,9 @@ class Config:
             dest="allow_author_skip",
             default=ConfigDefaults.allow_author_skip,
             getter="getboolean",
-            comment=_X("Allow the member who requested the song to skip it, bypassing votes."),
+            comment=_X(
+                "Allow the member who requested the song to skip it, bypassing votes."
+            ),
         )
         self.use_experimental_equalization: bool = self.register.init_option(
             section="MusicBot",
@@ -573,7 +620,9 @@ class Config:
             dest="queue_length",
             default=ConfigDefaults.queue_length,
             getter="getint",
-            comment=_X("The number of entries to show per-page when using q command to list the queue."),
+            comment=_X(
+                "The number of entries to show per-page when using q command to list the queue."
+            ),
         )
         self.remove_ap: bool = self.register.init_option(
             section="MusicBot",
@@ -581,7 +630,9 @@ class Config:
             dest="remove_ap",
             default=ConfigDefaults.remove_ap,
             getter="getboolean",
-            comment=_X("Enable MusicBot to automatically remove unplayable entries from tha auto playlist."),
+            comment=_X(
+                "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
+            ),
         )
         self.show_config_at_start: bool = self.register.init_option(
             section="MusicBot",
@@ -598,7 +649,9 @@ class Config:
             default=ConfigDefaults.legacy_skip,
             getter="getboolean",
             # TRANSLATORS: InstaSkip should not be translated.
-            comment=_X("Enable users with the InstaSkip permission to bypass skip voting and force skips."),
+            comment=_X(
+                "Enable users with the InstaSkip permission to bypass skip voting and force skips."
+            ),
         )
         self.leavenonowners: bool = self.register.init_option(
             section="MusicBot",
@@ -606,7 +659,9 @@ class Config:
             dest="leavenonowners",
             default=ConfigDefaults.leavenonowners,
             getter="getboolean",
-            comment=_X("If enabled, MusicBot will leave servers if the owner is not in their member list."),
+            comment=_X(
+                "If enabled, MusicBot will leave servers if the owner is not in their member list."
+            ),
         )
         self.usealias: bool = self.register.init_option(
             section="MusicBot",
@@ -636,7 +691,9 @@ class Config:
             dest="self_deafen",
             default=ConfigDefaults.self_deafen,
             getter="getboolean",
-            comment=_X("MusicBot will automatically deafen itself when entering a voice channel."),
+            comment=_X(
+                "MusicBot will automatically deafen itself when entering a voice channel."
+            ),
         )
         self.leave_inactive_channel: bool = self.register.init_option(
             section="MusicBot",
@@ -668,7 +725,9 @@ class Config:
             dest="leave_after_queue_empty",
             default=ConfigDefaults.leave_after_queue_empty,
             getter="getboolean",
-            comment=_X("If enabled, MusicBot will leave the channel immediately when the song queue is empty."),
+            comment=_X(
+                "If enabled, MusicBot will leave the channel immediately when the song queue is empty."
+            ),
         )
         self.leave_player_inactive_for: float = self.register.init_option(
             section="MusicBot",
@@ -764,7 +823,10 @@ class Config:
             comment=_X(
                 "Enable saving songs played per-server to a playlist file:  %(basename)s[Server ID]%(ext)s"
             ),
-            comment_args={"basename": f"{DEFAULT_PLAYLIST_DIR}{hist_file.stem}", "ext": hist_file.suffix},
+            comment_args={
+                "basename": f"{DEFAULT_PLAYLIST_DIR}{hist_file.stem}",
+                "ext": hist_file.suffix,
+            },
         )
 
         self.enable_local_media: bool = self.register.init_option(
@@ -787,7 +849,9 @@ class Config:
             dest="auto_unpause_on_play",
             default=ConfigDefaults.auto_unpause_on_play,
             getter="getboolean",
-            comment=_X("Allow MusicBot to automatically unpause when play commands are used."),
+            comment=_X(
+                "Allow MusicBot to automatically unpause when play commands are used."
+            ),
         )
 
         # This is likely to turn into one option for each separate part.
@@ -866,7 +930,9 @@ class Config:
             dest="user_blocklist_enabled",
             default=ConfigDefaults.user_blocklist_enabled,
             getter="getboolean",
-            comment=_X("Toggle the user block list feature, without emptying the block list."),
+            comment=_X(
+                "Toggle the user block list feature, without emptying the block list."
+            ),
         )
         self.user_blocklist_file: pathlib.Path = self.register.init_option(
             section="Files",
@@ -874,7 +940,9 @@ class Config:
             dest="user_blocklist_file",
             default=ConfigDefaults.user_blocklist_file,
             getter="getpathlike",
-            comment=_X("An optional file path to a text file listing Discord User IDs, one per line."),
+            comment=_X(
+                "An optional file path to a text file listing Discord User IDs, one per line."
+            ),
         )
         self.user_blocklist: UserBlocklist = UserBlocklist(self.user_blocklist_file)
 
@@ -884,7 +952,9 @@ class Config:
             dest="song_blocklist_enabled",
             default=ConfigDefaults.song_blocklist_enabled,
             getter="getboolean",
-            comment=_X("Enable the song block list feature, without emptying the block list."),
+            comment=_X(
+                "Enable the song block list feature, without emptying the block list."
+            ),
         )
         self.song_blocklist_file: pathlib.Path = self.register.init_option(
             section="Files",
@@ -945,7 +1015,9 @@ class Config:
             dest="audio_cache_path",
             default=ConfigDefaults.audio_cache_path,
             getter="getpathlike",
-            comment=_X("An optional directory path where MusicBot will store long and short-term cache for playback."),
+            comment=_X(
+                "An optional directory path where MusicBot will store long and short-term cache for playback."
+            ),
         )
 
         # TODO: i18n, allow i18n format args here.
@@ -1240,7 +1312,9 @@ class Config:
             else:
                 self.register.write_default_ini(pathlib.Path(EXAMPLE_OPTIONS_FILE))
                 shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
-                log.warning("Generated a new example_options.ini and copied it to options.ini")
+                log.warning(
+                    "Generated a new example_options.ini and copied it to options.ini"
+                )
 
         # load the config and check if settings are configured.
         if not config.read(self.config_file, encoding="utf-8"):
@@ -1375,6 +1449,8 @@ class ConfigDefaults:
     auto_pause: bool = True
     delete_messages: bool = True
     delete_invoking: bool = False
+    delete_delay_short: float = 30.0
+    delete_delay_long: float = 60.0
     persistent_queue: bool = True
     status_message: str = ""
     status_include_paused: bool = False

@@ -532,7 +532,7 @@ class PermissionGroup:
 
         :param: command:  The command name to test.
         :param: sub:      The sub-command argument of the command being tested.
-        
+
         :returns:  boolean:  False if not allowed, True otherwise.
         """
         csub = f"{command}_{sub}"
@@ -541,20 +541,33 @@ class PermissionGroup:
             terms.append(csub)
 
         if not self.advanced_commandlists:
-            if self.command_whitelist and all(c not in self.command_whitelist for c in terms):
+            if self.command_whitelist and all(
+                c not in self.command_whitelist for c in terms
+            ):
                 return False
-            
-            if self.command_blacklist and any(c in self.command_blacklist for c in terms):
+
+            if self.command_blacklist and any(
+                c in self.command_blacklist for c in terms
+            ):
                 return False
 
         else:
-            if self.command_whitelist and all(x not in self.command_whitelist for x in terms):
+            if self.command_whitelist and all(
+                x not in self.command_whitelist for x in terms
+            ):
                 return False
 
-            if sub and command in self.command_whitelist and csub in self.command_blacklist:
+            if (
+                sub
+                and command in self.command_whitelist
+                and csub in self.command_blacklist
+            ):
                 return False
 
-            if any(c in self.command_blacklist and c in self.command_whitelist for c in terms):
+            if any(
+                c in self.command_blacklist and c in self.command_whitelist
+                for c in terms
+            ):
                 return False
         return True
 
@@ -731,8 +744,10 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
             raise RuntimeError("Dev bug, Permissions object expcted.")
 
         if DEFAULT_OWNER_GROUP_NAME not in self._config.groups:
-            self._config.groups[DEFAULT_OWNER_GROUP_NAME] = self._config._generate_permissive_group(
-                DEFAULT_OWNER_GROUP_NAME
+            self._config.groups[DEFAULT_OWNER_GROUP_NAME] = (
+                self._config._generate_permissive_group(  # pylint: disable=protected-access
+                    DEFAULT_OWNER_GROUP_NAME
+                )
             )
         if DEFAULT_PERMS_GROUP_NAME not in self._config.groups:
             self._config.add_group(DEFAULT_PERMS_GROUP_NAME)
@@ -748,7 +763,10 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
             # create the comment documentation and fill in defaults for each section.
             docs = ""
             for opt in self.option_list:
-                if opt.section not in [DEFAULT_OWNER_GROUP_NAME, DEFAULT_PERMS_GROUP_NAME]:
+                if opt.section not in [
+                    DEFAULT_OWNER_GROUP_NAME,
+                    DEFAULT_PERMS_GROUP_NAME,
+                ]:
                     continue
                 dval = self.to_ini(opt, use_default=True)
                 cu[opt.section][opt.option] = dval
@@ -757,7 +775,9 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
                         comment = opt.comment % opt.comment_args
                     else:
                         comment = opt.comment
-                    comment = "".join(f"    {c}\n" for c in comment.split("\n")).rstrip()
+                    comment = "".join(
+                        f"    {c}\n" for c in comment.split("\n")
+                    ).rstrip()
                     docs += f" {opt.option} = {dval}\n{comment}\n\n"
 
             # add comments to head of file.
@@ -783,7 +803,7 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
                 adder.comment(line, comment_prefix=";")
             adder.space()
             adder.space()
-            
+
             # add owner section comment
             owner_comment = (
                 "This permission group is used by the Owner only, and cannot be edited at all.\n"
@@ -816,5 +836,3 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
         ):
             log.exception("Failed to save default INI file at:  %s", filename)
             return False
-
-

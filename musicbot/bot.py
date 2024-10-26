@@ -14,6 +14,7 @@ import ssl
 import sys
 import time
 import traceback
+import uuid
 from collections import defaultdict
 from io import BytesIO, StringIO
 from textwrap import dedent
@@ -45,17 +46,22 @@ from .constants import (
     EMOJI_IDLE_ICON,
     EMOJI_NEXT_ICON,
     EMOJI_PREV_ICON,
+    EMOJI_RESTART_FULL,
+    EMOJI_RESTART_SOFT,
     EMOJI_STOP_SIGN,
+    EMOJI_UPDATE_ALL,
+    EMOJI_UPDATE_GIT,
+    EMOJI_UPDATE_PIP,
     FALLBACK_PING_SLEEP,
     FALLBACK_PING_TIMEOUT,
     MUSICBOT_USER_AGENT_AIOHTTP,
 )
 from .constants import VERSION as BOTVERSION
 from .constants import VOICE_CLIENT_MAX_RETRY_CONNECT, VOICE_CLIENT_RECONNECT_TIMEOUT
-from .constructs import GuildSpecificData, Response
+from .constructs import ErrorResponse, GuildSpecificData, MusicBotResponse, Response
 from .entry import LocalFilePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
 from .filecache import AudioFileCache
-from .i18n import _L
+from .i18n import _D, _L
 from .json import I18nJson  # TODO: remove this
 from .logs import muffle_discord_console_log, mute_discord_console_log
 from .opus_loader import load_opus_lib
@@ -120,7 +126,7 @@ MessageAuthor = Union[
 ]
 UserMentions = List[Union[discord.Member, discord.User]]
 EntryTypes = Union[URLPlaylistEntry, StreamPlaylistEntry, LocalFilePlaylistEntry]
-CommandResponse = Union[Response, None]
+CommandResponse = Union[None, MusicBotResponse, Response, ErrorResponse]
 
 log = logging.getLogger(__name__)
 
@@ -702,28 +708,6 @@ class MusicBot(discord.Client):
                 )
         log.info("Finished joining configured channels.")
 
-    async def _wait_delete_msg(
-        self, message: discord.Message, after: Union[int, float]
-    ) -> None:
-        """
-        Uses asyncio.sleep to delay a call to safe_delete_message but
-        does not check if the bot can delete a message or if it has
-        already been deleted before trying to delete it anyway.
-        """
-        try:
-            await asyncio.sleep(after)
-        except asyncio.CancelledError:
-            log.warning(
-                "Cancelled delete for message (ID: %s):  %s",
-                message.id,
-                message.content,
-            )
-            return
-
-        if not self.is_closed():
-
-            await self.safe_delete_message(message, quiet=True)
-
     async def _check_ignore_non_voice(self, msg: discord.Message) -> bool:
         """Check used by on_message to determine if caller is in a VoiceChannel."""
         if msg.guild and msg.guild.me.voice:
@@ -1158,7 +1142,7 @@ class MusicBot(discord.Client):
         np_channel: Optional[MessageableChannel] = None
         if newmsg:
             if self.config.dm_nowplaying and entry.author:
-                await self.safe_send_message(entry.author, newmsg)
+                await self.safe_send_message(entry.author, Response(newmsg))
                 return
 
             if self.config.no_nowplaying_auto and entry.from_auto_playlist:
@@ -1180,21 +1164,20 @@ class MusicBot(discord.Client):
             if not np_channel and last_np_msg:
                 np_channel = last_np_msg.channel
 
-        content = self._gen_embed()
-        if self.config.embeds:
-            if entry.thumbnail_url:
-                content.set_image(url=entry.thumbnail_url)
-            else:
-                log.warning(
-                    "No thumbnail set for entry with url: %s",
-                    entry.url,
-                )
+        content = Response("")
+        if entry.thumbnail_url:
+            content.set_image(url=entry.thumbnail_url)
+        else:
+            log.warning(
+                "No thumbnail set for entry with url: %s",
+                entry.url,
+            )
 
-            if self.config.now_playing_mentions:
-                content.title = None
-                content.add_field(name="\n", value=newmsg, inline=True)
-            else:
-                content.title = newmsg
+        if self.config.now_playing_mentions:
+            content.title = None
+            content.add_field(name="\n", value=newmsg, inline=True)
+        else:
+            content.title = newmsg
 
         # send it in specified channel
         if not np_channel:
@@ -1220,8 +1203,7 @@ class MusicBot(discord.Client):
 
         self.server_data[guild.id].last_np_msg = await self.safe_send_message(
             np_channel,
-            content if self.config.embeds else newmsg,
-            expire_in=30 if self.config.delete_nowplaying else 0,
+            content,
         )
 
         # TODO: Check channel voice state?
@@ -1349,8 +1331,9 @@ class MusicBot(discord.Client):
                     await self.safe_send_message(
                         channel,
                         # TODO: i18n UI stuff.
-                        f"Skipping songs added by {author.name} as they are not in voice!",
-                        expire_in=60,
+                        Response(
+                            f"Skipping songs added by {author.name} as they are not in voice!"
+                        ),
                     )
                     notice_sent = True
                 deleted_entry = player.playlist.delete_entry_at_index(0)
@@ -1563,8 +1546,10 @@ class MusicBot(discord.Client):
             await self.safe_send_message(
                 entry.channel,
                 # TODO: i18n / UI stuff
-                f"Playback failed for song: `{song}` due to error:\n```\n{ex}\n```",
-                expire_in=90,
+                Response(
+                    f"Playback failed for song: `{song}` due to error:\n```\n{ex}\n```",
+                    delete_after=self.config.delete_delay_long,
+                ),
             )
 
         # Take care of auto-playlist related issues.
@@ -1791,8 +1776,7 @@ class MusicBot(discord.Client):
     async def safe_send_message(
         self,
         dest: discord.abc.Messageable,
-        content: Union[str, discord.Embed],
-        **kwargs: Any,
+        content: MusicBotResponse,
     ) -> Optional[discord.Message]:
         """
         Safely send a message with given `content` to the message-able
@@ -1800,56 +1784,82 @@ class MusicBot(discord.Client):
         This method should handle all raised exceptions so callers will
         not need to handle them locally.
 
-        :param: tts:  set the Text-to-Speech flag on the message.
-        :param: quiet:  Toggle using log.debug or log.warning.
-        :param: expire_in:  time in seconds to wait before auto deleting this message
-        :param: allow_none:  Allow sending a message with empty `content`
-        :param: also_delete:  Optional discord.Message to delete when `expire_in` is set.
+        :param: dest:     A channel, user, or other discord.abc.Messageable object.
+        :param: content:  A MusicBotMessage such as Response or ErrorResponse.
 
         :returns:  May return a discord.Message object if a message was sent.
         """
-        tts = kwargs.pop("tts", False)
-        quiet = kwargs.pop("quiet", False)
-        expire_in = int(kwargs.pop("expire_in", 0))
-        allow_none = kwargs.pop("allow_none", True)
-        also_delete = kwargs.pop("also_delete", None)
-        fallback_channel = kwargs.pop("fallback_channel", None)
+        if not isinstance(content, MusicBotResponse):
+            log.error(
+                "Cannot send non-reponse object:  %r",
+                content,
+                exc_info=self.config.debug_mode,
+            )
+            raise exceptions.MusicbotException(
+                "[Dev Bug] Tried sending an invalid response object."
+            )
+
+        fallback_channel = content.sent_from
+        delete_after = content.delete_after
+        reply_to = content.reply_to
+
+        # set the default delete delay to configured short delay.
+        if delete_after is None:
+            delete_after = self.config.delete_delay_short
 
         msg = None
         retry_after = 0.0
-        lfunc = log.debug if quiet else log.warning
-        if log.getEffectiveLevel() <= logging.NOISY:  # type: ignore[attr-defined]
-            lfunc = log.exception
+        send_kws: Dict[str, Any] = {}
 
         ch_name = "DM-Channel"
         if hasattr(dest, "name"):
             ch_name = str(dest.name)
 
+        if reply_to and reply_to.channel == dest:
+            send_kws["reference"] = reply_to
+            send_kws["mention_author"] = True
+
+        if content.files:
+            send_kws["files"] = content.files
+
         try:
-            if content is not None or allow_none:
-                if isinstance(content, discord.Embed):
-                    msg = await dest.send(embed=content)
-                else:
-                    msg = await dest.send(content, tts=tts)
+            if self.config.embeds and not content.force_text:
+                log.debug("sending embed to: %s", dest)
+                msg = await dest.send(embed=content, **send_kws)
+            else:
+                log.debug("sending text to: %s", dest)
+                msg = await dest.send(content.to_markdown(), **send_kws)
 
         except discord.Forbidden:
-            lfunc('Cannot send message to "%s", no permission', ch_name)
+            log.error(
+                'Cannot send message to "%s", no permission',
+                ch_name,
+                exc_info=self.config.debug_mode,
+            )
 
         except discord.NotFound:
-            lfunc('Cannot send message to "%s", invalid channel?', ch_name)
+            log.error(
+                'Cannot send message to "%s", invalid or deleted channel',
+                ch_name,
+                exc_info=self.config.debug_mode,
+            )
 
         except discord.HTTPException as e:
             if len(content) > DISCORD_MSG_CHAR_LIMIT:
-                lfunc(
+                log.error(
                     "Message is over the message size limit (%s)",
                     DISCORD_MSG_CHAR_LIMIT,
+                    exc_info=self.config.debug_mode,
                 )
 
             # if `dest` is a user with strict privacy or a bot, direct message can fail.
             elif e.code == 50007 and fallback_channel:
-                log.debug("DM failed, sending in fallback channel instead.")
-                await self.safe_send_message(fallback_channel, content, **kwargs)
+                log.debug(
+                    "Could not send private message, sending in fallback channel instead."
+                )
+                await self.safe_send_message(fallback_channel, content)
 
+            # If we got rate-limited, retry using the retry-after api header.
             elif e.status == 429:
                 # Note:  `e.response` could be either type:  aiohttp.ClientResponse  OR  requests.Response
                 # thankfully both share a similar enough `response.headers` member CI Dict.
@@ -1871,32 +1881,31 @@ class MusicBot(discord.Client):
                     except asyncio.CancelledError:
                         log.warning("Cancelled message retry for:  %s", content)
                         return msg
-                    return await self.safe_send_message(dest, content, **kwargs)
+                    return await self.safe_send_message(dest, content)
 
-                log.error("Rate limited send message, but cannot retry!")
+                log.error(
+                    "Rate limited send message, but cannot retry!",
+                    exc_info=self.config.debug_mode,
+                )
 
             else:
-                lfunc("Failed to send message")
-                log.noise(  # type: ignore[attr-defined]
-                    "Got HTTPException trying to send message to %s: %s", dest, content
+                log.error(
+                    "Failed to send message in fallback channel.",
+                    exc_info=self.config.debug_mode,
                 )
 
         except aiohttp.client_exceptions.ClientError:
-            lfunc("Failed to send due to an HTTP error.")
+            log.error("Failed to send due to an HTTP error.")
 
         finally:
-            if not retry_after and self.config.delete_messages:
-                if msg and expire_in:
-                    self.create_task(self._wait_delete_msg(msg, expire_in))
-
-            if not retry_after and self.config.delete_invoking:
-                if also_delete and isinstance(also_delete, discord.Message):
-                    self.create_task(self._wait_delete_msg(also_delete, expire_in))
+            if not retry_after and self.config.delete_messages and msg and delete_after:
+                self.create_task(self._wait_delete_msg(msg, delete_after))
 
         return msg
 
     async def safe_delete_message(
-        self, message: discord.Message, *, quiet: bool = False
+        self,
+        message: discord.Message,
     ) -> None:
         """
         Safely delete the given `message` from discord.
@@ -1906,16 +1915,17 @@ class MusicBot(discord.Client):
         :param: quiet:  Toggle using log.debug or log.warning
         """
         # TODO: this could use a queue and some other handling.
-        lfunc = log.debug if quiet else log.warning
 
         try:
             await message.delete()
 
         except discord.Forbidden:
-            lfunc('Cannot delete message "%s", no permission', message.clean_content)
+            log.warning(
+                'Cannot delete message "%s", no permission', message.clean_content
+            )
 
         except discord.NotFound:
-            lfunc(
+            log.warning(
                 'Cannot delete message "%s", message not found',
                 message.clean_content,
             )
@@ -1942,23 +1952,24 @@ class MusicBot(discord.Client):
                     log.error("Rate limited message delete, but cannot retry!")
 
             else:
-                lfunc("Failed to delete message")
+                log.warning("Failed to delete message")
                 log.noise(  # type: ignore[attr-defined]
                     "Got HTTPException trying to delete message: %s", message
                 )
 
         except aiohttp.client_exceptions.ClientError:
-            lfunc("Failed to send due to an HTTP error.")
+            log.error(
+                "Failed to send due to an HTTP error.", exc_info=self.config.debug_mode
+            )
 
         return None
 
     async def safe_edit_message(
         self,
         message: discord.Message,
-        new: Union[str, discord.Embed],
+        new: MusicBotResponse,
         *,
         send_if_fail: bool = False,
-        quiet: bool = False,
     ) -> Optional[discord.Message]:
         """
         Safely update the given `message` with the `new` content.
@@ -1970,8 +1981,6 @@ class MusicBot(discord.Client):
 
         :returns:  May return a discord.Message object if edit/send did not fail.
         """
-        lfunc = log.debug if quiet else log.warning
-
         try:
             if isinstance(new, discord.Embed):
                 return await message.edit(embed=new)
@@ -1979,12 +1988,12 @@ class MusicBot(discord.Client):
             return await message.edit(content=new)
 
         except discord.NotFound:
-            lfunc(
+            log.warning(
                 'Cannot edit message "%s", message not found',
                 message.clean_content,
             )
             if send_if_fail:
-                lfunc("Sending message instead")
+                log.warning("Sending message instead")
                 return await self.safe_send_message(message.channel, new)
 
         except discord.HTTPException as e:
@@ -2010,18 +2019,41 @@ class MusicBot(discord.Client):
                         log.warning("Cancelled message edit for:  %s", message)
                         return None
                     return await self.safe_edit_message(
-                        message, new, send_if_fail=send_if_fail, quiet=quiet
+                        message, new, send_if_fail=send_if_fail
                     )
             else:
-                lfunc("Failed to edit message")
+                log.warning("Failed to edit message")
                 log.noise(  # type: ignore[attr-defined]
                     "Got HTTPException trying to edit message %s to: %s", message, new
                 )
 
         except aiohttp.client_exceptions.ClientError:
-            lfunc("Failed to send due to an HTTP error.")
+            log.error(
+                "Failed to send due to an HTTP error.", exc_info=self.config.debug_mode
+            )
 
         return None
+
+    async def _wait_delete_msg(
+        self, message: discord.Message, after: Union[int, float]
+    ) -> None:
+        """
+        Uses asyncio.sleep to delay a call to safe_delete_message but
+        does not check if the bot can delete a message or if it has
+        already been deleted before trying to delete it anyway.
+        """
+        try:
+            await asyncio.sleep(after)
+        except asyncio.CancelledError:
+            log.warning(
+                "Cancelled delete for message (ID: %s):  %s",
+                message.id,
+                message.content,
+            )
+            return
+
+        if not self.is_closed():
+            await self.safe_delete_message(message)
 
     def _setup_windows_signal_handler(self) -> None:
         """
@@ -2803,7 +2835,7 @@ class MusicBot(discord.Client):
     async def cmd_help(
         self,
         message: discord.Message,
-        guild: discord.Guild,
+        guild: Optional[discord.Guild],
         command: Optional[str] = None,
     ) -> CommandResponse:
         """
@@ -2817,7 +2849,10 @@ class MusicBot(discord.Client):
         is_all = False
         is_emoji = False
         alias_of = ""
-        prefix = self.server_data[guild.id].command_prefix
+        if not guild:
+            prefix = self.config.command_prefix
+        else:
+            prefix = self.server_data[guild.id].command_prefix
         # Its OK to skip unicode emoji here, they render correctly inside of code boxes.
         emoji_regex = re.compile(r"^(<a?:.+:\d+>|:.+:)$")
         if emoji_regex.match(prefix):
@@ -2924,7 +2959,7 @@ class MusicBot(discord.Client):
                 ),
             )
 
-        return Response(desc, reply=True, delete_after=60)
+        return Response(desc, delete_after=60)
 
     @command_helper(
         # fmt: off
@@ -3033,7 +3068,6 @@ class MusicBot(discord.Client):
             n_users = len(self.config.user_blocklist) - old_len
             return Response(
                 f"{n_users} user(s) have been added to the block list.\n{status_msg}",
-                reply=True,
                 delete_after=10,
             )
 
@@ -3043,7 +3077,6 @@ class MusicBot(discord.Client):
                     "cmd-blacklist-none",
                     "None of those users are in the blacklist.",
                 ),
-                reply=True,
                 delete_after=10,
             )
 
@@ -3065,7 +3098,6 @@ class MusicBot(discord.Client):
         n_users = old_len - len(self.config.user_blocklist)
         return Response(
             f"{n_users} user(s) have been removed from the block list.\n{status_msg}",
-            reply=True,
             delete_after=10,
         )
 
@@ -3145,7 +3177,6 @@ class MusicBot(discord.Client):
             # TODO: i18n/UI stuff.
             return Response(
                 f"Added subject `{song_subject}` to the song block list.\n{status_msg}",
-                reply=True,
                 delete_after=10,
             )
 
@@ -3161,7 +3192,6 @@ class MusicBot(discord.Client):
 
         return Response(
             f"Subject `{song_subject}` has been removed from the block list.\n{status_msg}",
-            reply=True,
             delete_after=10,
         )
 
@@ -3366,7 +3396,6 @@ class MusicBot(discord.Client):
                 "cmd-joinserver-response",
                 "Click here to add me to another server: \n{}",
             ).format(url),
-            reply=True,
             delete_after=30,
         )
 
@@ -3559,11 +3588,12 @@ class MusicBot(discord.Client):
             player.resume()
             await self.safe_send_message(
                 channel,
-                self.str.get(
-                    "cmd-unpause-check",
-                    "Bot was previously paused, resuming playback now.",
+                Response(
+                    _D(
+                        "Bot was previously paused, resuming playback now.",
+                        self.server_data[player.voice_client.channel.guild.id],
+                    )
                 ),
-                expire_in=30,
             )
 
     @command_helper(
@@ -4019,11 +4049,14 @@ class MusicBot(discord.Client):
         # TODO:  replace this with a Response maybe.  UI stuff.
         await self.safe_send_message(
             channel,
-            self.str.get(
-                "cmd-move-success",
-                "Successfully moved the requested song from positon number {} in queue to position {}!",
-            ).format(indexes[0] + 1, indexes[1] + 1),
-            expire_in=30,
+            Response(
+                _D(
+                    "Successfully moved song from positon %(from) in queue to position %(to)s!",
+                    self.server_data[guild.id],
+                )
+                % {"from": indexes[0] + 1, "to": indexes[1] + 1},
+                expire_in=30,
+            ),
         )
 
         song = player.playlist.delete_entry_at_index(indexes[0])
@@ -4054,7 +4087,7 @@ class MusicBot(discord.Client):
         async def _prompt_for_playing(
             prompt: str, next_url: str, ignore_vid: str = ""
         ) -> None:
-            msg = await self.safe_send_message(channel, prompt)
+            msg = await self.safe_send_message(channel, Response(prompt))
             if not msg:
                 log.warning(
                     "Could not prompt for playlist playback, no message to add reactions to."
@@ -4142,25 +4175,8 @@ class MusicBot(discord.Client):
         if not player and permissions.summonplay and channel.guild:
             response = await self.cmd_summon(channel.guild, author, message)
             if response:
-                if self.config.embeds:
-                    content = self._gen_embed()
-                    content.title = "summon"
-                    content.description = str(response.content)
-                    await self.safe_send_message(
-                        channel,
-                        content,
-                        expire_in=(
-                            response.delete_after if self.config.delete_messages else 0
-                        ),
-                    )
-                else:
-                    await self.safe_send_message(
-                        channel,
-                        str(response.content),
-                        expire_in=(
-                            response.delete_after if self.config.delete_messages else 0
-                        ),
-                    )
+                # TODO: check if response is an error before sending.
+                await self.safe_send_message(channel, response)
                 player = self.get_player_in(channel.guild)
 
         if not player:
@@ -4359,8 +4375,7 @@ class MusicBot(discord.Client):
 
             log.debug("Added song(s) at position %s", position)
             if position == 1 and player.is_stopped:
-                position = self.str.get("cmd-play-next", "Up next!")
-                reply_text %= (btext, position)
+                reply_text %= (btext, self.str.get("cmd-play-next", "Up next!"))
                 player.play()
 
             # shift the playing track to the end of queue and skip current playback.
@@ -4376,8 +4391,7 @@ class MusicBot(discord.Client):
 
                 player.skip()
 
-                position = self.str.get("cmd-play-next", "Up next!")
-                reply_text %= (btext, position)
+                reply_text %= (btext, self.str.get("cmd-play-next", "Up next!"))
 
             else:
                 reply_text %= (btext, position)
@@ -4429,25 +4443,8 @@ class MusicBot(discord.Client):
         if permissions.summonplay and not _player:
             response = await self.cmd_summon(guild, author, message)
             if response:
-                if self.config.embeds:
-                    content = self._gen_embed()
-                    content.title = "summon"
-                    content.description = str(response.content)
-                    await self.safe_send_message(
-                        channel,
-                        content,
-                        expire_in=(
-                            response.delete_after if self.config.delete_messages else 0
-                        ),
-                    )
-                else:
-                    await self.safe_send_message(
-                        channel,
-                        str(response.content),
-                        expire_in=(
-                            response.delete_after if self.config.delete_messages else 0
-                        ),
-                    )
+                # TODO:  check if response is an error before sending.
+                await self.safe_send_message(channel, response)
                 p = self.get_player_in(guild)
                 if p:
                     _player = p
@@ -4634,6 +4631,7 @@ class MusicBot(discord.Client):
             leftover_args[0] = leftover_args[0].lstrip(lchar)
             leftover_args[-1] = leftover_args[-1].rstrip(lchar)
 
+        ssd = self.server_data[guild.id]
         srvc = services[service]
         args_str = " ".join(leftover_args)
         search_query = f"{srvc}{items_requested}:{args_str}"
@@ -4641,7 +4639,8 @@ class MusicBot(discord.Client):
         self._do_song_blocklist_check(args_str)
 
         search_msg = await self.safe_send_message(
-            channel, self.str.get("cmd-search-searching", "Searching for videos...")
+            channel,
+            Response(_D("Searching for videos...", ssd)),
         )
         await channel.typing()
 
@@ -4657,7 +4656,9 @@ class MusicBot(discord.Client):
             youtube_dl.networking.exceptions.RequestError,
         ) as e:
             if search_msg:
-                await self.safe_edit_message(search_msg, str(e), send_if_fail=True)
+                await self.safe_edit_message(
+                    search_msg, Response(str(e)), send_if_fail=True
+                )
             return None
 
         else:
@@ -4675,17 +4676,11 @@ class MusicBot(discord.Client):
         if self.config.searchlist:
             result_message_array = []
 
-            if self.config.embeds:
-                content = self._gen_embed()
-                content.title = self.str.get(
-                    "cmd-search-title", "{0} search results:"
-                ).format(service.capitalize())
-                content.description = "To select a song, type the corresponding number"
-            else:
-                result_header = self.str.get(
-                    "cmd-search-title", "{0} search results:"
-                ).format(service.capitalize())
-                result_header += "\n\n"
+            content = Response(
+                "To select a song, type the corresponding number.",
+                title=_D("Search results from %(service)s:", self.server_data[guild.id])
+                % {"service": service},
+            )
 
             for entry in entries:
                 # This formats the results and adds it to an array
@@ -4704,24 +4699,13 @@ class MusicBot(discord.Client):
             result_string = "\n".join(str(result) for result in result_message_array)
             result_string += "\n**0.** Cancel"
 
-            if self.config.embeds:
-                # Add the result entries to the embedded message and send it to the channel
-                content.add_field(
-                    name=self.str.get("cmd-search-field-name", "Pick a song"),
-                    value=result_string,
-                    inline=False,
-                )
-                result_message = await self.safe_send_message(channel, content)
-            else:
-                # Construct the complete message and send it to the channel.
-                result_string = result_header + result_string
-                result_string += "\n\nSelect song by typing the corresponding number or type cancel to cancel search"
-                result_message = await self.safe_send_message(
-                    channel,
-                    self.str.get("cmd-search-result-list-noembed", "{0}").format(
-                        result_string
-                    ),
-                )
+            # Add the result entries to the embedded message and send it to the channel
+            content.add_field(
+                name=self.str.get("cmd-search-field-name", "Pick a song"),
+                value=result_string,
+                inline=False,
+            )
+            result_message = await self.safe_send_message(channel, content)
 
             # Check to verify that received message is valid.
             def check(reply: discord.Message) -> bool:
@@ -4732,6 +4716,7 @@ class MusicBot(discord.Client):
                     and -1 <= int(reply.content) - 1 <= info.entry_count
                 )
 
+            # TODO: fix timeout here.
             # Wait for a response from the author.
             try:
                 choice = await self.wait_for("message", timeout=30.0, check=check)
@@ -4786,10 +4771,13 @@ class MusicBot(discord.Client):
             for entry in entries:
                 result_message = await self.safe_send_message(
                     channel,
-                    self.str.get("cmd-search-result", "Result {0}/{1}: {2}").format(
-                        entries.index(entry) + 1,
-                        info.entry_count,
-                        entry["url"],
+                    Response(
+                        _D("Result %(number)s of %(total)s: %(url)s", ssd)
+                        % {
+                            "number": entries.index(entry) + 1,
+                            "total": info.entry_count,
+                            "url": entry["url"],
+                        },
                     ),
                 )
                 if not result_message:
@@ -4905,37 +4893,8 @@ class MusicBot(discord.Client):
             entry = player.current_entry
             entry_author = player.current_entry.author
 
-            if entry_author:
-                np_text = self.str.get(
-                    "cmd-np-reply-author",
-                    "Currently {action}: **{title}** added by **{author}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>",
-                ).format(
-                    action=action_text,
-                    title=entry.title,
-                    author=entry_author.name,
-                    progress_bar=prog_bar_str,
-                    progress=prog_str,
-                    url=entry.url,
-                )
-            else:
-                np_text = self.str.get(
-                    "cmd-np-reply-noauthor",
-                    "Currently {action}: **{title}**\nProgress: {progress_bar} {progress}\n\N{WHITE RIGHT POINTING BACKHAND INDEX} <{url}>",
-                ).format(
-                    action=action_text,
-                    title=entry.title,
-                    progress_bar=prog_bar_str,
-                    progress=prog_str,
-                    url=entry.url,
-                )
-
-                # TODO: i18n
-                if entry.from_auto_playlist:
-                    np_text += "\n`via autoplaylist`"
-
             if self.config.embeds:
-                content = self._gen_embed()
-                content.title = action_text
+                content = Response("", title=action_text)
                 content.add_field(
                     name=f"Currently {action_text}", value=entry.title, inline=False
                 )
@@ -4960,7 +4919,8 @@ class MusicBot(discord.Client):
                     log.warning("No thumbnail set for entry with url: %s", entry.url)
 
             self.server_data[guild.id].last_np_msg = await self.safe_send_message(
-                channel, content if self.config.embeds else np_text, expire_in=30
+                channel,
+                content,
             )
             return None
 
@@ -5119,9 +5079,9 @@ class MusicBot(discord.Client):
 
         if player.is_stopped and player.playlist:
             player.play()
-            return None
+            return Response("Resumed music queue")
 
-        raise exceptions.CommandError(
+        return ErrorResponse(
             self.str.get("cmd-resume-none", "Player is not paused."), expire_in=30
         )
 
@@ -5143,16 +5103,20 @@ class MusicBot(discord.Client):
         ]
         random.shuffle(cards)
 
-        hand = await self.safe_send_message(channel, " ".join(cards))
+        hand = await self.safe_send_message(
+            channel, Response(" ".join(cards), force_text=True)
+        )
         await asyncio.sleep(0.6)
 
         if hand:
             for _ in range(4):
                 random.shuffle(cards)
-                await self.safe_edit_message(hand, " ".join(cards))
+                await self.safe_edit_message(
+                    hand, Response(" ".join(cards), force_text=True)
+                )
                 await asyncio.sleep(0.6)
 
-            await self.safe_delete_message(hand, quiet=True)
+            await self.safe_delete_message(hand)
         return Response(
             self.str.get("cmd-shuffle-reply", "Shuffled `{0}`'s queue.").format(
                 player.voice_client.channel.guild
@@ -5390,7 +5354,6 @@ class MusicBot(discord.Client):
                 self.str.get("cmd-skip-force", "Force skipped `{}`.").format(
                     current_entry.title
                 ),
-                reply=True,
                 delete_after=30,
             )
 
@@ -5468,7 +5431,6 @@ class MusicBot(discord.Client):
                         else ""
                     ),
                 ),
-                reply=True,
                 delete_after=20,
             )
 
@@ -5496,7 +5458,6 @@ class MusicBot(discord.Client):
                     else self.str.get("cmd-skip-reply-voted-3", "people are")
                 ),
             ),
-            reply=True,
             delete_after=20,
         )
 
@@ -5519,7 +5480,6 @@ class MusicBot(discord.Client):
             return Response(
                 self.str.get("cmd-volume-current", "Current volume: `%s%%`")
                 % int(player.volume * 100),
-                reply=True,
                 delete_after=20,
             )
 
@@ -5551,7 +5511,6 @@ class MusicBot(discord.Client):
             return Response(
                 self.str.get("cmd-volume-reply", "Updated volume from **%d** to **%d**")
                 % (old_volume, int_volume),
-                reply=True,
                 delete_after=20,
             )
 
@@ -5730,6 +5689,7 @@ class MusicBot(discord.Client):
                 f"Alias `{alias}` was removed.",
                 delete_after=30,
             )
+
         return None
 
     @owner_only
@@ -6222,11 +6182,12 @@ class MusicBot(discord.Client):
 
         # create an embed
         starting_at = start_index + 1  # add 1 to index for display.
-        embed = self._gen_embed()
-        embed.title = "Songs in queue"
-        embed.description = (
+        embed = Response(
+            # TODO: i18n
             f"{current_progress}There are `{total_entry_count}` entries in the queue.\n"
-            f"Here are the next {limit_per_page} songs, starting at song #{starting_at}"
+            f"Here are the next {limit_per_page} songs, starting at song #{starting_at}",
+            title="Songs in queue",
+            delete_after=self.config.delete_delay_long,
         )
 
         # add the tracks to the embed fields
@@ -6255,7 +6216,7 @@ class MusicBot(discord.Client):
             q_msg = await self.safe_edit_message(update_msg, embed, send_if_fail=True)
         else:
             if pages_total <= 1:
-                q_msg = await self.safe_send_message(channel, embed, expire_in=30)
+                q_msg = await self.safe_send_message(channel, embed)
             else:
                 q_msg = await self.safe_send_message(channel, embed)
 
@@ -6289,7 +6250,9 @@ class MusicBot(discord.Client):
 
         try:
             reaction, _user = await self.wait_for(
-                "reaction_add", timeout=60, check=_check_react
+                "reaction_add",
+                timeout=self.config.delete_delay_long,
+                check=_check_react,
             )
             if reaction.emoji == EMOJI_NEXT_ICON:
                 await q_msg.clear_reactions()
@@ -6336,11 +6299,8 @@ class MusicBot(discord.Client):
                     "cmd-clean-invalid",
                     "Invalid parameter. Please provide a number of messages to search.",
                 ),
-                reply=True,
                 delete_after=8,
             )
-
-        await self.safe_delete_message(message, quiet=True)
 
         # TODO:  add alias names to the command names list here.
         # cmd_names = await self.gen_cmd_list(message)
@@ -6367,32 +6327,31 @@ class MusicBot(discord.Client):
                 return delete_all or message.author == author
             return message.author == self.user
 
-        if self.user and self.user.bot:
-            if isinstance(
-                channel,
-                (discord.DMChannel, discord.GroupChannel, discord.PartialMessageable),
-            ):
-                # TODO: maybe fix this to work?
-                raise exceptions.CommandError("Cannot use purge on private DM channel.")
+        if isinstance(
+            channel,
+            (discord.DMChannel, discord.GroupChannel, discord.PartialMessageable),
+        ):
+            # TODO: maybe fix this to work?
+            raise exceptions.CommandError("Cannot use purge on private DM channel.")
 
-            if channel.permissions_for(guild.me).manage_messages:
-                deleted = await channel.purge(
-                    check=check, limit=search_range, before=message
-                )
-                return Response(
-                    self.str.get(
-                        "cmd-clean-reply", "Cleaned up {0} message{1}."
-                    ).format(len(deleted), "s" * bool(deleted)),
-                    delete_after=15,
-                )
-        return None
+        if channel.permissions_for(guild.me).manage_messages:
+            deleted = await channel.purge(
+                check=check, limit=search_range, before=message
+            )
+            return Response(
+                self.str.get("cmd-clean-reply", "Cleaned up {0} message{1}.").format(
+                    len(deleted), "s" * bool(deleted)
+                ),
+                delete_after=15,
+            )
+        return ErrorResponse("Bot does not have permission to manage messages.")
 
     @command_helper(
         usage=["{cmd} <URL>"],
         desc="Dump the individual urls of a playlist to a file.",
     )
     async def cmd_pldump(
-        self, channel: MessageableChannel, author: discord.Member, song_subject: str
+        self, author: discord.Member, song_subject: str
     ) -> CommandResponse:
         """
         Extracts all URLs from a playlist and create a file attachment with the resulting links.
@@ -6420,7 +6379,6 @@ class MusicBot(discord.Client):
                 "This does not seem to be a playlist.", expire_in=25
             )
 
-        sent_to_channel = None
         filename = "playlist.txt"
         if info.title:
             safe_title = slugify(info.title)
@@ -6443,23 +6401,7 @@ class MusicBot(discord.Client):
             msg_str = f"Here is the playlist dump for:  <{song_url}>"
             datafile = discord.File(fcontent, filename=filename)
 
-            try:
-                # try to DM. this could fail for users with strict privacy settings.
-                # or users who just can't get direct messages.
-                await author.send(msg_str, file=datafile)
-
-            except discord.errors.HTTPException as e:
-                if e.code == 50007:  # cannot send to this user.
-                    log.debug("DM failed, sending in channel instead.")
-                    sent_to_channel = await channel.send(
-                        msg_str,
-                        file=datafile,
-                    )
-                else:
-                    raise
-        if not sent_to_channel:
-            return Response("Sent a message with a playlist file.", delete_after=20)
-        return None
+            return Response(msg_str, send_to=author, files=[datafile], force_text=True)
 
     @command_helper(
         usage=["{cmd} [@USER]"],
@@ -6477,7 +6419,6 @@ class MusicBot(discord.Client):
         if not user_mentions:
             return Response(
                 self.str.get("cmd-id-self", "Your ID is `{0}`").format(author.id),
-                reply=True,
                 delete_after=35,
             )
 
@@ -6486,7 +6427,6 @@ class MusicBot(discord.Client):
             self.str.get("cmd-id-other", "**{0}**s ID is `{1}`").format(
                 usr.name, usr.id
             ),
-            reply=True,
             delete_after=35,
         )
 
@@ -6502,7 +6442,6 @@ class MusicBot(discord.Client):
         self,
         guild: discord.Guild,
         author: discord.Member,
-        channel: MessageableChannel,
         leftover_args: List[str],
         cat: str = "all",
     ) -> CommandResponse:
@@ -6516,7 +6455,6 @@ class MusicBot(discord.Client):
             cats_str = " ".join([f"`{c}`" for c in cats])
             return Response(
                 f"Valid categories: {cats_str}",
-                reply=True,
                 delete_after=25,
             )
 
@@ -6558,8 +6496,6 @@ class MusicBot(discord.Client):
             if rawudata:
                 data.extend(rawudata)
 
-        # TODO: refactor this in favor of safe_send_message doing it all.
-        sent_to_channel = None
         with BytesIO() as sdata:
             slug = slugify(guild.name)
             fname = f"{slug}-ids-{cat}.txt"
@@ -6568,19 +6504,7 @@ class MusicBot(discord.Client):
             datafile = discord.File(sdata, filename=fname)
             msg_str = "Here are the IDs you requested:"
 
-            try:
-                # try to DM and fall back to channel
-                await author.send(msg_str, file=datafile)
-
-            except discord.errors.HTTPException as e:
-                if e.code == 50007:  # cannot send to this user.
-                    log.debug("DM failed, sending in channel instead.")
-                    sent_to_channel = await channel.send(msg_str, file=datafile)
-                else:
-                    raise
-        if not sent_to_channel:
-            return Response("Sent a message with a list of IDs.", delete_after=20)
-        return None
+            return Response(msg_str, send_to=author, files=[datafile])
 
     @command_helper(
         usage=["{cmd} [@USER]"],
@@ -6589,7 +6513,6 @@ class MusicBot(discord.Client):
     async def cmd_perms(
         self,
         author: discord.Member,
-        channel: MessageableChannel,
         user_mentions: UserMentions,
         guild: discord.Guild,
         permissions: PermissionGroup,
@@ -6638,8 +6561,7 @@ class MusicBot(discord.Client):
                 f"```{permissions.format()}```"
             )
 
-        await self.safe_send_message(author, perms, fallback_channel=channel)
-        return Response("\N{OPEN MAILBOX WITH RAISED FLAG}", delete_after=20)
+        return Response(perms, send_to=author)
 
     @owner_only
     @command_helper(
@@ -7128,6 +7050,7 @@ class MusicBot(discord.Client):
     async def cmd_restart(
         self,
         _player: Optional[MusicPlayer],
+        guild: discord.Guild,
         channel: MessageableChannel,
         opt: str = "soft",
     ) -> CommandResponse:
@@ -7135,6 +7058,7 @@ class MusicBot(discord.Client):
         Usage:
             {command_prefix}restart [soft|full|upgrade|upgit|uppip]
         """
+        # TODO:  move the update stuff to its own command, including update check.
         opt = opt.strip().lower()
         if opt not in ["soft", "full", "upgrade", "uppip", "upgit"]:
             raise exceptions.CommandError(
@@ -7145,56 +7069,34 @@ class MusicBot(discord.Client):
                 expire_in=30,
             )
 
+        out_msg = ""
         if opt == "soft":
-            await self.safe_send_message(
-                channel,
-                self.str.get(
-                    "cmd-restart-soft",
-                    "{emoji} Restarting current instance...",
-                ).format(
-                    emoji="\u21A9\uFE0F",  # Right arrow curving left
-                ),
-            )
+            out_msg = _D(
+                "%(emoji)s Restarting current instance...",
+                self.server_data[guild.id],
+            ) % {"emoji": EMOJI_RESTART_SOFT}
         elif opt == "full":
-            await self.safe_send_message(
-                channel,
-                self.str.get(
-                    "cmd-restart-full",
-                    "{emoji} Restarting bot process...",
-                ).format(
-                    emoji="\U0001F504",  # counterclockwise arrows
-                ),
-            )
+            out_msg = _D(
+                "%(emoji)s Restarting bot process...",
+                self.server_data[guild.id],
+            ) % {"emoji": EMOJI_RESTART_FULL}
         elif opt == "uppip":
-            await self.safe_send_message(
-                channel,
-                self.str.get(
-                    "cmd-restart-uppip",
-                    "{emoji} Will try to upgrade required pip packages and restart the bot...",
-                ).format(
-                    emoji="\U0001F4E6",  # package / box
-                ),
-            )
+            out_msg = _D(
+                "%(emoji)s Will try to upgrade required pip packages and restart the bot...",
+                self.server_data[guild.id],
+            ) % {"emoji": EMOJI_UPDATE_PIP}
         elif opt == "upgit":
-            await self.safe_send_message(
-                channel,
-                self.str.get(
-                    "cmd-restart-upgit",
-                    "{emoji} Will try to update bot code with git and restart the bot...",
-                ).format(
-                    emoji="\U0001F5C3\uFE0F",  # card box
-                ),
-            )
+            out_msg = _D(
+                "%(emoji)s Will try to update bot code with git and restart the bot...",
+                self.server_data[guild.id],
+            ) % {"emoji": EMOJI_UPDATE_GIT}
         elif opt == "upgrade":
-            await self.safe_send_message(
-                channel,
-                self.str.get(
-                    "cmd-restart-upgrade",
-                    "{emoji} Will try to upgrade everything and restart the bot...",
-                ).format(
-                    emoji="\U0001F310",  # globe with meridians
-                ),
-            )
+            out_msg = _D(
+                "%(emoji)s Will try to upgrade everything and restart the bot...",
+                self.server_data[guild.id],
+            ) % {"emoji": EMOJI_UPDATE_ALL}
+
+        await self.safe_send_message(channel, Response(out_msg))
 
         if _player and _player.is_paused:
             _player.resume()
@@ -7234,7 +7136,10 @@ class MusicBot(discord.Client):
         which is hopefully respected by all the loopy async processes
         and then results in MusicBot cleanly shutting down.
         """
-        await self.safe_send_message(channel, "\N{WAVING HAND SIGN}")
+        await self.safe_send_message(
+            channel,
+            Response("\N{WAVING HAND SIGN}", force_text=True),
+        )
 
         player = self.get_player_in(guild)
         if player and player.is_paused:
@@ -7301,27 +7206,10 @@ class MusicBot(discord.Client):
     @command_helper(
         desc="Command used for testing. It prints a list of commands which can be verified by a test suite."
     )
-    async def cmd_testready(
-        self, channel: GuildMessageableChannels, message: discord.Message
-    ) -> CommandResponse:
+    async def cmd_testready(self, message: discord.Message) -> CommandResponse:
         """Command used to signal command testing."""
         cmd_list = ",".join(await self.gen_cmd_list(message, list_all_cmds=True))
-        await self.safe_send_message(
-            channel,
-            f"CMD_TEST_LIST:[{cmd_list}]",
-            expire_in=30,
-        )
-
-        await self.safe_send_message(
-            channel,
-            await self.gen_cmd_help("makemarkdown", channel.guild),
-            expire_in=30,
-        )
-
-        return Response(
-            await self.gen_cmd_help("checkupdates", channel.guild),
-            delete_after=30,
-        )
+        return Response(f"CMD_TEST_LIST:[{cmd_list}]", force_text=True)
 
     @dev_only
     @command_helper(
@@ -7330,12 +7218,14 @@ class MusicBot(discord.Client):
             "Can be used to manually pin-point events in the MusicBot log file.\n"
         ),
     )
-    async def cmd_breakpoint(self) -> CommandResponse:
+    async def cmd_breakpoint(self, guild: discord.Guild) -> CommandResponse:
         """
         Do nothing but print a critical level error to the log.
         """
-        log.critical("Activating debug breakpoint")
-        return None
+        uid = str(uuid.uuid4())
+        ssd = self.server_data[guild.id]
+        log.critical("Activating debug breakpoint ID: %(uuid)s", {"uuid": uid})
+        return Response(_D("Logged breakpoint with ID:  %(uuid)s", ssd) % {"uuid": uid})
 
     @dev_only
     @command_helper(
@@ -7483,7 +7373,6 @@ class MusicBot(discord.Client):
     )
     async def cmd_makemarkdown(
         self,
-        channel: MessageableChannel,
         author: discord.Member,
         cfg: str = "opts",
     ) -> CommandResponse:
@@ -7534,33 +7423,13 @@ class MusicBot(discord.Client):
             config_md += f"### Owner Commands  \n\n{''.join(admin_commands)}"
             config_md += f"### Dev Commands  \n\n{''.join(dev_commands)}"
 
-        sent_to_channel = None
-
         # TODO: refactor this in favor of safe_send_message doing it all.
         with BytesIO() as fcontent:
             fcontent.write(config_md.encode("utf8"))
             fcontent.seek(0)
             datafile = discord.File(fcontent, filename=filename)
 
-            try:
-                # try to DM. this could fail for users with strict privacy settings.
-                # or users who just can't get direct messages.
-                await author.send(msg_str, file=datafile)
-
-            except discord.errors.HTTPException as e:
-                if e.code == 50007:  # cannot send to this user.
-                    log.debug("DM failed, sending in channel instead.")
-                    sent_to_channel = await channel.send(
-                        msg_str,
-                        file=datafile,
-                    )
-                else:
-                    raise
-        if not sent_to_channel:
-            return Response(
-                "Sent a message with the requested config markdown.", delete_after=20
-            )
-        return None
+            return Response(msg_str, send_to=author, files=[datafile], force_text=True)
 
     @dev_only
     @command_helper(desc="Makes default INI files.")
@@ -7578,12 +7447,13 @@ class MusicBot(discord.Client):
             self.config.register.write_default_ini(pathlib.Path("./config/ex_opts.ini"))
 
         if cfg == "perms":
-            self.permissions.register.write_default_ini(pathlib.Path("./config/ex_perms.ini"))
+            self.permissions.register.write_default_ini(
+                pathlib.Path("./config/ex_perms.ini")
+            )
 
         return Response(
             "Saved the requested INI file to disk. Go check it", delete_after=20
         )
-
 
     @owner_only
     @command_helper(
@@ -7996,7 +7866,8 @@ class MusicBot(discord.Client):
                 and getattr(handler, "cmd_in_dm", False)
             ):
                 await self.safe_send_message(
-                    message.channel, "You cannot use this bot in private messages."
+                    message.channel,
+                    ErrorResponse("You cannot use this bot in private messages."),
                 )
                 return
 
@@ -8030,7 +7901,7 @@ class MusicBot(discord.Client):
             )
             return
 
-        # all checks passed, log a successful message
+        # all command validation checks passed, log a successful message
         log.info(
             "Message from %s/%s: %s",
             message.author.id,
@@ -8038,13 +7909,15 @@ class MusicBot(discord.Client):
             message_content.replace("\n", "\n... "),
         )
 
+        # Get user's musicbot permissions for use in later checks and commands.
         user_permissions = self.permissions.for_user(message.author)
 
+        # Extract the function signature of the cmd_* command to assign proper values later.
         argspec = inspect.signature(handler)
         params = argspec.parameters.copy()
+        response: Optional[MusicBotResponse] = None
 
-        sentmsg = response = None
-
+        # Check permissions, assign arguments, and process the command call.
         try:
             # check non-voice permission.
             if (
@@ -8062,7 +7935,7 @@ class MusicBot(discord.Client):
                     f"This command is not allowed for your permissions group:  {user_permissions.name}",
                 )
 
-            # populate the existing command signature args.
+            # populate the requested command signature args.
             handler_kwargs: Dict[str, Any] = {}
             if params.pop("message", None):
                 handler_kwargs["message"] = message
@@ -8181,55 +8054,38 @@ class MusicBot(discord.Client):
 
             # Invalid usage, return docstring
             if params:
-                docs = getattr(handler, "__doc__", None)
-                if not docs:
-                    doc_args = " ".join(args_expected)
-                    docs = f"Usage: {command_prefix}{command} {doc_args}"
-
-                docs = dedent(docs).format(command_prefix=command_prefix)
-                await self.safe_send_message(
-                    message.channel,
-                    f"```\n{docs}\n```",
-                    expire_in=60,
+                log.debug(
+                    "Invalid command usage, missing values for params: %(params)r",
+                    {"params": params},
                 )
+                response = await self.cmd_help(message, message.channel.guild, command)
+                if response:
+                    response.reply_to = message
+                    await self.safe_send_message(message.channel, response)
                 return
 
             response = await handler(**handler_kwargs)
-            if response and isinstance(response, Response):
-                if (
-                    not isinstance(response.content, discord.Embed)
-                    and self.config.embeds
-                ):
-                    content = self._gen_embed()
-                    content.title = command
-                    content.description = response.content
+            if response and isinstance(response, MusicBotResponse):
+                ssd = None
+                if message.channel.guild:
+                    ssd = self.server_data[message.channel.guild.id]
 
-                    if response.reply:
-                        content.description = (
-                            f"{message.author.mention} {content.description}"
-                        )
-                    sentmsg = await self.safe_send_message(
-                        message.channel,
-                        content,
-                        expire_in=(
-                            response.delete_after if self.config.delete_messages else 0
-                        ),
-                        also_delete=message if self.config.delete_invoking else None,
-                    )
+                # Set a default response title if none is set.
+                if not response.title:
+                    response.title = _D("**Command:** %(name)s", ssd) % {
+                        "name": command
+                    }
 
-                else:
-                    contents = response.content
-                    if response.reply:
-                        contents = f"{message.author.mention}: {contents}"
+                # Determine if the response goes to a calling channel or a DM.
+                send_kwargs: Dict[str, Any] = {}
+                send_to = message.channel
+                if response.send_to:
+                    send_to = response.send_to
+                    response.sent_from = message.channel
 
-                    sentmsg = await self.safe_send_message(
-                        message.channel,
-                        contents,
-                        expire_in=(
-                            response.delete_after if self.config.delete_messages else 0
-                        ),
-                        also_delete=message if self.config.delete_invoking else None,
-                    )
+                # always reply to the caller, no reason not to.
+                response.reply_to = message
+                await self.safe_send_message(send_to, response, **send_kwargs)
 
         except (
             exceptions.CommandError,
@@ -8243,42 +8099,32 @@ class MusicBot(discord.Client):
                 e.message,
                 exc_info=True,
             )
+            er = ErrorResponse(
+                e.message, codeblock="text", title="Error", reply_to=message
+            )
+            await self.safe_send_message(message.channel, er)
 
-            expirein = e.expire_in if self.config.delete_messages else 0
-            alsodelete = message if self.config.delete_invoking else None
-
-            if self.config.embeds:
-                content = self._gen_embed()
-                content.add_field(name="Error", value=e.message, inline=False)
-                content.colour = discord.Colour(13369344)
-
-                await self.safe_send_message(
-                    message.channel, content, expire_in=expirein, also_delete=alsodelete
-                )
-
-            else:
-                contents = f"```\n{e.message}\n```"
-
-                await self.safe_send_message(
-                    message.channel,
-                    contents,
-                    expire_in=expirein,
-                    also_delete=alsodelete,
-                )
-
+        # raise custom signals for shutdown and restart.
         except exceptions.Signal:
             raise
 
+        # Catch everything else to keep bugs from bringing down the bot...
         except Exception:  # pylint: disable=broad-exception-caught
-            log.error("Exception in on_message", exc_info=True)
+            log.error("Exception in on_message", exc_info=self.config.debug_mode)
             if self.config.debug_mode:
-                tb_str = traceback.format_exc()
-                await self.safe_send_message(message.channel, f"```\n{tb_str}\n```")
+                er = ErrorResponse(
+                    traceback.format_exc(),
+                    codeblock="text",
+                    title="Exception Error",
+                    reply_to=message,
+                )
+                await self.safe_send_message(message.channel, er)
 
         finally:
-            if not sentmsg and not response and self.config.delete_invoking:
-                await asyncio.sleep(5)
-                await self.safe_delete_message(message, quiet=True)
+            if not response and self.config.delete_invoking:
+                self.create_task(
+                    self._wait_delete_msg(message, self.config.delete_delay_short)
+                )
 
     async def gen_cmd_help(
         self, cmd_name: str, guild: Optional[discord.Guild], for_md: bool = False
@@ -8384,22 +8230,15 @@ class MusicBot(discord.Client):
         guild = voice_channel.guild
 
         if isinstance(voice_channel, (discord.VoiceChannel, discord.StageChannel)):
-            last_np_msg = self.server_data[guild.id].last_np_msg
+            ssd = self.server_data[guild.id]
+            last_np_msg = ssd.last_np_msg
             if last_np_msg is not None and last_np_msg.channel:
                 channel = last_np_msg.channel
-                if self.config.embeds:
-                    embed = self._gen_embed()
-                    embed.title = "Leaving voice channel"
-                    embed.description = (
-                        f"Leaving voice channel {voice_channel.name} due to inactivity."
-                    )
-                    await self.safe_send_message(channel, embed, expire_in=30)
-                else:
-                    await self.safe_send_message(
-                        channel,
-                        f"Leaving voice channel {voice_channel.name} in due to inactivity.",
-                        expire_in=30,
-                    )
+                r = Response(
+                    _D("Leaving voice channel %(channel)s due to inactivity.", ssd)
+                    % {"channel": voice_channel.name},
+                )
+                await self.safe_send_message(channel, r)
 
             log.info(
                 "Leaving voice channel %s in %s due to inactivity.",
