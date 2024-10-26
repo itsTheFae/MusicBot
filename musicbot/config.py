@@ -976,10 +976,21 @@ class Config:
             ),
         )
 
+        self.use_opus_probe: bool = self.register.init_option(
+            section="MusicBot",
+            option="UseOpusAudio",
+            dest="use_opus_probe",
+            default=ConfigDefaults.use_opus_probe,
+            getter="getboolean",
+            comment=_X(
+                "Potentially reduces CPU usage, but disables volume and speed controls.\n"
+                "This option will disable UseExperimentalEqualization option as well."
+            ),
+        )
+
         #
         # end of config registry.
         #
-
 
         # Convert all path constants into config as pathlib.Path objects.
         self.data_path = pathlib.Path(DEFAULT_DATA_DIR).resolve()
@@ -1369,6 +1380,7 @@ class ConfigDefaults:
     status_include_paused: bool = False
     write_current_song: bool = False
     allow_author_skip: bool = True
+    use_opus_probe: bool = False
     use_experimental_equalization: bool = False
     embeds: bool = True
     queue_length: int = 10
