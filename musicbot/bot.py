@@ -8073,7 +8073,7 @@ class MusicBot(discord.Client):
                 await self.safe_send_message(message.channel, er)
 
         finally:
-            if not response and self.config.delete_invoking:
+            if self.config.delete_invoking:
                 self.create_task(
                     self._wait_delete_msg(message, self.config.delete_delay_short)
                 )
