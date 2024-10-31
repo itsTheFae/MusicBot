@@ -444,7 +444,8 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 self.info = info
             else:
                 raise InvalidDataError(
-                    f"Cannot download spotify links, processing error with type: {info.ytdl_type}."
+                    "Cannot download spotify links, processing error with type: %(type)s",
+                    fmt_args={"type": info.ytdl_type},
                 )
 
         # if this isn't set this entry is probably from a playlist and needs more info.

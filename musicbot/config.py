@@ -32,7 +32,6 @@ from .constants import (
     DEFAULT_COMMAND_ALIAS_FILE,
     DEFAULT_DATA_DIR,
     DEFAULT_FOOTER_TEXT,
-    DEFAULT_I18N_FILE,
     DEFAULT_LOG_LEVEL,
     DEFAULT_LOGS_KEPT,
     DEFAULT_LOGS_ROTATE_FORMAT,
@@ -44,9 +43,10 @@ from .constants import (
     DEPRECATED_USER_BLACKLIST,
     EXAMPLE_OPTIONS_FILE,
     MAXIMUM_LOGS_LIMIT,
+    MUSICBOT_TOKEN_ENV_VAR,
 )
 from .exceptions import HelpfulError
-from .i18n import _D, _L, _X
+from .i18n import _X
 from .logs import (
     set_logging_level,
     set_logging_max_kept_logs,
@@ -685,6 +685,8 @@ class Config:
                 "Only applied when UseEmbeds is enabled and it is not blank."
             ),
         )
+        # TODO: add option to completetly remove footer.
+        # self.remove_embed_footer: bool = self.register.init_option()
         self.self_deafen: bool = self.register.init_option(
             section="MusicBot",
             option="SelfDeafen",
@@ -996,19 +998,10 @@ class Config:
             comment_args={"path": "./media"},
         )
 
-        # TODO: remove this, replace with lang option?
-        self.i18n_file: pathlib.Path = self.register.init_option(
-            section="Files",
-            option="i18nFile",
-            dest="i18n_file",
-            default=ConfigDefaults.i18n_file,
-            getter="getpathlike",
-            comment=(
-                "An optional file path to an i18n language file.\n"
-                "This option may be removed or replaced in the future!"
-                # TODO: i18n stuff when I get around to gettext.
-            ),
-        )
+        # TODO: add options for default language(s)
+        # at least one for guild output language default.
+        # log lang may be better off set via CLI / ENV.
+
         self.audio_cache_path: pathlib.Path = self.register.init_option(
             section="Files",
             option="AudioCachePath",
@@ -1084,10 +1077,21 @@ class Config:
                 [f"[{s}]" for s in self.register.ini_missing_sections]
             )
             raise HelpfulError(
-                "One or more required config sections are missing.",
-                "Fix your config.  Each [Section] should be on its own line with "
-                f"nothing else on it.  The following sections are missing: {sections_str}",
-                preface="An error has occured parsing the config:\n",
+                # fmt: off
+                "Error while reading config.\n"
+                "\n"
+                "Problem:\n"
+                "  One or more required config option sections are missing.\n"
+                "  The missing sections are:\n"
+                "  %(sections)s\n"
+                "\n"
+                "Solution:\n"
+                "  Repair your config optoins file.\n"
+                "  Each [Section] must appear only once, with no other text on the same line.\n"
+                "  Each section must have at least one option.\n"
+                "  Use the example options as a template or copy it from the repository.",
+                # fmt: on
+                fmt_args={"sections": sections_str},
             )
 
         # This value gets set dynamically, based on success with API authentication.
@@ -1117,33 +1121,20 @@ class Config:
             self.logs_date_format = DEFAULT_LOGS_ROTATE_FORMAT
         set_logging_rotate_date_format(self.logs_date_format)
 
-        if self.i18n_file != ConfigDefaults.i18n_file and not os.path.isfile(
-            self.i18n_file
-        ):
-            log.warning(
-                "i18n file does not exist. Trying to fallback to: %s",
-                ConfigDefaults.i18n_file,
-            )
-            self.i18n_file = ConfigDefaults.i18n_file
-
-        if not os.path.isfile(self.i18n_file):
-            raise HelpfulError(
-                "Your i18n file was not found, and we could not fallback.",
-                "As a result, the bot cannot launch. Have you moved some files? "
-                "Try pulling the recent changes from Git, or resetting your local repo.",
-                preface=self._confpreface,
-            )
-
-        log.info("Using i18n: %s", self.i18n_file)
-
         if self.audio_cache_path:
             try:
                 acpath = self.audio_cache_path
                 if acpath.is_file():
                     raise HelpfulError(
-                        "AudioCachePath config option is a file path.",
-                        "Change it to a directory / folder path instead.",
-                        preface=self._confpreface2,
+                        # fmt: off
+                        "Error while validating config options.\n"
+                        "\n"
+                        "Problem:\n"
+                        "  Config option AudioCachePath is not a directory.\n"
+                        "\n"
+                        "Solution:\n"
+                        "  Make sure the path you configured is a path to a folder / directory."
+                        # fmt: on
                     )
                 # Might as well test for multiple issues here since we can give feedback.
                 if not acpath.is_dir():
@@ -1151,36 +1142,44 @@ class Config:
                 actest = acpath.joinpath(".bot-test-write")
                 actest.touch(exist_ok=True)
                 actest.unlink(missing_ok=True)
-            except PermissionError as e:
-                raise HelpfulError(
-                    "AudioCachePath config option cannot be used due to invalid permissions.",
-                    "Check that directory permissions and ownership are correct.",
-                    preface=self._confpreface2,
-                ) from e
-            except Exception as e:
+            except OSError as e:
                 log.exception(
-                    "Some other exception was thrown while validating AudioCachePath."
+                    "An exception was thrown while validating AudioCachePath."
                 )
                 raise HelpfulError(
-                    "AudioCachePath config option could not be set due to some exception we did not expect.",
-                    "Double check the setting and maybe report an issue.",
-                    preface=self._confpreface2,
+                    # fmt: off
+                    "Error while validating config options.\n"
+                    "\n"
+                    "Problem:\n"
+                    "  AudioCachePath config option could not be set due to an error:\n"
+                    "  %(raw_error)s\n"
+                    "\n"
+                    "Solution:\n"
+                    "  Double check the setting is a valid, accessible directory path.",
+                    # fmt: on
+                    fmt_args={"raw_error": e},
                 ) from e
 
         log.info("Audio Cache will be stored in:  %s", self.audio_cache_path)
 
         if not self._login_token:
             # Attempt to fallback to an environment variable.
-            env_token = os.environ.get("MUSICBOT_TOKEN")
+            env_token = os.environ.get(MUSICBOT_TOKEN_ENV_VAR)
             if env_token:
                 self._login_token = env_token
                 self.auth = (self._login_token,)
             else:
                 raise HelpfulError(
-                    "No bot token was specified in the config, or as an environment variable.",
-                    "As of v1.9.6_1, you are required to use a Discord bot account. "
-                    "See https://github.com/Just-Some-Bots/MusicBot/wiki/FAQ for info.",
-                    preface=self._confpreface,
+                    # fmt: off
+                    "Error while reading config options.\n"
+                    "\n"
+                    "Problem:\n"
+                    "  No bot Token was specified in the config options or environment.\n"
+                    "\n"
+                    "Solution:\n"
+                    "  Set the Token config option or set environment variable %(env_var)s with an App token.",
+                    # fmt: on
+                    fmt_args={"env_var": MUSICBOT_TOKEN_ENV_VAR},
                 )
 
         else:
@@ -1239,9 +1238,16 @@ class Config:
                 log.debug("Acquired owner id via API")
             else:
                 raise HelpfulError(
-                    "Discord app info is not available. (Probably a bug!)",
-                    "You may need to set OwnerID config manually, and report this.",
-                    preface="Error fetching OwnerID automatically:\n",
+                    # fmt: off
+                    "Error while fetching OwnerID automatically.\n"
+                    "\n"
+                    "Problem:\n"
+                    "  Discord App info is not available.\n"
+                    "  This could be a temporary API outage or a bug.\n"
+                    "\n"
+                    "Solution:\n"
+                    "  Manually set the OwnerID config option or try again later."
+                    # fmt: on
                 )
 
         if not bot.user:
@@ -1250,13 +1256,15 @@ class Config:
 
         if self.owner_id == bot.user.id:
             raise HelpfulError(
-                "Your OwnerID is incorrect or you've used the wrong credentials.",
-                "The bot's user ID and the id for OwnerID is identical. "
-                "This is wrong. The bot needs a bot account to function, "
-                "meaning you cannot use your own account to run the bot on. "
-                "The OwnerID is the id of the owner, not the bot. "
-                "Figure out which one is which and use the correct information.",
-                preface=self._confpreface2,
+                # fmt: off
+                "Error validating config options.\n"
+                "\n"
+                "Problem:\n"
+                "  The OwnerID config is the same as your Bot / App ID.\n"
+                "\n"
+                "Solution:\n"
+                "  Do not use the Bot or App ID in the OwnerID field."
+                # fmt: on
             )
 
     def find_config(self) -> None:
@@ -1269,73 +1277,81 @@ class Config:
         :raises: musicbot.exceptions.HelpfulError
             if config fails to be located or has not been configured.
         """
-        config = configparser.ConfigParser(interpolation=None)
+        config = ExtendedConfigParser()
 
         # Check for options.ini and copy example ini if missing.
         if not self.config_file.is_file():
-            ini_file = self.config_file.with_suffix(".ini")
-            if ini_file.is_file():
-                try:
-                    # Explicit compat with python 3.8
+            log.warning("Config options file not found. Checking for alternatives...")
+
+            try:
+                # Check for options.ini.ini because windows.
+                ini_file = self.config_file.with_suffix(".ini.ini")
+                if sys.platform == "nt" and ini_file.is_file():
+                    # shutil.move in 3.8 expects str and not path-like.
                     if sys.version_info >= (3, 9):
                         shutil.move(ini_file, self.config_file)
                     else:
-                        # shutil.move in 3.8 expects str and not path-like.
                         shutil.move(str(ini_file), str(self.config_file))
-                    log.info(
-                        "Moving %s to %s, you should probably turn file extensions on.",
-                        ini_file,
-                        self.config_file,
+                    log.warning(
+                        "Renaming %(ini_file)s to %(option_file)s, you should probably turn file extensions on.",
+                        {"ini_file": ini_file, "option_file": self.config_file},
                     )
-                except (
-                    OSError,
-                    IsADirectoryError,
-                    NotADirectoryError,
-                    FileExistsError,
-                    PermissionError,
-                ) as e:
-                    log.exception(
-                        "Something went wrong while trying to move .ini to config file path."
-                    )
-                    raise HelpfulError(
-                        f"Config file move failed due to error:  {str(e)}",
-                        "Verify your config folder and files exist, and can be read by the bot.",
-                    ) from e
 
-            elif os.path.isfile(EXAMPLE_OPTIONS_FILE):
-                shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
-                log.warning(
-                    "Options file not found, copying example file:  %s",
-                    EXAMPLE_OPTIONS_FILE,
+                # Look for an existing examples file.
+                elif os.path.isfile(EXAMPLE_OPTIONS_FILE):
+                    shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
+                    log.warning(
+                        "Copying existing example options file:  %(example_file)s",
+                        {"example_file": EXAMPLE_OPTIONS_FILE},
+                    )
+
+                # Generate a new example file and copy it too.
+                else:
+                    self.register.write_default_ini(pathlib.Path(EXAMPLE_OPTIONS_FILE))
+                    shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
+                    log.warning(
+                        "Generated a new %(example_file)s and copied it to %(option_file)s",
+                        {
+                            "example_file": EXAMPLE_OPTIONS_FILE,
+                            "option_file": self.config_file,
+                        },
+                    )
+            except OSError as e:
+                log.exception(
+                    "Something went wrong while trying to find a config option file."
                 )
-
-            else:
-                self.register.write_default_ini(pathlib.Path(EXAMPLE_OPTIONS_FILE))
-                shutil.copy(EXAMPLE_OPTIONS_FILE, self.config_file)
-                log.warning(
-                    "Generated a new example_options.ini and copied it to options.ini"
-                )
-
-        # load the config and check if settings are configured.
-        if not config.read(self.config_file, encoding="utf-8"):
-            c = configparser.ConfigParser()
-            owner_id = ""
-            try:
-                c.read(self.config_file, encoding="utf-8")
-                owner_id = c.get("Permissions", "OwnerID", fallback="").strip().lower()
-
-                if not owner_id.isdigit() and owner_id != "auto":
-                    log.critical(
-                        "Please configure settings in '%s' and re-run the bot.",
-                        DEFAULT_OPTIONS_FILE,
-                    )
-                    raise RuntimeError("MusicBot cannot proceed with this config.")
-
-            except ValueError as e:  # Config id value was changed but its not valid
                 raise HelpfulError(
-                    "Invalid config value for OwnerID",
-                    "The OwnerID option requires a user ID number or 'auto'.",
+                    # fmt: off
+                    "Error locating config.\n"
+                    "\n"
+                    "Problem:\n"
+                    "  Could not find or create a config file due to an error:\n"
+                    "  %(raw_error)s\n"
+                    "\n"
+                    "Solution:\n"
+                    "  Verify the config folder and files exist and can be read by MusicBot.",
+                    # fmt: on
+                    fmt_args={"raw_error": e},
                 ) from e
+
+        # try to read / parse the config file.
+        try:
+            config.read(self.config_file, encoding="utf-8")
+        except (OSError, configparser.Error) as e:
+            raise HelpfulError(
+                # fmt: off
+                "Error loading config.\n"
+                "\n"
+                "Problem:\n"
+                "  MusicBot could not read config file due to an error:\n"
+                "  %(raw_error)s\n"
+                "\n"
+                "Solution:\n"
+                "  Make sure the file is accessible and error free.\n"
+                "  Copy the example file from the repo if all else fails.",
+                # fmg: on
+                fmt_args={"raw_error": e},
+            ) from e
 
     def update_option(self, option: "ConfigOption", value: str) -> bool:
         """
@@ -1510,7 +1526,6 @@ class ConfigDefaults:
     song_blocklist_file: pathlib.Path = pathlib.Path(DEFAULT_SONG_BLOCKLIST_FILE)
     auto_playlist_dir: pathlib.Path = pathlib.Path(DEFAULT_PLAYLIST_DIR)
     media_file_dir: pathlib.Path = pathlib.Path(DEFAULT_MEDIA_FILE_DIR)
-    i18n_file: pathlib.Path = pathlib.Path(DEFAULT_I18N_FILE)
     audio_cache_path: pathlib.Path = pathlib.Path(DEFAULT_AUDIO_CACHE_DIR)
 
     @staticmethod
@@ -1715,7 +1730,7 @@ class ConfigOptionRegistry:
         parser_value = p_getter(opt.section, opt.option, fallback=opt.default)
 
         display_config_value = ""
-        if not display_config_value and opt.empty_display_val:
+        if opt.empty_display_val:
             display_config_value = opt.empty_display_val
 
         return (config_value, parser_value, display_config_value)
@@ -1745,7 +1760,7 @@ class ConfigOptionRegistry:
         getter: str = "get",
         editable: bool = True,
         invisible: bool = False,
-        empty_display_val: str = "",
+        empty_display_val: str = " ",
     ) -> str:
         pass
 
@@ -1809,7 +1824,7 @@ class ConfigOptionRegistry:
         getter: str = "getidset",
         editable: bool = True,
         invisible: bool = False,
-        empty_display_val: str = "",
+        empty_display_val: str = " ",
     ) -> Set[int]:
         pass
 
@@ -1825,7 +1840,7 @@ class ConfigOptionRegistry:
         getter: str = "getstrset",
         editable: bool = True,
         invisible: bool = False,
-        empty_display_val: str = "",
+        empty_display_val: str = " ",
     ) -> Set[str]:
         pass
 
@@ -2163,9 +2178,16 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return int(val)
         except ValueError as e:
             raise HelpfulError(
-                f"The owner ID in [{section}] > {key} is not valid. Your setting:  {val}",
-                f"Set {key} to a numerical ID or set it to 'auto' to have the bot find it for you.",
-                preface=self.error_preface,
+                # fmt: off
+                "Error loading config value.\n"
+                "\n"
+                "Problem:\n"
+                "  The owner ID in [%(section)s] > %(option)s is not valid.\n"
+                "\n"
+                "Solution:\n"
+                "  Set %(option)s to a numerical ID or set it to `auto` or `0` for automatic owner binding.",
+                # fmt: on
+                fmt_args={"section": section, "option": key},
             ) from e
 
     def getpathlike(
@@ -2192,9 +2214,16 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return pathlib.Path(val).resolve(strict=False)
         except RuntimeError as e:
             raise HelpfulError(
-                preface=self.error_preface,
-                issue=f"The config option [{section}] > {key} is not a valid file system location.",
-                solution="Check the path setting and make sure it doesn't loop back on itself.",
+                # fmt: off
+                "Error loading config value.\n"
+                "\n"
+                "Problem:\n"
+                "  The config option [%(section)s] > %(option)s is not a valid file location.\n"
+                "\n"
+                "Solution:\n"
+                "  Check the path setting and make sure the file exists and is accessible to MusicBot.",
+                # fmt: on
+                fmt_args={"section": section, "option": key},
             ) from e
 
     def getidset(
@@ -2215,9 +2244,16 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return set(int(i) for i in str_ids)
         except ValueError as e:
             raise HelpfulError(
-                f"One of the IDs in option [{section}] > {key} is invalid.",
-                "Ensure all IDs are numerical, and separated only by spaces or commas.",
-                preface=self.error_preface,
+                # fmt: off
+                "Error loading config value.\n"
+                "\n"
+                "Problem:\n"
+                "  One of the IDs in option [%(section)s] > %(option)s is invalid.\n"
+                "\n"
+                "Solution:\n"
+                "  Ensure all IDs are numerical, and separated only by spaces or commas.",
+                # fmt: on
+                fmt_args={"section": section, "option": key},
             ) from e
 
     def getdebuglevel(

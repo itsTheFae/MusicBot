@@ -589,8 +589,8 @@ class PermissionGroup:
         # the extractor is not allowed.
         raise PermissionsError(
             "You do not have permission to play the requested media.\n"
-            f"The yt-dlp extractor `{extractor}` is not permitted in your group.",
-            expire_in=30,
+            "The yt-dlp extractor `%(extractor)s` is not permitted in your group.",
+            fmt_args={"extractor": extractor},
         )
 
     def format(self, for_user: bool = False) -> str:

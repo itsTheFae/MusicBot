@@ -159,11 +159,7 @@ class Playlist(EventEmitter, Serializable):
 
         # this should, in theory, never happen.
         if info.ytdl_type == "playlist":
-            raise WrongEntryTypeError(
-                "This is a playlist.",
-                True,
-                info.webpage_url or info.url,
-            )
+            raise WrongEntryTypeError("This is a playlist.")
 
         # check if this is a local file entry.
         if info.ytdl_type == "local":
@@ -195,7 +191,8 @@ class Playlist(EventEmitter, Serializable):
                     if not any(x in content_type for x in ("/ogg", "/octet-stream")):
                         # How does a server say `application/ogg` what the actual fuck
                         raise ExtractionError(
-                            f'Invalid content type "{content_type}" for url: {info.url}'
+                            "Invalid content type `%(type)s` for url: %(url)s",
+                            fmt_args={"type": content_type, "url": info.url},
                         )
 
                 elif (

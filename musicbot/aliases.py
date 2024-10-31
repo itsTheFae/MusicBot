@@ -54,8 +54,16 @@ class Aliases:
                 log.warning("Aliases file not found, copying example_aliases.json")
             else:
                 raise HelpfulError(
-                    "Your aliases files are missing. Neither aliases.json nor example_aliases.json were found.",
-                    "Replace the aliases.json config file(s) or copy them from https://github.com/Just-Some-Bots/MusicBot/",
+                    # fmt: off
+                    "Error while loading alises.\n"
+                    "\n"
+                    "Problem:\n"
+                    "  Your aliases files (aliases.json & example_aliases.json) are missing.\n"
+                    "\n"
+                    "Solution:\n"
+                    "  Replace the alias config file(s) or copy them from:\n"
+                    "    https://github.com/Just-Some-Bots/MusicBot/",
+                    # fmt: on
                 )
 
         # parse json

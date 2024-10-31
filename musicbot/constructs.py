@@ -390,6 +390,7 @@ class MusicBotResponse(discord.Embed):
         force_text: bool = False,
         **kwargs: Any,
     ) -> None:
+        self.content = content
         self.codeblock = codeblock
         self.reply_to = reply_to
         self.send_to = send_to
@@ -398,12 +399,8 @@ class MusicBotResponse(discord.Embed):
         self.delete_after = delete_after
         self.files = files if files is not None else []
 
-        if codeblock:
-            content = f"```{codeblock}\n{content}\n```"
-
         super().__init__(
             title=title,
-            description=content,
             color=discord.Colour.from_str(color_hex),
             **kwargs,
         )
@@ -411,6 +408,18 @@ class MusicBotResponse(discord.Embed):
             text=DEFAULT_FOOTER_TEXT,
             icon_url=DEFAULT_BOT_ICON,
         )
+        # overload the original description with our formatting property.
+        # yes, this is cursed and I don't like doing it, but it defers format.
+        setattr(self, "description", getattr(self, "overload_description"))
+
+    @property
+    def overload_description(self) -> str:
+        """
+        Overload the description attribute to defer codeblock formatting.
+        """
+        if self.codeblock:
+            return f"```{self.codeblock}\n{self.content}```"
+        return self.content
 
     def to_markdown(self) -> str:
         """

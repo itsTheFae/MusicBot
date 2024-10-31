@@ -115,7 +115,8 @@ class SpotifyTrack(SpotifyObject):
         super().__init__(track_data, origin_url)
         if not SpotifyObject.is_track_data(track_data):
             raise SpotifyError(
-                f"Invalid track_data, must be of type `track` got `{self.spotify_type}`"
+                "Invalid track_data, must be of type `track` got `%(type)s`",
+                fmt_args={"type": self.spotify_type},
             )
 
     @property
@@ -348,8 +349,8 @@ class Spotify:
     WEB_TOKEN_URL = "https://open.spotify.com/get_access_token?reason=transport&productType=web_player"
     OAUTH_TOKEN_URL = "https://accounts.spotify.com/api/token"
     API_BASE = "https://api.spotify.com/v1/"
-    # URL_REGEX allows missing protocol scheme intentionally.
-    URL_REGEX = re.compile(r"(?:https?://)?open\.spotify\.com/", re.I)
+    # URL_REGEX allows missing protocol scheme and region code intentionally.
+    URL_REGEX = re.compile(r"(?:https?://)?open\.spotify\.com/(?:intl-[\w-]+/)?", re.I)
 
     def __init__(
         self,
@@ -572,7 +573,8 @@ class Spotify:
             async with self.aiosession.get(url, headers=headers) as r:
                 if r.status != 200:
                     raise SpotifyError(
-                        f"Response status is not OK: [{r.status}] {r.reason}"
+                        "Response status is not OK: [%(status)s] %(reason)s",
+                        fmt_args={"status": r.status, "reason": r.reason},
                     )
                 # log.everything("Spotify API GET:  %s\nData:  %s", url, await r.text() )
                 data = await r.json()  # type: Dict[str, Any]
@@ -588,7 +590,8 @@ class Spotify:
         ) as e:
             log.exception("Failed making GET request to url:  %s", url)
             raise SpotifyError(
-                f"Could not make GET to URL:  {url}  Reason:  {str(e)}"
+                "Could not make GET to URL:  %(url)s  Reason:  %(raw_error)s",
+                fmt_args={"url": url, "raw_error": e},
             ) from e
 
     async def _make_post(
@@ -602,7 +605,8 @@ class Spotify:
             async with self.aiosession.post(url, data=payload, headers=headers) as r:
                 if r.status != 200:
                     raise SpotifyError(
-                        f"Response status is not OK: [{r.status}] {r.reason}"
+                        "Response status is not OK: [%(status)s] %(reason)s",
+                        fmt_args={"status": r.status, "reason": r.reason},
                     )
 
                 data = await r.json()  # type: Dict[str, Any]
@@ -618,7 +622,8 @@ class Spotify:
         ) as e:
             log.exception("Failed making POST request to url:  %s", url)
             raise SpotifyError(
-                f"Could not make POST to URL:  {url}  Reason:  {str(e)}"
+                "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s",
+                fmt_args={"url": url, "raw_error": e},
             ) from e
 
     def _make_token_auth(self, client_id: str, client_secret: str) -> Dict[str, Any]:
@@ -662,12 +667,14 @@ class Spotify:
             except KeyError as e:
                 self._token = None
                 raise SpotifyError(
-                    f"API response did not contain the expected data. Missing: {str(e)}"
+                    "API response did not contain the expected data. Missing key: %(raw_error)s",
+                    fmt_args={"raw_error": e},
                 ) from e
             except (ValueError, TypeError) as e:
                 self._token = None
                 raise SpotifyError(
-                    f"API response contained unexpected data.  {str(e)}"
+                    "API response contained unexpected data.\n%(raw_error)s",
+                    fmt_args={"raw_error": e},
                 ) from e
         else:
             token = await self._request_token()
@@ -704,7 +711,8 @@ class Spotify:
                     # Note:  when status == 429 we could check for "Retry*" headers.
                     # however, this isn't an API endpoint, so we don't get Retry data.
                     raise SpotifyError(
-                        f"API response status is not OK: [{r.status}]  {r.reason}"
+                        "API response status is not OK: [%(status)s]  %(reason)s",
+                        fmt_args={"status": r.status, "reason": r.reason},
                     )
 
                 data = await r.json()  # type: Dict[str, Any]

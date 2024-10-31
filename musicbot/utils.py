@@ -172,7 +172,7 @@ def owner_only(func: Callable[..., Any]) -> Any:
 
         if not orig_msg or orig_msg.author.id == self.config.owner_id:
             return await func(self, *args, **kwargs)
-        raise PermissionsError("Only the owner can use this command.", expire_in=30)
+        raise PermissionsError("Only the owner can use this command.")
 
     setattr(wrapper, "admin_only", True)
     return wrapper
@@ -192,7 +192,7 @@ def dev_only(func: Callable[..., Any]) -> Any:
 
         if orig_msg.author.id in self.config.dev_ids:
             return await func(self, *args, **kwargs)
-        raise PermissionsError("Only dev users can use this command.", expire_in=30)
+        raise PermissionsError("Only dev users can use this command.")
 
     setattr(wrapper, "dev_cmd", True)
     return wrapper

@@ -440,8 +440,6 @@ def req_ensure_py3() -> None:
             "Could not find Python 3.8 or higher.  Please run the bot using Python 3.8"
         )
         bugger_off()
-    else:
-        log.info("Python version:  %s", sys.version)
 
 
 def req_check_deps() -> None:
@@ -945,6 +943,7 @@ def main() -> None:
     # Log file creation is deferred until this first write.
     log.info("Loading MusicBot version:  %s", BOTVERSION)
     log.info("Log opened:  %s", time.ctime())
+    log.info("Python version:  %s", sys.version)
 
     # Check if run.py is in the current working directory.
     run_py_dir = os.path.dirname(os.path.realpath(__file__))
@@ -1062,18 +1061,18 @@ def main() -> None:
                     raise
 
             if cli_args.no_install_deps:
-                helpfulerr = HelpfulError(
-                    preface=_L("Cannot start MusicBot due to an error!"),
-                    issue=_L(
-                        "Error: %s\n"
-                        "This is an error importing MusicBot or a dependency package."
-                    ),
-                    solution=_L(
-                        "You need to manually install dependency packages via pip.\n"
-                        "Or launch without `--no-install-deps` and MusicBot will try to install them for you."
-                    ),
+                log.error(
+                    # fmt: off
+                    "Cannot start MusicBot due to an error!\n"
+                    "\n"
+                    "Problem:\n"
+                    "  There was an error importing MusicBot or a dependency package.\n"
+                    "\n"
+                    "Solution:\n"
+                    "  You need to manually install pip packages for MusicBot\n"
+                    "  or launch without `--no-install-deps` and MusicBot will try to install them for you."
+                    # fmt: on
                 )
-                log.error(str(helpfulerr))
                 break
 
             if not PIP.works():
@@ -1104,19 +1103,26 @@ def main() -> None:
                 # If pip ran without issue, it should return 0 status code.
                 if pip_exit_code:
                     print()
-                    dep_error = HelpfulError(
-                        preface=_L("MusicBot dependencies may not be installed!"),
-                        issue=_L("We didn't get a clean exit code from `pip` install."),
-                        solution=_L(
-                            "You will need to manually install dependency packages.\n"
-                            "MusicBot tries to use the following command, so modify as needed:\n"
-                            "  pip install -U -r ./requirements.txt"
-                        ),
-                        footnote=_L(
-                            "You can also ask for help in MusicBot support server:  https://discord.gg/bots"
-                        ),
+                    log.critical(
+                        # fmt: off
+                        "MusicBot dependencies may not be installed!\n"
+                        "\n"
+                        "Problem:\n"
+                        "  The pip install process ended with a possible error.\n"
+                        "  Some or all of the the dependencies may be missing.\n"
+                        "\n"
+                        "Solution:\n"
+                        "  You must manually install dependency packages.\n"
+                        "  Open a CMD prompt / terminal to the MusicBot directory.\n"
+                        "  You can try using the update scripts install packages.\n"
+                        "  Or try this manual command:\n"
+                        "    %(py_bin)s -m pip install -U -r ./requirements.txt\n"
+                        "\n"
+                        "You can also ask for help in MusicBot's support discord:\n"
+                        "  https://discord.gg/bots",
+                        # fmt: on
+                        {"py_bin": sys.executable}
                     )
-                    log.critical(str(dep_error))
                     break
 
                 print()
@@ -1140,7 +1146,7 @@ def main() -> None:
             break
 
         except HelpfulError as e:
-            log.info(e.message)
+            log.error(_L(e.message), e.fmt_args)
             break
 
         except TerminateSignal as e:
