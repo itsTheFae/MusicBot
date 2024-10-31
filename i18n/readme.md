@@ -1,4 +1,5 @@
-# MusicBot i18n Guide
+# MusicBot i18n Guide  
+
 MusicBot makes use of GNU gettext for translation of display text.  
 We use the typical `.po`/`.mo` format to enable translations.  
 Language directories in `i18n/` should be named using lower-case, and mostly conform to the [Locale-Names specification](https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/Locale-Names.html) by gettext.  
@@ -14,7 +15,8 @@ MusicBot will look for languages based on a longest-match first. For example, as
 
 Multiple language codes can be specified, each separated by a comma, where the first are considered most favored. However, only one language will be used at a time. Translations missing from one language will be returned without translation, rather than checking a different language first.
 
-## Add New Language
+## Add New Language  
+
 Adding new languages to MusicBot is relatively easy, and can be done in a few steps:  
 1. Pick a language code. For example: `es_ES` as in Spanish of Spain.  
 2. Create the new language directories. Ex.: `./i18n/es_es/LC_MESSAGES/`  
@@ -27,12 +29,19 @@ Picking an appropriate language code or [Locale-Name](https://www.gnu.org/savann
 As MusicBot will detect the system / environment language automatically, some consideration must be given to what code(s) each system might report for a specific language.  
 That being said, it may make sense to use a shorter, less-strict language code in some cases. While Spanish in Spain (`es_ES`) may be different from Spanish in Mexico (`es_MX`) adding Spanish as `es` will cover both variations until a more specific translation is added.  
 
-## Updating Source Strings
+## Working with strings  
+
+MusicBot sometimes uses strings which include variable data. As Python provides a number of formatting styles, it is important to pick one for consistency sake.  
+Currently, the style of choice is the traditional percent or modulo `%` formatting in python that resembles C-style `sprintf` string formatting.  
+For details on how this style of formatting works, check out the [printf-style string formatting](https://docs.python.org/3.10/library/stdtypes.html#printf-style-string-formatting) section of the python manual.
+
+### Updating Source Strings
 While working on MusicBot you might want to change some text or add new strings for translation.  All changes and additional strings need to be extracted before they can be translated.  
 
 For convenience, the script `./i18n/extract.sh` is pre-configured to extract properly marked strings from the source code and create `.po` files with the results.  
+These files need further edits to select the language code and provide translations.
 
-## Testing Translations
+### Testing Translations
 For developers adding new strings to MusicBot, we provide another script to generate a testing language using extracted strings.  
 
 The script `./i18n/mktestlang.sh` will perform an extraction and conversion of strings to reversed variations. The test language is stored inside of `./i18n/xx/LC_MESSAGES/` and can then be enabled by passing `--lang=xx` as a launch option.  

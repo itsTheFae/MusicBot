@@ -8,12 +8,13 @@ MB_Version="$(git describe --tags --always)"
 echo "Extracting strings for translation from MusicBot $MB_Version"
 
 echo "Log domain..."
-xgettext -v -F --language=Python --no-wrap \
+xgettext -v -F -k --language=Python --no-wrap \
     --add-comments="TRANSLATORS:" \
     --package-name="Just-Some-Bots/MusicBot" \
     --package-version="${MB_Version}" \
     --keyword="_L" \
     --keyword="_Ln" \
+    --keyword="_X" \
     --keyword="debug" \
     --keyword="info" \
     --keyword="warning" \
@@ -24,6 +25,17 @@ xgettext -v -F --language=Python --no-wrap \
     --keyword="voicedebug" \
     --keyword="ffmpeg" \
     --keyword="noise" \
+    --keyword="MusicbotException" \
+    --keyword="CommandError" \
+    --keyword="ExtractionError" \
+    --keyword="InvalidDataError" \
+    --keyword="WrongEntryTypeError" \
+    --keyword="FFmpegError" \
+    --keyword="FFmpegWarning" \
+    --keyword="SpotifyError" \
+    --keyword="PermissionsError" \
+    --keyword="HelpfulError" \
+    --keyword="HelpfulWarning" \
     --output="./i18n/musicbot_logs.po" \
     ./run.py \
     ./musicbot/*.py
@@ -35,6 +47,18 @@ xgettext -v -F -k --language=Python --no-wrap \
     --package-version="${MB_Version}" \
     --keyword="_D" \
     --keyword="_Dn" \
+    --keyword="_X" \
+    --keyword="MusicbotException" \
+    --keyword="CommandError" \
+    --keyword="ExtractionError" \
+    --keyword="InvalidDataError" \
+    --keyword="WrongEntryTypeError" \
+    --keyword="FFmpegError" \
+    --keyword="FFmpegWarning" \
+    --keyword="SpotifyError" \
+    --keyword="PermissionsError" \
+    --keyword="HelpfulError" \
+    --keyword="HelpfulWarning" \
     --output="./i18n/musicbot_messages.po" \
     ./musicbot/*.py
 
