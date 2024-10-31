@@ -1,7 +1,7 @@
 #!/bin/bash
 
-cd "$(dirname "${BASH_SOURCE[0]}")" || echo "failed to change directory"; exit 1;
-cd .. || echo "failed to change directory"; exit 1;
+cd "$(dirname "${BASH_SOURCE[0]}")" || { echo "failed to change directory"; exit 1; }
+cd .. || { echo "failed to change directory"; exit 1; }
 
 # extract all strings.
 ./i18n/extract.sh
