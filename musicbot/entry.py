@@ -345,7 +345,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             downloaded = (
                 raw_json["downloaded"] if playlist.bot.config.save_videos else False
             )
-            filename = raw_json["filename"] if downloaded else None
+            filename = raw_json["filename"] if downloaded else ""
 
             channel_id = raw_json.get("channel_id", None)
             if channel_id:
@@ -1062,7 +1062,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
             downloaded = (
                 raw_json["downloaded"] if playlist.bot.config.save_videos else False
             )
-            filename = raw_json["filename"] if downloaded else None
+            filename = raw_json["filename"] if downloaded else ""
 
             channel_id = raw_json.get("channel_id", None)
             if channel_id:
