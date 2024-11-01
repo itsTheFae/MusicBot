@@ -835,14 +835,19 @@ class MusicBot(discord.Client):
                     "MusicBot connection to voice was cancelled. This is odd. Maybe restart?"
                 ) from e
 
-        # TODO: look into Stage channel handling and test this at some point.
-        # It is likely that we'll want to respond to a voice state update instead
-        # to make sure manually moving a bot to a StageChannel gives it speaker.
+        # request speaker automatically in stage channels.
         if isinstance(channel, discord.StageChannel):
             try:
-                await channel.guild.me.edit(suppress=False)
-            except (discord.Forbidden, discord.HTTPException):
-                log.exception("Something broke in StageChannel handling.")
+                # this has the same effect as edit(suppress=False)
+                await channel.guild.me.request_to_speak()
+            except discord.Forbidden as e:
+                raise exceptions.PermissionsError(
+                    "MusicBot does not have permission to speak."
+                ) from e
+            except (discord.HTTPException, discord.ClientException) as e:
+                raise exceptions.MusicbotException(
+                    "MusicBot could not request to speak."
+                ) from e
 
         return client
 
@@ -8323,12 +8328,22 @@ class MusicBot(discord.Client):
                         )
                         event.set()
 
-        # Voice stat updates for bot itself.
+        # Voice state updates for bot itself.
         if member == self.user:
             # check if bot was disconnected from a voice channel
             if not after.channel and before.channel and not self.network_outage:
                 if await self._handle_api_disconnect(before):
                     return
+
+            # if the bot was moved to a stage channel, request speaker.
+            if isinstance(after.channel, discord.StageChannel):
+                try:
+                    # this has the same effect as edit(suppress=False)
+                    await after.channel.guild.me.request_to_speak()
+                except discord.Forbidden as e:
+                    log.exception("MusicBot does not have permission to speak.")
+                except (discord.HTTPException, discord.ClientException) as e:
+                    log.exception("MusicBot could not request to speak.")
 
         if before.channel:
             player = self.get_player_in(before.channel.guild)
