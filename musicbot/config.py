@@ -46,7 +46,7 @@ from .constants import (
     MUSICBOT_TOKEN_ENV_VAR,
 )
 from .exceptions import HelpfulError
-from .i18n import _X
+from .i18n import _Dd
 from .logs import (
     set_logging_level,
     set_logging_max_kept_logs,
@@ -116,9 +116,6 @@ class Config:
         config.read(config_file, encoding="utf-8")
         self.register = ConfigOptionRegistry(self, config)
 
-        self._confpreface = "An error has occured reading the config:\n"
-        self._confpreface2 = "An error has occured validating the config:\n"
-
         # DebugLevel is important for feedback, so we load it first.
         self._debug_level: DebugLevel = self.register.init_option(
             section="MusicBot",
@@ -126,7 +123,7 @@ class Config:
             dest="_debug_level",
             default=ConfigDefaults._debug_level(),
             getter="getdebuglevel",
-            comment=_X(
+            comment=_Dd(
                 "Set the log verbosity of MusicBot. Normally this should be set to INFO.\n"
                 "It can be set to one of the following:\n"
                 " CRITICAL, ERROR, WARNING, INFO, DEBUG, VOICEDEBUG, FFMPEG, NOISY, or EVERYTHING"
@@ -148,7 +145,7 @@ class Config:
             dest="_login_token",
             getter="get",
             default=ConfigDefaults.token,
-            comment=_X(
+            comment=_Dd(
                 "Discord bot authentication token for your Bot.\n"
                 "Visit Discord Developer Portal to create a bot App and generate your Token.\n"
                 "Never publish your bot token!"
@@ -161,7 +158,7 @@ class Config:
             option="Spotify_ClientID",
             dest="spotify_clientid",
             default=ConfigDefaults.spotify_clientid,
-            comment=_X(
+            comment=_Dd(
                 "Provide your own Spotify Client ID to enable MusicBot to interact with Spotify API.\n"
                 "MusicBot will try to use the web player API (guest mode) if nothing is set here.\n"
                 "Using your own API credentials grants higher usage limits than guest mode."
@@ -173,7 +170,7 @@ class Config:
             option="Spotify_ClientSecret",
             dest="spotify_clientsecret",
             default=ConfigDefaults.spotify_clientsecret,
-            comment=_X(
+            comment=_Dd(
                 "Provide your Spotify Client Secret to enable MusicBot to interact with Spotify API.\n"
                 "This is required if you set the Spotify_ClientID option above."
             ),
@@ -187,7 +184,7 @@ class Config:
             dest="owner_id",
             default=ConfigDefaults.owner_id,
             # TRANSLATORS: 'auto' should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Provide a Discord User ID number to set the owner of this bot.\n"
                 "The word 'auto' or number 0 will set the owner based on App information.\n"
                 "Only one owner ID can be set here. Generally, setting 'auto' is recommended."
@@ -200,7 +197,7 @@ class Config:
             option="DevIDs",
             dest="dev_ids",
             default=ConfigDefaults.dev_ids,
-            comment=_X(
+            comment=_Dd(
                 "A list of Discord User IDs who can use the dev-only commands.\n"
                 "Warning: dev-only commands can allow arbitrary remote code execution.\n"
                 "Use spaces to separate multiple IDs.\n"
@@ -216,7 +213,7 @@ class Config:
             dest="bot_exception_ids",
             getter="getidset",
             default=ConfigDefaults.bot_exception_ids,
-            comment=_X(
+            comment=_Dd(
                 "Discord Member IDs for other bots that MusicBot should not ignore.\n"
                 "Use spaces to separate multiple IDs.\n"
                 "All bots are ignored by default."
@@ -229,7 +226,7 @@ class Config:
             option="CommandPrefix",
             dest="command_prefix",
             default=ConfigDefaults.command_prefix,
-            comment=_X(
+            comment=_Dd(
                 "Command prefix is how all MusicBot commands must be started in Discord messages.\n"
                 "E.g., if you set this to * the play command is trigger by *play ..."
             ),
@@ -241,7 +238,7 @@ class Config:
             default=ConfigDefaults.commands_via_mention,
             getter="getboolean",
             # TRANSLATORS: YourBotNameHere can be translated.  CommandPrefix should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Enable using commands with @[YourBotNameHere]\n"
                 "The CommandPrefix is still available, but can be replaced with @ mention."
             ),
@@ -252,7 +249,7 @@ class Config:
             dest="bound_channels",
             default=ConfigDefaults.bound_channels,
             getter="getidset",
-            comment=_X(
+            comment=_Dd(
                 "ID numbers for text channels that MusicBot should exclusively use for commands.\n"
                 "This can contain IDs for channels in multiple servers.\n"
                 "Use spaces to separate multiple IDs.\n"
@@ -266,7 +263,7 @@ class Config:
             default=ConfigDefaults.unbound_servers,
             getter="getboolean",
             # TRANSLATORS: BindToChannels should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Allow responses in all channels while no specific channel is set for a server.\n"
                 "Only used when BindToChannels is missing an ID for a server."
             ),
@@ -277,7 +274,7 @@ class Config:
             dest="autojoin_channels",
             default=ConfigDefaults.autojoin_channels,
             getter="getidset",
-            comment=_X(
+            comment=_Dd(
                 "A list of Voice Channel IDs that MusicBot should automatically join on start up.\n"
                 "Use spaces to separate multiple IDs."
             ),
@@ -288,7 +285,7 @@ class Config:
             dest="dm_nowplaying",
             default=ConfigDefaults.dm_nowplaying,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "MusicBot will try to send Now Playing notices directly to the member who requested the song instead of posting in a server channel."
             ),
         )
@@ -298,7 +295,7 @@ class Config:
             dest="no_nowplaying_auto",
             default=ConfigDefaults.no_nowplaying_auto,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Disable now playing messages for songs played via auto playlist."
             ),
         )
@@ -308,7 +305,7 @@ class Config:
             dest="nowplaying_channels",
             default=ConfigDefaults.nowplaying_channels,
             getter="getidset",
-            comment=_X(
+            comment=_Dd(
                 "Forces MusicBot to use a specific channel to send now playing messages.\n"
                 "Only one text channel ID can be used per server."
             ),
@@ -319,7 +316,7 @@ class Config:
             dest="delete_nowplaying",
             default=ConfigDefaults.delete_nowplaying,
             getter="getboolean",
-            comment=_X("MusicBot will automatically delete Now Playing messages."),
+            comment=_Dd("MusicBot will automatically delete Now Playing messages."),
         )
 
         self.default_volume: float = self.register.init_option(
@@ -328,7 +325,7 @@ class Config:
             dest="default_volume",
             default=ConfigDefaults.default_volume,
             getter="getpercent",
-            comment=_X(
+            comment=_Dd(
                 "Sets the default volume level MusicBot will play songs at.\n"
                 "You can use any value from 0 to 1, or 0% to 100% volume."
             ),
@@ -339,7 +336,7 @@ class Config:
             dest="default_speed",
             default=ConfigDefaults.default_speed,
             getter="getfloat",
-            comment=_X(
+            comment=_Dd(
                 "Sets the default speed MusicBot will play songs at.\n"
                 "Must be a value from 0.5 to 100.0 for ffmpeg to use it.\n"
                 "A value of 1 is normal playback speed.\n"
@@ -353,7 +350,7 @@ class Config:
             default=ConfigDefaults.skips_required,
             getter="getint",
             # TRANSLATORS: SkipRatio should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Number of channel member votes required to skip a song.\n"
                 "Acts as a minimum when SkipRatio would require more votes."
             ),
@@ -365,7 +362,7 @@ class Config:
             default=ConfigDefaults.skip_ratio_required,
             getter="getpercent",
             # TRANSLATORS: SkipsRequired is not translated
-            comment=_X(
+            comment=_Dd(
                 "This percent of listeners in voice must vote for skip.\n"
                 "If SkipsRequired is lower than the computed value, it will be used instead.\n"
                 "You can set this from 0 to 1, or 0% to 100%."
@@ -377,7 +374,7 @@ class Config:
             dest="save_videos",
             default=ConfigDefaults.save_videos,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Allow MusicBot to keep downloaded media, or delete it right away."
             ),
         )
@@ -388,7 +385,7 @@ class Config:
             default=ConfigDefaults.storage_limit_bytes,
             getter="getdatasize",
             # TRANSLATORS: SaveVideos is not translated.
-            comment=_X(
+            comment=_Dd(
                 "If SaveVideos is enabled, set a limit on how much storage space should be used."
             ),
         )
@@ -399,7 +396,7 @@ class Config:
             default=ConfigDefaults.storage_limit_days,
             getter="getint",
             # TRANSLATORS: SaveVideos should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "If SaveVideos is enabled, set a limit on how long files should be kept."
             ),
         )
@@ -410,7 +407,7 @@ class Config:
             default=ConfigDefaults.storage_retain_autoplay,
             getter="getboolean",
             # TRANSLATORS: SaveVideos should not be translated
-            comment=_X(
+            comment=_Dd(
                 "If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."
             ),
         )
@@ -420,7 +417,7 @@ class Config:
             dest="now_playing_mentions",
             default=ConfigDefaults.now_playing_mentions,
             getter="getboolean",
-            comment=_X("Mention the user who added the song when it is played."),
+            comment=_Dd("Mention the user who added the song when it is played."),
         )
         self.auto_summon: bool = self.register.init_option(
             section="MusicBot",
@@ -428,7 +425,7 @@ class Config:
             dest="auto_summon",
             default=ConfigDefaults.auto_summon,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Automatically join the owner if they are in an accessible voice channel when bot starts."
             ),
         )
@@ -438,7 +435,7 @@ class Config:
             dest="auto_playlist",
             default=ConfigDefaults.auto_playlist,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Enable MusicBot to automatically play music from the auto playlist when the queue is empty."
             ),
         )
@@ -448,7 +445,7 @@ class Config:
             dest="auto_playlist_random",
             default=ConfigDefaults.auto_playlist_random,
             getter="getboolean",
-            comment=_X("Shuffles the auto playlist tracks before playing them."),
+            comment=_Dd("Shuffles the auto playlist tracks before playing them."),
         )
         self.auto_playlist_autoskip: bool = self.register.init_option(
             section="MusicBot",
@@ -456,7 +453,7 @@ class Config:
             dest="auto_playlist_autoskip",
             default=ConfigDefaults.auto_playlist_autoskip,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Enable automatic skip of auto playlist songs when a user plays a new song.\n"
                 "This only applies to the current playing song if it was added by the auto playlist."
             ),
@@ -468,7 +465,7 @@ class Config:
             dest="auto_playlist_remove_on_block",
             default=ConfigDefaults.auto_playlist_remove_on_block,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Remove songs from the auto playlist if they are found in the song blocklist."
             ),
         )
@@ -487,7 +484,7 @@ class Config:
             default=ConfigDefaults.delete_messages,
             getter="getboolean",
             # TRANSLATORS: DeleteDelayShort and DeleteDelayLong should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
                 "Delay period is controlled by DeleteDelayShort and DeleteDelayLong."
             ),
@@ -498,7 +495,7 @@ class Config:
             dest="delete_invoking",
             default=ConfigDefaults.delete_invoking,
             getter="getboolean",
-            comment=_X("Auto delete valid commands after a delay."),
+            comment=_Dd("Auto delete valid commands after a delay."),
         )
         self.delete_delay_short: float = self.register.init_option(
             section="MusicBot",
@@ -506,7 +503,7 @@ class Config:
             dest="delete_invoking",
             default=ConfigDefaults.delete_delay_short,
             getter="getduration",
-            comment=_X(
+            comment=_Dd(
                 "Sets the short period of seconds before deleting messages.\n"
                 "This period is used by messages that require no further interaction."
             ),
@@ -517,7 +514,7 @@ class Config:
             dest="delete_invoking",
             default=ConfigDefaults.delete_delay_long,
             getter="getduration",
-            comment=_X(
+            comment=_Dd(
                 "Sets the long delay period before deleting messages.\n"
                 "This period is used by interactive or long-winded messages, like search and help."
             ),
@@ -529,7 +526,7 @@ class Config:
             dest="persistent_queue",
             default=ConfigDefaults.persistent_queue,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Allow MusicBot to save the song queue, so queued songs will survive restarts."
             ),
         )
@@ -539,7 +536,7 @@ class Config:
             dest="pre_download_next_song",
             default=ConfigDefaults.pre_download_next_song,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Enable MusicBot to download the next song in the queue while a song is playing.\n"
                 "Currently this option does not apply to auto playlist or songs added to an empty queue."
             ),
@@ -549,7 +546,7 @@ class Config:
             option="StatusMessage",
             dest="status_message",
             default=ConfigDefaults.status_message,
-            comment=_X(
+            comment=_Dd(
                 "Specify a custom message to use as the bot's status. If left empty, the bot\n"
                 "will display dynamic info about music currently being played in its status instead.\n"
                 "Status messages may also use the following variables:\n"
@@ -570,7 +567,7 @@ class Config:
             dest="status_include_paused",
             default=ConfigDefaults.status_include_paused,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "If enabled, status messages will report info on paused players."
             ),
         )
@@ -581,7 +578,7 @@ class Config:
             default=ConfigDefaults.write_current_song,
             getter="getboolean",
             # TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
-            comment=_X(
+            comment=_Dd(
                 "If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"
             ),
         )
@@ -591,7 +588,7 @@ class Config:
             dest="allow_author_skip",
             default=ConfigDefaults.allow_author_skip,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Allow the member who requested the song to skip it, bypassing votes."
             ),
         )
@@ -601,7 +598,7 @@ class Config:
             dest="use_experimental_equalization",
             default=ConfigDefaults.use_experimental_equalization,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Tries to use ffmpeg to get volume normalizing options for use in playback.\n"
                 "This option can cause delay between playing songs, as the whole track must be processed."
             ),
@@ -612,7 +609,7 @@ class Config:
             dest="embeds",
             default=ConfigDefaults.embeds,
             getter="getboolean",
-            comment=_X("Allow MusicBot to format it's messages as embeds."),
+            comment=_Dd("Allow MusicBot to format it's messages as embeds."),
         )
         self.queue_length: int = self.register.init_option(
             section="MusicBot",
@@ -620,7 +617,7 @@ class Config:
             dest="queue_length",
             default=ConfigDefaults.queue_length,
             getter="getint",
-            comment=_X(
+            comment=_Dd(
                 "The number of entries to show per-page when using q command to list the queue."
             ),
         )
@@ -630,7 +627,7 @@ class Config:
             dest="remove_ap",
             default=ConfigDefaults.remove_ap,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
             ),
         )
@@ -640,7 +637,7 @@ class Config:
             dest="show_config_at_start",
             default=ConfigDefaults.show_config_at_start,
             getter="getboolean",
-            comment=_X("Display MusicBot config settings in the logs at startup."),
+            comment=_Dd("Display MusicBot config settings in the logs at startup."),
         )
         self.legacy_skip: bool = self.register.init_option(
             section="MusicBot",
@@ -649,7 +646,7 @@ class Config:
             default=ConfigDefaults.legacy_skip,
             getter="getboolean",
             # TRANSLATORS: InstaSkip should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Enable users with the InstaSkip permission to bypass skip voting and force skips."
             ),
         )
@@ -659,7 +656,7 @@ class Config:
             dest="leavenonowners",
             default=ConfigDefaults.leavenonowners,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "If enabled, MusicBot will leave servers if the owner is not in their member list."
             ),
         )
@@ -669,7 +666,7 @@ class Config:
             dest="usealias",
             default=ConfigDefaults.usealias,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "If enabled, MusicBot will allow commands to have multiple names using data in:  config/aliases.json"
             ),
             comment_args={"filepath": DEFAULT_COMMAND_ALIAS_FILE},
@@ -680,7 +677,7 @@ class Config:
             dest="footer_text",
             default=ConfigDefaults.footer_text,
             # TRANSLATORS: UseEmbeds should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Replace MusicBot name/version in embed footer with custom text.\n"
                 "Only applied when UseEmbeds is enabled and it is not blank."
             ),
@@ -693,7 +690,7 @@ class Config:
             dest="self_deafen",
             default=ConfigDefaults.self_deafen,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "MusicBot will automatically deafen itself when entering a voice channel."
             ),
         )
@@ -704,7 +701,7 @@ class Config:
             default=ConfigDefaults.leave_inactive_channel,
             getter="getboolean",
             # TRANSLATORS: LeaveInactiveVCTimeOut should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "If enabled, MusicBot will leave a voice channel when no users are listening,\n"
                 "after waiting for a period set in LeaveInactiveVCTimeOut option.\n"
                 "Listeners are channel members, excluding bots, who are not deafened."
@@ -716,7 +713,7 @@ class Config:
             dest="leave_inactive_channel_timeout",
             default=ConfigDefaults.leave_inactive_channel_timeout,
             getter="getduration",
-            comment=_X(
+            comment=_Dd(
                 "Set a period of time to wait before leaving an inactive voice channel.\n"
                 "You can set this to a number of seconds or phrase like:  4 hours"
             ),
@@ -727,7 +724,7 @@ class Config:
             dest="leave_after_queue_empty",
             default=ConfigDefaults.leave_after_queue_empty,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "If enabled, MusicBot will leave the channel immediately when the song queue is empty."
             ),
         )
@@ -737,7 +734,7 @@ class Config:
             dest="leave_player_inactive_for",
             default=ConfigDefaults.leave_player_inactive_for,
             getter="getduration",
-            comment=_X(
+            comment=_Dd(
                 "When paused or no longer playing, wait for this amount of time then leave voice.\n"
                 "You can set this to a number of seconds of phrase like:  15 minutes\n"
                 "Set it to 0 to disable leaving in this way."
@@ -749,7 +746,7 @@ class Config:
             dest="searchlist",
             default=ConfigDefaults.searchlist,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "If enabled, users must indicate search result choices by sending a message instead of using reactions."
             ),
         )
@@ -759,7 +756,7 @@ class Config:
             dest="defaultsearchresults",
             default=ConfigDefaults.defaultsearchresults,
             getter="getint",
-            comment=_X(
+            comment=_Dd(
                 "Sets the default number of search results to fetch when using the search command without a specific number."
             ),
         )
@@ -771,7 +768,7 @@ class Config:
             default=ConfigDefaults.enable_options_per_guild,
             getter="getboolean",
             # TRANSLATORS: setprefix should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Allow MusicBot to save a per-server command prefix, and enables the setprefix command."
             ),
         )
@@ -782,7 +779,7 @@ class Config:
             dest="round_robin_queue",
             default=ConfigDefaults.defaultround_robin_queue,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member."
             ),
         )
@@ -793,7 +790,7 @@ class Config:
             dest="enable_network_checker",
             default=ConfigDefaults.enable_network_checker,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Allow MusicBot to use timed pings to detect network outage and availability.\n"
                 "This may be useful if you keep the bot joined to a channel or playing music 24/7.\n"
                 "MusicBot must be restarted to enable network testing.\n"
@@ -807,7 +804,7 @@ class Config:
             dest="enable_queue_history_global",
             default=ConfigDefaults.enable_queue_history_global,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Enable saving all songs played by MusicBot to a global playlist file:  %(filename)s\n"
                 "This will contain all songs from all servers."
             ),
@@ -822,7 +819,7 @@ class Config:
             default=ConfigDefaults.enable_queue_history_guilds,
             getter="getboolean",
             # TRANSLATORS:  [Server ID] is a descriptive placeholder, and can be translated.
-            comment=_X(
+            comment=_Dd(
                 "Enable saving songs played per-server to a playlist file:  %(basename)s[Server ID]%(ext)s"
             ),
             comment_args={
@@ -838,7 +835,7 @@ class Config:
             default=ConfigDefaults.enable_local_media,
             getter="getboolean",
             # TRANSLATORS: MediaFileDirectory should not be translated.
-            comment=_X(
+            comment=_Dd(
                 "Enable playback of local media files using the play command.\n"
                 "When enabled, users can use:  `play file://path/to/file.ext`\n"
                 "to play files from the local MediaFileDirectory path."
@@ -851,7 +848,7 @@ class Config:
             dest="auto_unpause_on_play",
             default=ConfigDefaults.auto_unpause_on_play,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Allow MusicBot to automatically unpause when play commands are used."
             ),
         )
@@ -870,7 +867,7 @@ class Config:
             option="YtdlpProxy",
             dest="ytdlp_proxy",
             default=ConfigDefaults.ytdlp_proxy,
-            comment=_X(
+            comment=_Dd(
                 "Experimental, HTTP/HTTPS proxy settings to use with ytdlp media downloader.\n"
                 "The value set here is passed to `ytdlp --proxy` and aiohttp header checking.\n"
                 "Leave blank to disable."
@@ -881,7 +878,7 @@ class Config:
             option="YtdlpUserAgent",
             dest="ytdlp_user_agent",
             default=ConfigDefaults.ytdlp_user_agent,
-            comment=_X(
+            comment=_Dd(
                 "Experimental option to set a static User-Agent header in yt-dlp.\n"
                 "It is not typically recommended by yt-dlp to change the UA string.\n"
                 "For examples of what you might put here, check the following two links:\n"
@@ -896,7 +893,7 @@ class Config:
             dest="ytdlp_use_oauth2",
             default=ConfigDefaults.ytdlp_use_oauth2,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Experimental option to enable yt-dlp to use a YouTube account via OAuth2.\n"
                 "When enabled, you must use the generated URL and code to authorize an account.\n"
                 "The authorization token is then stored in the "
@@ -913,7 +910,7 @@ class Config:
             dest="ytdlp_oauth2_url",
             getter="getstr",
             default=ConfigDefaults.ytdlp_oauth2_url,
-            comment=_X(
+            comment=_Dd(
                 "Optional youtube video URL used at start-up for triggering OAuth2 authorization.\n"
                 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
                 "The URL set here should be an accessible youtube video URL.\n"
@@ -932,7 +929,7 @@ class Config:
             dest="user_blocklist_enabled",
             default=ConfigDefaults.user_blocklist_enabled,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Toggle the user block list feature, without emptying the block list."
             ),
         )
@@ -942,7 +939,7 @@ class Config:
             dest="user_blocklist_file",
             default=ConfigDefaults.user_blocklist_file,
             getter="getpathlike",
-            comment=_X(
+            comment=_Dd(
                 "An optional file path to a text file listing Discord User IDs, one per line."
             ),
         )
@@ -954,7 +951,7 @@ class Config:
             dest="song_blocklist_enabled",
             default=ConfigDefaults.song_blocklist_enabled,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Enable the song block list feature, without emptying the block list."
             ),
         )
@@ -964,7 +961,7 @@ class Config:
             dest="song_blocklist_file",
             default=ConfigDefaults.song_blocklist_file,
             getter="getpathlike",
-            comment=_X(
+            comment=_Dd(
                 "An optional file path to a text file that lists URLs, words, or phrases one per line.\n"
                 "Any song title or URL that contains any line in the list will be blocked."
             ),
@@ -977,7 +974,7 @@ class Config:
             dest="auto_playlist_dir",
             default=ConfigDefaults.auto_playlist_dir,
             getter="getpathlike",
-            comment=_X(
+            comment=_Dd(
                 "An optional path to a directory containing auto playlist files.\n"
                 "Each file should contain a list of playable URLs or terms, one track per line."
             ),
@@ -989,7 +986,7 @@ class Config:
             dest="media_file_dir",
             default=ConfigDefaults.media_file_dir,
             getter="getpathlike",
-            comment=_X(
+            comment=_Dd(
                 "An optional directory path where playable media files can be stored.\n"
                 "All files and sub-directories can then be accessed by using 'file://' as a protocol.\n"
                 "Example:  file://some/folder/name/file.ext\n"
@@ -1008,7 +1005,7 @@ class Config:
             dest="audio_cache_path",
             default=ConfigDefaults.audio_cache_path,
             getter="getpathlike",
-            comment=_X(
+            comment=_Dd(
                 "An optional directory path where MusicBot will store long and short-term cache for playback."
             ),
         )
@@ -1020,7 +1017,7 @@ class Config:
             dest="logs_max_kept",
             default=ConfigDefaults.logs_max_kept,
             getter="getint",
-            comment=_X(
+            comment=_Dd(
                 "Configure automatic log file rotation at restart, and limit the number of files kept.\n"
                 "When disabled, only one log is kept and its contents are replaced each run.\n"
                 "Set to 0 to disable.  Maximum allowed number is %(max)s."
@@ -1033,7 +1030,7 @@ class Config:
             option="LogsDateFormat",
             dest="logs_date_format",
             default=ConfigDefaults.logs_date_format,
-            comment=_X(
+            comment=_Dd(
                 "Configure the log file date format used when LogsMaxKept is enabled.\n"
                 "If left blank, a warning is logged and the default will be used instead.\n"
                 "Learn more about time format codes from the tables and data here:\n"
@@ -1047,7 +1044,7 @@ class Config:
             dest="use_opus_probe",
             default=ConfigDefaults.use_opus_probe,
             getter="getboolean",
-            comment=_X(
+            comment=_Dd(
                 "Potentially reduces CPU usage, but disables volume and speed controls.\n"
                 "This option will disable UseExperimentalEqualization option as well."
             ),

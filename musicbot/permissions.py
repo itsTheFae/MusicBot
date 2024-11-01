@@ -15,6 +15,7 @@ from .constants import (
     EXAMPLE_PERMS_FILE,
 )
 from .exceptions import HelpfulError, PermissionsError
+from .i18n import _Dd
 
 if TYPE_CHECKING:
     from .bot import MusicBot
@@ -323,7 +324,7 @@ class PermissionGroup:
             dest="command_whitelist",
             getter="getstrset",
             default=defaults.command_whitelist,
-            comment=(
+            comment=_Dd(
                 "List of command names allowed for use, separated by spaces.\n"
                 "Sub-command access can be controlled by adding _ and the sub-command name.\n"
                 "That is `config_set` grants only the `set` sub-command of the config command.\n"
@@ -337,7 +338,7 @@ class PermissionGroup:
             dest="command_blacklist",
             default=defaults.command_blacklist,
             getter="getstrset",
-            comment=(
+            comment=_Dd(
                 "List of command names denied from use, separated by spaces.\n"
                 "Will not work if CommandWhitelist is set!"
             ),
@@ -349,7 +350,7 @@ class PermissionGroup:
             dest="advanced_commandlists",
             getter="getboolean",
             default=defaults.advanced_commandlists,
-            comment=(
+            comment=_Dd(
                 "When enabled, CommandBlacklist and CommandWhitelist are used together.\n"
                 "Only commands in the whitelist are allowed, however sub-commands may be denied by the blacklist.\n"
             ),
@@ -360,7 +361,7 @@ class PermissionGroup:
             dest="ignore_non_voice",
             getter="getstrset",
             default=defaults.ignore_non_voice,
-            comment=(
+            comment=_Dd(
                 "List of command names that can only be used while in the same voice channel as MusicBot.\n"
                 "Some commands will always require the user to be in voice, regardless of this list.\n"
                 "Command names should be separated by spaces."
@@ -373,7 +374,10 @@ class PermissionGroup:
             dest="granted_to_roles",
             getter="getidset",
             default=defaults.grant_to_roles,
-            comment="List of Discord server role IDs that are granted this permission group. This option is ignored if UserList is set.",
+            comment=_Dd(
+                "List of Discord server role IDs that are granted this permission group.\n"
+                "This option is ignored if UserList is set."
+            ),
             invisible=True,
         )
         self.user_list = self._mgr.register.init_option(
@@ -382,7 +386,10 @@ class PermissionGroup:
             dest="user_list",
             getter="getidset",
             default=defaults.user_list,
-            comment="List of Discord member IDs that are granted permissions in this group. This option overrides GrantToRoles.",
+            comment=_Dd(
+                "List of Discord member IDs that are granted permissions in this group.\n"
+                "This option overrides GrantToRoles."
+            ),
             invisible=True,
         )
         self.max_songs = self._mgr.register.init_option(
@@ -391,7 +398,10 @@ class PermissionGroup:
             dest="max_songs",
             getter="getint",
             default=defaults.max_songs,
-            comment="Maximum number of songs a user is allowed to queue. A value of 0 means unlimited.",
+            comment=_Dd(
+                "Maximum number of songs a user is allowed to queue.\n"
+                "A value of 0 means unlimited."
+            ),
             empty_display_val="(Unlimited)",
         )
         self.max_song_length = self._mgr.register.init_option(
@@ -400,7 +410,7 @@ class PermissionGroup:
             dest="max_song_length",
             getter="getint",
             default=defaults.max_song_length,
-            comment=(
+            comment=_Dd(
                 "Maximum length of a song in seconds. A value of 0 means unlimited.\n"
                 "This permission may not be enforced if song duration is not available."
             ),
@@ -412,7 +422,10 @@ class PermissionGroup:
             dest="max_playlist_length",
             getter="getint",
             default=defaults.max_playlist_length,
-            comment="Maximum number of songs a playlist is allowed to have to be queued. A value of 0 means unlimited.",
+            comment=_Dd(
+                "Maximum number of songs a playlist is allowed to have when queued.\n"
+                "A value of 0 means unlimited."
+            ),
             empty_display_val="(Unlimited)",
         )
         self.max_search_items = self._mgr.register.init_option(
@@ -421,7 +434,9 @@ class PermissionGroup:
             dest="max_search_items",
             getter="getint",
             default=defaults.max_search_items,
-            comment="The maximum number of items that can be returned in a search.",
+            comment=_Dd(
+                "The maximum number of items that can be returned in a search."
+            ),
         )
         self.allow_playlists = self._mgr.register.init_option(
             section=name,
@@ -429,7 +444,7 @@ class PermissionGroup:
             dest="allow_playlists",
             getter="getboolean",
             default=defaults.allow_playlists,
-            comment="Allow users to queue playlists, or multiple songs at once.",
+            comment=_Dd("Allow users to queue playlists, or multiple songs at once."),
         )
         self.instaskip = self._mgr.register.init_option(
             section=name,
@@ -437,7 +452,9 @@ class PermissionGroup:
             dest="instaskip",
             getter="getboolean",
             default=defaults.insta_skip,
-            comment="Allow users to skip without voting, if LegacySkip config option is enabled.",
+            comment=_Dd(
+                "Allow users to skip without voting, if LegacySkip config option is enabled."
+            ),
         )
         self.skip_looped = self._mgr.register.init_option(
             section=name,
@@ -445,7 +462,7 @@ class PermissionGroup:
             dest="skip_looped",
             getter="getboolean",
             default=defaults.skip_looped,
-            comment="Allows the user to skip a looped song.",
+            comment=_Dd("Allows the user to skip a looped song."),
         )
         self.remove = self._mgr.register.init_option(
             section=name,
@@ -453,7 +470,7 @@ class PermissionGroup:
             dest="remove",
             getter="getboolean",
             default=defaults.remove,
-            comment=(
+            comment=_Dd(
                 "Allows the user to remove any song from the queue.\n"
                 "Does not remove or skip currently playing songs."
             ),
@@ -464,7 +481,9 @@ class PermissionGroup:
             dest="skip_when_absent",
             getter="getboolean",
             default=defaults.skip_when_absent,
-            comment="Skip songs added by users who are not in voice when their song is played.",
+            comment=_Dd(
+                "Skip songs added by users who are not in voice when their song is played."
+            ),
         )
         self.bypass_karaoke_mode = self._mgr.register.init_option(
             section=name,
@@ -472,7 +491,9 @@ class PermissionGroup:
             dest="bypass_karaoke_mode",
             getter="getboolean",
             default=defaults.bypass_karaoke_mode,
-            comment="Allows the user to add songs to the queue when Karaoke Mode is enabled.",
+            comment=_Dd(
+                "Allows the user to add songs to the queue when Karaoke Mode is enabled."
+            ),
         )
         self.summonplay = self._mgr.register.init_option(
             section=name,
@@ -480,7 +501,7 @@ class PermissionGroup:
             dest="summonplay",
             getter="getboolean",
             default=defaults.summon_no_voice,
-            comment=(
+            comment=_Dd(
                 "Auto summon to user voice channel when using play commands, if bot isn't in voice already.\n"
                 "The summon command must still be allowed for this group!"
             ),
@@ -491,10 +512,10 @@ class PermissionGroup:
             dest="extractors",
             getter="getstrset",
             default=defaults.extractors,
-            comment=(
+            comment=_Dd(
                 "Specify yt-dlp extractor names, separated by spaces, that are allowed to be used.\n"
                 "When empty, hard-coded defaults are used. The defaults are displayed above, but may change between versions.\n"
-                f"To allow all extractors, add `{PERMS_ALLOW_ALL_EXTRACTOR_NAME}` without quotes to the list.\n"
+                "To allow all extractors, add `%(allow_all)s` without quotes to the list.\n"
                 "\n"
                 "Services/extractors supported by yt-dlp are listed here:\n"
                 "  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n"
@@ -502,6 +523,7 @@ class PermissionGroup:
                 "MusicBot also provides one custom service `spotify:musicbot` to enable or disable spotify API extraction.\n"
                 "NOTICE: MusicBot might not support all services available to yt-dlp!\n"
             ),
+            comment_args={"allow_all": PERMS_ALLOW_ALL_EXTRACTOR_NAME},
             empty_display_val="(All allowed)",
         )
 

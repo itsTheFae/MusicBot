@@ -60,7 +60,7 @@ from .constants import VOICE_CLIENT_MAX_RETRY_CONNECT, VOICE_CLIENT_RECONNECT_TI
 from .constructs import ErrorResponse, GuildSpecificData, MusicBotResponse, Response
 from .entry import LocalFilePlaylistEntry, StreamPlaylistEntry, URLPlaylistEntry
 from .filecache import AudioFileCache
-from .i18n import _D, _L
+from .i18n import _D, _L, _Dd
 from .logs import muffle_discord_console_log, mute_discord_console_log
 from .opus_loader import load_opus_lib
 from .permissions import PermissionGroup, Permissions, PermissionsDefaults
@@ -2815,7 +2815,7 @@ class MusicBot(discord.Client):
             log.debug("Player activity timer is being reset.")
 
     @command_helper(
-        desc=(
+        desc=_Dd(
             "Reset the auto playlist queue by copying it back into player memory.\n"
             "This command will be removed in a future version, replaced by the autoplaylist command(s)."
         )
@@ -2837,7 +2837,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [COMMAND]"],
-        desc=(
+        desc=_Dd(
             "Show usage and description of a command, or list all available commands.\n"
         ),
     )
@@ -2969,16 +2969,16 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} add <@USER>\n"
-            "    Block a mentioned user.",
+            + _Dd("    Block a mentioned user."),
 
             "{cmd} remove <@USER>\n"
-            "    Unblock a mentioned user.",
+            + _Dd("    Unblock a mentioned user."),
 
             "{cmd} status <@USER>\n"
-            "    Show the block status of a mentioned user.",
+            + _Dd("    Show the block status of a mentioned user."),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Manage the users in the user block list.\n"
             "Blocked users are forbidden from using all bot commands.\n"
         ),
@@ -3104,7 +3104,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <add | remove> [SUBJECT]\n"],
-        desc=(
+        desc=_Dd(
             "Manage a block list applied to song requests and extracted song data.\n"
             "A subject may be a song URL or a word or phrase found in the track title.\n"
             "If subject is omitted, any currently playing track URL will be added instead.\n"
@@ -3202,22 +3202,22 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} <add | remove> [URL]\n"
-            "    Adds or removes the specified song or currently playing song to/from the current playlist.\n",
+            + _Dd("    Adds or removes the specified song or currently playing song to/from the current playlist.\n"),
 
             "{cmd} add all\n"
-            "    Adds the entire queue to the guilds playlist.\n",
+            + _Dd("    Adds the entire queue to the guilds playlist.\n"),
 
             "{cmd} show\n"
-            "    Show a list of existing playlist files.\n",
+            + _Dd("    Show a list of existing playlist files.\n"),
 
             "{cmd} restart\n"
-            "    Reset the auto playlist queue, restarting at the first track unless randomized.\n",
+            + _Dd("    Reset the auto playlist queue, restarting at the first track unless randomized.\n"),
 
             "{cmd} set <NAME>\n"
-            "    Set a playlist as default for this guild and reloads the guild auto playlist.\n",
+            + _Dd("    Set a playlist as default for this guild and reloads the guild auto playlist.\n"),
         ],
         # fmt: on
-        desc="Manage auto playlist files and per-guild settings.",
+        desc=_Dd("Manage auto playlist files and per-guild settings."),
         remap_subs={"+": "add", "-": "remove"},
     )
     async def cmd_autoplaylist(
@@ -3360,7 +3360,9 @@ class MusicBot(discord.Client):
 
     @owner_only
     @command_helper(
-        desc="Generate an invite link that can be used to add this bot to another server.",
+        desc=_Dd(
+            "Generate an invite link that can be used to add this bot to another server."
+        ),
         allow_dm=True,
     )
     async def cmd_joinserver(
@@ -3376,7 +3378,7 @@ class MusicBot(discord.Client):
         )
 
     @command_helper(
-        desc=(
+        desc=_Dd(
             "Toggle karaoke mode on or off. While enabled, only karaoke members may queue songs.\n"
             "Groups with BypassKaraokeMode permission control which members are Karaoke members.\n"
         )
@@ -3574,7 +3576,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <URL | SEARCH>"],
-        desc=(
+        desc=_Dd(
             "Add a song to be played in the queue. If no song is playing or paused, playback will be started.\n"
             "\n"
             "You may supply a URL to a video or audio file or the URL of a service supported by yt-dlp.\n"
@@ -3613,7 +3615,9 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [URL]"],
-        desc="Play command that shuffles playlist entries before adding them to the queue.\n",
+        desc=_Dd(
+            "Play command that shuffles playlist entries before adding them to the queue.\n"
+        ),
     )
     async def cmd_shuffleplay(
         self,
@@ -3655,7 +3659,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <URL | SEARCH>"],
-        desc=(
+        desc=_Dd(
             "A play command that adds the song as the next to play rather than last.\n"
             "Read help for the play command for information on supported inputs.\n"
         ),
@@ -3690,7 +3694,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <URL | SEARCH>"],
-        desc=(
+        desc=_Dd(
             "A play command which skips any current song and plays immediately.\n"
             "Read help for the play command for information on supported inputs.\n"
         ),
@@ -3727,7 +3731,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <TIME>"],
-        desc=(
+        desc=_Dd(
             "Restarts the current song at the given time.\n"
             "If time starts with + or - seek will be relative to current playback time.\n"
             "Time should be given in seconds, fractional seconds are accepted.\n"
@@ -3835,7 +3839,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [all | song | playlist | on | off]"],
-        desc=(
+        desc=_Dd(
             "Toggles playlist or song looping.\n"
             "If no option is provided the current song will be repeated.\n"
             "If no option is provided and the song is already repeating, repeating will be turned off.\n"
@@ -3922,10 +3926,10 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} <FROM> <TO>\n"
-            "    Move song at position FROM to position TO.\n",
+            + _Dd("    Move song at position FROM to position TO.\n"),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Swap existing songs in the queue using their position numbers.\n"
             "Use the queue command to find track position numbers.\n"
         ),
@@ -4325,7 +4329,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <URL>"],
-        desc=(
+        desc=_Dd(
             "Add a media URL to the queue as a Stream.\n"
             "The URL may be actual streaming media, like Twitch, Youtube, or a shoutcast like service.\n"
             "You can also use non-streamed media to play it without downloading it.\n"
@@ -4408,14 +4412,16 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} [SERVICE] [NUMBER] <QUERY>\n"
-            "    Search with service for a number of results with the search query.\n",
+            + _Dd("    Search with service for a number of results with the search query.\n"),
 
             "{cmd} [NUMBER] \"<QUERY>\"\n"
-            "    Search youtube for query but get a custom number of results.\n"
-            "    Note: the double-quotes are required in this case.\n",
+            + _Dd(
+                "    Search youtube for query but get a custom number of results.\n"
+                "    Note: the double-quotes are required in this case.\n"
+            ),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Search a supported service and select from results to add to queue.\n"
             "Service and number arguments can be omitted, default number is 3 results.\n"
             "Select from these services:\n"
@@ -4696,7 +4702,7 @@ class MusicBot(discord.Client):
                     break
         return None
 
-    @command_helper(desc="Show information on what is currently playing.")
+    @command_helper(desc=_Dd("Show information on what is currently playing."))
     async def cmd_np(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -4789,7 +4795,7 @@ class MusicBot(discord.Client):
             _D("There are no songs queued! Queue something with a play command.", ssd_)
         )
 
-    @command_helper(desc="Tell MusicBot to join the channel you're in.")
+    @command_helper(desc=_Dd("Tell MusicBot to join the channel you're in."))
     async def cmd_summon(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -4850,7 +4856,9 @@ class MusicBot(discord.Client):
             )
 
     @command_helper(
-        desc="Makes MusicBot follow a user when they change channels in a server.\n"
+        desc=_Dd(
+            "Makes MusicBot follow a user when they change channels in a server.\n"
+        )
     )
     async def cmd_follow(
         self,
@@ -4908,7 +4916,7 @@ class MusicBot(discord.Client):
             % {"user": bind_to_member.name}
         )
 
-    @command_helper(desc="Pause playback if a track is currently playing.")
+    @command_helper(desc=_Dd("Pause playback if a track is currently playing."))
     async def cmd_pause(
         self, ssd_: Optional[GuildSpecificData], player: MusicPlayer
     ) -> CommandResponse:
@@ -4925,7 +4933,7 @@ class MusicBot(discord.Client):
 
         raise exceptions.CommandError("Player is not playing.")
 
-    @command_helper(desc="Resumes playback if the player was previously paused.")
+    @command_helper(desc=_Dd("Resumes playback if the player was previously paused."))
     async def cmd_resume(
         self, ssd_: Optional[GuildSpecificData], player: MusicPlayer
     ) -> CommandResponse:
@@ -4946,7 +4954,7 @@ class MusicBot(discord.Client):
 
         return ErrorResponse(_D("Player is not paused.", ssd_))
 
-    @command_helper(desc="Shuffle all current tracks in the queue.")
+    @command_helper(desc=_Dd("Shuffle all current tracks in the queue."))
     async def cmd_shuffle(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -4983,7 +4991,7 @@ class MusicBot(discord.Client):
             await self.safe_delete_message(hand)
         return Response(_D("Shuffled all songs in the queue.", ssd_))
 
-    @command_helper(desc="Removes all songs currently in the queue.")
+    @command_helper(desc=_Dd("Removes all songs currently in the queue."))
     async def cmd_clear(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -4999,7 +5007,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [POSITION]"],
-        desc=(
+        desc=_Dd(
             "Remove a song from the queue, optionally at the given queue position.\n"
             "If the position is omitted, the song at the end of the queue is removed.\n"
             "Use the queue command to find position number of your track.\n"
@@ -5087,7 +5095,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [force | f]"],
-        desc=(
+        desc=_Dd(
             "Skip or vote to skip the current playing song.\n"
             "Members with InstaSkip permission may use force parameter to bypass voting.\n"
             "If LegacySkip option is enabled, the force parameter can be ignored.\n"
@@ -5272,7 +5280,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [VOLUME]"],
-        desc=(
+        desc=_Dd(
             "Set the output volume level of MusicBot from 1 to 100.\n"
             "Volume parameter allows a leading + or - for relative adjustments.\n"
             "The volume setting is retained until MusicBot is restarted.\n"
@@ -5340,7 +5348,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [RATE]"],
-        desc=(
+        desc=_Dd(
             "Change the playback speed of the currently playing track only.\n"
             "The rate must be between 0.5 and 100.0 due to ffmpeg limits.\n"
             "Streaming playback does not support speed adjustments.\n"
@@ -5408,16 +5416,18 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} + <ALIAS> <CMD> [ARGS]\n"
-            "    Add an new alias with optional arguments.\n",
+            + _Dd("    Add an new alias with optional arguments.\n"),
 
             "{cmd} - <ALIAS>\n"
-            "    Remove an alias with the given name.",
+            + _Dd("    Remove an alias with the given name."),
 
             "{cmd} <save | load>\n"
-            "    Reload or save aliases from/to the config file.",
+            + _Dd("    Reload or save aliases from/to the config file."),
         ],
         # fmt: on
-        desc="Allows management of aliases from discord. To see aliases use the help command.",
+        desc=_Dd(
+            "Allows management of aliases from discord. To see aliases use the help command."
+        ),
     )
     async def cmd_setalias(
         self,
@@ -5493,34 +5503,34 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} missing\n"
-            "    Shows help text about any missing config options.\n",
+            + _Dd("    Shows help text about any missing config options.\n"),
 
             "{cmd} diff\n"
-            "    Lists the names of options which have been changed since loading config file.\n",
+            + _Dd("    Lists the names of options which have been changed since loading config file.\n"),
 
             "{cmd} list\n"
-            "    List the available config options and their sections.\n",
+            + _Dd("    List the available config options and their sections.\n"),
 
             "{cmd} reload\n"
-            "    Reload the options.ini file from disk.\n",
+            + _Dd("    Reload the options.ini file from disk.\n"),
 
             "{cmd} help <SECTION> <OPTION>\n"
-            "    Shows help text for a specific option.\n",
+            + _Dd("    Shows help text for a specific option.\n"),
 
             "{cmd} show <SECTION> <OPTION>\n"
-            "    Display the current value of the option.\n",
+            + _Dd("    Display the current value of the option.\n"),
 
             "{cmd} save <SECTION> <OPTION>\n"
-            "    Saves the current current value to the options file.\n",
+            + _Dd("    Saves the current current value to the options file.\n"),
 
             "{cmd} set <SECTION> <OPTION> <VALUE>\n"
-            "    Validates the option and sets the config for the session, but not to file.\n",
+            + _Dd("    Validates the option and sets the config for the session, but not to file.\n"),
 
             "{cmd} reset <SECTION> <OPTION>\n"
-            "    Reset the option to it's default value.\n",
+            + _Dd("    Reset the option to it's default value.\n"),
         ],
         # fmt: on
-        desc="Manage options.ini configuration from within Discord.",
+        desc=_Dd("Manage options.ini configuration from within Discord."),
     )
     async def cmd_config(
         self,
@@ -5831,7 +5841,7 @@ class MusicBot(discord.Client):
         return None
 
     @owner_only
-    @command_helper(desc="Deprecated command, use the config command instead.")
+    @command_helper(desc=_Dd("Deprecated command, use the config command instead."))
     async def cmd_option(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -5850,7 +5860,7 @@ class MusicBot(discord.Client):
     @owner_only
     @command_helper(
         usage=["{cmd} <info | clear | update>"],
-        desc=(
+        desc=_Dd(
             "Display information about cache storage or clear cache according to configured limits.\n"
             "Using update option will scan the cache for external changes before displaying details."
         ),
@@ -5931,7 +5941,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [PAGE]"],
-        desc=(
+        desc=_Dd(
             "Display information about the current player queue.\n"
             "Optional page number shows later entries in the queue.\n"
         ),
@@ -6114,7 +6124,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [RANGE]"],
-        desc=(
+        desc=_Dd(
             "Search for and remove bot messages and commands from the calling text channel.\n"
             "Optionally supply a number of messages to search through, 50 by default 500 max.\n"
             "This command may be slow if larger ranges are given.\n"
@@ -6190,7 +6200,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <URL>"],
-        desc="Dump the individual urls of a playlist to a file.",
+        desc=_Dd("Dump the individual urls of a playlist to a file."),
     )
     async def cmd_pldump(
         self,
@@ -6251,7 +6261,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [@USER]"],
-        desc=(
+        desc=_Dd(
             "Display your Discord User ID, or the ID of a mentioned user.\n"
             "This command is deprecated in favor of Developer Mode in Discord clients.\n"
         ),
@@ -6278,7 +6288,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [all | users | roles | channels]"],
-        desc=(
+        desc=_Dd(
             "List the Discord IDs for the selected category.\n"
             "Returns all ID data by default, but one or more categories may be selected.\n"
             "This command is deprecated in favor of using Developer mode in Discord clients.\n"
@@ -6354,7 +6364,9 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} [@USER]"],
-        desc="Get a list of your permissions, or the permisions of the mentioned user.",
+        desc=_Dd(
+            "Get a list of your permissions, or the permisions of the mentioned user."
+        ),
     )
     async def cmd_perms(
         self,
@@ -6422,31 +6434,31 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} list\n"
-            "    Show loaded groups and list permission options.\n",
+            + _Dd("    Show loaded groups and list permission options.\n"),
 
             "{cmd} reload\n"
-            "    Reloads permissions from the permissions.ini file.\n",
+            + _Dd("    Reloads permissions from the permissions.ini file.\n"),
 
             "{cmd} add <GROUP>\n"
-            "    Add new group with defaults.\n",
+            + _Dd("    Add new group with defaults.\n"),
 
             "{cmd} remove <GROUP>\n"
-            "    Remove existing group.\n",
+            + _Dd("    Remove existing group.\n"),
 
             "{cmd} help <PERMISSION>\n"
-            "    Show help text for the permission option.\n",
+            + _Dd("    Show help text for the permission option.\n"),
 
             "{cmd} show <GROUP> <PERMISSION>\n"
-            "    Show permission value for given group and permission.\n",
+            + _Dd("    Show permission value for given group and permission.\n"),
 
             "{cmd} save <GROUP>\n"
-            "    Save permissions group to file.\n",
+            + _Dd("    Save permissions group to file.\n"),
 
             "{cmd} set <GROUP> <PERMISSION> [VALUE]\n"
-            "    Set permission value for the group.\n",
+            + _Dd("    Set permission value for the group.\n"),
         ],
         # fmt: on
-        desc="Manage permissions.ini configuration from within discord.",
+        desc=_Dd("Manage permissions.ini configuration from within discord."),
     )
     async def cmd_setperms(
         self,
@@ -6722,7 +6734,7 @@ class MusicBot(discord.Client):
     @owner_only
     @command_helper(
         usage=["{cmd} <NAME>"],
-        desc=(
+        desc=_Dd(
             "Change the bot's username on discord."
             "Note: The API may limit name changes to twice per hour."
         ),
@@ -6756,7 +6768,7 @@ class MusicBot(discord.Client):
             _D("Set the bot's username to `%(name)s`", ssd_) % {"name": name}
         )
 
-    @command_helper(usage=["{cmd} <NICK>"], desc="Change the MusicBot's nickname.")
+    @command_helper(usage=["{cmd} <NICK>"], desc=_Dd("Change the MusicBot's nickname."))
     async def cmd_setnick(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -6790,12 +6802,12 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} <PREFIX>\n"
-            "    Set a per-server command prefix.",
+            + _Dd("    Set a per-server command prefix."),
             "{cmd} clear\n"
-            "    Clear the per-server command prefix.",
+            + _Dd("    Clear the per-server command prefix."),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Override the default command prefix in the server.\n"
             "The option EnablePrefixPerGuild must be enabled first."
         ),
@@ -6842,7 +6854,7 @@ class MusicBot(discord.Client):
     @owner_only
     @command_helper(
         usage=["{cmd} [URL]"],
-        desc=(
+        desc=_Dd(
             "Change MusicBot's avatar.\n"
             "Attaching a file and omitting the url parameter also works.\n"
         ),
@@ -6880,7 +6892,7 @@ class MusicBot(discord.Client):
         return Response(_D("Changed the bot's avatar.", ssd_))
 
     @command_helper(
-        desc="Force MusicBot to disconnect from the discord server.",
+        desc=_Dd("Force MusicBot to disconnect from the discord server."),
     )
     async def cmd_disconnect(self, guild: discord.Guild) -> CommandResponse:
         """
@@ -6918,18 +6930,18 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} [soft]\n"
-            "    Attempt to reload without process restart. The default option.\n",
+            + _Dd("    Attempt to reload without process restart. The default option.\n"),
             "{cmd} full\n"
-            "    Attempt to restart the entire MusicBot process, reloading everything.\n",
+            + _Dd("    Attempt to restart the entire MusicBot process, reloading everything.\n"),
             "{cmd} uppip\n"
-            "    Full restart, but attempt to update pip packages before restart.\n",
+            + _Dd("    Full restart, but attempt to update pip packages before restart.\n"),
             "{cmd} upgit\n"
-            "    Full restart, but update MusicBot source code with git first.\n",
+            + _Dd("    Full restart, but update MusicBot source code with git first.\n"),
             "{cmd} upgrade\n"
-            "    Attempt to update all dependency and source code before fully restarting.\n",
+            + _Dd("    Attempt to update all dependency and source code before fully restarting.\n"),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Attempts to restart the MusicBot in a number of different ways.\n"
             "With no option supplied, a `soft` restart is implied.\n"
             "It can be used to remotely update a MusicBot installation, but should be used with care.\n"
@@ -7011,7 +7023,7 @@ class MusicBot(discord.Client):
         return None
 
     @command_helper(
-        desc="Disconnect from all voice channels and close the MusicBot process.",
+        desc=_Dd("Disconnect from all voice channels and close the MusicBot process.")
     )
     async def cmd_shutdown(
         self, guild: discord.Guild, channel: MessageableChannel
@@ -7037,10 +7049,10 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd} <NAME | ID>\n"
-            "   Leave the discord server given by name or server ID.",
+            + _Dd("   Leave the discord server given by name or server ID."),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Force MusicBot to leave the given Discord server.\n"
             "Names are case-sensitive, so using an ID number is more reliable.\n"
         ),
@@ -7095,7 +7107,9 @@ class MusicBot(discord.Client):
 
     @dev_only
     @command_helper(
-        desc="Command used for testing. It prints a list of commands which can be verified by a test suite."
+        desc=_Dd(
+            "Command used for testing. It prints a list of commands which can be verified by a test suite."
+        )
     )
     async def cmd_testready(self, message: discord.Message) -> CommandResponse:
         """Command used to signal command testing."""
@@ -7104,7 +7118,7 @@ class MusicBot(discord.Client):
 
     @dev_only
     @command_helper(
-        desc=(
+        desc=_Dd(
             "This command issues a log at level CRITICAL, but does nothing else.\n"
             "Can be used to manually pin-point events in the MusicBot log file.\n"
         ),
@@ -7123,22 +7137,22 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd}\n"
-            "    View most common types reported by objgraph.\n",
+            + _Dd("    View most common types reported by objgraph.\n"),
 
             "{cmd} growth\n"
-            "    View limited objgraph.show_growth() output.\n",
+            + _Dd("    View limited objgraph.show_growth() output.\n"),
 
             "{cmd} leaks\n"
-            "    View most common types of leaking objects.\n",
+            + _Dd("    View most common types of leaking objects.\n"),
 
             "{cmd} leakstats\n"
-            "    View typestats of leaking objects.\n",
+            + _Dd("    View typestats of leaking objects.\n"),
 
             "{cmd} [objgraph.function(...)]\n"
-            "    Evaluate the given function and args on objgraph.\n",
+            + _Dd("    Evaluate the given function and args on objgraph.\n"),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Interact with objgraph, if it is installed, to gain insight into memory usage.\n"
             "You can pass an arbitrary method with arguments (but no spaces!) that is a member of objgraph.\n"
             "Since this method evaluates arbitrary code, it is considered dangerous like the debug command.\n"
@@ -7191,7 +7205,7 @@ class MusicBot(discord.Client):
             "{cmd} [PYCODE]\n",
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "This command will execute arbitrary python code in the command scope.\n"
             "First eval() is attempted, if exceptions are thrown exec() is tried next.\n"
             "If eval is successful, it's return value is displayed.\n"
@@ -7262,7 +7276,7 @@ class MusicBot(discord.Client):
     @dev_only
     @command_helper(
         usage=["{cmd} < opts | perms | help >"],
-        desc=(
+        desc=_Dd(
             "Create 'markdown' for options, permissions, or commands from the code.\n"
             "The output is used to update github pages and is thus unsuitable for normal reference use."
         ),
@@ -7330,7 +7344,7 @@ class MusicBot(discord.Client):
             return Response(msg_str, send_to=author, files=[datafile], force_text=True)
 
     @dev_only
-    @command_helper(desc="Makes default INI files.")
+    @command_helper(desc=_Dd("Makes default INI files."))
     async def cmd_makeini(
         self,
         ssd_: Optional[GuildSpecificData],
@@ -7357,7 +7371,9 @@ class MusicBot(discord.Client):
 
     @owner_only
     @command_helper(
-        desc="Display the current bot version and check for updates to MusicBot or dependencies.\n",
+        desc=_Dd(
+            "Display the current bot version and check for updates to MusicBot or dependencies.\n"
+        ),
     )
     async def cmd_checkupdates(
         self, ssd_: Optional[GuildSpecificData], channel: MessageableChannel
@@ -7491,7 +7507,7 @@ class MusicBot(discord.Client):
         )
 
     @command_helper(
-        desc="Displays the MusicBot uptime, or time since last start / restart.",
+        desc=_Dd("Displays the MusicBot uptime, or time since last start / restart."),
     )
     async def cmd_uptime(self, ssd_: Optional[GuildSpecificData]) -> CommandResponse:
         """
@@ -7512,7 +7528,9 @@ class MusicBot(discord.Client):
 
     @owner_only
     @command_helper(
-        desc="Display latency information for Discord API and all connected voice clients.",
+        desc=_Dd(
+            "Display latency information for Discord API and all connected voice clients."
+        ),
     )
     async def cmd_botlatency(
         self, ssd_: Optional[GuildSpecificData]
@@ -7551,7 +7569,7 @@ class MusicBot(discord.Client):
         )
 
     @command_helper(
-        desc="Display API latency and Voice latency if MusicBot is connected.",
+        desc=_Dd("Display API latency and Voice latency if MusicBot is connected."),
     )
     async def cmd_latency(
         self, ssd_: Optional[GuildSpecificData], guild: discord.Guild
@@ -7579,7 +7597,7 @@ class MusicBot(discord.Client):
         )
 
     @command_helper(
-        desc="Display MusicBot version number in the chat.",
+        desc=_Dd("Display MusicBot version number in the chat."),
     )
     async def cmd_botversion(
         self, ssd_: Optional[GuildSpecificData]
@@ -7599,13 +7617,13 @@ class MusicBot(discord.Client):
         # fmt: off
         usage=[
             "{cmd}\n"
-            "    Update the cookies.txt file using a cookies.txt attachment.",
+            + _Dd("    Update the cookies.txt file using a cookies.txt attachment."),
 
             "{cmd} [off | on]\n"
-            "    Enable or disable cookies.txt file without deleting it.",
+            + _Dd("    Enable or disable cookies.txt file without deleting it."),
         ],
         # fmt: on
-        desc=(
+        desc=_Dd(
             "Allows management of the cookies feature in yt-dlp.\n"
             "When updating cookies, you must upload a file named cookies.txt\n"
             "If cookies are disabled, uploading will enable the feature.\n"
@@ -8099,8 +8117,10 @@ class MusicBot(discord.Client):
         cmd_usage = getattr(cmd, "help_usage", [])
         cmd_desc = getattr(cmd, "help_desc", "")
         emoji_prefix = False
+        ssd = None
         if guild:
-            prefix_l = self.server_data[guild.id].command_prefix
+            ssd = self.server_data[guild.id]
+            prefix_l = ssd.command_prefix
         else:
             prefix_l = self.config.command_prefix
         # Its OK to skip unicode emoji here, they render correctly inside of code boxes.
@@ -8108,14 +8128,29 @@ class MusicBot(discord.Client):
         prefix_note = ""
         if emoji_regex.match(prefix_l):
             emoji_prefix = True
-            prefix_note = f"**Example with prefix:**\n{prefix_l}`{cmd_name} ...`\n"
+            prefix_note = _D(
+                "**Example with prefix:**\n%(prefix)s`%(command)s ...`\n",
+                ssd,
+            ) % {"prefix": prefix_l, "command": cmd_name}
 
-        desc = cmd_desc or "No description given.\n"
+        desc = _D(cmd_desc, ssd) or _D("No description given.\n", ssd)
         if desc[-1] != "\n":
             desc += "\n"
-        usage = "No usage given."
+        usage = _D("No usage given.", ssd)
         if cmd_usage and isinstance(cmd_usage, list):
-            usage = "\n".join(cmd_usage)
+            cases = []
+            for case in cmd_usage:
+                if "\n" in case:
+                    bits = case.split("\n", maxsplit=1)
+                    example = bits[0]
+                    text = ""
+                    if len(bits) > 1:
+                        text = "\n"
+                        text += _D(bits[1], ssd)
+                    cases.append(f"{example}{text}")
+                else:
+                    cases.append(case)
+            usage = "\n".join(cases)
             if emoji_prefix:
                 usage = usage.replace("{prefix}", "")
             else:
@@ -8134,12 +8169,13 @@ class MusicBot(discord.Client):
                 "%(desc)s"
             ) % {"usage": usage, "desc": desc}
 
-        return (
+        return _D(
             "**Example usage:**\n"
             "```%(usage)s```\n"
             "%(prefix_note)s"
             "**Description:**\n"
-            "%(desc)s"
+            "%(desc)s",
+            ssd,
         ) % {"usage": usage, "prefix_note": prefix_note, "desc": desc}
 
     async def gen_cmd_list(

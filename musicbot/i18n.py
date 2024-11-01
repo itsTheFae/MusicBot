@@ -80,6 +80,14 @@ def _Dn(  # pylint: disable=invalid-name
     return msg
 
 
+def _Dd(msg: str) -> str:  # pylint: disable=invalid-name
+    """
+    Marks strings for translation as part of discord domain.
+    Translation is deferred until later in runtime.
+    """
+    return msg
+
+
 class I18n:
     """
     This class provides a utility to set up i18n via GNU gettext with automatic

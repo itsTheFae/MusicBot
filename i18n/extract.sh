@@ -47,6 +47,7 @@ xgettext -v -F -k --language=Python --no-wrap \
     --package-version="${MB_Version}" \
     --keyword="_D" \
     --keyword="_Dn" \
+    --keyword="_Dd" \
     --keyword="_X" \
     --keyword="MusicbotException" \
     --keyword="CommandError" \
