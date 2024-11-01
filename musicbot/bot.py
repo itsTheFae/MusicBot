@@ -8340,9 +8340,9 @@ class MusicBot(discord.Client):
                 try:
                     # this has the same effect as edit(suppress=False)
                     await after.channel.guild.me.request_to_speak()
-                except discord.Forbidden as e:
+                except discord.Forbidden:
                     log.exception("MusicBot does not have permission to speak.")
-                except (discord.HTTPException, discord.ClientException) as e:
+                except (discord.HTTPException, discord.ClientException):
                     log.exception("MusicBot could not request to speak.")
 
         if before.channel:
