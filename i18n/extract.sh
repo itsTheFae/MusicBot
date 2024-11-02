@@ -36,7 +36,7 @@ xgettext -v -F -k --language=Python --no-wrap \
     --keyword="PermissionsError" \
     --keyword="HelpfulError" \
     --keyword="HelpfulWarning" \
-    --output="./i18n/musicbot_logs.po" \
+    --output="./i18n/musicbot_logs.pot" \
     ./run.py \
     ./musicbot/*.py
 
@@ -60,7 +60,7 @@ xgettext -v -F -k --language=Python --no-wrap \
     --keyword="PermissionsError" \
     --keyword="HelpfulError" \
     --keyword="HelpfulWarning" \
-    --output="./i18n/musicbot_messages.po" \
+    --output="./i18n/musicbot_messages.pot" \
     ./musicbot/*.py
 
 echo "Done."

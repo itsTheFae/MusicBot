@@ -20,8 +20,8 @@ import re
 import pathlib
 import polib
 
-file1 = pathlib.Path("./i18n/musicbot_logs.po")
-file2 = pathlib.Path("./i18n/musicbot_messages.po")
+file1 = pathlib.Path("./i18n/musicbot_logs.pot")
+file2 = pathlib.Path("./i18n/musicbot_messages.pot")
 
 subs = re.compile("([a-z]+|f[0-9]+\.)(\)[a-z\._]+\()?%")
 
