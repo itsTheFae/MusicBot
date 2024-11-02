@@ -118,7 +118,8 @@ class Playlist(EventEmitter, Serializable):
         """
 
         log.noise(  # type: ignore[attr-defined]
-            f"Adding stream entry for URL:  {info.url}"
+            "Adding stream entry for URL:  %(url)s",
+            {"url": info.url},
         )
         entry = StreamPlaylistEntry(
             self,
@@ -206,13 +207,13 @@ class Playlist(EventEmitter, Serializable):
 
                 elif not content_type.startswith(("audio/", "video/")):
                     log.warning(
-                        'Questionable content-type "%s" for url:  %s',
-                        content_type,
-                        info.url,
+                        'Questionable content-type "%(type)s" for url:  %(url)s',
+                        {"type": content_type, "url": info.url},
                     )
 
         log.noise(  # type: ignore[attr-defined]
-            f"Adding URLPlaylistEntry for: {info.input_subject}"
+            "Adding URLPlaylistEntry for: %(subject)s",
+            {"subject": info.input_subject},
         )
         entry = URLPlaylistEntry(self, info, author=author, channel=channel)
         self._add_entry(entry, head=head, defer_serialize=defer_serialize)
@@ -231,7 +232,8 @@ class Playlist(EventEmitter, Serializable):
         Adds a local media file entry to the playlist.
         """
         log.noise(  # type: ignore[attr-defined]
-            f"Adding LocalFilePlaylistEntry for: {info.input_subject}"
+            "Adding LocalFilePlaylistEntry for: %(subject)s",
+            {"subject": info.input_subject},
         )
         entry = LocalFilePlaylistEntry(self, info, author=author, channel=channel)
         self._add_entry(entry, head=head, defer_serialize=defer_serialize)

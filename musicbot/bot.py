@@ -262,9 +262,8 @@ class MusicBot(discord.Client):
                     )
                 else:
                     log.error(
-                        "Unhandled exception for task:  %r  --  %s",
-                        task,
-                        str(ex),
+                        "Unhandled exception for task:  %(task)r  --  %(raw_error)s",
+                        {"task": task, "raw_error": str(ex)},
                     )
 
             self.task_pool.discard(task)
@@ -517,7 +516,10 @@ class MusicBot(discord.Client):
                         "VoiceClient is not connected, waiting to resume MusicPlayer..."
                     )
                     continue
-                log.info("Resuming playback of player:  (%s) %s", gid, repr(player))
+                log.info(
+                    "Resuming playback of player:  (%(guild_id)s) %(player)r",
+                    {"guild_id": gid, "player": player},
+                )
                 player.guild_or_net_unavailable = False
                 player.resume()
             player.guild_or_net_unavailable = False
@@ -530,9 +532,8 @@ class MusicBot(discord.Client):
         for gid, player in self.players.items():
             if player.is_playing:
                 log.info(
-                    "Pausing MusicPlayer due to network availability:  (%s) %s",
-                    gid,
-                    repr(player),
+                    "Pausing MusicPlayer due to network availability:  (%(guild_id)s) %(player)r",
+                    {"guild_id": gid, "player": player},
                 )
                 player.pause()
             player.guild_or_net_unavailable = True
@@ -552,10 +553,8 @@ class MusicBot(discord.Client):
             server.members if server else self.get_all_members(),
         )
         log.noise(  # type: ignore[attr-defined]
-            "Looking for owner (in guild: %s) (required voice: %s) and got:  %s",
-            server,
-            voice,
-            owner,
+            "Looking for owner in guild: %(guild)s (required voice: %(required)s) and got:  %(owner)s",
+            {"guild": server, "required": voice, "owner": owner},
         )
         return owner
 
@@ -580,18 +579,19 @@ class MusicBot(discord.Client):
 
             if guild.unavailable:
                 log.warning(
-                    "Guild not available, cannot auto join:  %s/%s",
-                    guild.id,
-                    guild.name,
+                    "Guild not available, cannot auto join:  %(id)s/%(name)s",
+                    {"id": guild.id, "name": guild.name},
                 )
                 continue
 
             # Check for a resumable channel.
             if guild.me.voice and guild.me.voice.channel:
                 log.info(
-                    "Found resumable voice channel:  %s  in guild:  %s",
-                    guild.me.voice.channel.name,
-                    guild.name,
+                    "Found resumable voice channel:  %(channel)s  in guild:  %(guild)s",
+                    {
+                        "channel": guild.me.voice.channel.name,
+                        "guild": guild.name,
+                    },
                 )
 
                 # override an existing auto-join if bot was previously in a different channel.
@@ -639,9 +639,9 @@ class MusicBot(discord.Client):
                 and guild.voice_client.is_connected()
             ):
                 log.info(
-                    "Already connected to channel:  %s  in guild:  %s",
-                    guild.voice_client.channel.name,
-                    guild.name,
+                    "Already connected to channel:  %(channel)s  in guild:  %(guild)s",
+                    {"channel": guild.voice_client.channel.name,
+                    "guild":guild.name},
                 )
                 continue
 
@@ -649,10 +649,8 @@ class MusicBot(discord.Client):
                 channel, (discord.VoiceChannel, discord.StageChannel)
             ):
                 log.info(
-                    "Attempting to join channel:  %s/%s  in guild:  %s",
-                    channel.guild.name,
-                    channel.name,
-                    channel.guild,
+                    "Attempting to join channel:  %(channel)s  in guild:  %(guild)s",
+                    {"channel": channel.name, "guild": channel.guild},
                 )
 
                 player = self.get_player_in(guild)
@@ -699,9 +697,8 @@ class MusicBot(discord.Client):
                 channel, (discord.VoiceChannel, discord.StageChannel)
             ):
                 log.warning(
-                    "Not joining %s/%s, it isn't a supported voice channel.",
-                    channel.guild.name,
-                    channel.name,
+                    "Not joining %(guild)s/%(channel)s, it isn't a supported voice channel.",
+                    {"guild": channel.guild.name, "channel": channel.name},
                 )
         log.info("Finished joining configured channels.")
 
@@ -823,9 +820,8 @@ class MusicBot(discord.Client):
                 break
             except asyncio.exceptions.TimeoutError:
                 log.warning(
-                    "Retrying connection after a timeout error (%s) while trying to connect to:  %s",
-                    attempt,
-                    channel,
+                    "Retrying connection after a timeout error (%(attempt)s) while trying to connect to:  %(channel)s",
+                    {"attempt": attempt, "channel": channel},
                 )
             except asyncio.exceptions.CancelledError as e:
                 log.exception(
@@ -946,9 +942,8 @@ class MusicBot(discord.Client):
         for gid in player_gids:
             player = self.players[gid]
             log.warning(
-                "We still have a MusicPlayer ref in guild (%s):  %s",
-                gid,
-                repr(player),
+                "We still have a MusicPlayer ref in guild (%(guild_id)s):  %(player)r",
+                {"guild_id": gid, "player": player},
             )
             del self.players[gid]
 
@@ -960,7 +955,8 @@ class MusicBot(discord.Client):
         p = self.players.get(guild.id)
         if log.getEffectiveLevel() <= logging.EVERYTHING:  # type: ignore[attr-defined]
             log.voicedebug(  # type: ignore[attr-defined]
-                "Guild (%s) wants a player, optional:  %s", guild, repr(p)
+                "Guild (%(guild)s) wants a player, optional:  %(player)r",
+                {"guild": guild, "player": p},
             )
 
         if log.getEffectiveLevel() <= logging.VOICEDEBUG:  # type: ignore[attr-defined]
@@ -980,7 +976,6 @@ class MusicBot(discord.Client):
         self,
         channel: VoiceableChannel,
         create: bool = False,
-        *,
         deserialize: bool = False,
     ) -> MusicPlayer:
         """
@@ -994,11 +989,8 @@ class MusicBot(discord.Client):
         guild = channel.guild
 
         log.voicedebug(  # type: ignore[attr-defined]
-            "Getting a MusicPlayer for guild:  %s  In Channel:  %s  Will Create:  %s  Deserialize:  %s",
-            guild,
-            channel,
-            create,
-            deserialize,
+            "Getting a MusicPlayer for guild:  %(guild)s  In Channel:  %(channel)s  Create: %(create)s  Deserialize:  %(serial)s",
+            {"guild": guild, "channel":channel, "create": create,"serial": deserialize},
         )
 
         async with self.aiolocks[_func_() + ":" + str(guild.id)]:
@@ -1008,9 +1000,8 @@ class MusicBot(discord.Client):
 
                 if player:
                     log.voicedebug(  # type: ignore[attr-defined]
-                        "Created player via deserialization for guild %s with %s entries",
-                        guild.id,
-                        len(player.playlist),
+                        "Created player via deserialization for guild %(guild_id)s with %(number)s entries",
+                        {"guild_id": guild.id, "number": len(player.playlist)},
                     )
                     # Since deserializing only happens when the bot starts, I should never need to reconnect
                     return self._init_player(player, guild=guild)
@@ -1104,7 +1095,7 @@ class MusicBot(discord.Client):
                 player.skip()
             elif self.config.now_playing_mentions:
                 newmsg = _D(
-                    "%(mention)s - your song `%(title)` is now playing in %(channel)s!",
+                    "%(mention)s - your song `%(title)s` is now playing in %(channel)s!",
                     ssd_,
                 ) % {
                     "mention": entry.author.mention,
@@ -1137,7 +1128,10 @@ class MusicBot(discord.Client):
             self.config.enable_queue_history_global
             or self.config.enable_queue_history_guilds
         ) and not entry.from_auto_playlist:
-            log.debug("Setting URL history guild %s == %s", guild.id, entry.url)
+            log.debug(
+                "Setting URL history guild %(guild_id)s == %(url)s",
+                {"guild_id": guild.id, "url": entry.url},
+            )
             self.server_data[guild.id].current_playing_url = entry.url
 
         last_np_msg = self.server_data[guild.id].last_np_msg
@@ -1341,9 +1335,8 @@ class MusicBot(discord.Client):
                     notice_sent = True
                 deleted_entry = player.playlist.delete_entry_at_index(0)
                 log.noise(  # type: ignore[attr-defined]
-                    "Author `%s` absent, skipped (deleted) entry from queue:  %s",
-                    author.name,
-                    deleted_entry.title,
+                    "Author `%(user)s` absent, skipped (deleted) entry from queue:  %(song)s",
+                    {"user": author.name, "song": deleted_entry.title},
                 )
             else:
                 break
@@ -1412,9 +1405,8 @@ class MusicBot(discord.Client):
 
                 except youtube_dl.utils.DownloadError as e:
                     log.error(
-                        'Error while processing song "%s":  %s',
-                        song_url,
-                        e,
+                        'Error while processing song "%(url)s":  %(raw_error)s',
+                        {"url": song_url, "raw_error": e},
                     )
 
                     await self.server_data[guild.id].autoplaylist.remove_track(
@@ -1427,9 +1419,8 @@ class MusicBot(discord.Client):
                     youtube_dl.utils.YoutubeDLError,
                 ) as e:
                     log.error(
-                        'Error extracting song "%s": %s',
-                        song_url,
-                        e,
+                        'Error extracting song "%(url)s": %(raw_error)s',
+                        {"url": song_url, "raw_error": e},
                         exc_info=True,
                     )
 
@@ -1470,6 +1461,7 @@ class MusicBot(discord.Client):
                         head=False,
                     )
                 except (
+                    # TODO: find usages of these and make sure they get translated.
                     exceptions.ExtractionError,
                     exceptions.WrongEntryTypeError,
                 ) as e:
@@ -2051,9 +2043,8 @@ class MusicBot(discord.Client):
             await asyncio.sleep(after)
         except asyncio.CancelledError:
             log.warning(
-                "Cancelled delete for message (ID: %s):  %s",
-                message.id,
-                message.content,
+                "Cancelled delete for message (ID: %(id)s):  %(content)s",
+                {"id": message.id, "content": message.content},
             )
             return
 
@@ -2181,11 +2172,17 @@ class MusicBot(discord.Client):
                 if tname.startswith("Signal_SIG") or coro_name.startswith(
                     "Client.close."
                 ):
-                    log.debug("Will wait for task:  %s  (%s)", tname, coro_name)
+                    log.debug(
+                        "Will wait for task:  %(name)s  (%(func)s)",
+                        {"name": tname, "func": coro_name},
+                    )
                     pending_tasks.append(task)
 
                 else:
-                    log.debug("Will try to cancel task:  %s  (%s)", tname, coro_name)
+                    log.debug(
+                        "Will try to cancel task:  %(name)s  (%(func)s)",
+                        {"name": tname, "func": coro_name},
+                    )
                     task.cancel()
                     pending_tasks.append(task)
 
@@ -2226,7 +2223,10 @@ class MusicBot(discord.Client):
         _ex_type, ex, _stack = sys.exc_info()
 
         if isinstance(ex, exceptions.HelpfulError):
-            log.error("Exception in %s:\n%s", event, ex.message)
+            log.error(
+                "Exception in %(event)s:\n%(raw_error)s",
+                {"event": event, "raw_error": ex.message},
+            )
 
             await asyncio.sleep(2)  # makes extra sure this gets seen(?)
 
@@ -2280,19 +2280,23 @@ class MusicBot(discord.Client):
         await self._on_ready_sanity_checks()
 
         log.info(
-            "MusicBot:  %s/%s#%s",
-            self.user.id,
-            self.user.name,
-            self.user.discriminator,
+            "MusicBot:  %(id)s/%(name)s#%(desc)s",
+            {
+                "id": self.user.id,
+                "name": self.user.name,
+                "desc": self.user.discriminator,
+            },
         )
 
         owner = self._get_owner_member()
         if owner and self.guilds:
             log.info(
-                "Owner:     %s/%s#%s\n",
-                owner.id,
-                owner.name,
-                owner.discriminator,
+                "Owner:     %(id)s/%(name)s#%(desc)s\n",
+                {
+                    "id": owner.id,
+                    "name": owner.name,
+                    desc"": owner.discriminator,
+                },
             )
 
             log.info("Guild List:")
@@ -2382,7 +2386,10 @@ class MusicBot(discord.Client):
                         ch_name = valid_ch.name or f"Unnamed Channel: {valid_ch.id}"
                     if valid_ch.guild:
                         guild_name = valid_ch.guild.name
-                    log.info(" - %s/%s", guild_name, ch_name)
+                    log.info(
+                        " - %(guild)s/%(channel)s",
+                        {"guild": guild_name, "channel": ch_name},
+                    )
             else:
                 log.info("Not bound to any text channels")
         else:
@@ -2550,9 +2557,11 @@ class MusicBot(discord.Client):
         log.info("  Command prefix: %s", self.config.command_prefix)
         log.info("  Default volume: %d%%", int(self.config.default_volume * 100))
         log.info(
-            "  Skip threshold: %d votes or %.0f%%",
-            self.config.skips_required,
-            (self.config.skip_ratio_required * 100),
+            "  Skip threshold: %(num)d votes or %(percent).0f%%",
+            {
+                "num": self.config.skips_required,
+                "percent": (self.config.skip_ratio_required * 100),
+            },
         )
         log.info(
             "  Now Playing @mentions: %s",
@@ -2720,9 +2729,11 @@ class MusicBot(discord.Client):
                 chname = guild.voice_client.channel.name
 
             log.info(
-                "Channel activity waiting %d seconds to leave channel: %s",
-                self.config.leave_inactive_channel_timeout,
-                chname,
+                "Channel activity waiting %(time)d seconds to leave channel: %(channel)s",
+                {
+                    "time": self.config.leave_inactive_channel_timeout,
+                    "channel": chname,
+                },
             )
             await discord.utils.sane_wait_for(
                 [event.wait()], timeout=self.config.leave_inactive_channel_timeout
@@ -2739,9 +2750,11 @@ class MusicBot(discord.Client):
                 await self.on_inactivity_timeout_expired(guild.voice_client.channel)
         else:
             log.info(
-                "Channel activity timer canceled for: %s in %s",
-                getattr(guild.voice_client.channel, "name", guild.voice_client.channel),
-                guild.name,
+                "Channel activity timer canceled for: %(channel)s in %(guild)s",
+                {
+                    "channel": getattr(guild.voice_client.channel, "name", guild.voice_client.channel),
+                    "guild": guild.name,
+                },
             )
         finally:
             event.deactivate()
@@ -2778,9 +2791,8 @@ class MusicBot(discord.Client):
 
         try:
             log.info(
-                "Player activity timer waiting %d seconds to leave channel: %s",
-                self.config.leave_player_inactive_for,
-                channel.name,
+                "Player activity timer waiting %(time)d seconds to leave channel: %(channel)s",
+                {"time": self.config.leave_player_inactive_for, "channel": channel.name},
             )
             await discord.utils.sane_wait_for(
                 [event.wait()], timeout=self.config.leave_player_inactive_for
@@ -2794,9 +2806,8 @@ class MusicBot(discord.Client):
                 await self.on_inactivity_timeout_expired(channel)
             else:
                 log.info(
-                    "Player activity timer canceled for: %s in %s",
-                    channel.name,
-                    guild.name,
+                    "Player activity timer canceled for: %(channel)s in %(guild)s",
+                    {"channel": channel.name, "guild": guild.name},
                 )
         else:
             log.info(
@@ -3033,9 +3044,8 @@ class MusicBot(discord.Client):
                     )
 
                 log.info(
-                    "Not adding user to block list, already blocked:  %s/%s",
-                    user.id,
-                    user.name,
+                    "Not adding user to block list, already blocked:  %(id)s/%(name)s",
+                    {"id": user.id, "name": user.name},
                 )
                 user_mentions.remove(user)
 
@@ -3043,9 +3053,8 @@ class MusicBot(discord.Client):
                 user
             ):
                 log.info(
-                    "Not removing user from blocklist, not listed:  %s/%s",
-                    user.id,
-                    user.name,
+                    "Not removing user from blocklist, not listed:  %(id)s/%(name)s",
+                    {"id": user.id, "name": user.name},
                 )
                 user_mentions.remove(user)
 
@@ -4229,11 +4238,13 @@ class MusicBot(discord.Client):
                 listlen = len(entry_list)
 
                 log.info(
-                    "Processed %d of %d songs in %.3f seconds at %.2f s/song",
-                    listlen,
-                    num_songs,
-                    time_taken,
-                    time_taken / listlen if listlen else 1,
+                    "Processed %(number)d of %(total)d songs in %(time).3f seconds at %(time_per).2f s/song",
+                    {
+                        "number": listlen, 
+                        "total": num_songs,
+                        "time": time_taken,
+                        "time_per": time_taken / listlen if listlen else 1,
+                    }
                 )
 
                 if not entry_list:
@@ -4848,9 +4859,11 @@ class MusicBot(discord.Client):
                     player.play()
 
             log.info(
-                "Joining %s/%s",
-                author.voice.channel.guild.name,
-                author.voice.channel.name,
+                "Joining %(guild)s/%(channel)s",
+                {
+                    "guild": author.voice.channel.guild.name,
+                    "channel": author.voice.channel.name,
+                }
             )
 
             self.server_data[guild.id].last_np_msg = message
@@ -5789,7 +5802,10 @@ class MusicBot(discord.Client):
                     "You must provide a section, option, and value for this sub command.",
                 )
 
-            log.debug("Doing set with on %s == %s", opt, value_arg)
+            log.debug(
+                "Doing set with on %(config)s == %(value)s",
+                {"config": opt, "value": value_arg},
+            )
             async with self.aiolocks["config_update"]:
                 updated = self.config.update_option(opt, value_arg)
             if not updated:
@@ -5821,7 +5837,10 @@ class MusicBot(discord.Client):
             # TODO look into option registry display code for use here
             reset_value_display = default_value if default_value else "an empty set"
 
-            log.debug("Resetting %s to default %s", opt, default_value)
+            log.debug(
+                "Resetting %(config)s to default %(value)s",
+                {"config": opt, "value": default_value},
+            )
             async with self.aiolocks["config_update"]:
                 updated = self.config.update_option(opt, default_value)
             if not updated:
@@ -6015,7 +6034,7 @@ class MusicBot(discord.Client):
             ) % {
                 "title": player.current_entry.title,
                 "user": added_by,
-                "progess": song_progress,
+                "progress": song_progress,
                 "total": song_total,
             }
 
@@ -7077,7 +7096,6 @@ class MusicBot(discord.Client):
             guild_id = int(val)
         except ValueError as e:
             if not guild_name:
-                # TODO: i18n / UI stuff
                 raise exceptions.CommandError("You must provide an ID or name.") from e
 
         if guild_id:
@@ -7862,19 +7880,19 @@ class MusicBot(discord.Client):
         ):
             # TODO:  maybe add a config option to enable telling users they are blocked.
             log.warning(
-                "User in block list: %s/%s  tried command: %s",
-                message.author.id,
-                message.author,
-                command,
+                "User in block list: %(id)s/%(name)s  tried command: %(command)s",
+                {"id": message.author.id, "name": message.author, "comand": command},
             )
             return
 
         # all command validation checks passed, log a successful message
         log.info(
-            "Message from %s/%s: %s",
-            message.author.id,
-            message.author,
-            message_content.replace("\n", "\n... "),
+            "Message from %(id)s/%(name)s: %(message)s",
+            {
+                "id": message.author.id,
+                "name": message.author,
+                "message": message_content.replace("\n", "\n... "),
+            },
         )
 
         # Get user's musicbot permissions for use in later checks and commands.
@@ -7897,7 +7915,7 @@ class MusicBot(discord.Client):
             ):
                 await self._check_ignore_non_voice(message)
 
-            # Test non-owners for command permissions.
+            # Test for command permissions.
             if (
                 message.author.id != self.config.owner_id
                 and not user_permissions.can_use_command(command, args[0])
@@ -8378,7 +8396,10 @@ class MusicBot(discord.Client):
 
             # follow-user has moved to a new channel.
             elif before.channel != after.channel and player:
-                log.debug("Following user `%s` to channel:  %s", member, after.channel)
+                log.debug(
+                    "Following user `%(user)s` to channel:  %(channel)s",
+                    {"user": member, "channel": after.channel},
+                )
                 if player.is_playing:
                     player.pause()
                 # using move_to does not respect the self-deafen flags from connect
@@ -8423,11 +8444,13 @@ class MusicBot(discord.Client):
             and o_guild.id in self.players
         ):
             log.info(
-                "Disconnected from voice by Discord API in: %s/%s (Code: %s) [S:%s]",
-                o_guild.name,
-                before.channel.name,
-                close_code,
-                state.name.upper() if state else None,
+                "Disconnected from voice by Discord API in: %(guild)s/%(channel)s (Code: %(code)s) [S:%(state)s]",
+                {
+                    "guild": o_guild.name,
+                    "channel": before.channel.name,
+                    "code": close_code,
+                    "state": state.name.upper() if state else None,
+                },
             )
             await self.disconnect_voice_client(o_guild)
 
@@ -8443,9 +8466,8 @@ class MusicBot(discord.Client):
                     target_channel, (discord.VoiceChannel, discord.StageChannel)
                 ):
                     log.error(
-                        "Cannot use auto-join channel with type: %s  in guild:  %s",
-                        type(target_channel),
-                        before.channel.guild,
+                        "Cannot use auto-join channel with type: %(type)s  in guild:  %(guild)s",
+                        {"type": type(target_channel), "guild": before.channel.guild},
                     )
                     return True
 
@@ -8617,4 +8639,7 @@ class MusicBot(discord.Client):
             changes += f" slowmode = {after.slowmode_delay}"
 
         if changes:
-            log.info("Channel update for:  %s  --  %s", before, changes)
+            log.info(
+                "Channel update for:  %(channel)s  --  %(changes)s",
+                {"channel": before, "changes": changes},
+            )

@@ -456,7 +456,8 @@ class MusicPlayer(EventEmitter, Serializable):
                     aoptions,
                 )
                 log.voicedebug(  # type: ignore[attr-defined]
-                    "Playing %r using %r", self._source, self.voice_client
+                    "Playing %(source)r using %(client)r",
+                    {"source": self._source, "client": self.voice_client},
                 )
                 self.voice_client.play(self._source, after=self._playback_finished)
 

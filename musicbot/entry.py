@@ -144,7 +144,8 @@ class BasePlaylistEntry(Serializable):
         self._waiting_futures = []
 
         log.everything(  # type: ignore[attr-defined]
-            "Completed futures for %r with %r", self, cb
+            "Completed futures for %(entry)r with %(callback)r",
+            {"entry": self, "callback": cb},
         )
         for future in futures:
             if future.cancelled():

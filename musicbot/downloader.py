@@ -500,6 +500,7 @@ class Downloader:
                     raise ExtractionError("Cannot stream an invalid URL.") from e
 
             else:
+                # TODO: i18n format args for better messages out of this logic.
                 raise ExtractionError(f"Invalid input: {str(e)}") from e
         except NoSupportingHandlers:
             # due to how we allow search service strings we can't just encode this by default.
@@ -547,7 +548,10 @@ class Downloader:
         Uses an instance of YoutubeDL with errors explicitly ignored to
         call extract_info with all arguments passed to this function.
         """
-        log.noise(f"Called safe_extract_info with:  {args}, {kwargs}")  # type: ignore[attr-defined]
+        log.noise(  # type: ignore[attr-defined]
+            "Called safe_extract_info with:  %(args)s, %(kws)s",
+            {"args": args, "kws": kwargs},
+        )
         return await self.bot.loop.run_in_executor(
             self.thread_pool,
             functools.partial(self.safe_ytdl.extract_info, *args, **kwargs),
@@ -837,7 +841,8 @@ class YtdlpResponseDict(YUserDict):
             return float(self.data.get("duration", 0))
         except (ValueError, TypeError):
             log.noise(  # type: ignore[attr-defined]
-                f"Warning, duration ValueEror/TypeError for: {self.original_url}",
+                "Warning, duration error for: %(url)s",
+                {"url": self.original_url},
                 exc_info=True,
             )
             return 0.0

@@ -25,8 +25,6 @@ class Aliases:
     the user to avoid configuring aliases with conflicts.
     """
 
-    # TODO: add a method to query aliases a natural command has.
-
     def __init__(self, aliases_file: Path, nat_cmds: List[str]) -> None:
         """
         Handle locating, initializing, loading, and validation of command aliases.
@@ -172,7 +170,7 @@ class Aliases:
     def for_command(self, cmd_name: str) -> List[Tuple[str, str]]:
         """
         Get the aliases registered for a given command.
-        Returns a two-member tuple containing the alias name, and any arguments.
+        Returns a list of two-member tuples containing the alias name, and any arguments.
         """
         if cmd_name in self.cmd_aliases:
             return self.cmd_aliases[cmd_name]
