@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-968-ged837abf\n"
+"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-974-g08715d2d\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-01 18:34-0700\n"
-"PO-Revision-Date: 2024-11-01 18:38-0700\n"
+"POT-Creation-Date: 2024-11-02 06:41-0700\n"
+"PO-Revision-Date: 2024-11-02 09:09-0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -38,25 +38,25 @@ msgstr ""
 "  Replace the alias config file(s) or copy them from:\n"
 "    https://github.com/Just-Some-Bots/MusicBot/"
 
-#: musicbot/bot.py:715
+#: musicbot/bot.py:714
 msgid "Member is not voice-enabled and cannot use this command."
 msgstr "Member is not voice-enabled and cannot use this command."
 
-#: musicbot/bot.py:723
+#: musicbot/bot.py:722
 msgid "You cannot use this command when not in the voice channel."
 msgstr "You cannot use this command when not in the voice channel."
 
-#: musicbot/bot.py:766
+#: musicbot/bot.py:765
 #, python-format
 msgid "MusicBot does not have permission to Connect in channel:  `%(name)s`"
 msgstr "MusicBot does not have permission to Connect in channel:  `%(name)s`"
 
-#: musicbot/bot.py:775
+#: musicbot/bot.py:774
 #, python-format
 msgid "MusicBot does not have permission to Speak in channel:  `%(name)s`"
 msgstr "MusicBot does not have permission to Speak in channel:  `%(name)s`"
 
-#: musicbot/bot.py:808
+#: musicbot/bot.py:807
 msgid ""
 "MusicBot could not connect to the channel. Try again later, or restart the "
 "bot if this continues."
@@ -64,20 +64,20 @@ msgstr ""
 "MusicBot could not connect to the channel. Try again later, or restart the "
 "bot if this continues."
 
-#: musicbot/bot.py:831
+#: musicbot/bot.py:830
 msgid "MusicBot connection to voice was cancelled. This is odd. Maybe restart?"
 msgstr ""
 "MusicBot connection to voice was cancelled. This is odd. Maybe restart?"
 
-#: musicbot/bot.py:841
+#: musicbot/bot.py:840
 msgid "MusicBot does not have permission to speak."
 msgstr "MusicBot does not have permission to speak."
 
-#: musicbot/bot.py:845
+#: musicbot/bot.py:844
 msgid "MusicBot could not request to speak."
 msgstr "MusicBot could not request to speak."
 
-#: musicbot/bot.py:1012
+#: musicbot/bot.py:1016
 msgid ""
 "The bot is not in a voice channel.\n"
 "Use the summon command to bring the bot to your voice channel."
@@ -85,37 +85,37 @@ msgstr ""
 "The bot is not in a voice channel.\n"
 "Use the summon command to bring the bot to your voice channel."
 
-#: musicbot/bot.py:1024
+#: musicbot/bot.py:1028
 msgid "Something is wrong, we didn't get the VoiceClient."
 msgstr "Something is wrong, we didn't get the VoiceClient."
 
-#: musicbot/bot.py:1080
+#: musicbot/bot.py:1084
 #, python-format
 msgid "Skipping next song `%(title)s` as requester `%(user)s` is not in voice!"
 msgstr ""
 "Skipping next song `%(title)s` as requester `%(user)s` is not in voice!"
 
-#: musicbot/bot.py:1098
+#: musicbot/bot.py:1102
 #, python-format
 msgid "%(mention)s - your song `%(title)s` is now playing in %(channel)s!"
 msgstr "%(mention)s - your song `%(title)s` is now playing in %(channel)s!"
 
-#: musicbot/bot.py:1107
+#: musicbot/bot.py:1111
 #, python-format
 msgid "Now playing in %(channel)s: `%(title)s` added by %(author)s!"
 msgstr "Now playing in %(channel)s: `%(title)s` added by %(author)s!"
 
-#: musicbot/bot.py:1118
+#: musicbot/bot.py:1122
 #, python-format
 msgid "Now playing automatically added entry `%(title)s` in %(channel)s!"
 msgstr "Now playing automatically added entry `%(title)s` in %(channel)s!"
 
-#: musicbot/bot.py:1329
+#: musicbot/bot.py:1333
 #, python-format
 msgid "Skipping songs added by %(user)s as they are not in voice!"
 msgstr "Skipping songs added by %(user)s as they are not in voice!"
 
-#: musicbot/bot.py:1544
+#: musicbot/bot.py:1548
 #, python-format
 msgid ""
 "Playback failed for song `%(song)s` due to an error:\n"
@@ -126,11 +126,11 @@ msgstr ""
 "```\n"
 "%(error)s```"
 
-#: musicbot/bot.py:1796
+#: musicbot/bot.py:1800
 msgid "[Dev Bug] Tried sending an invalid response object."
 msgstr "[Dev Bug] Tried sending an invalid response object."
 
-#: musicbot/bot.py:2136
+#: musicbot/bot.py:2140
 msgid ""
 "Failed Discord API Login!\n"
 "\n"
@@ -152,12 +152,12 @@ msgstr ""
 "  Make sure you have the correct Token set in your config.\n"
 "  Check API status at the official site: discordstatus.com"
 
-#: musicbot/bot.py:2704
+#: musicbot/bot.py:2708
 #, python-brace-format
 msgid "The requested song `{subject}` is blocked by the song blocklist."
 msgstr "The requested song `{subject}` is blocked by the song blocklist."
 
-#: musicbot/bot.py:2835
+#: musicbot/bot.py:2844
 msgid ""
 "Reset the auto playlist queue by copying it back into player memory.\n"
 "This command will be removed in a future version, replaced by the "
@@ -167,26 +167,26 @@ msgstr ""
 "This command will be removed in a future version, replaced by the "
 "autoplaylist command(s)."
 
-#: musicbot/bot.py:2850
+#: musicbot/bot.py:2859
 msgid "\\N{OK HAND SIGN}"
 msgstr "\\N{OK HAND SIGN}"
 
-#: musicbot/bot.py:2857
+#: musicbot/bot.py:2866
 msgid ""
 "Show usage and description of a command, or list all available commands.\n"
 msgstr ""
 "Show usage and description of a command, or list all available commands.\n"
 
-#: musicbot/bot.py:2892
+#: musicbot/bot.py:2901
 msgid "**Aliases for this command:**\n"
 msgstr "**Aliases for this command:**\n"
 
-#: musicbot/bot.py:2895
+#: musicbot/bot.py:2904
 #, python-format
 msgid "`%(alias)s` alias of `%(command)s %(args)s`\n"
 msgstr "`%(alias)s` alias of `%(command)s %(args)s`\n"
 
-#: musicbot/bot.py:2928
+#: musicbot/bot.py:2937
 #, python-format
 msgid ""
 "**Alias of command:**\n"
@@ -196,7 +196,7 @@ msgstr ""
 "  `%(command)s`\n"
 
 #. TRANSLATORS: template string for command-specific help output.
-#: musicbot/bot.py:2935
+#: musicbot/bot.py:2944
 #, python-format
 msgid ""
 "%(is_alias)s\n"
@@ -207,11 +207,11 @@ msgstr ""
 "%(docs)s\n"
 "%(alias_list)s"
 
-#: musicbot/bot.py:2944
+#: musicbot/bot.py:2953
 msgid "No such command"
 msgstr "No such command"
 
-#: musicbot/bot.py:2963
+#: musicbot/bot.py:2972
 #, python-format
 msgid ""
 "The list above shows only commands permitted for your use.\n"
@@ -220,7 +220,7 @@ msgstr ""
 "The list above shows only commands permitted for your use.\n"
 "For a list of all commands, run: %(example_all)s\n"
 
-#: musicbot/bot.py:2969
+#: musicbot/bot.py:2978
 #, python-format
 msgid ""
 "**Commands by name:** *(without prefix)*\n"
@@ -241,19 +241,19 @@ msgstr ""
 "For help with a particular command, run: %(example_command)s\n"
 "%(all_note)s"
 
-#: musicbot/bot.py:2988
+#: musicbot/bot.py:2997
 msgid "    Block a mentioned user."
 msgstr "    Block a mentioned user."
 
-#: musicbot/bot.py:2991
+#: musicbot/bot.py:3000
 msgid "    Unblock a mentioned user."
 msgstr "    Unblock a mentioned user."
 
-#: musicbot/bot.py:2994
+#: musicbot/bot.py:3003
 msgid "    Show the block status of a mentioned user."
 msgstr "    Show the block status of a mentioned user."
 
-#: musicbot/bot.py:2998
+#: musicbot/bot.py:3007
 msgid ""
 "Manage the users in the user block list.\n"
 "Blocked users are forbidden from using all bot commands.\n"
@@ -261,35 +261,35 @@ msgstr ""
 "Manage the users in the user block list.\n"
 "Blocked users are forbidden from using all bot commands.\n"
 
-#: musicbot/bot.py:3020
+#: musicbot/bot.py:3029
 msgid "You must mention a user or provide their ID number."
 msgstr "You must mention a user or provide their ID number."
 
-#: musicbot/bot.py:3025
+#: musicbot/bot.py:3034
 msgid "Invalid sub-command given. Use `help blockuser` for usage examples."
 msgstr "Invalid sub-command given. Use `help blockuser` for usage examples."
 
-#: musicbot/bot.py:3036
+#: musicbot/bot.py:3045
 msgid "MusicBot could not find the user(s) you specified."
 msgstr "MusicBot could not find the user(s) you specified."
 
-#: musicbot/bot.py:3043
+#: musicbot/bot.py:3052
 msgid "The owner cannot be added to the block list."
 msgstr "The owner cannot be added to the block list."
 
-#: musicbot/bot.py:3063
+#: musicbot/bot.py:3072
 msgid "User block list is currently enabled."
 msgstr "User block list is currently enabled."
 
-#: musicbot/bot.py:3065
+#: musicbot/bot.py:3074
 msgid "User block list is currently disabled."
 msgstr "User block list is currently disabled."
 
-#: musicbot/bot.py:3073
+#: musicbot/bot.py:3082
 msgid "Cannot add the users you listed, they are already added."
 msgstr "Cannot add the users you listed, they are already added."
 
-#: musicbot/bot.py:3082
+#: musicbot/bot.py:3091
 #, python-format
 msgid ""
 "%(number)s user(s) have been added to the block list.\n"
@@ -298,21 +298,21 @@ msgstr ""
 "%(number)s user(s) have been added to the block list.\n"
 "%(status)s"
 
-#: musicbot/bot.py:3093
+#: musicbot/bot.py:3102
 msgid "None of those users are in the blacklist."
 msgstr "None of those users are in the blacklist."
 
-#: musicbot/bot.py:3098
+#: musicbot/bot.py:3107
 #, python-format
 msgid "User: `%(user)s` is not blocked.\n"
 msgstr "User: `%(user)s` is not blocked.\n"
 
-#: musicbot/bot.py:3100
+#: musicbot/bot.py:3109
 #, python-format
 msgid "User: `%(user)s` is blocked.\n"
 msgstr "User: `%(user)s` is blocked.\n"
 
-#: musicbot/bot.py:3103
+#: musicbot/bot.py:3112
 #, python-format
 msgid ""
 "**Block list status:**\n"
@@ -322,17 +322,17 @@ msgstr ""
 "**Block list status:**\n"
 "%(status)s\n"
 "%(users)s"
-
-#: musicbot/bot.py:3113
-#, python-format
-msgid ""
-"%(number)s user(s) have been removed from the block list.\n"
-"%(status)s"
-msgstr ""
-"%(number)s user(s) have been removed from the block list.\n"
-"%(status)s"
 
 #: musicbot/bot.py:3122
+#, python-format
+msgid ""
+"%(number)s user(s) have been removed from the block list.\n"
+"%(status)s"
+msgstr ""
+"%(number)s user(s) have been removed from the block list.\n"
+"%(status)s"
+
+#: musicbot/bot.py:3131
 msgid ""
 "Manage a block list applied to song requests and extracted song data.\n"
 "A subject may be a song URL or a word or phrase found in the track title.\n"
@@ -352,20 +352,20 @@ msgstr ""
 "This means adding 'Pie' will match 'cherry Pie' but not 'piecrust' in "
 "checks.\n"
 
-#: musicbot/bot.py:3150
+#: musicbot/bot.py:3159
 msgid "You must provide a song subject if no song is currently playing."
 msgstr "You must provide a song subject if no song is currently playing."
 
-#: musicbot/bot.py:3156
+#: musicbot/bot.py:3165
 msgid "Ivalid sub-command given. Use `help blocksong` for usage examples."
 msgstr "Ivalid sub-command given. Use `help blocksong` for usage examples."
 
-#: musicbot/bot.py:3168
+#: musicbot/bot.py:3177
 #, python-format
 msgid "Subject `%(subject)s` is already in the song block list."
 msgstr "Subject `%(subject)s` is already in the song block list."
 
-#: musicbot/bot.py:3192
+#: musicbot/bot.py:3201
 #, python-format
 msgid ""
 "Added subject `%(subject)s` to the song block list.\n"
@@ -374,11 +374,11 @@ msgstr ""
 "Added subject `%(subject)s` to the song block list.\n"
 "%(status)s"
 
-#: musicbot/bot.py:3201
+#: musicbot/bot.py:3210
 msgid "The subject is not in the song block list and cannot be removed."
 msgstr "The subject is not in the song block list and cannot be removed."
 
-#: musicbot/bot.py:3209
+#: musicbot/bot.py:3218
 #, python-format
 msgid ""
 "Subject `%(subject)s` has been removed from the block list.\n"
@@ -387,7 +387,7 @@ msgstr ""
 "Subject `%(subject)s` has been removed from the block list.\n"
 "%(status)s"
 
-#: musicbot/bot.py:3219
+#: musicbot/bot.py:3228
 msgid ""
 "    Adds or removes the specified song or currently playing song to/from the "
 "current playlist.\n"
@@ -395,15 +395,15 @@ msgstr ""
 "    Adds or removes the specified song or currently playing song to/from the "
 "current playlist.\n"
 
-#: musicbot/bot.py:3222
+#: musicbot/bot.py:3231
 msgid "    Adds the entire queue to the guilds playlist.\n"
 msgstr "    Adds the entire queue to the guilds playlist.\n"
 
-#: musicbot/bot.py:3225
+#: musicbot/bot.py:3234
 msgid "    Show a list of existing playlist files.\n"
 msgstr "    Show a list of existing playlist files.\n"
 
-#: musicbot/bot.py:3228
+#: musicbot/bot.py:3237
 msgid ""
 "    Reset the auto playlist queue, restarting at the first track unless "
 "randomized.\n"
@@ -411,7 +411,7 @@ msgstr ""
 "    Reset the auto playlist queue, restarting at the first track unless "
 "randomized.\n"
 
-#: musicbot/bot.py:3231
+#: musicbot/bot.py:3240
 msgid ""
 "    Set a playlist as default for this guild and reloads the guild auto "
 "playlist.\n"
@@ -419,55 +419,55 @@ msgstr ""
 "    Set a playlist as default for this guild and reloads the guild auto "
 "playlist.\n"
 
-#: musicbot/bot.py:3234
+#: musicbot/bot.py:3243
 msgid "Manage auto playlist files and per-guild settings."
 msgstr "Manage auto playlist files and per-guild settings."
 
-#: musicbot/bot.py:3254
+#: musicbot/bot.py:3263
 msgid "Invalid sub-command given. Use `help autoplaylist` for usage examples."
 msgstr "Invalid sub-command given. Use `help autoplaylist` for usage examples."
 
-#: musicbot/bot.py:3261
+#: musicbot/bot.py:3270
 msgid "The supplied song link is invalid"
 msgstr "The supplied song link is invalid"
 
-#: musicbot/bot.py:3267
+#: musicbot/bot.py:3276
 msgid "The queue is empty. Add some songs with a play command!"
 msgstr "The queue is empty. Add some songs with a play command!"
 
-#: musicbot/bot.py:3278
+#: musicbot/bot.py:3287
 msgid "All songs in the queue are already in the autoplaylist."
 msgstr "All songs in the queue are already in the autoplaylist."
 
-#: musicbot/bot.py:3282
+#: musicbot/bot.py:3291
 #, python-format
 msgid "Added %(number)d songs to the autoplaylist."
 msgstr "Added %(number)d songs to the autoplaylist."
 
-#: musicbot/bot.py:3292
+#: musicbot/bot.py:3301
 #, python-format
 msgid "Added `%(url)s` to the autoplaylist."
 msgstr "Added `%(url)s` to the autoplaylist."
 
-#: musicbot/bot.py:3295
+#: musicbot/bot.py:3304
 msgid "This song is already in the autoplaylist."
 msgstr "This song is already in the autoplaylist."
 
-#: musicbot/bot.py:3309
+#: musicbot/bot.py:3318
 #, python-format
 msgid "Removed `%(url)s` from the autoplaylist."
 msgstr "Removed `%(url)s` from the autoplaylist."
 
-#: musicbot/bot.py:3312
+#: musicbot/bot.py:3321
 msgid "This song is not yet in the autoplaylist."
 msgstr "This song is not yet in the autoplaylist."
 
-#: musicbot/bot.py:3321
+#: musicbot/bot.py:3330
 #, python-format
 msgid "Loaded a fresh copy of the playlist: `%(file)s`"
 msgstr "Loaded a fresh copy of the playlist: `%(file)s`"
 
-#: musicbot/bot.py:3332
+#: musicbot/bot.py:3341
 #, python-format
 msgid ""
 "**Available Playlists:**\n"
@@ -476,11 +476,11 @@ msgstr ""
 "**Available Playlists:**\n"
 "%(names)s"
 
-#: musicbot/bot.py:3342
+#: musicbot/bot.py:3351
 msgid "You must provide a playlist filename."
 msgstr "You must provide a playlist filename."
 
-#: musicbot/bot.py:3362
+#: musicbot/bot.py:3371
 msgid ""
 "\n"
 "This playlist is new, you must add songs to save it to disk!"
@@ -488,18 +488,18 @@ msgstr ""
 "\n"
 "This playlist is new, you must add songs to save it to disk!"
 
-#: musicbot/bot.py:3367
+#: musicbot/bot.py:3376
 #, python-format
 msgid "The playlist for this server has been updated to: `%(name)s`%(note)s"
 msgstr "The playlist for this server has been updated to: `%(name)s`%(note)s"
 
-#: musicbot/bot.py:3378
+#: musicbot/bot.py:3387
 msgid ""
 "Generate an invite link that can be used to add this bot to another server."
 msgstr ""
 "Generate an invite link that can be used to add this bot to another server."
 
-#: musicbot/bot.py:3390
+#: musicbot/bot.py:3399
 #, python-format
 msgid ""
 "Click here to add me to a discord server:\n"
@@ -508,7 +508,7 @@ msgstr ""
 "Click here to add me to a discord server:\n"
 "%(url)s"
 
-#: musicbot/bot.py:3396
+#: musicbot/bot.py:3405
 msgid ""
 "Toggle karaoke mode on or off. While enabled, only karaoke members may queue "
 "songs.\n"
@@ -520,24 +520,24 @@ msgstr ""
 "Groups with BypassKaraokeMode permission control which members are Karaoke "
 "members.\n"
 
-#: musicbot/bot.py:3408
+#: musicbot/bot.py:3417
 msgid "\\N{OK HAND SIGN} Karaoke mode is now enabled."
 msgstr "\\N{OK HAND SIGN} Karaoke mode is now enabled."
 
-#: musicbot/bot.py:3410
+#: musicbot/bot.py:3419
 msgid "\\N{OK HAND SIGN} Karaoke mode is now disabled."
 msgstr "\\N{OK HAND SIGN} Karaoke mode is now disabled."
 
-#: musicbot/bot.py:3433
+#: musicbot/bot.py:3442
 msgid "You are not allowed to request playlists"
 msgstr "You are not allowed to request playlists"
 
-#: musicbot/bot.py:3441
+#: musicbot/bot.py:3450
 #, python-format
 msgid "Playlist has too many entries (%(songs)s but max is %(max)s)"
 msgstr "Playlist has too many entries (%(songs)s but max is %(max)s)"
 
-#: musicbot/bot.py:3452
+#: musicbot/bot.py:3461
 #, python-format
 msgid ""
 "The playlist entries will exceed your queue limit.\n"
@@ -548,11 +548,11 @@ msgstr ""
 "There are %(songs)s in the list, and %(queued)s already in queue.\n"
 "The limit is %(max)s for your group."
 
-#: musicbot/bot.py:3585
+#: musicbot/bot.py:3594
 msgid "Bot was previously paused, resuming playback now."
 msgstr "Bot was previously paused, resuming playback now."
 
-#: musicbot/bot.py:3594
+#: musicbot/bot.py:3603
 msgid ""
 "Add a song to be played in the queue. If no song is playing or paused, "
 "playback will be started.\n"
@@ -578,7 +578,7 @@ msgstr ""
 "MusicBot also supports Spotify URIs and URLs, but audio is fetched from "
 "youtube regardless.\n"
 
-#: musicbot/bot.py:3633
+#: musicbot/bot.py:3642
 msgid ""
 "Play command that shuffles playlist entries before adding them to the "
 "queue.\n"
@@ -586,12 +586,12 @@ msgstr ""
 "Play command that shuffles playlist entries before adding them to the "
 "queue.\n"
 
-#: musicbot/bot.py:3670
+#: musicbot/bot.py:3679
 #, python-format
 msgid "Shuffled playlist items into the queue from `%(request)s`"
 msgstr "Shuffled playlist items into the queue from `%(request)s`"
 
-#: musicbot/bot.py:3677
+#: musicbot/bot.py:3686
 msgid ""
 "A play command that adds the song as the next to play rather than last.\n"
 "Read help for the play command for information on supported inputs.\n"
@@ -599,7 +599,7 @@ msgstr ""
 "A play command that adds the song as the next to play rather than last.\n"
 "Read help for the play command for information on supported inputs.\n"
 
-#: musicbot/bot.py:3712
+#: musicbot/bot.py:3721
 msgid ""
 "A play command which skips any current song and plays immediately.\n"
 "Read help for the play command for information on supported inputs.\n"
@@ -607,7 +607,7 @@ msgstr ""
 "A play command which skips any current song and plays immediately.\n"
 "Read help for the play command for information on supported inputs.\n"
 
-#: musicbot/bot.py:3749
+#: musicbot/bot.py:3758
 msgid ""
 "Restarts the current song at the given time.\n"
 "If time starts with + or - seek will be relative to current playback time.\n"
@@ -619,28 +619,28 @@ msgstr ""
 "Time should be given in seconds, fractional seconds are accepted.\n"
 "Due to codec specifics in ffmpeg, this may not be accurate.\n"
 
-#: musicbot/bot.py:3769
+#: musicbot/bot.py:3778
 msgid "Cannot use seek if there is nothing playing."
 msgstr "Cannot use seek if there is nothing playing."
 
-#: musicbot/bot.py:3774
+#: musicbot/bot.py:3783
 msgid "Cannot use seek on current track, it has an unknown duration."
 msgstr "Cannot use seek on current track, it has an unknown duration."
 
-#: musicbot/bot.py:3780
+#: musicbot/bot.py:3789
 msgid "Seeking is not supported for streams."
 msgstr "Seeking is not supported for streams."
 
-#: musicbot/bot.py:3790
+#: musicbot/bot.py:3799
 msgid "Cannot use seek without a time to position playback."
 msgstr "Cannot use seek without a time to position playback."
 
-#: musicbot/bot.py:3808
+#: musicbot/bot.py:3817
 #, python-format
 msgid "Could not convert `%(input)s` to a valid time in seconds."
 msgstr "Could not convert `%(input)s` to a valid time in seconds."
 
-#: musicbot/bot.py:3821
+#: musicbot/bot.py:3830
 #, python-format
 msgid ""
 "Cannot seek to `%(input)s` (`%(seconds)s` seconds) in the current track with "
@@ -649,14 +649,14 @@ msgstr ""
 "Cannot seek to `%(input)s` (`%(seconds)s` seconds) in the current track with "
 "a length of `%(progress)s / %(total)s`"
 
-#: musicbot/bot.py:3845
+#: musicbot/bot.py:3854
 #, python-format
 msgid ""
 "Seeking to time `%(input)s` (`%(seconds).2f` seconds) in the current song."
 msgstr ""
 "Seeking to time `%(input)s` (`%(seconds).2f` seconds) in the current song."
 
-#: musicbot/bot.py:3857
+#: musicbot/bot.py:3866
 msgid ""
 "Toggles playlist or song looping.\n"
 "If no option is provided the current song will be repeated.\n"
@@ -668,51 +668,51 @@ msgstr ""
 "If no option is provided and the song is already repeating, repeating will "
 "be turned off.\n"
 
-#: musicbot/bot.py:3875
+#: musicbot/bot.py:3884
 msgid "No songs are currently playing. Play something with a play command."
 msgstr "No songs are currently playing. Play something with a play command."
 
-#: musicbot/bot.py:3882
+#: musicbot/bot.py:3891
 msgid "Invalid sub-command. Use the command `help repeat` for usage examples."
 msgstr "Invalid sub-command. Use the command `help repeat` for usage examples."
 
-#: musicbot/bot.py:3888 musicbot/bot.py:3925
+#: musicbot/bot.py:3897 musicbot/bot.py:3934
 msgid "Playlist is now repeating."
 msgstr "Playlist is now repeating."
 
-#: musicbot/bot.py:3891 musicbot/bot.py:3918 musicbot/bot.py:3929
+#: musicbot/bot.py:3900 musicbot/bot.py:3927 musicbot/bot.py:3938
 msgid "Playlist is no longer repeating."
 msgstr "Playlist is no longer repeating."
 
-#: musicbot/bot.py:3897 musicbot/bot.py:3906
+#: musicbot/bot.py:3906 musicbot/bot.py:3915
 msgid "Player will now loop the current song."
 msgstr "Player will now loop the current song."
 
-#: musicbot/bot.py:3899 musicbot/bot.py:3913
+#: musicbot/bot.py:3908 musicbot/bot.py:3922
 msgid "Player will no longer loop the current song."
 msgstr "Player will no longer loop the current song."
 
-#: musicbot/bot.py:3903
+#: musicbot/bot.py:3912
 msgid "Player is already looping a song!"
 msgstr "Player is already looping a song!"
 
-#: musicbot/bot.py:3920
+#: musicbot/bot.py:3929
 msgid "The player is not currently looping."
 msgstr "The player is not currently looping."
 
-#: musicbot/bot.py:3931
+#: musicbot/bot.py:3940
 msgid "Song is no longer repeating."
 msgstr "Song is no longer repeating."
 
-#: musicbot/bot.py:3935
+#: musicbot/bot.py:3944
 msgid "Song is now repeating."
 msgstr "Song is now repeating."
 
-#: musicbot/bot.py:3943
+#: musicbot/bot.py:3952
 msgid "    Move song at position FROM to position TO.\n"
 msgstr "    Move song at position FROM to position TO.\n"
 
-#: musicbot/bot.py:3947
+#: musicbot/bot.py:3956
 msgid ""
 "Swap existing songs in the queue using their position numbers.\n"
 "Use the queue command to find track position numbers.\n"
@@ -720,26 +720,26 @@ msgstr ""
 "Swap existing songs in the queue using their position numbers.\n"
 "Use the queue command to find track position numbers.\n"
 
-#: musicbot/bot.py:3966
+#: musicbot/bot.py:3975
 msgid "There are no songs queued. Play something with a play command."
 msgstr "There are no songs queued. Play something with a play command."
 
-#: musicbot/bot.py:3976
+#: musicbot/bot.py:3985
 msgid "Song positions must be integers!"
 msgstr "Song positions must be integers!"
 
-#: musicbot/bot.py:3981
+#: musicbot/bot.py:3990
 msgid "You gave a position outside the playlist size!"
 msgstr "You gave a position outside the playlist size!"
 
-#: musicbot/bot.py:3989
+#: musicbot/bot.py:3998
 #, python-format
 msgid ""
-"Successfully moved song from positon %(from) in queue to position %(to)s!"
+"Successfully moved song from positon %(from)s in queue to position %(to)s!"
 msgstr ""
-"Successfully moved song from positon %(from) in queue to position %(to)s!"
+"Successfully moved song from positon %(from)s in queue to position %(to)s!"
 
-#: musicbot/bot.py:4077
+#: musicbot/bot.py:4086
 #, python-format
 msgid ""
 "This link contains a Playlist ID:\n"
@@ -752,28 +752,28 @@ msgstr ""
 "\n"
 "Do you want to queue the playlist too?"
 
-#: musicbot/bot.py:4119
+#: musicbot/bot.py:4128
 msgid "Local media playback is not enabled."
 msgstr "Local media playback is not enabled."
 
-#: musicbot/bot.py:4160
+#: musicbot/bot.py:4169
 msgid "Spotify URL is invalid or not currently supported."
 msgstr "Spotify URL is invalid or not currently supported."
 
-#: musicbot/bot.py:4164
+#: musicbot/bot.py:4173
 msgid "Detected a spotify URL, but spotify is not enabled."
 msgstr "Detected a spotify URL, but spotify is not enabled."
 
-#: musicbot/bot.py:4174 musicbot/bot.py:4377
+#: musicbot/bot.py:4183 musicbot/bot.py:4386
 #, python-format
 msgid "You have reached your enqueued song limit (%(max)s)"
 msgstr "You have reached your enqueued song limit (%(max)s)"
 
-#: musicbot/bot.py:4180 musicbot/bot.py:4383 musicbot/bot.py:4477
+#: musicbot/bot.py:4189 musicbot/bot.py:4392 musicbot/bot.py:4486
 msgid "Karaoke mode is enabled, please try again when its disabled!"
 msgstr "Karaoke mode is enabled, please try again when its disabled!"
 
-#: musicbot/bot.py:4194
+#: musicbot/bot.py:4203
 #, python-format
 msgid ""
 "Failed to extract info due to error:\n"
@@ -782,22 +782,22 @@ msgstr ""
 "Failed to extract info due to error:\n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:4200
+#: musicbot/bot.py:4209
 msgid "That video cannot be played. Try using the stream command."
 msgstr "That video cannot be played. Try using the stream command."
 
-#: musicbot/bot.py:4211
+#: musicbot/bot.py:4220
 #, python-format
 msgid "Youtube search returned no results for:  %(url)s"
 msgstr "Youtube search returned no results for:  %(url)s"
 
-#: musicbot/bot.py:4252
+#: musicbot/bot.py:4261
 #, python-format
 msgid "No songs were added, all songs were over max duration (%(max)s seconds)"
 msgstr ""
 "No songs were added, all songs were over max duration (%(max)s seconds)"
 
-#: musicbot/bot.py:4257
+#: musicbot/bot.py:4266
 #, python-format
 msgid ""
 "Enqueued **%(number)s** songs to be played.\n"
@@ -806,12 +806,12 @@ msgstr ""
 "Enqueued **%(number)s** songs to be played.\n"
 "Position in queue: %(position)s"
 
-#: musicbot/bot.py:4280
+#: musicbot/bot.py:4289
 #, python-format
 msgid "Song duration exceeds limit (%(length)s > %(max)s)"
 msgstr "Song duration exceeds limit (%(length)s > %(max)s)"
 
-#: musicbot/bot.py:4292
+#: musicbot/bot.py:4301
 #, python-format
 msgid ""
 "Enqueued `%(track)s` to be played.\n"
@@ -820,21 +820,21 @@ msgstr ""
 "Enqueued `%(track)s` to be played.\n"
 "Position in queue: %(position)s"
 
-#: musicbot/bot.py:4300 musicbot/bot.py:4315
+#: musicbot/bot.py:4309 musicbot/bot.py:4324
 msgid "Playing next!"
 msgstr "Playing next!"
 
-#: musicbot/bot.py:4323
+#: musicbot/bot.py:4332
 #, python-format
 msgid "%(position)s - estimated time until playing: `%(eta)s`"
 msgstr "%(position)s - estimated time until playing: `%(eta)s`"
 
-#: musicbot/bot.py:4331
+#: musicbot/bot.py:4340
 #, python-format
 msgid "%(position)s - cannot estimate time until playing."
 msgstr "%(position)s - cannot estimate time until playing."
 
-#: musicbot/bot.py:4349
+#: musicbot/bot.py:4358
 msgid ""
 "Add a media URL to the queue as a Stream.\n"
 "The URL may be actual streaming media, like Twitch, Youtube, or a shoutcast "
@@ -848,7 +848,7 @@ msgstr ""
 "You can also use non-streamed media to play it without downloading it.\n"
 "Note: FFmpeg may drop the stream randomly or if connection hiccups happen.\n"
 
-#: musicbot/bot.py:4399
+#: musicbot/bot.py:4408
 #, python-format
 msgid ""
 "Failed to exctract info due to error:\n"
@@ -857,22 +857,22 @@ msgstr ""
 "Failed to exctract info due to error:\n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:4405
+#: musicbot/bot.py:4414
 msgid "Streaming playlists is not yet supported."
 msgstr "Streaming playlists is not yet supported."
 
-#: musicbot/bot.py:4422
+#: musicbot/bot.py:4431
 #, python-format
 msgid "Now streaming track `%(track)s`"
 msgstr "Now streaming track `%(track)s`"
 
-#: musicbot/bot.py:4431
+#: musicbot/bot.py:4440
 msgid ""
 "    Search with service for a number of results with the search query.\n"
 msgstr ""
 "    Search with service for a number of results with the search query.\n"
 
-#: musicbot/bot.py:4435
+#: musicbot/bot.py:4444
 msgid ""
 "    Search youtube for query but get a custom number of results.\n"
 "    Note: the double-quotes are required in this case.\n"
@@ -880,7 +880,7 @@ msgstr ""
 "    Search youtube for query but get a custom number of results.\n"
 "    Note: the double-quotes are required in this case.\n"
 
-#: musicbot/bot.py:4441
+#: musicbot/bot.py:4450
 msgid ""
 "Search a supported service and select from results to add to queue.\n"
 "Service and number arguments can be omitted, default number is 3 results.\n"
@@ -896,44 +896,44 @@ msgstr ""
 "- sc, soundcloud\n"
 "- yh, yahoo\n"
 
-#: musicbot/bot.py:4471
+#: musicbot/bot.py:4480
 #, python-format
 msgid "You have reached your playlist item limit (%(max)s)"
 msgstr "You have reached your playlist item limit (%(max)s)"
 
-#: musicbot/bot.py:4483
+#: musicbot/bot.py:4492
 msgid "Please specify a search query.  Use `help search` for more information."
 msgstr ""
 "Please specify a search query.  Use `help search` for more information."
 
-#: musicbot/bot.py:4512
+#: musicbot/bot.py:4521
 #, python-format
 msgid "You cannot search for more than %(max)s videos"
 msgstr "You cannot search for more than %(max)s videos"
 
-#: musicbot/bot.py:4535
+#: musicbot/bot.py:4544
 msgid "Searching for videos..."
 msgstr "Searching for videos..."
 
-#: musicbot/bot.py:4562
+#: musicbot/bot.py:4571
 msgid "No videos found."
 msgstr "No videos found."
 
-#: musicbot/bot.py:4571
+#: musicbot/bot.py:4580
 msgid "To select a song, type the corresponding number."
 msgstr "To select a song, type the corresponding number."
 
-#: musicbot/bot.py:4572
+#: musicbot/bot.py:4581
 #, python-format
 msgid "Search results from %(service)s:"
 msgstr "Search results from %(service)s:"
 
-#: musicbot/bot.py:4581
+#: musicbot/bot.py:4590
 #, python-format
 msgid "**%(index)s**. **%(track)s** | %(length)s"
 msgstr "**%(index)s**. **%(track)s** | %(length)s"
 
-#: musicbot/bot.py:4590
+#: musicbot/bot.py:4599
 msgid ""
 "\n"
 "**0**. Cancel"
@@ -941,144 +941,144 @@ msgstr ""
 "\n"
 "**0**. Cancel"
 
-#: musicbot/bot.py:4594
+#: musicbot/bot.py:4603
 msgid "Pick a song"
 msgstr "Pick a song"
 
-#: musicbot/bot.py:4645
+#: musicbot/bot.py:4654
 #, python-format
 msgid "Added song [%(track)s](%(url)s) to the queue."
 msgstr "Added song [%(track)s](%(url)s) to the queue."
 
-#: musicbot/bot.py:4659
+#: musicbot/bot.py:4668
 #, python-format
 msgid "Result %(number)s of %(total)s: %(url)s"
 msgstr "Result %(number)s of %(total)s: %(url)s"
 
-#: musicbot/bot.py:4709
+#: musicbot/bot.py:4718
 msgid "Alright, coming right up!"
 msgstr "Alright, coming right up!"
 
-#: musicbot/bot.py:4721
+#: musicbot/bot.py:4730
 msgid "Show information on what is currently playing."
 msgstr "Show information on what is currently playing."
 
-#: musicbot/bot.py:4773 musicbot/bot.py:6023 musicbot/bot.py:6055
+#: musicbot/bot.py:4782 musicbot/bot.py:6032 musicbot/bot.py:6064
 msgid "[autoplaylist]"
 msgstr "[autoplaylist]"
 
-#: musicbot/bot.py:4777
+#: musicbot/bot.py:4786
 msgid "Now playing"
 msgstr "Now playing"
 
-#: musicbot/bot.py:4780
+#: musicbot/bot.py:4789
 msgid "Currently streaming:"
 msgstr "Currently streaming:"
 
-#: musicbot/bot.py:4782
+#: musicbot/bot.py:4791
 msgid "Currently playing:"
 msgstr "Currently playing:"
 
-#: musicbot/bot.py:4788
+#: musicbot/bot.py:4797
 msgid "Added By:"
 msgstr "Added By:"
 
-#: musicbot/bot.py:4789
+#: musicbot/bot.py:4798
 #, python-format
 msgid "`%(user)s`"
 msgstr "`%(user)s`"
 
-#: musicbot/bot.py:4793
+#: musicbot/bot.py:4802
 msgid "Progress:"
 msgstr "Progress:"
 
-#: musicbot/bot.py:4811 musicbot/bot.py:6000
+#: musicbot/bot.py:4820 musicbot/bot.py:6009
 msgid "There are no songs queued! Queue something with a play command."
 msgstr "There are no songs queued! Queue something with a play command."
 
-#: musicbot/bot.py:4814
+#: musicbot/bot.py:4823
 msgid "Tell MusicBot to join the channel you're in."
 msgstr "Tell MusicBot to join the channel you're in."
 
-#: musicbot/bot.py:4837
+#: musicbot/bot.py:4846
 msgid "You are not connected to voice. Try joining a voice channel!"
 msgstr "You are not connected to voice. Try joining a voice channel!"
 
-#: musicbot/bot.py:4872
+#: musicbot/bot.py:4881
 #, python-format
 msgid "Connected to `%(channel)s`"
 msgstr "Connected to `%(channel)s`"
 
-#: musicbot/bot.py:4878
+#: musicbot/bot.py:4887
 msgid "Makes MusicBot follow a user when they change channels in a server.\n"
 msgstr "Makes MusicBot follow a user when they change channels in a server.\n"
 
-#: musicbot/bot.py:4901
+#: musicbot/bot.py:4910
 #, python-format
 msgid "No longer following user `%(user)s`"
 msgstr "No longer following user `%(user)s`"
 
-#: musicbot/bot.py:4911
+#: musicbot/bot.py:4920
 #, python-format
 msgid "Now following user `%(user)s` between voice channels."
 msgstr "Now following user `%(user)s` between voice channels."
 
-#: musicbot/bot.py:4924
+#: musicbot/bot.py:4933
 msgid "MusicBot cannot follow a user that is not a member of the server."
 msgstr "MusicBot cannot follow a user that is not a member of the server."
 
-#: musicbot/bot.py:4931
+#: musicbot/bot.py:4940
 #, python-format
 msgid "Will follow user `%(user)s` between voice channels."
 msgstr "Will follow user `%(user)s` between voice channels."
 
-#: musicbot/bot.py:4937
+#: musicbot/bot.py:4946
 msgid "Pause playback if a track is currently playing."
 msgstr "Pause playback if a track is currently playing."
 
-#: musicbot/bot.py:4948
+#: musicbot/bot.py:4957
 #, python-format
 msgid "Paused music in `%(channel)s`"
 msgstr "Paused music in `%(channel)s`"
 
-#: musicbot/bot.py:4952
+#: musicbot/bot.py:4961
 msgid "Player is not playing."
 msgstr "Player is not playing."
 
-#: musicbot/bot.py:4954
+#: musicbot/bot.py:4963
 msgid "Resumes playback if the player was previously paused."
 msgstr "Resumes playback if the player was previously paused."
 
-#: musicbot/bot.py:4965
+#: musicbot/bot.py:4974
 #, python-format
 msgid "Resumed music in `%(channel)s`"
 msgstr "Resumed music in `%(channel)s`"
 
-#: musicbot/bot.py:4971
+#: musicbot/bot.py:4980
 msgid "Resumed music queue"
 msgstr "Resumed music queue"
 
-#: musicbot/bot.py:4973
+#: musicbot/bot.py:4982
 msgid "Player is not paused."
 msgstr "Player is not paused."
 
-#: musicbot/bot.py:4975
+#: musicbot/bot.py:4984
 msgid "Shuffle all current tracks in the queue."
 msgstr "Shuffle all current tracks in the queue."
 
-#: musicbot/bot.py:5010
+#: musicbot/bot.py:5019
 msgid "Shuffled all songs in the queue."
 msgstr "Shuffled all songs in the queue."
 
-#: musicbot/bot.py:5012
+#: musicbot/bot.py:5021
 msgid "Removes all songs currently in the queue."
 msgstr "Removes all songs currently in the queue."
 
-#: musicbot/bot.py:5024
+#: musicbot/bot.py:5033
 msgid "Cleared all songs from the queue."
 msgstr "Cleared all songs from the queue."
 
-#: musicbot/bot.py:5029
+#: musicbot/bot.py:5038
 msgid ""
 "Remove a song from the queue, optionally at the given queue position.\n"
 "If the position is omitted, the song at the end of the queue is removed.\n"
@@ -1090,21 +1090,21 @@ msgstr ""
 "Use the queue command to find position number of your track.\n"
 "However, positions of all songs are changed when a new song starts playing.\n"
 
-#: musicbot/bot.py:5049
+#: musicbot/bot.py:5058
 msgid "Nothing in the queue to remove!"
 msgstr "Nothing in the queue to remove!"
 
-#: musicbot/bot.py:5064
+#: musicbot/bot.py:5073
 #, python-format
 msgid "Removed `%(track)s` added by `%(user)s`"
 msgstr "Removed `%(track)s` added by `%(user)s`"
 
-#: musicbot/bot.py:5070
+#: musicbot/bot.py:5079
 #, python-format
 msgid "Nothing found in the queue from user `%(user)s`"
 msgstr "Nothing found in the queue from user `%(user)s`"
 
-#: musicbot/bot.py:5075 musicbot/bot.py:5110
+#: musicbot/bot.py:5084 musicbot/bot.py:5119
 msgid ""
 "You do not have the permission to remove that entry from the queue.\n"
 "You must be the one who queued it or have instant skip permissions."
@@ -1112,20 +1112,21 @@ msgstr ""
 "You do not have the permission to remove that entry from the queue.\n"
 "You must be the one who queued it or have instant skip permissions."
 
-#: musicbot/bot.py:5086 musicbot/bot.py:5091
+#: musicbot/bot.py:5095 musicbot/bot.py:5100
 msgid "Invalid entry number. Use the queue command to find queue positions."
 msgstr "Invalid entry number. Use the queue command to find queue positions."
 
-#: musicbot/bot.py:5101
-msgid "Removed entry `%(track)s` added by `%(user)`"
-msgstr "Removed entry `%(track)s` added by `%(user)`"
+#: musicbot/bot.py:5110
+#, python-format
+msgid "Removed entry `%(track)s` added by `%(user)s`"
+msgstr "Removed entry `%(track)s` added by `%(user)s`"
 
-#: musicbot/bot.py:5106
+#: musicbot/bot.py:5115
 #, python-format
 msgid "Removed entry `%(track)s`"
 msgstr "Removed entry `%(track)s`"
 
-#: musicbot/bot.py:5117
+#: musicbot/bot.py:5126
 msgid ""
 "Skip or vote to skip the current playing song.\n"
 "Members with InstaSkip permission may use force parameter to bypass voting.\n"
@@ -1135,20 +1136,20 @@ msgstr ""
 "Members with InstaSkip permission may use force parameter to bypass voting.\n"
 "If LegacySkip option is enabled, the force parameter can be ignored.\n"
 
-#: musicbot/bot.py:5141
+#: musicbot/bot.py:5150
 msgid "Can't skip! The player is not playing!"
 msgstr "Can't skip! The player is not playing!"
 
-#: musicbot/bot.py:5149
+#: musicbot/bot.py:5158
 #, python-format
 msgid "The next song `%(track)s` is downloading, please wait."
 msgstr "The next song `%(track)s` is downloading, please wait."
 
-#: musicbot/bot.py:5157
+#: musicbot/bot.py:5166
 msgid "The next song will be played shortly. Please wait."
 msgstr "The next song will be played shortly. Please wait."
 
-#: musicbot/bot.py:5162
+#: musicbot/bot.py:5171
 msgid ""
 "Something odd is happening.\n"
 "You might want to restart the bot if it doesn't start working."
@@ -1156,7 +1157,7 @@ msgstr ""
 "Something odd is happening.\n"
 "You might want to restart the bot if it doesn't start working."
 
-#: musicbot/bot.py:5169
+#: musicbot/bot.py:5178
 msgid ""
 "Something strange is happening.\n"
 "You might want to restart the bot if it doesn't start working."
@@ -1164,36 +1165,37 @@ msgstr ""
 "Something strange is happening.\n"
 "You might want to restart the bot if it doesn't start working."
 
-#: musicbot/bot.py:5193
+#: musicbot/bot.py:5202
 msgid "You do not have permission to force skip a looped song."
 msgstr "You do not have permission to force skip a looped song."
 
-#: musicbot/bot.py:5207
+#: musicbot/bot.py:5216
 #, python-format
 msgid "Force skipped `%(track)s`."
 msgstr "Force skipped `%(track)s`."
 
-#: musicbot/bot.py:5212
+#: musicbot/bot.py:5221
 msgid "You do not have permission to force skip."
 msgstr "You do not have permission to force skip."
 
-#: musicbot/bot.py:5249 musicbot/bot.py:5282
+#: musicbot/bot.py:5258 musicbot/bot.py:5291
 msgid "You do not have permission to skip a looped song."
 msgstr "You do not have permission to skip a looped song."
 
-#: musicbot/bot.py:5265
+#: musicbot/bot.py:5274
+#, python-format
 msgid ""
-"Your skip for `%(track)` was acknowledged.\n"
+"Your skip for `%(track)s` was acknowledged.\n"
 "The vote to skip has been passed.%(next_up)s"
 msgstr ""
-"Your skip for `%(track)` was acknowledged.\n"
+"Your skip for `%(track)s` was acknowledged.\n"
 "The vote to skip has been passed.%(next_up)s"
 
-#: musicbot/bot.py:5272
+#: musicbot/bot.py:5281
 msgid " Next song coming up!"
 msgstr " Next song coming up!"
 
-#: musicbot/bot.py:5289
+#: musicbot/bot.py:5298
 #, python-format
 msgid ""
 "Your skip for `%(track)s` was acknowledged.\n"
@@ -1202,7 +1204,7 @@ msgstr ""
 "Your skip for `%(track)s` was acknowledged.\n"
 "Need **%(votes)s** more vote(s) to skip this song."
 
-#: musicbot/bot.py:5302
+#: musicbot/bot.py:5311
 msgid ""
 "Set the output volume level of MusicBot from 1 to 100.\n"
 "Volume parameter allows a leading + or - for relative adjustments.\n"
@@ -1212,22 +1214,22 @@ msgstr ""
 "Volume parameter allows a leading + or - for relative adjustments.\n"
 "The volume setting is retained until MusicBot is restarted.\n"
 
-#: musicbot/bot.py:5319
+#: musicbot/bot.py:5328
 #, python-format
 msgid "Current volume: `%(volume)s%%`"
 msgstr "Current volume: `%(volume)s%%`"
 
-#: musicbot/bot.py:5332
+#: musicbot/bot.py:5341
 #, python-format
 msgid "`%(new_volume)s` is not a valid number"
 msgstr "`%(new_volume)s` is not a valid number"
 
-#: musicbot/bot.py:5347
+#: musicbot/bot.py:5356
 #, python-format
 msgid "Updated volume from **%(old)d** to **%(new)d**"
 msgstr "Updated volume from **%(old)d** to **%(new)d**"
 
-#: musicbot/bot.py:5353
+#: musicbot/bot.py:5362
 #, python-format
 msgid ""
 "Unreasonable volume change provided: %(old_volume)s%(adjustment)s is "
@@ -1238,14 +1240,14 @@ msgstr ""
 "%(new_volume)s.\n"
 "Volume can only be set from 1 to 100."
 
-#: musicbot/bot.py:5363
+#: musicbot/bot.py:5372
 #, python-format
 msgid ""
 "Unreasonable volume provided: %(volume)s. Provide a value between 1 and 100."
 msgstr ""
 "Unreasonable volume provided: %(volume)s. Provide a value between 1 and 100."
 
-#: musicbot/bot.py:5370
+#: musicbot/bot.py:5379
 msgid ""
 "Change the playback speed of the currently playing track only.\n"
 "The rate must be between 0.5 and 100.0 due to ffmpeg limits.\n"
@@ -1255,7 +1257,7 @@ msgstr ""
 "The rate must be between 0.5 and 100.0 due to ffmpeg limits.\n"
 "Streaming playback does not support speed adjustments.\n"
 
-#: musicbot/bot.py:5387
+#: musicbot/bot.py:5396
 msgid ""
 "No track is playing, cannot set speed.\n"
 "Use the config command to set a default playback speed."
@@ -1263,36 +1265,36 @@ msgstr ""
 "No track is playing, cannot set speed.\n"
 "Use the config command to set a default playback speed."
 
-#: musicbot/bot.py:5395
+#: musicbot/bot.py:5404
 msgid "Speed cannot be applied to streamed media."
 msgstr "Speed cannot be applied to streamed media."
 
-#: musicbot/bot.py:5400
+#: musicbot/bot.py:5409
 msgid "You must provide a speed to set."
 msgstr "You must provide a speed to set."
 
-#: musicbot/bot.py:5409
+#: musicbot/bot.py:5418
 msgid "The speed you proivded is invalid. Use a number between 0.5 and 100."
 msgstr "The speed you proivded is invalid. Use a number between 0.5 and 100."
 
-#: musicbot/bot.py:5428
+#: musicbot/bot.py:5437
 #, python-format
 msgid "Setting playback speed to `%(speed).3f` for current track."
 msgstr "Setting playback speed to `%(speed).3f` for current track."
 
-#: musicbot/bot.py:5437
+#: musicbot/bot.py:5446
 msgid "    Add an new alias with optional arguments.\n"
 msgstr "    Add an new alias with optional arguments.\n"
 
-#: musicbot/bot.py:5440
+#: musicbot/bot.py:5449
 msgid "    Remove an alias with the given name."
 msgstr "    Remove an alias with the given name."
 
-#: musicbot/bot.py:5443
+#: musicbot/bot.py:5452
 msgid "    Reload or save aliases from/to the config file."
 msgstr "    Reload or save aliases from/to the config file."
 
-#: musicbot/bot.py:5447
+#: musicbot/bot.py:5456
 msgid ""
 "Allows management of aliases from discord. To see aliases use the help "
 "command."
@@ -1300,20 +1302,20 @@ msgstr ""
 "Allows management of aliases from discord. To see aliases use the help "
 "command."
 
-#: musicbot/bot.py:5467 musicbot/bot.py:5583 musicbot/bot.py:6516
+#: musicbot/bot.py:5476 musicbot/bot.py:5592 musicbot/bot.py:6525
 #, python-format
 msgid "Invalid option for command: `%(option)s`"
 msgstr "Invalid option for command: `%(option)s`"
 
-#: musicbot/bot.py:5473
+#: musicbot/bot.py:5482
 msgid "Aliases reloaded from config file."
 msgstr "Aliases reloaded from config file."
 
-#: musicbot/bot.py:5478
+#: musicbot/bot.py:5487
 msgid "Aliases saved to config file."
 msgstr "Aliases saved to config file."
 
-#: musicbot/bot.py:5481
+#: musicbot/bot.py:5490
 #, python-format
 msgid ""
 "Failed to save aliases due to error:\n"
@@ -1322,34 +1324,34 @@ msgstr ""
 "Failed to save aliases due to error:\n"
 "`%(raw_error)s`"
 
-#: musicbot/bot.py:5488
+#: musicbot/bot.py:5497
 msgid "You must supply an alias and a command to alias"
 msgstr "You must supply an alias and a command to alias"
 
-#: musicbot/bot.py:5494
+#: musicbot/bot.py:5503
 #, python-format
 msgid "New alias added. `%(alias)s` is now an alias of `%(command)s`"
 msgstr "New alias added. `%(alias)s` is now an alias of `%(command)s`"
 
-#: musicbot/bot.py:5503
+#: musicbot/bot.py:5512
 msgid "You must supply an alias name to remove."
 msgstr "You must supply an alias name to remove."
 
-#: musicbot/bot.py:5508
+#: musicbot/bot.py:5517
 #, python-format
 msgid "The alias `%(alias)s` does not exist."
 msgstr "The alias `%(alias)s` does not exist."
 
-#: musicbot/bot.py:5514
+#: musicbot/bot.py:5523
 #, python-format
 msgid "Alias `%(alias)s` was removed."
 msgstr "Alias `%(alias)s` was removed."
 
-#: musicbot/bot.py:5524
+#: musicbot/bot.py:5533
 msgid "    Shows help text about any missing config options.\n"
 msgstr "    Shows help text about any missing config options.\n"
 
-#: musicbot/bot.py:5527
+#: musicbot/bot.py:5536
 msgid ""
 "    Lists the names of options which have been changed since loading config "
 "file.\n"
@@ -1357,27 +1359,27 @@ msgstr ""
 "    Lists the names of options which have been changed since loading config "
 "file.\n"
 
-#: musicbot/bot.py:5530
+#: musicbot/bot.py:5539
 msgid "    List the available config options and their sections.\n"
 msgstr "    List the available config options and their sections.\n"
 
-#: musicbot/bot.py:5533
+#: musicbot/bot.py:5542
 msgid "    Reload the options.ini file from disk.\n"
 msgstr "    Reload the options.ini file from disk.\n"
 
-#: musicbot/bot.py:5536
+#: musicbot/bot.py:5545
 msgid "    Shows help text for a specific option.\n"
 msgstr "    Shows help text for a specific option.\n"
 
-#: musicbot/bot.py:5539
+#: musicbot/bot.py:5548
 msgid "    Display the current value of the option.\n"
 msgstr "    Display the current value of the option.\n"
 
-#: musicbot/bot.py:5542
+#: musicbot/bot.py:5551
 msgid "    Saves the current current value to the options file.\n"
 msgstr "    Saves the current current value to the options file.\n"
 
-#: musicbot/bot.py:5545
+#: musicbot/bot.py:5554
 msgid ""
 "    Validates the option and sets the config for the session, but not to "
 "file.\n"
@@ -1385,19 +1387,19 @@ msgstr ""
 "    Validates the option and sets the config for the session, but not to "
 "file.\n"
 
-#: musicbot/bot.py:5548
+#: musicbot/bot.py:5557
 msgid "    Reset the option to it's default value.\n"
 msgstr "    Reset the option to it's default value.\n"
 
-#: musicbot/bot.py:5551
+#: musicbot/bot.py:5560
 msgid "Manage options.ini configuration from within Discord."
 msgstr "Manage options.ini configuration from within Discord."
 
-#: musicbot/bot.py:5566
+#: musicbot/bot.py:5575
 msgid "Config cannot use channel and user mentions at the same time."
 msgstr "Config cannot use channel and user mentions at the same time."
 
-#: musicbot/bot.py:5592
+#: musicbot/bot.py:5601
 #, python-format
 msgid ""
 "**Missing Option:** `%(config)s`\n"
@@ -1410,15 +1412,15 @@ msgstr ""
 "%(comment)s\n"
 "Default is set to:  %(default)s```\n"
 
-#: musicbot/bot.py:5605
+#: musicbot/bot.py:5614
 msgid "*All config options are present and accounted for!*"
 msgstr "*All config options are present and accounted for!*"
 
-#: musicbot/bot.py:5621
+#: musicbot/bot.py:5630
 msgid "No config options appear to be changed."
 msgstr "No config options appear to be changed."
 
-#: musicbot/bot.py:5623
+#: musicbot/bot.py:5632
 #, python-format
 msgid ""
 "**Changed Options:**\n"
@@ -1427,7 +1429,7 @@ msgstr ""
 "**Changed Options:**\n"
 "%(changed)s"
 
-#: musicbot/bot.py:5643
+#: musicbot/bot.py:5652
 #, python-format
 msgid ""
 "## Available Options:\n"
@@ -1442,11 +1444,11 @@ msgstr ""
 "**Manual Edit Only:**\n"
 "%(manual)s"
 
-#: musicbot/bot.py:5665
+#: musicbot/bot.py:5674
 msgid "Config options reloaded from file successfully!"
 msgstr "Config options reloaded from file successfully!"
 
-#: musicbot/bot.py:5669
+#: musicbot/bot.py:5678
 #, python-format
 msgid ""
 "Unable to reload Config due to the following error:\n"
@@ -1455,7 +1457,7 @@ msgstr ""
 "Unable to reload Config due to the following error:\n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:5687
+#: musicbot/bot.py:5696
 msgid ""
 "Could not resolve section name from option name. Please provide a valid "
 "section and option name."
@@ -1463,15 +1465,15 @@ msgstr ""
 "Could not resolve section name from option name. Please provide a valid "
 "section and option name."
 
-#: musicbot/bot.py:5691
+#: musicbot/bot.py:5700
 msgid "The option given is ambiguous, please provide a section name."
 msgstr "The option given is ambiguous, please provide a section name."
 
-#: musicbot/bot.py:5697
+#: musicbot/bot.py:5706
 msgid "You must provide a section name and option name for this command."
 msgstr "You must provide a section name and option name for this command."
 
-#: musicbot/bot.py:5713
+#: musicbot/bot.py:5722
 #, python-format
 msgid ""
 "The section `%(section)s` is not available.\n"
@@ -1480,21 +1482,21 @@ msgstr ""
 "The section `%(section)s` is not available.\n"
 "The available sections are:  %(sections)s"
 
-#: musicbot/bot.py:5721
+#: musicbot/bot.py:5730
 #, python-format
 msgid "The option `%(option)s` is not available."
 msgstr "The option `%(option)s` is not available."
 
-#: musicbot/bot.py:5729
+#: musicbot/bot.py:5738
 msgid "This option can only be set by editing the config file."
 msgstr "This option can only be set by editing the config file."
 
-#: musicbot/bot.py:5733
+#: musicbot/bot.py:5742
 #, python-format
 msgid "By default this option is set to: %(default)s"
 msgstr "By default this option is set to: %(default)s"
 
-#: musicbot/bot.py:5738
+#: musicbot/bot.py:5747
 #, python-format
 msgid ""
 "**Option:** `%(config)s`\n"
@@ -1507,27 +1509,27 @@ msgstr ""
 "\n"
 "%(default)s"
 
-#: musicbot/bot.py:5749
+#: musicbot/bot.py:5758
 #, python-format
 msgid "Option `%(option)s` is not editable. Cannot save to disk."
 msgstr "Option `%(option)s` is not editable. Cannot save to disk."
 
-#: musicbot/bot.py:5758
+#: musicbot/bot.py:5767
 #, python-format
 msgid "Failed to save the option:  `%(option)s`"
 msgstr "Failed to save the option:  `%(option)s`"
 
-#: musicbot/bot.py:5763
+#: musicbot/bot.py:5772
 #, python-format
 msgid "Successfully saved the option:  `%(config)s`"
 msgstr "Successfully saved the option:  `%(config)s`"
 
-#: musicbot/bot.py:5773
+#: musicbot/bot.py:5782
 #, python-format
 msgid "Option `%(option)s` is not editable, value cannot be displayed."
 msgstr "Option `%(option)s` is not editable, value cannot be displayed."
 
-#: musicbot/bot.py:5780
+#: musicbot/bot.py:5789
 #, python-format
 msgid ""
 "**Option:** `%(config)s`\n"
@@ -1538,21 +1540,21 @@ msgstr ""
 "Current Value:  `%(loaded)s`\n"
 "INI File Value:  `%(ini)s`"
 
-#: musicbot/bot.py:5796
+#: musicbot/bot.py:5805
 #, python-format
 msgid "Option `%(option)s` is not editable. Cannot update setting."
 msgstr "Option `%(option)s` is not editable. Cannot update setting."
 
-#: musicbot/bot.py:5802 musicbot/bot.py:6729
+#: musicbot/bot.py:5811 musicbot/bot.py:6738
 msgid "You must provide a section, option, and value for this sub command."
 msgstr "You must provide a section, option, and value for this sub command."
 
-#: musicbot/bot.py:5813
+#: musicbot/bot.py:5822
 #, python-format
 msgid "Option `%(option)s` was not updated!"
 msgstr "Option `%(option)s` was not updated!"
 
-#: musicbot/bot.py:5818
+#: musicbot/bot.py:5827
 #, python-format
 msgid ""
 "Option `%(config)s` was updated for this session.\n"
@@ -1561,17 +1563,17 @@ msgstr ""
 "Option `%(config)s` was updated for this session.\n"
 "To save the change use `config save %(section)s %(option)s`"
 
-#: musicbot/bot.py:5829
+#: musicbot/bot.py:5838
 #, python-format
 msgid "Option `%(option)s` is not editable. Cannot reset to default."
 msgstr "Option `%(option)s` is not editable. Cannot reset to default."
 
-#: musicbot/bot.py:5848
+#: musicbot/bot.py:5857
 #, python-format
 msgid "Option `%(option)s` was not reset to default!"
 msgstr "Option `%(option)s` was not reset to default!"
 
-#: musicbot/bot.py:5853
+#: musicbot/bot.py:5862
 #, python-format
 msgid ""
 "Option `%(config)s` was reset to its default value `%(default)s`.\n"
@@ -1580,15 +1582,15 @@ msgstr ""
 "Option `%(config)s` was reset to its default value `%(default)s`.\n"
 "To save the change use `config save %(section)s %(option)s`"
 
-#: musicbot/bot.py:5868
+#: musicbot/bot.py:5877
 msgid "Deprecated command, use the config command instead."
 msgstr "Deprecated command, use the config command instead."
 
-#: musicbot/bot.py:5881
+#: musicbot/bot.py:5890
 msgid "The option command is deprecated, use the config command instead."
 msgstr "The option command is deprecated, use the config command instead."
 
-#: musicbot/bot.py:5888
+#: musicbot/bot.py:5897
 msgid ""
 "Display information about cache storage or clear cache according to "
 "configured limits.\n"
@@ -1600,28 +1602,28 @@ msgstr ""
 "Using update option will scan the cache for external changes before "
 "displaying details."
 
-#: musicbot/bot.py:5901
+#: musicbot/bot.py:5910
 msgid "Invalid option specified, use: info, update, or clear"
 msgstr "Invalid option specified, use: info, update, or clear"
 
-#: musicbot/bot.py:5912
+#: musicbot/bot.py:5921
 msgid "Disabled"
 msgstr "Disabled"
 
-#: musicbot/bot.py:5912
+#: musicbot/bot.py:5921
 msgid "Enabled"
 msgstr "Enabled"
 
-#: musicbot/bot.py:5915
+#: musicbot/bot.py:5924
 #, python-format
 msgid "%(time)s days"
 msgstr "%(time)s days"
 
-#: musicbot/bot.py:5921 musicbot/bot.py:5924
+#: musicbot/bot.py:5930 musicbot/bot.py:5933
 msgid "Unlimited"
 msgstr "Unlimited"
 
-#: musicbot/bot.py:5929
+#: musicbot/bot.py:5938
 #, python-format
 msgid ""
 "**Video Cache:** *%(state)s*\n"
@@ -1636,19 +1638,19 @@ msgstr ""
 "\n"
 "**Cached Now:  %(used)s in %(files)s file(s)."
 
-#: musicbot/bot.py:5952
+#: musicbot/bot.py:5961
 msgid "Cache has been cleared."
 msgstr "Cache has been cleared."
 
-#: musicbot/bot.py:5958
+#: musicbot/bot.py:5967
 msgid "**Failed** to delete cache, check logs for more info..."
 msgstr "**Failed** to delete cache, check logs for more info..."
 
-#: musicbot/bot.py:5961
+#: musicbot/bot.py:5970
 msgid "No cache found to clear."
 msgstr "No cache found to clear."
 
-#: musicbot/bot.py:5969
+#: musicbot/bot.py:5978
 msgid ""
 "Display information about the current player queue.\n"
 "Optional page number shows later entries in the queue.\n"
@@ -1656,11 +1658,11 @@ msgstr ""
 "Display information about the current player queue.\n"
 "Optional page number shows later entries in the queue.\n"
 
-#: musicbot/bot.py:5993
+#: musicbot/bot.py:6002
 msgid "Queue page argument must be a whole number."
 msgstr "Queue page argument must be a whole number."
 
-#: musicbot/bot.py:6009
+#: musicbot/bot.py:6018
 #, python-format
 msgid ""
 "Requested page number is out of bounds.\n"
@@ -1669,11 +1671,11 @@ msgstr ""
 "Requested page number is out of bounds.\n"
 "There are **%(total)s** pages."
 
-#: musicbot/bot.py:6021
+#: musicbot/bot.py:6030
 msgid "(unknown duration)"
 msgstr "(unknown duration)"
 
-#: musicbot/bot.py:6030
+#: musicbot/bot.py:6039
 #, python-format
 msgid ""
 "Currently playing: `%(title)s`\n"
@@ -1684,7 +1686,7 @@ msgstr ""
 "Added by: `%(user)s`\n"
 "Progress: `[%(progress)s/%(total)s]`\n"
 
-#: musicbot/bot.py:6060
+#: musicbot/bot.py:6069
 #, python-format
 msgid ""
 "**Entry #%(index)s:**Title: `%(title)s`\n"
@@ -1695,7 +1697,7 @@ msgstr ""
 "Added by: `%(user)s\n"
 "\n"
 
-#: musicbot/bot.py:6068
+#: musicbot/bot.py:6077
 #, python-format
 msgid ""
 "%(progress)sThere are `%(total)s` entries in the queue.\n"
@@ -1708,11 +1710,11 @@ msgstr ""
 "\n"
 "%(tracks)s"
 
-#: musicbot/bot.py:6081
+#: musicbot/bot.py:6090
 msgid "Songs in queue"
 msgstr "Songs in queue"
 
-#: musicbot/bot.py:6101
+#: musicbot/bot.py:6110
 msgid ""
 "Try that again. MusicBot couldn't make or get a reference to the queue "
 "message.\n"
@@ -1722,7 +1724,7 @@ msgstr ""
 "message.\n"
 "If the issue persists, file a bug report."
 
-#: musicbot/bot.py:6152
+#: musicbot/bot.py:6161
 msgid ""
 "Search for and remove bot messages and commands from the calling text "
 "channel.\n"
@@ -1736,32 +1738,32 @@ msgstr ""
 "max.\n"
 "This command may be slow if larger ranges are given.\n"
 
-#: musicbot/bot.py:6176
+#: musicbot/bot.py:6185
 msgid "Invalid parameter. Please provide a number of messages to search."
 msgstr "Invalid parameter. Please provide a number of messages to search."
 
-#: musicbot/bot.py:6211
+#: musicbot/bot.py:6220
 msgid "Cannot use purge on private DM channel."
 msgstr "Cannot use purge on private DM channel."
 
-#: musicbot/bot.py:6218
+#: musicbot/bot.py:6227
 #, python-format
 msgid "Cleaned up %(number)s message(s)."
 msgstr "Cleaned up %(number)s message(s)."
 
-#: musicbot/bot.py:6222
+#: musicbot/bot.py:6231
 msgid "Bot does not have permission to manage messages."
 msgstr "Bot does not have permission to manage messages."
 
-#: musicbot/bot.py:6227
+#: musicbot/bot.py:6236
 msgid "Dump the individual urls of a playlist to a file."
 msgstr "Dump the individual urls of a playlist to a file."
 
-#: musicbot/bot.py:6243
+#: musicbot/bot.py:6252
 msgid "The given URL was not a valid URL."
 msgstr "The given URL was not a valid URL."
 
-#: musicbot/bot.py:6253
+#: musicbot/bot.py:6262
 #, python-format
 msgid ""
 "Could not extract info from input url\n"
@@ -1770,16 +1772,16 @@ msgstr ""
 "Could not extract info from input url\n"
 "%(raw_error)s\n"
 
-#: musicbot/bot.py:6258
+#: musicbot/bot.py:6267
 msgid "This does not seem to be a playlist."
 msgstr "This does not seem to be a playlist."
 
-#: musicbot/bot.py:6279
+#: musicbot/bot.py:6288
 #, python-format
 msgid "Here is the playlist dump for:  %(url)s"
 msgstr "Here is the playlist dump for:  %(url)s"
 
-#: musicbot/bot.py:6289
+#: musicbot/bot.py:6298
 msgid ""
 "Display your Discord User ID, or the ID of a mentioned user.\n"
 "This command is deprecated in favor of Developer Mode in Discord clients.\n"
@@ -1787,17 +1789,17 @@ msgstr ""
 "Display your Discord User ID, or the ID of a mentioned user.\n"
 "This command is deprecated in favor of Developer Mode in Discord clients.\n"
 
-#: musicbot/bot.py:6304
+#: musicbot/bot.py:6313
 #, python-format
 msgid "Your user ID is `%(id)s`"
 msgstr "Your user ID is `%(id)s`"
 
-#: musicbot/bot.py:6309
+#: musicbot/bot.py:6318
 #, python-format
 msgid "The user ID for `%(username)s` is `%(id)s`"
 msgstr "The user ID for `%(username)s` is `%(id)s`"
 
-#: musicbot/bot.py:6316
+#: musicbot/bot.py:6325
 msgid ""
 "List the Discord IDs for the selected category.\n"
 "Returns all ID data by default, but one or more categories may be selected.\n"
@@ -1809,102 +1811,102 @@ msgstr ""
 "This command is deprecated in favor of using Developer mode in Discord "
 "clients.\n"
 
-#: musicbot/bot.py:6338
+#: musicbot/bot.py:6347
 #, python-format
 msgid "Valid categories: %(cats)s"
 msgstr "Valid categories: %(cats)s"
 
-#: musicbot/bot.py:6385
+#: musicbot/bot.py:6394
 msgid "Here are the IDs you requested:"
 msgstr "Here are the IDs you requested:"
 
-#: musicbot/bot.py:6392
+#: musicbot/bot.py:6401
 msgid ""
 "Get a list of your permissions, or the permisions of the mentioned user."
 msgstr ""
 "Get a list of your permissions, or the permisions of the mentioned user."
 
-#: musicbot/bot.py:6422
+#: musicbot/bot.py:6431
 msgid ""
 "Invalid user ID or server nickname, please double check the ID and try again."
 msgstr ""
 "Invalid user ID or server nickname, please double check the ID and try again."
 
-#: musicbot/bot.py:6429
+#: musicbot/bot.py:6438
 msgid "Could not determine the discord User.  Try again."
 msgstr "Could not determine the discord User.  Try again."
-
-#: musicbot/bot.py:6436
-#, python-format
-msgid ""
-"Your command permissions in %(server)s are:\n"
-"```\n"
-"%(permissions)s\n"
-"```"
-msgstr ""
-"Your command permissions in %(server)s are:\n"
-"```\n"
-"%(permissions)s\n"
-"```"
 
 #: musicbot/bot.py:6445
 #, python-format
 msgid ""
-"The command permissions for %(username) in %(server)s are:\n"
+"Your command permissions in %(server)s are:\n"
 "```\n"
 "%(permissions)s\n"
 "```"
 msgstr ""
-"The command permissions for %(username) in %(server)s are:\n"
+"Your command permissions in %(server)s are:\n"
 "```\n"
 "%(permissions)s\n"
 "```"
 
-#: musicbot/bot.py:6461
+#: musicbot/bot.py:6454
+#, python-format
+msgid ""
+"The command permissions for %(username)s in %(server)s are:\n"
+"```\n"
+"%(permissions)s\n"
+"```"
+msgstr ""
+"The command permissions for %(username)s in %(server)s are:\n"
+"```\n"
+"%(permissions)s\n"
+"```"
+
+#: musicbot/bot.py:6470
 msgid "    Show loaded groups and list permission options.\n"
 msgstr "    Show loaded groups and list permission options.\n"
 
-#: musicbot/bot.py:6464
+#: musicbot/bot.py:6473
 msgid "    Reloads permissions from the permissions.ini file.\n"
 msgstr "    Reloads permissions from the permissions.ini file.\n"
 
-#: musicbot/bot.py:6467
+#: musicbot/bot.py:6476
 msgid "    Add new group with defaults.\n"
 msgstr "    Add new group with defaults.\n"
 
-#: musicbot/bot.py:6470
+#: musicbot/bot.py:6479
 msgid "    Remove existing group.\n"
 msgstr "    Remove existing group.\n"
 
-#: musicbot/bot.py:6473
+#: musicbot/bot.py:6482
 msgid "    Show help text for the permission option.\n"
 msgstr "    Show help text for the permission option.\n"
 
-#: musicbot/bot.py:6476
+#: musicbot/bot.py:6485
 msgid "    Show permission value for given group and permission.\n"
 msgstr "    Show permission value for given group and permission.\n"
 
-#: musicbot/bot.py:6479
+#: musicbot/bot.py:6488
 msgid "    Save permissions group to file.\n"
 msgstr "    Save permissions group to file.\n"
 
-#: musicbot/bot.py:6482
+#: musicbot/bot.py:6491
 msgid "    Set permission value for the group.\n"
 msgstr "    Set permission value for the group.\n"
 
-#: musicbot/bot.py:6485
+#: musicbot/bot.py:6494
 msgid "Manage permissions.ini configuration from within discord."
 msgstr "Manage permissions.ini configuration from within discord."
 
-#: musicbot/bot.py:6500
+#: musicbot/bot.py:6509
 msgid "Permissions cannot use channel and user mentions at the same time."
 msgstr "Permissions cannot use channel and user mentions at the same time."
 
-#: musicbot/bot.py:6531
+#: musicbot/bot.py:6540
 msgid "Permissions reloaded from file successfully!"
 msgstr "Permissions reloaded from file successfully!"
 
-#: musicbot/bot.py:6535
+#: musicbot/bot.py:6544
 #, python-format
 msgid ""
 "Unable to reload Permissions due to an errror:\n"
@@ -1913,7 +1915,7 @@ msgstr ""
 "Unable to reload Permissions due to an errror:\n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:6555
+#: musicbot/bot.py:6564
 #, python-format
 msgid ""
 "## Available Groups:\n"
@@ -1926,20 +1928,20 @@ msgstr ""
 "## Available Options:\n"
 "%(options)s\n"
 
-#: musicbot/bot.py:6572
+#: musicbot/bot.py:6581
 msgid "You must provide a group or option name for this command."
 msgstr "You must provide a group or option name for this command."
 
-#: musicbot/bot.py:6576
+#: musicbot/bot.py:6585
 msgid "You must provide a group, option, and value to set for this command."
 msgstr "You must provide a group, option, and value to set for this command."
 
-#: musicbot/bot.py:6590
+#: musicbot/bot.py:6599
 #, python-format
 msgid "The %(option)s sub-command requires a group and permission name."
 msgstr "The %(option)s sub-command requires a group and permission name."
 
-#: musicbot/bot.py:6602
+#: musicbot/bot.py:6611
 #, python-format
 msgid ""
 "The group `%(group)s` is not available.\n"
@@ -1948,21 +1950,21 @@ msgstr ""
 "The group `%(group)s` is not available.\n"
 "The available groups are:  %(sections)s"
 
-#: musicbot/bot.py:6613
+#: musicbot/bot.py:6622
 #, python-format
 msgid "The permission `%(option)s` is not available."
 msgstr "The permission `%(option)s` is not available."
 
-#: musicbot/bot.py:6621
+#: musicbot/bot.py:6630
 msgid "This permission can only be set by editing the permissions file."
 msgstr "This permission can only be set by editing the permissions file."
 
-#: musicbot/bot.py:6630
+#: musicbot/bot.py:6639
 #, python-format
 msgid "By default this permission is set to: `%(value)s`"
 msgstr "By default this permission is set to: `%(value)s`"
 
-#: musicbot/bot.py:6635
+#: musicbot/bot.py:6644
 #, python-format
 msgid ""
 "**Permission:** `%(option)s`\n"
@@ -1975,12 +1977,12 @@ msgstr ""
 "\n"
 "%(default)s"
 
-#: musicbot/bot.py:6649
+#: musicbot/bot.py:6658
 #, python-format
 msgid "Cannot add group `%(group)s` it already exists."
 msgstr "Cannot add group `%(group)s` it already exists."
 
-#: musicbot/bot.py:6657
+#: musicbot/bot.py:6666
 #, python-format
 msgid ""
 "Successfully added new group:  `%(group)s`\n"
@@ -1991,11 +1993,11 @@ msgstr ""
 "You can now customizse the permissions with:  `setperms set %(group)s`\n"
 "Make sure to save the new group with:  `setperms save %(group)s`"
 
-#: musicbot/bot.py:6667
+#: musicbot/bot.py:6676
 msgid "Cannot remove built-in group."
 msgstr "Cannot remove built-in group."
 
-#: musicbot/bot.py:6674
+#: musicbot/bot.py:6683
 #, python-format
 msgid ""
 "Successfully removed group:  `%(group)s`\n"
@@ -2004,21 +2006,21 @@ msgstr ""
 "Successfully removed group:  `%(group)s`\n"
 "Make sure to save this change with:  `setperms save %(group)s`"
 
-#: musicbot/bot.py:6685 musicbot/bot.py:6724
+#: musicbot/bot.py:6694 musicbot/bot.py:6733
 msgid "The owner group is not editable."
 msgstr "The owner group is not editable."
 
-#: musicbot/bot.py:6693
+#: musicbot/bot.py:6702
 #, python-format
 msgid "Failed to save the group:  `%(group)s`"
 msgstr "Failed to save the group:  `%(group)s`"
 
-#: musicbot/bot.py:6697
+#: musicbot/bot.py:6706
 #, python-format
 msgid "Successfully saved the group:  `%(group)s`"
 msgstr "Successfully saved the group:  `%(group)s`"
 
-#: musicbot/bot.py:6708
+#: musicbot/bot.py:6717
 #, python-format
 msgid ""
 "**Permission:** `%(permission)s`\n"
@@ -2029,12 +2031,12 @@ msgstr ""
 "Current Value:  `%(loaded)s`\n"
 "INI File Value:  `%(ini)s`"
 
-#: musicbot/bot.py:6740
+#: musicbot/bot.py:6749
 #, python-format
 msgid "Permission `%(option)s` was not updated!"
 msgstr "Permission `%(option)s` was not updated!"
 
-#: musicbot/bot.py:6745
+#: musicbot/bot.py:6754
 #, python-format
 msgid ""
 "Permission `%(permission)s` was updated for this session.\n"
@@ -2043,7 +2045,7 @@ msgstr ""
 "Permission `%(permission)s` was updated for this session.\n"
 "To save the change use `setperms save %(section)s %(option)s`"
 
-#: musicbot/bot.py:6762
+#: musicbot/bot.py:6771
 msgid ""
 "Change the bot's username on discord.Note: The API may limit name changes to "
 "twice per hour."
@@ -2051,7 +2053,7 @@ msgstr ""
 "Change the bot's username on discord.Note: The API may limit name changes to "
 "twice per hour."
 
-#: musicbot/bot.py:6781
+#: musicbot/bot.py:6790
 msgid ""
 "Failed to change username. Did you change names too many times?\n"
 "Remember name changes are limited to twice per hour.\n"
@@ -2059,7 +2061,7 @@ msgstr ""
 "Failed to change username. Did you change names too many times?\n"
 "Remember name changes are limited to twice per hour.\n"
 
-#: musicbot/bot.py:6787
+#: musicbot/bot.py:6796
 #, python-format
 msgid ""
 "Failed to change username due to error:  \n"
@@ -2068,20 +2070,20 @@ msgstr ""
 "Failed to change username due to error:  \n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:6792
+#: musicbot/bot.py:6801
 #, python-format
 msgid "Set the bot's username to `%(name)s`"
 msgstr "Set the bot's username to `%(name)s`"
 
-#: musicbot/bot.py:6795
+#: musicbot/bot.py:6804
 msgid "Change the MusicBot's nickname."
 msgstr "Change the MusicBot's nickname."
 
-#: musicbot/bot.py:6809
+#: musicbot/bot.py:6818
 msgid "Unable to change nickname: no permission."
 msgstr "Unable to change nickname: no permission."
 
-#: musicbot/bot.py:6817
+#: musicbot/bot.py:6826
 #, python-format
 msgid ""
 "Failed to set nickname due to error:  \n"
@@ -2090,20 +2092,20 @@ msgstr ""
 "Failed to set nickname due to error:  \n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:6822
+#: musicbot/bot.py:6831
 #, python-format
 msgid "Set the bot's nickname to `%(nick)s`"
 msgstr "Set the bot's nickname to `%(nick)s`"
 
-#: musicbot/bot.py:6829
+#: musicbot/bot.py:6838
 msgid "    Set a per-server command prefix."
 msgstr "    Set a per-server command prefix."
 
-#: musicbot/bot.py:6831
+#: musicbot/bot.py:6840
 msgid "    Clear the per-server command prefix."
 msgstr "    Clear the per-server command prefix."
 
-#: musicbot/bot.py:6835
+#: musicbot/bot.py:6844
 msgid ""
 "Override the default command prefix in the server.\n"
 "The option EnablePrefixPerGuild must be enabled first."
@@ -2111,20 +2113,20 @@ msgstr ""
 "Override the default command prefix in the server.\n"
 "The option EnablePrefixPerGuild must be enabled first."
 
-#: musicbot/bot.py:6857
+#: musicbot/bot.py:6866
 msgid "Custom emoji must be from this server to use as a prefix."
 msgstr "Custom emoji must be from this server to use as a prefix."
 
-#: musicbot/bot.py:6863
+#: musicbot/bot.py:6872
 msgid "Server command prefix is cleared."
 msgstr "Server command prefix is cleared."
 
-#: musicbot/bot.py:6868
+#: musicbot/bot.py:6877
 #, python-format
 msgid "Server command prefix is now:  %(prefix)s"
 msgstr "Server command prefix is now:  %(prefix)s"
 
-#: musicbot/bot.py:6874
+#: musicbot/bot.py:6883
 msgid ""
 "Prefix per server is not enabled!\n"
 "Use the config command to update the prefix instead."
@@ -2132,7 +2134,7 @@ msgstr ""
 "Prefix per server is not enabled!\n"
 "Use the config command to update the prefix instead."
 
-#: musicbot/bot.py:6882
+#: musicbot/bot.py:6891
 msgid ""
 "Change MusicBot's avatar.\n"
 "Attaching a file and omitting the url parameter also works.\n"
@@ -2140,11 +2142,11 @@ msgstr ""
 "Change MusicBot's avatar.\n"
 "Attaching a file and omitting the url parameter also works.\n"
 
-#: musicbot/bot.py:6902
+#: musicbot/bot.py:6911
 msgid "You must provide a URL or attach a file."
 msgstr "You must provide a URL or attach a file."
 
-#: musicbot/bot.py:6912
+#: musicbot/bot.py:6921
 #, python-format
 msgid ""
 "Unable to change avatar due to error:  \n"
@@ -2153,47 +2155,47 @@ msgstr ""
 "Unable to change avatar due to error:  \n"
 "%(raw_error)s"
 
-#: musicbot/bot.py:6916
+#: musicbot/bot.py:6925
 msgid "Changed the bot's avatar."
 msgstr "Changed the bot's avatar."
 
-#: musicbot/bot.py:6919
+#: musicbot/bot.py:6928
 msgid "Force MusicBot to disconnect from the discord server."
 msgstr "Force MusicBot to disconnect from the discord server."
 
-#: musicbot/bot.py:6930
+#: musicbot/bot.py:6939
 #, python-format
 msgid "Disconnected from server `%(guild)s`"
 msgstr "Disconnected from server `%(guild)s`"
 
-#: musicbot/bot.py:6945
+#: musicbot/bot.py:6954
 msgid "Disconnected a playerless voice client? [BUG]"
 msgstr "Disconnected a playerless voice client? [BUG]"
 
-#: musicbot/bot.py:6949
+#: musicbot/bot.py:6958
 #, python-format
 msgid "Not currently connected to server `%(guild)s`"
 msgstr "Not currently connected to server `%(guild)s`"
 
-#: musicbot/bot.py:6957
+#: musicbot/bot.py:6966
 msgid "    Attempt to reload without process restart. The default option.\n"
 msgstr "    Attempt to reload without process restart. The default option.\n"
 
-#: musicbot/bot.py:6959
+#: musicbot/bot.py:6968
 msgid ""
 "    Attempt to restart the entire MusicBot process, reloading everything.\n"
 msgstr ""
 "    Attempt to restart the entire MusicBot process, reloading everything.\n"
 
-#: musicbot/bot.py:6961
+#: musicbot/bot.py:6970
 msgid "    Full restart, but attempt to update pip packages before restart.\n"
 msgstr "    Full restart, but attempt to update pip packages before restart.\n"
 
-#: musicbot/bot.py:6963
+#: musicbot/bot.py:6972
 msgid "    Full restart, but update MusicBot source code with git first.\n"
 msgstr "    Full restart, but update MusicBot source code with git first.\n"
 
-#: musicbot/bot.py:6965
+#: musicbot/bot.py:6974
 msgid ""
 "    Attempt to update all dependency and source code before fully "
 "restarting.\n"
@@ -2201,7 +2203,7 @@ msgstr ""
 "    Attempt to update all dependency and source code before fully "
 "restarting.\n"
 
-#: musicbot/bot.py:6969
+#: musicbot/bot.py:6978
 msgid ""
 "Attempts to restart the MusicBot in a number of different ways.\n"
 "With no option supplied, a `soft` restart is implied.\n"
@@ -2217,47 +2219,47 @@ msgstr ""
 "If you have a service manager, we recommend using it instead of this command "
 "for restarts.\n"
 
-#: musicbot/bot.py:6990
+#: musicbot/bot.py:6999
 msgid "Invalid option given, use one of:  soft, full, upgrade, uppip, or upgit"
 msgstr ""
 "Invalid option given, use one of:  soft, full, upgrade, uppip, or upgit"
 
-#: musicbot/bot.py:6996
+#: musicbot/bot.py:7005
 #, python-format
 msgid "%(emoji)s Restarting current instance..."
 msgstr "%(emoji)s Restarting current instance..."
 
-#: musicbot/bot.py:7001
+#: musicbot/bot.py:7010
 #, python-format
 msgid "%(emoji)s Restarting bot process..."
 msgstr "%(emoji)s Restarting bot process..."
 
-#: musicbot/bot.py:7006
+#: musicbot/bot.py:7015
 #, python-format
 msgid ""
 "%(emoji)s Will try to upgrade required pip packages and restart the bot..."
 msgstr ""
 "%(emoji)s Will try to upgrade required pip packages and restart the bot..."
 
-#: musicbot/bot.py:7011
+#: musicbot/bot.py:7020
 #, python-format
 msgid "%(emoji)s Will try to update bot code with git and restart the bot..."
 msgstr "%(emoji)s Will try to update bot code with git and restart the bot..."
 
-#: musicbot/bot.py:7016
+#: musicbot/bot.py:7025
 #, python-format
 msgid "%(emoji)s Will try to upgrade everything and restart the bot..."
 msgstr "%(emoji)s Will try to upgrade everything and restart the bot..."
 
-#: musicbot/bot.py:7050
+#: musicbot/bot.py:7059
 msgid "Disconnect from all voice channels and close the MusicBot process."
 msgstr "Disconnect from all voice channels and close the MusicBot process."
 
-#: musicbot/bot.py:7076
+#: musicbot/bot.py:7085
 msgid "   Leave the discord server given by name or server ID."
 msgstr "   Leave the discord server given by name or server ID."
 
-#: musicbot/bot.py:7080
+#: musicbot/bot.py:7089
 msgid ""
 "Force MusicBot to leave the given Discord server.\n"
 "Names are case-sensitive, so using an ID number is more reliable.\n"
@@ -2265,25 +2267,25 @@ msgstr ""
 "Force MusicBot to leave the given Discord server.\n"
 "Names are case-sensitive, so using an ID number is more reliable.\n"
 
-#: musicbot/bot.py:7099
+#: musicbot/bot.py:7108
 msgid "You must provide an ID or name."
 msgstr "You must provide an ID or name."
 
-#: musicbot/bot.py:7110
+#: musicbot/bot.py:7119
 #, python-format
 msgid "No guild was found with the ID or name `%(input)s`"
 msgstr "No guild was found with the ID or name `%(input)s`"
 
-#: musicbot/bot.py:7118
+#: musicbot/bot.py:7127
 msgid "Unknown"
 msgstr "Unknown"
 
-#: musicbot/bot.py:7125
+#: musicbot/bot.py:7134
 #, python-format
 msgid "Left the guild: `%(name)s` (Owner: `%(owner)s`, ID: `%(id)s`)"
 msgstr "Left the guild: `%(name)s` (Owner: `%(owner)s`, ID: `%(id)s`)"
 
-#: musicbot/bot.py:7134
+#: musicbot/bot.py:7143
 msgid ""
 "Command used for testing. It prints a list of commands which can be verified "
 "by a test suite."
@@ -2291,7 +2293,7 @@ msgstr ""
 "Command used for testing. It prints a list of commands which can be verified "
 "by a test suite."
 
-#: musicbot/bot.py:7145
+#: musicbot/bot.py:7154
 msgid ""
 "This command issues a log at level CRITICAL, but does nothing else.\n"
 "Can be used to manually pin-point events in the MusicBot log file.\n"
@@ -2299,32 +2301,32 @@ msgstr ""
 "This command issues a log at level CRITICAL, but does nothing else.\n"
 "Can be used to manually pin-point events in the MusicBot log file.\n"
 
-#: musicbot/bot.py:7156
+#: musicbot/bot.py:7165
 #, python-format
 msgid "Logged breakpoint with ID:  %(uuid)s"
 msgstr "Logged breakpoint with ID:  %(uuid)s"
 
-#: musicbot/bot.py:7163
+#: musicbot/bot.py:7172
 msgid "    View most common types reported by objgraph.\n"
 msgstr "    View most common types reported by objgraph.\n"
 
-#: musicbot/bot.py:7166
+#: musicbot/bot.py:7175
 msgid "    View limited objgraph.show_growth() output.\n"
 msgstr "    View limited objgraph.show_growth() output.\n"
 
-#: musicbot/bot.py:7169
+#: musicbot/bot.py:7178
 msgid "    View most common types of leaking objects.\n"
 msgstr "    View most common types of leaking objects.\n"
 
-#: musicbot/bot.py:7172
+#: musicbot/bot.py:7181
 msgid "    View typestats of leaking objects.\n"
 msgstr "    View typestats of leaking objects.\n"
 
-#: musicbot/bot.py:7175
+#: musicbot/bot.py:7184
 msgid "    Evaluate the given function and args on objgraph.\n"
 msgstr "    Evaluate the given function and args on objgraph.\n"
 
-#: musicbot/bot.py:7179
+#: musicbot/bot.py:7188
 msgid ""
 "Interact with objgraph, if it is installed, to gain insight into memory "
 "usage.\n"
@@ -2340,11 +2342,11 @@ msgstr ""
 "Since this method evaluates arbitrary code, it is considered dangerous like "
 "the debug command.\n"
 
-#: musicbot/bot.py:7195
+#: musicbot/bot.py:7204
 msgid "Could not import `objgraph`, is it installed?"
 msgstr "Could not import `objgraph`, is it installed?"
 
-#: musicbot/bot.py:7232
+#: musicbot/bot.py:7241
 msgid ""
 "This command will execute arbitrary python code in the command scope.\n"
 "First eval() is attempted, if exceptions are thrown exec() is tried next.\n"
@@ -2374,7 +2376,7 @@ msgstr ""
 "The danger of this command cannot be understated. Do not use it or give "
 "access to it if you do not understand the risks!\n"
 
-#: musicbot/bot.py:7285
+#: musicbot/bot.py:7294
 #, python-format
 msgid ""
 "Failed to execute debug code:\n"
@@ -2389,7 +2391,7 @@ msgstr ""
 "%(ex_name)s:\n"
 "%(ex_text)s```"
 
-#: musicbot/bot.py:7303
+#: musicbot/bot.py:7312
 msgid ""
 "Create 'markdown' for options, permissions, or commands from the code.\n"
 "The output is used to update github pages and is thus unsuitable for normal "
@@ -2399,20 +2401,20 @@ msgstr ""
 "The output is used to update github pages and is thus unsuitable for normal "
 "reference use."
 
-#: musicbot/bot.py:7320 musicbot/bot.py:7381
+#: musicbot/bot.py:7329 musicbot/bot.py:7390
 #, python-format
 msgid "Sub-command must be one of: %(options)s"
 msgstr "Sub-command must be one of: %(options)s"
 
-#: musicbot/bot.py:7370
+#: musicbot/bot.py:7379
 msgid "Makes default INI files."
 msgstr "Makes default INI files."
 
-#: musicbot/bot.py:7393
+#: musicbot/bot.py:7402
 msgid "Saved the requested INI file to disk. Go check it"
 msgstr "Saved the requested INI file to disk. Go check it"
 
-#: musicbot/bot.py:7398
+#: musicbot/bot.py:7407
 msgid ""
 "Display the current bot version and check for updates to MusicBot or "
 "dependencies.\n"
@@ -2420,41 +2422,42 @@ msgstr ""
 "Display the current bot version and check for updates to MusicBot or "
 "dependencies.\n"
 
-#: musicbot/bot.py:7422
+#: musicbot/bot.py:7431
 msgid "Could not locate git executable."
 msgstr "Could not locate git executable."
 
-#: musicbot/bot.py:7456
+#: musicbot/bot.py:7465
 #, python-format
 msgid "No updates in branch `%(branch)s` remote."
 msgstr "No updates in branch `%(branch)s` remote."
 
-#: musicbot/bot.py:7461
+#: musicbot/bot.py:7470
 #, python-format
 msgid "New commits are available in `%(branch)s` branch remote."
 msgstr "New commits are available in `%(branch)s` branch remote."
 
-#: musicbot/bot.py:7467 musicbot/bot.py:7510
+#: musicbot/bot.py:7476 musicbot/bot.py:7519
 msgid "Error while checking, see logs for details."
 msgstr "Error while checking, see logs for details."
 
-#: musicbot/bot.py:7501
-msgid "Update for `%(name)s` to version: `%(version)`\n"
-msgstr "Update for `%(name)s` to version: `%(version)`\n"
+#: musicbot/bot.py:7510
+#, python-format
+msgid "Update for `%(name)s` to version: `%(version)s`\n"
+msgstr "Update for `%(name)s` to version: `%(version)s`\n"
 
-#: musicbot/bot.py:7507
+#: musicbot/bot.py:7516
 msgid "No updates for dependencies found."
 msgstr "No updates for dependencies found."
 
-#: musicbot/bot.py:7513
+#: musicbot/bot.py:7522
 msgid "There are updates for MusicBot available for download."
 msgstr "There are updates for MusicBot available for download."
 
-#: musicbot/bot.py:7515
+#: musicbot/bot.py:7524
 msgid "MusicBot is totally up-to-date!"
 msgstr "MusicBot is totally up-to-date!"
 
-#: musicbot/bot.py:7519
+#: musicbot/bot.py:7528
 #, python-format
 msgid ""
 "%(status)s\n"
@@ -2473,50 +2476,51 @@ msgstr ""
 "**Dependency Updates:**\n"
 "%(pip_status)s"
 
-#: musicbot/bot.py:7533
+#: musicbot/bot.py:7542
 msgid "Displays the MusicBot uptime, or time since last start / restart."
 msgstr "Displays the MusicBot uptime, or time since last start / restart."
 
-#: musicbot/bot.py:7548
+#: musicbot/bot.py:7557
 #, python-format
 msgid "%(name)s has been online for `%(time)s`"
 msgstr "%(name)s has been online for `%(time)s`"
 
-#: musicbot/bot.py:7555
+#: musicbot/bot.py:7564
 msgid ""
 "Display latency information for Discord API and all connected voice clients."
 msgstr ""
 "Display latency information for Discord API and all connected voice clients."
 
-#: musicbot/bot.py:7577
+#: musicbot/bot.py:7586
 #, python-format
 msgid "- `%(delay).0f ms` (`%(avg).0f ms` Avg.) in region: `%(region)s`\n"
 msgstr "- `%(delay).0f ms` (`%(avg).0f ms` Avg.) in region: `%(region)s`\n"
 
-#: musicbot/bot.py:7582
+#: musicbot/bot.py:7591
 msgid "No voice clients connected.\n"
 msgstr "No voice clients connected.\n"
 
-#: musicbot/bot.py:7587
+#: musicbot/bot.py:7596
+#, python-format
 msgid ""
 "**API Latency:** `%(delay).0f ms`\n"
 "**VoiceClient Latency:**\n"
-"%(voices)"
+"%(voices)s"
 msgstr ""
 "**API Latency:** `%(delay).0f ms`\n"
 "**VoiceClient Latency:**\n"
-"%(voices)"
+"%(voices)s"
 
-#: musicbot/bot.py:7595
+#: musicbot/bot.py:7604
 msgid "Display API latency and Voice latency if MusicBot is connected."
 msgstr "Display API latency and Voice latency if MusicBot is connected."
 
 #. TRANSLATORS: short for automatic, displayed when voice region is not selected.
-#: musicbot/bot.py:7611
+#: musicbot/bot.py:7620
 msgid "auto"
 msgstr "auto"
 
-#: musicbot/bot.py:7613
+#: musicbot/bot.py:7622
 #, python-format
 msgid ""
 "\n"
@@ -2527,16 +2531,16 @@ msgstr ""
 "**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region "
 "`%(region)s`"
 
-#: musicbot/bot.py:7618
+#: musicbot/bot.py:7627
 #, python-format
 msgid "**API Latency:** `%(delay).0f ms`%(voice)s"
 msgstr "**API Latency:** `%(delay).0f ms`%(voice)s"
 
-#: musicbot/bot.py:7623
+#: musicbot/bot.py:7632
 msgid "Display MusicBot version number in the chat."
 msgstr "Display MusicBot version number in the chat."
 
-#: musicbot/bot.py:7631
+#: musicbot/bot.py:7640
 #, python-format
 msgid ""
 "https://github.com/Just-Some-Bots/MusicBot\n"
@@ -2545,15 +2549,15 @@ msgstr ""
 "https://github.com/Just-Some-Bots/MusicBot\n"
 "Current version:  `%(version)s`"
 
-#: musicbot/bot.py:7643
+#: musicbot/bot.py:7652
 msgid "    Update the cookies.txt file using a cookies.txt attachment."
 msgstr "    Update the cookies.txt file using a cookies.txt attachment."
 
-#: musicbot/bot.py:7646
+#: musicbot/bot.py:7655
 msgid "    Enable or disable cookies.txt file without deleting it."
 msgstr "    Enable or disable cookies.txt file without deleting it."
 
-#: musicbot/bot.py:7650
+#: musicbot/bot.py:7659
 msgid ""
 "Allows management of the cookies feature in yt-dlp.\n"
 "When updating cookies, you must upload a file named cookies.txt\n"
@@ -2577,24 +2581,24 @@ msgstr ""
 "  It is not recommended due to these risks, and you should not use this\n"
 "  feature if you do not understand how to avoid the risks."
 
-#: musicbot/bot.py:7671
+#: musicbot/bot.py:7680
 msgid "Cookies already enabled."
 msgstr "Cookies already enabled."
 
-#: musicbot/bot.py:7678
+#: musicbot/bot.py:7687
 msgid "Cookies must be uploaded to be enabled. (Missing cookies file.)"
 msgstr "Cookies must be uploaded to be enabled. (Missing cookies file.)"
 
-#: musicbot/bot.py:7691
+#: musicbot/bot.py:7700
 #, python-format
 msgid "Could not enable cookies due to error:  %(raw_error)s"
 msgstr "Could not enable cookies due to error:  %(raw_error)s"
 
-#: musicbot/bot.py:7694
+#: musicbot/bot.py:7703
 msgid "Cookies have been enabled."
 msgstr "Cookies have been enabled."
 
-#: musicbot/bot.py:7705
+#: musicbot/bot.py:7714
 #, python-format
 msgid ""
 "Could not rename cookies file due to error:  %(raw_error)s\n"
@@ -2603,53 +2607,53 @@ msgstr ""
 "Could not rename cookies file due to error:  %(raw_error)s\n"
 "Cookies temporarily disabled and will be re-enabled on next restart."
 
-#: musicbot/bot.py:7709
+#: musicbot/bot.py:7718
 msgid "Cookies have been disabled."
 msgstr "Cookies have been disabled."
 
-#: musicbot/bot.py:7714
+#: musicbot/bot.py:7723
 msgid ""
 "No attached uploads were found, try again while uploading a cookie file."
 msgstr ""
 "No attached uploads were found, try again while uploading a cookie file."
 
-#: musicbot/bot.py:7732
+#: musicbot/bot.py:7741
 #, python-format
 msgid "Error downloading the cookies file from discord:  %(raw_error)s"
 msgstr "Error downloading the cookies file from discord:  %(raw_error)s"
 
-#: musicbot/bot.py:7737
+#: musicbot/bot.py:7746
 #, python-format
 msgid "Could not save cookies to disk:  %(raw_error)s"
 msgstr "Could not save cookies to disk:  %(raw_error)s"
 
-#: musicbot/bot.py:7745
+#: musicbot/bot.py:7754
 msgid "Cookies uploaded and enabled."
 msgstr "Cookies uploaded and enabled."
 
-#: musicbot/bot.py:7855
+#: musicbot/bot.py:7864
 msgid "You cannot use this bot in private messages."
 msgstr "You cannot use this bot in private messages."
 
-#: musicbot/bot.py:7924
+#: musicbot/bot.py:7933
 #, python-format
 msgid "This command is not allowed for your permissions group:  %(group)s"
 msgstr "This command is not allowed for your permissions group:  %(group)s"
 
-#: musicbot/bot.py:7959
+#: musicbot/bot.py:7968
 msgid "This command requires you to be in a Voice channel."
 msgstr "This command requires you to be in a Voice channel."
 
-#: musicbot/bot.py:8058
+#: musicbot/bot.py:8067
 #, python-format
 msgid "**Command:** %(name)s"
 msgstr "**Command:** %(name)s"
 
-#: musicbot/bot.py:8111
+#: musicbot/bot.py:8120
 msgid "Exception Error"
 msgstr "Exception Error"
 
-#: musicbot/bot.py:8155
+#: musicbot/bot.py:8164
 #, python-format
 msgid ""
 "**Example with prefix:**\n"
@@ -2658,15 +2662,15 @@ msgstr ""
 "**Example with prefix:**\n"
 "%(prefix)s`%(command)s ...`\n"
 
-#: musicbot/bot.py:8159
+#: musicbot/bot.py:8168
 msgid "No description given.\n"
 msgstr "No description given.\n"
 
-#: musicbot/bot.py:8162
+#: musicbot/bot.py:8171
 msgid "No usage given."
 msgstr "No usage given."
 
-#: musicbot/bot.py:8196
+#: musicbot/bot.py:8205
 #, python-format
 msgid ""
 "**Example usage:**\n"
@@ -2679,12 +2683,12 @@ msgstr ""
 "%(prefix_note)s**Description:**\n"
 "%(desc)s"
 
-#: musicbot/bot.py:8249
+#: musicbot/bot.py:8258
 #, python-format
 msgid "Leaving voice channel %(channel)s due to inactivity."
 msgstr "Leaving voice channel %(channel)s due to inactivity."
 
-#: musicbot/bot.py:8530
+#: musicbot/bot.py:8539
 #, python-format
 msgid "Left `%(guild)s` due to bot owner not being found in it."
 msgstr "Left `%(guild)s` due to bot owner not being found in it."
