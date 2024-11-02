@@ -98,7 +98,7 @@ If you already have the gettext tools installed on your system, the script `./i1
 If you can't use gettext or want to use another gettext compatible tool for extraction, you'll want to open the above script in a text editor and use its gettext options to adjust your own settings.
 
 ### Testing Translations
-For developers adding new strings to MusicBot, we provide another script to generate a testing language using extracted strings. Again, you'll need the gettext tools installed to use this script.    
+For developers adding new strings to MusicBot, we provide another script to generate a testing language using extracted strings. To use this script you'll need both gettext tools and the python package `polib` or it will fail to work.
 
 The script `./i18n/mktestlang.sh` will perform an extraction and conversion of strings to reversed variations. The test language is stored inside of `./i18n/xx/LC_MESSAGES/` and can then be enabled by passing `--lang=xx` as a launch option.  
 
