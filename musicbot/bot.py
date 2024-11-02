@@ -640,8 +640,7 @@ class MusicBot(discord.Client):
             ):
                 log.info(
                     "Already connected to channel:  %(channel)s  in guild:  %(guild)s",
-                    {"channel": guild.voice_client.channel.name,
-                    "guild":guild.name},
+                    {"channel": guild.voice_client.channel.name, "guild": guild.name},
                 )
                 continue
 
@@ -990,7 +989,12 @@ class MusicBot(discord.Client):
 
         log.voicedebug(  # type: ignore[attr-defined]
             "Getting a MusicPlayer for guild:  %(guild)s  In Channel:  %(channel)s  Create: %(create)s  Deserialize:  %(serial)s",
-            {"guild": guild, "channel":channel, "create": create,"serial": deserialize},
+            {
+                "guild": guild,
+                "channel": channel,
+                "create": create,
+                "serial": deserialize,
+            },
         )
 
         async with self.aiolocks[_func_() + ":" + str(guild.id)]:
@@ -2295,7 +2299,7 @@ class MusicBot(discord.Client):
                 {
                     "id": owner.id,
                     "name": owner.name,
-                    desc"": owner.discriminator,
+                    "desc": owner.discriminator,
                 },
             )
 
@@ -2752,7 +2756,9 @@ class MusicBot(discord.Client):
             log.info(
                 "Channel activity timer canceled for: %(channel)s in %(guild)s",
                 {
-                    "channel": getattr(guild.voice_client.channel, "name", guild.voice_client.channel),
+                    "channel": getattr(
+                        guild.voice_client.channel, "name", guild.voice_client.channel
+                    ),
                     "guild": guild.name,
                 },
             )
@@ -2792,7 +2798,10 @@ class MusicBot(discord.Client):
         try:
             log.info(
                 "Player activity timer waiting %(time)d seconds to leave channel: %(channel)s",
-                {"time": self.config.leave_player_inactive_for, "channel": channel.name},
+                {
+                    "time": self.config.leave_player_inactive_for,
+                    "channel": channel.name,
+                },
             )
             await discord.utils.sane_wait_for(
                 [event.wait()], timeout=self.config.leave_player_inactive_for
@@ -4240,11 +4249,11 @@ class MusicBot(discord.Client):
                 log.info(
                     "Processed %(number)d of %(total)d songs in %(time).3f seconds at %(time_per).2f s/song",
                     {
-                        "number": listlen, 
+                        "number": listlen,
                         "total": num_songs,
                         "time": time_taken,
                         "time_per": time_taken / listlen if listlen else 1,
-                    }
+                    },
                 )
 
                 if not entry_list:
@@ -4863,7 +4872,7 @@ class MusicBot(discord.Client):
                 {
                     "guild": author.voice.channel.guild.name,
                     "channel": author.voice.channel.name,
-                }
+                },
             )
 
             self.server_data[guild.id].last_np_msg = message
