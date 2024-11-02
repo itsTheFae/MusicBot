@@ -3995,7 +3995,7 @@ class MusicBot(discord.Client):
             channel,
             Response(
                 _D(
-                    "Successfully moved song from positon %(from) in queue to position %(to)s!",
+                    "Successfully moved song from positon %(from)s in queue to position %(to)s!",
                     self.server_data[guild.id],
                 )
                 % {"from": indexes[0] + 1, "to": indexes[1] + 1},
@@ -5107,7 +5107,7 @@ class MusicBot(discord.Client):
             entry = player.playlist.delete_entry_at_index((idx - 1))
             if entry.channel and entry.author:
                 return Response(
-                    _D("Removed entry `%(track)s` added by `%(user)`", ssd_)
+                    _D("Removed entry `%(track)s` added by `%(user)s`", ssd_)
                     % {"track": entry.title, "user": entry.author.name},
                 )
 
@@ -5271,7 +5271,7 @@ class MusicBot(discord.Client):
             player.skip()
             return Response(
                 _D(
-                    "Your skip for `%(track)` was acknowledged.\n"
+                    "Your skip for `%(track)s` was acknowledged.\n"
                     "The vote to skip has been passed.%(next_up)s",
                     ssd_,
                 )
@@ -6451,7 +6451,7 @@ class MusicBot(discord.Client):
             }
         else:
             perms = _D(
-                "The command permissions for %(username) in %(server)s are:\n"
+                "The command permissions for %(username)s in %(server)s are:\n"
                 "```\n%(permissions)s\n```",
                 ssd_,
             ) % {
@@ -7507,7 +7507,7 @@ class MusicBot(discord.Client):
                 ver = meta.get("version", "")
                 if name and ver:
                     pip_packages += _D(
-                        "Update for `%(name)s` to version: `%(version)`\n", ssd_
+                        "Update for `%(name)s` to version: `%(version)s`\n", ssd_
                     ) % {"name": name, "version": ver}
             if pip_packages:
                 pip_status = pip_packages
@@ -7594,7 +7594,7 @@ class MusicBot(discord.Client):
         return Response(
             _D(
                 "**API Latency:** `%(delay).0f ms`\n"
-                "**VoiceClient Latency:**\n%(voices)",
+                "**VoiceClient Latency:**\n%(voices)s",
                 ssd_,
             )
             % {"delay": sl, "voices": vclats}
