@@ -450,10 +450,8 @@ class MusicPlayer(EventEmitter, Serializable):
                     playback_speed=entry.playback_speed,
                 )
                 log.ffmpeg(  # type: ignore[attr-defined]
-                    "Creating player with options: ffmpeg %s -i %s %s",
-                    boptions,
-                    entry.filename,
-                    aoptions,
+                    "Creating player with options: ffmpeg %(before)s -i %(input)s %(after)s",
+                    {"before": boptions, "input": entry.filename, "after": aoptions},
                 )
                 log.voicedebug(  # type: ignore[attr-defined]
                     "Playing %(source)r using %(client)r",

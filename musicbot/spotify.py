@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 import aiohttp
 
 from .exceptions import SpotifyError
+from .i18n import _L
 
 log = logging.getLogger(__name__)
 
@@ -482,7 +483,10 @@ class Spotify:
         next_url = aldata.get("tracks", {}).get("next", None)
 
         total_tracks = aldata["tracks"]["total"]  # total tracks in playlist.
-        log.debug("Spotify Album total tacks: %s --  %s", total_tracks, next_url)
+        log.debug(
+            "Spotify Album total tacks:  %(total)s  Next URL: %(url)s",
+            {"total": total_tracks, "url": next_url},
+        )
         while True:
             if next_url:
                 log.debug("Getting Spofity Album Next URL:  %s", next_url)
@@ -496,9 +500,8 @@ class Spotify:
 
         if total_tracks > len(tracks):
             log.warning(
-                "Spotify Album Object may not be complete, expected %s tracks but got %s",
-                total_tracks,
-                len(tracks),
+                "Spotify Album Object may not be complete, expected %(total)s tracks but got %(number)s",
+                {"total": total_tracks, "number": len(tracks)},
             )
         elif total_tracks < len(tracks):
             log.warning("Spotify Album has more tracks than initial total.")
@@ -523,7 +526,10 @@ class Spotify:
         next_url = pldata.get("tracks", {}).get("next", None)
 
         total_tracks = pldata["tracks"]["total"]  # total tracks in playlist.
-        log.debug("Spotify Playlist total tacks: %s  --  %s", total_tracks, next_url)
+        log.debug(
+            "Spotify Playlist total tacks: %(total)s  Next URL: %(url)s",
+            {"total": total_tracks, "url": next_url},
+        )
         while True:
             if next_url:
                 log.debug("Getting Spofity Playlist Next URL:  %s", next_url)
@@ -537,9 +543,8 @@ class Spotify:
 
         if total_tracks > len(tracks):
             log.warning(
-                "Spotify Playlist Object may not be complete, expected %s tracks but got %s",
-                total_tracks,
-                len(tracks),
+                "Spotify Playlist Object may not be complete, expected %(total)s tracks but got %(number)s",
+                {"total": total_tracks, "number": len(tracks)},
             )
         elif total_tracks < len(tracks):
             log.warning("Spotify Playlist has more tracks than initial total.")
@@ -589,9 +594,13 @@ class Spotify:
             SpotifyError,
         ) as e:
             log.exception("Failed making GET request to url:  %s", url)
+            if isinstance(e, SpotifyError):
+                error = _L(e.message) % e.fmt_args
+            else:
+                error = str(e)
             raise SpotifyError(
                 "Could not make GET to URL:  %(url)s  Reason:  %(raw_error)s",
-                fmt_args={"url": url, "raw_error": e},
+                fmt_args={"url": url, "raw_error": error},
             ) from e
 
     async def _make_post(
@@ -621,9 +630,13 @@ class Spotify:
             SpotifyError,
         ) as e:
             log.exception("Failed making POST request to url:  %s", url)
+            if isinstance(e, SpotifyError):
+                error = _L(e.message) % e.fmt_args
+            else:
+                error = str(e)
             raise SpotifyError(
                 "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s",
-                fmt_args={"url": url, "raw_error": e},
+                fmt_args={"url": url, "raw_error": error},
             ) from e
 
     def _make_token_auth(self, client_id: str, client_secret: str) -> Dict[str, Any]:
@@ -729,5 +742,12 @@ class Spotify:
             if log.getEffectiveLevel() <= logging.DEBUG:
                 log.exception("Failed to get Spotify Guest Token.")
             else:
-                log.error("Failed to get Guest Token due to: %s", str(e))
+                if isinstance(e, SpotifyError):
+                    error = _L(e.message) % e.fmt_args
+                else:
+                    error = str(e)
+                log.error(
+                    "Failed to get Guest Token due to: %(raw_error)s",
+                    {"raw_error": error},
+                )
             return {}

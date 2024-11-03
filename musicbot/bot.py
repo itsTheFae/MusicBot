@@ -150,8 +150,6 @@ discord_bot_perms.request_to_speak = True
 # TODO:  add support for local file playback via indexed data.
 #  --  Using tinytag to extract meta data from files and index it.
 # TODO: autoplaylist remove all.
-# TODO: an option to have help show aliases?
-# TODO: change all formatted strings to use named substitution instead.
 
 
 class MusicBot(discord.Client):
@@ -316,7 +314,7 @@ class MusicBot(discord.Client):
             except exceptions.SpotifyError as e:
                 log.warning(
                     "Could not start Spotify client. Is your client ID and secret correct? Details: %s. Continuing anyway in 5 seconds...",
-                    e,
+                    e.message % e.fmt_args,
                 )
                 self.config.spotify_enabled = False
                 time.sleep(5)  # make sure they see the problem
@@ -338,7 +336,8 @@ class MusicBot(discord.Client):
                     self.config.spotify_enabled = True
             except exceptions.SpotifyError as e:
                 log.warning(
-                    "Could not start Spotify client using guest mode. Details: %s.", e
+                    "Could not start Spotify client using guest mode. Details: %s.",
+                    e.message % e.fmt_args,
                 )
                 self.config.spotify_enabled = False
 
@@ -800,11 +799,12 @@ class MusicBot(discord.Client):
             timeout = attempt * VOICE_CLIENT_RECONNECT_TIMEOUT
             if timeout > max_timeout:
                 log.critical(
-                    "MusicBot is unable to connect to the channel right now:  %s",
-                    channel,
+                    "MusicBot is unable to connect to the channel right now:  %(channel)s",
+                    {"channel": channel},
                 )
                 raise exceptions.CommandError(
-                    "MusicBot could not connect to the channel. Try again later, or restart the bot if this continues."
+                    "MusicBot could not connect to the channel.\n"
+                    "Try again later, or restart the bot if this continues."
                 )
 
             try:
@@ -1407,7 +1407,10 @@ class MusicBot(discord.Client):
                         song_url, download=False, process=True
                     )
 
-                except youtube_dl.utils.DownloadError as e:
+                except (
+                    youtube_dl.utils.DownloadError,
+                    youtube_dl.utils.YoutubeDLError,
+                ) as e:
                     log.error(
                         'Error while processing song "%(url)s":  %(raw_error)s',
                         {"url": song_url, "raw_error": e},
@@ -1418,13 +1421,13 @@ class MusicBot(discord.Client):
                     )
                     continue
 
-                except (
-                    exceptions.ExtractionError,
-                    youtube_dl.utils.YoutubeDLError,
-                ) as e:
+                except exceptions.ExtractionError as e:
                     log.error(
                         'Error extracting song "%(url)s": %(raw_error)s',
-                        {"url": song_url, "raw_error": e},
+                        {
+                            "url": song_url,
+                            "raw_error": _L(e.message) % e.fmt_args,
+                        },
                         exc_info=True,
                     )
 
@@ -1471,7 +1474,7 @@ class MusicBot(discord.Client):
                 ) as e:
                     log.error(
                         "Error adding song from autoplaylist: %s",
-                        str(e),
+                        _L(e.message) % e.fmt_args,
                     )
                     log.debug("Exception data for above error:", exc_info=True)
                     continue
@@ -1542,13 +1545,17 @@ class MusicBot(discord.Client):
         # Send a message to the calling channel if we can.
         if entry and entry.channel:
             song = entry.title or entry.url
-            # TODO: passed exception may need translation checking.
+            ssd = self.server_data[player.voice_client.guild.id]
+            if isinstance(ex, exceptions.MusicbotException):
+                error = _D(ex.message, ssd) % ex.fmt_args
+            else:
+                error = str(ex)
             res = ErrorResponse(
                 _D(
                     "Playback failed for song `%(song)s` due to an error:\n```\n%(error)s```",
-                    self.server_data[player.voice_client.guild.id],
+                    ssd,
                 )
-                % {"song": song, "error": ex},
+                % {"song": song, "error": error},
                 delete_after=self.config.delete_delay_long,
             )
             await self.safe_send_message(entry.channel, res)
@@ -2228,8 +2235,11 @@ class MusicBot(discord.Client):
 
         if isinstance(ex, exceptions.HelpfulError):
             log.error(
-                "Exception in %(event)s:\n%(raw_error)s",
-                {"event": event, "raw_error": ex.message},
+                "Exception in %(event)s:\n%(error)s",
+                {
+                    "event": event,
+                    "error": _L(ex.message) % ex.fmt_args,
+                },
             )
 
             await asyncio.sleep(2)  # makes extra sure this gets seen(?)
@@ -4175,6 +4185,8 @@ class MusicBot(discord.Client):
                 # TODO: i18n for translated exceptions.
                 info = None
                 log.exception("Issue with extract_info(): ")
+                if isinstance(e, exceptions.MusicbotException):
+                    raise
                 raise exceptions.CommandError(
                     "Failed to extract info due to error:\n%(raw_error)s",
                     fmt_args={"raw_error": e},
@@ -4526,7 +4538,6 @@ class MusicBot(discord.Client):
                 search_query, download=False, process=True
             )
 
-        # TODO: fix the translatable exceptions here
         except (
             exceptions.ExtractionError,
             exceptions.SpotifyError,
@@ -4534,8 +4545,16 @@ class MusicBot(discord.Client):
             youtube_dl.networking.exceptions.RequestError,
         ) as e:
             if search_msg:
+                error = str(e)
+                if isinstance(e, exceptions.MusicbotException):
+                    error = _D(e.message, ssd_) % e.fmt_args
                 await self.safe_edit_message(
-                    search_msg, ErrorResponse(str(e)), send_if_fail=True
+                    search_msg,
+                    ErrorResponse(
+                        _D("Search failed due to an error: %(error)s", ssd_)
+                        % {"error": error},
+                    ),
+                    send_if_fail=True,
                 )
             return None
 

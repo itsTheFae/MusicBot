@@ -1015,7 +1015,6 @@ class Config:
             ),
         )
 
-        # TODO: i18n, allow i18n format args here.
         self.logs_max_kept: int = self.register.init_option(
             section="Files",
             option="LogsMaxKept",
@@ -1411,9 +1410,11 @@ class Config:
                 return False
             cu.update_file()
             log.info(
-                "Saved config option: %s  =  %s",
-                option,
-                cu[option.section][option.option].value,
+                "Saved config option: %(config)s  =  %(value)s",
+                {
+                    "config": option,
+                    "value": cu[option.section][option.option].value,
+                },
             )
             return True
         except (
@@ -1502,10 +1503,7 @@ class ConfigDefaults:
     ytdlp_proxy: str = ""
     ytdlp_user_agent: str = ""
     ytdlp_oauth2_url: str = ""
-    # These client details are taken from the original plugin code.
-    # Likely that they wont work forever, should be removed, but testing for now.
-    # PR #21 to get these from YT-TV seems broken already.  Maybe I am stupid.
-    # TODO: remove these when a working method to reliably extract them is available.
+
     ytdlp_oauth2_client_id: str = (
         "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com"
     )
@@ -2281,9 +2279,8 @@ class ExtendedConfigParser(configparser.ConfigParser):
         int_level = getattr(logging, DEFAULT_LOG_LEVEL, logging.INFO)
         str_level = logging.getLevelName(int_level)
         log.warning(
-            'Invalid DebugLevel option "%s" given, falling back to level: %s',
-            val,
-            str_level,
+            'Invalid DebugLevel option "%(value)s" given, falling back to level: %(fallback)s',
+            {"value": val, "fallback": str_level},
         )
         return (str_level, int_level)
 
@@ -2303,10 +2300,8 @@ class ExtendedConfigParser(configparser.ConfigParser):
             return format_size_to_bytes(val)
         except ValueError:
             log.warning(
-                "Option [%s] > %s has invalid config value '%s' using default instead.",
-                section,
-                key,
-                val,
+                "Option [%(section)s] > %(option)s has invalid config value '%(value)s' using default instead.",
+                {"section": section, "option": key, "value": val},
             )
             return fallback
 
@@ -2354,11 +2349,13 @@ class ExtendedConfigParser(configparser.ConfigParser):
 
         if v > 1:
             log.warning(
-                "Option [%s] > %s has a value greater than 100 %% (%s) and will be set to %s instead.",
-                section,
-                key,
-                val,
-                fallback if fallback else 1,
+                "Option [%(section)s] > %(option)s has a value greater than 100 %% (%(value)s) and will be set to %(fallback)s instead.",
+                {
+                    "section": section,
+                    "option": key,
+                    "value": val,
+                    "fallback": fallback if fallback else 1,
+                },
             )
             v = fallback if fallback else 1
 
@@ -2436,11 +2433,8 @@ class ConfigRenameManager:
         o_sect, o_opt, n_sect, n_opt = remap
 
         log.debug(
-            "Renaming INI file entry [%s] > %s  to  [%s] > %s",
-            o_sect,
-            o_opt,
-            n_sect,
-            n_opt,
+            "Renaming INI file entry [%(old_s)s] > %(old_o)s  to  [%(new_s)s] > %(new_o)s",
+            {"old_s": o_sect, "old_o": o_opt, "new_s": n_sect, "new_o": n_opt},
         )
 
         opt = cu.get(o_sect, o_opt)

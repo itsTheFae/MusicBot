@@ -226,16 +226,18 @@ class GuildSpecificData:
                 str(self._guild_id), DATA_GUILD_FILE_OPTIONS
             )
             if not opt_file.is_file():
-                log.debug("No file for guild %s/%s", self._guild_id, self._guild_name)
+                log.debug(
+                    "No file for guild %(id)s/%(name)s",
+                    {"id": self._guild_id, "name": self._guild_name},
+                )
                 self._is_file_loaded = True
                 return
 
             async with self._file_lock:
                 try:
                     log.debug(
-                        "Loading guild data for guild with ID:  %s/%s",
-                        self._guild_id,
-                        self._guild_name,
+                        "Loading guild data for guild with ID:  %(id)s/%(name)s",
+                        {"id": self._guild_id, "name": self._guild_name},
                     )
                     options = Json(opt_file)
                     self._is_file_loaded = True
@@ -250,10 +252,12 @@ class GuildSpecificData:
             if guild_prefix:
                 self._command_prefix = guild_prefix
                 log.info(
-                    "Guild %s/%s has custom command prefix: %s",
-                    self._guild_id,
-                    self._guild_name,
-                    self._command_prefix,
+                    "Guild %(id)s/%(name)s has custom command prefix: %(prefix)s",
+                    {
+                        "id": self._guild_id,
+                        "name": self._guild_name,
+                        "prefix": self._command_prefix,
+                    },
                 )
 
             guild_playlist = options.get("auto_playlist", None)

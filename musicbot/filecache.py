@@ -212,22 +212,28 @@ class AudioFileCache:
 
         if removed_count:
             log.debug(
-                "Audio cache deleted %s file(s), total of %s removed.",
-                removed_count,
-                format_size_from_bytes(removed_size),
+                "Audio cache deleted %(number)s file(s), total of %(size)s removed.",
+                {
+                    "number": removed_count,
+                    "size": format_size_from_bytes(removed_size),
+                },
             )
         if retained_count:
             log.debug(
-                "Audio cached retained %s file(s) from autoplaylist, total of %s retained.",
-                retained_count,
-                format_size_from_bytes(retained_size),
+                "Audio cached retained %(number)s file(s) from autoplaylist, total of %(size)s retained.",
+                {
+                    "number": retained_count,
+                    "size": format_size_from_bytes(retained_size),
+                },
             )
         self.file_count = len(cached_files) - removed_count
         self.size_bytes = cached_size
         log.debug(
-            "Audio cache is now %s over %s file(s).",
-            format_size_from_bytes(self.size_bytes),
-            self.file_count,
+            "Audio cache is now %(size)s over %(number)s file(s).",
+            {
+                "size": format_size_from_bytes(self.size_bytes),
+                "number": self.file_count,
+            },
         )
         return True
 
@@ -346,10 +352,12 @@ class AudioFileCache:
         if filename in self.auto_playlist_cachemap:
             if self.auto_playlist_cachemap[filename] != entry.url:
                 log.warning(
-                    "Autoplaylist cache map conflict on Key: %s  Old: %s  New: %s",
-                    filename,
-                    self.auto_playlist_cachemap[filename],
-                    entry.url,
+                    "Autoplaylist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s",
+                    {
+                        "file": filename,
+                        "old": self.auto_playlist_cachemap[filename],
+                        "new": entry.url,
+                    }
                 )
                 self.auto_playlist_cachemap[filename] = entry.url
                 change_made = True

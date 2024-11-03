@@ -111,18 +111,16 @@ class Aliases:
             # ensure command name is valid.
             if cmd not in self.nat_cmds:
                 log.error(
-                    "Aliases skipped for non-existent command:  %s  ->  %s",
-                    cmd,
-                    aliases,
+                    "Aliases skipped for non-existent command:  %(command)s  ->  %(aliases)s",
+                    {"command": cmd, "aliases": aliases},
                 )
                 continue
 
             # ensure alias data uses valid types.
             if not isinstance(cmd, str) or not isinstance(aliases, list):
                 log.error(
-                    "Alias(es) skipped for invalid alias data:  %s  ->  %s",
-                    cmd,
-                    aliases,
+                    "Alias(es) skipped for invalid alias data:  %(command)s  ->  %(aliases)s",
+                    {"command": cmd, "aliases": aliases},
                 )
                 continue
 
@@ -131,9 +129,8 @@ class Aliases:
                 alias = alias.lower()
                 if alias in self.aliases:
                     log.error(
-                        "Alias `%s` skipped as already exists on command:  %s",
-                        alias,
-                        self.aliases[alias],
+                        "Alias `%(alias)s` skipped as already exists on command:  %(command)s",
+                        {"alias": alias, "command": self.aliases[alias]},
                     )
                     continue
 

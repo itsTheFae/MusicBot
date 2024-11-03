@@ -289,9 +289,8 @@ class Playlist(EventEmitter, Serializable):
                 or self.bot.config.song_blocklist.is_blocked(item.title)
             ):
                 log.info(
-                    "Not allowing entry that is in song block list:  %s  URL: %s",
-                    item.title,
-                    item.url,
+                    "Not allowing entry that is in song block list:  %(title)s  URL: %(url)s",
+                    {"title": item.title, "url": item.url},
                 )
                 baditems += 1
                 continue

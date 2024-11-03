@@ -185,7 +185,8 @@ async def run_command(command: List[str]) -> bytes:
         stderr=asyncio.subprocess.PIPE,
     )
     log.noise(  # type: ignore[attr-defined]
-        "Starting asyncio subprocess (%s) with command: %s", p, command
+        "Starting asyncio subprocess (%(process)s) with command: %(run)s",
+        {"process": p, "run": command},
     )
     stdout, stderr = await p.communicate()
     return stdout + stderr
@@ -514,9 +515,8 @@ class URLPlaylistEntry(BasePlaylistEntry):
                     )
                 else:
                     log.debug(
-                        "Got duration of %s seconds for file:  %s",
-                        self.duration,
-                        self.filename,
+                        "Got duration of %(time)s seconds for file:  %(file)s",
+                        {"time": self.duration, "file": self.filename},
                     )
 
             if self.playlist.bot.config.use_experimental_equalization:
@@ -694,24 +694,38 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 if attempt < 3:
                     wait_for = 1.5 * attempt
                     log.warning(
-                        "Download incomplete, retrying in %.1f seconds.  Reason: %s",
-                        wait_for,
-                        str(e),
+                        "Download incomplete, retrying in %(time).1f seconds.  Reason: %(raw_error)s",
+                        {"time": wait_for, "raw_error": e},
                     )
                     await asyncio.sleep(wait_for)  # TODO: backoff timer maybe?
                     continue
 
                 # Mark the file I guess, and maintain the default of raising ExtractionError.
-                log.error("Download failed, not retrying! Reason:  %s", str(e))
+                log.error(
+                    "Download failed, not retrying! Reason:  %(raw_error)s",
+                    {"raw_error": e},
+                )
                 self.cache_busted = True
-                raise ExtractionError(str(e)) from e
+                raise ExtractionError(
+                    "Download did not complete due to an error: %(raw_error)s",
+                    fmt_args={"raw_error": e},
+                ) from e
             except YoutubeDLError as e:
                 # as a base exception for any exceptions raised by yt_dlp.
-                raise ExtractionError(str(e)) from e
+                raise ExtractionError(
+                    "Download failed due to a yt-dlp error: %(raw_error)s",
+                    fmt_args={"raw_error": e},
+                ) from e
 
             except Exception as e:
-                log.error("Extraction encountered an unhandled exception.")
-                raise MusicbotException(str(e)) from e
+                log.error(
+                    "Extraction encountered an unhandled exception.",
+                    exc_info=self.playlist.bot.config.debug_mode,
+                )
+                raise MusicbotException(
+                    "Download failed due to an unhandled exception: %(raw_error)s",
+                    fmt_args={"raw_error": e},
+                ) from e
 
         if info is None:
             log.error("Download failed:  %r", self)

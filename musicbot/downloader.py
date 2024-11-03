@@ -482,7 +482,10 @@ class Downloader:
             )
         except DownloadError as e:
             if not as_stream_url:
-                raise ExtractionError(str(e)) from e
+                raise ExtractionError(
+                    "Error in yt-dlp while downloading data: %(raw_error)s",
+                    fmt_args={"raw_error": e},
+                ) from e
 
             log.exception("Download Error with stream URL")
             if e.exc_info[0] == UnsupportedError:
@@ -500,8 +503,10 @@ class Downloader:
                     raise ExtractionError("Cannot stream an invalid URL.") from e
 
             else:
-                # TODO: i18n format args for better messages out of this logic.
-                raise ExtractionError(f"Invalid input: {str(e)}") from e
+                raise ExtractionError(
+                    "Error in yt-dlp while downloading data: %(raw_error)s",
+                    fmt_args={"raw_error": e},
+                ) from e
         except NoSupportingHandlers:
             # due to how we allow search service strings we can't just encode this by default.
             # on the other hand, this method prevents cmd_stream from taking search strings.
