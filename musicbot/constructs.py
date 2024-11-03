@@ -388,6 +388,7 @@ class MusicBotResponse(discord.Embed):
         files: Optional[List[discord.File]] = None,
         delete_after: Union[None, int, float] = None,
         force_text: bool = False,
+        no_footer: bool = False,
         **kwargs: Any,
     ) -> None:
         self.content = content
@@ -404,10 +405,11 @@ class MusicBotResponse(discord.Embed):
             color=discord.Colour.from_str(color_hex),
             **kwargs,
         )
-        self.set_footer(
-            text=DEFAULT_FOOTER_TEXT,
-            icon_url=DEFAULT_BOT_ICON,
-        )
+        if not no_footer:
+            self.set_footer(
+                text=DEFAULT_FOOTER_TEXT,
+                icon_url=DEFAULT_BOT_ICON,
+            )
         # overload the original description with our formatting property.
         # yes, this is cursed and I don't like doing it, but it defers format.
         setattr(self, "description", getattr(self, "overload_description"))

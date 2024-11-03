@@ -2657,29 +2657,6 @@ class MusicBot(discord.Client):
         )
         print(flush=True)
 
-    def _gen_embed(self) -> discord.Embed:
-        """Provides a basic template for embeds"""
-        e = discord.Embed()
-        e.colour = discord.Colour(7506394)
-        e.set_footer(
-            text=self.config.footer_text, icon_url="https://i.imgur.com/gFHBoZA.png"
-        )
-
-        # TODO: handle this part when EmbedResponse get handled.
-        author_name = "MusicBot"
-        avatar_url = None
-        if self.user:
-            author_name = self.user.name
-            if self.user.avatar:
-                avatar_url = self.user.avatar.url
-
-        e.set_author(
-            name=author_name,
-            url="https://github.com/Just-Some-Bots/MusicBot",
-            icon_url=avatar_url,
-        )
-        return e
-
     def _get_song_url_or_none(
         self, url: str, player: Optional[MusicPlayer]
     ) -> Optional[str]:
@@ -3195,7 +3172,6 @@ class MusicBot(discord.Client):
             async with self.aiolocks["song_blocklist"]:
                 self.config.song_blocklist.append_items([song_subject])
 
-            # TODO: i18n/UI stuff.
             return Response(
                 _D(
                     "Added subject `%(subject)s` to the song block list.\n%(status)s",
@@ -6271,7 +6247,6 @@ class MusicBot(discord.Client):
             safe_title = slugify(info.title)
             filename = f"playlist_{safe_title}.txt"
 
-        # TODO: refactor this in favor of safe_send_message doing it all.
         with BytesIO() as fcontent:
             total = info.playlist_count or info.entry_count
             fcontent.write(f"# Title:  {info.title}\n".encode("utf8"))
@@ -8077,6 +8052,11 @@ class MusicBot(discord.Client):
 
                 # always reply to the caller, no reason not to.
                 response.reply_to = message
+
+                # remove footer if configured.
+                if self.config.remove_embed_footer:
+                    response.remove_footer()
+
                 await self.safe_send_message(send_to, response, **send_kwargs)
 
         except (
@@ -8099,6 +8079,7 @@ class MusicBot(discord.Client):
                 codeblock="text",
                 title="Error",
                 reply_to=message,
+                no_footer=self.config.remove_embed_footer,
             )
             await self.safe_send_message(message.channel, er)
 
@@ -8119,6 +8100,7 @@ class MusicBot(discord.Client):
                     codeblock="text",
                     title=_D("Exception Error", ssd),
                     reply_to=message,
+                    no_footer=self.config.remove_embed_footer,
                 )
                 await self.safe_send_message(message.channel, er)
 

@@ -682,8 +682,13 @@ class Config:
                 "Only applied when UseEmbeds is enabled and it is not blank."
             ),
         )
-        # TODO: add option to completetly remove footer.
-        # self.remove_embed_footer: bool = self.register.init_option()
+        self.remove_embed_footer: bool = self.register.init_option(
+            section="MusicBot",
+            option="RemoveEmbedFooter",
+            dest="remove_embed_footer",
+            default=ConfigDefaults.remove_embed_footer,
+            comment=_Dd("Completely remove the footer from embeds."),
+        )
         self.self_deafen: bool = self.register.init_option(
             section="MusicBot",
             option="SelfDeafen",
@@ -1487,6 +1492,7 @@ class ConfigDefaults:
     defaultsearchresults: int = 3
     enable_options_per_guild: bool = False
     footer_text: str = DEFAULT_FOOTER_TEXT
+    remove_embed_footer: bool = False
     defaultround_robin_queue: bool = False
     enable_network_checker: bool = False
     enable_local_media: bool = False
