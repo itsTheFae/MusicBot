@@ -357,7 +357,7 @@ class AudioFileCache:
                         "file": filename,
                         "old": self.auto_playlist_cachemap[filename],
                         "new": entry.url,
-                    }
+                    },
                 )
                 self.auto_playlist_cachemap[filename] = entry.url
                 change_made = True
