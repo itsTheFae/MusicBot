@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-03 07:59-0800\n"
-"PO-Revision-Date: 2024-11-04 23:23\n"
+"PO-Revision-Date: 2024-11-04 23:58\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -15,8 +15,8 @@ msgstr ""
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
 "X-Crowdin-Language: it\n"
-"X-Crowdin-File: /fae/i18n/en/LC_MESSAGES/musicbot_messages.po\n"
-"X-Crowdin-File-ID: 20\n"
+"X-Crowdin-File: /fae/i18n/en_US/LC_MESSAGES/musicbot_messages.po\n"
+"X-Crowdin-File-ID: 24\n"
 
 #: musicbot/aliases.py:56
 msgid "Error while loading alises.\n\n"
@@ -29,11 +29,11 @@ msgstr ""
 
 #: musicbot/bot.py:713
 msgid "Member is not voice-enabled and cannot use this command."
-msgstr "Il membro non è abilitato alla voce e non può usare questo comando."
+msgstr ""
 
 #: musicbot/bot.py:721
 msgid "You cannot use this command when not in the voice channel."
-msgstr "Non puoi usare questo comando quando non è nel canale vocale."
+msgstr ""
 
 #: musicbot/bot.py:764
 #, python-format
@@ -52,15 +52,15 @@ msgstr ""
 
 #: musicbot/bot.py:830
 msgid "MusicBot connection to voice was cancelled. This is odd. Maybe restart?"
-msgstr "La connessione MusicBot alla voce è stata annullata. Questo è strano. Forse riavviare?"
+msgstr ""
 
 #: musicbot/bot.py:840
 msgid "MusicBot does not have permission to speak."
-msgstr "MusicBot non ha il permesso di parlare."
+msgstr ""
 
 #: musicbot/bot.py:844
 msgid "MusicBot could not request to speak."
-msgstr "MusicBot non può richiedere di parlare."
+msgstr ""
 
 #: musicbot/bot.py:1016
 msgid "The bot is not in a voice channel.\n"
@@ -69,7 +69,7 @@ msgstr ""
 
 #: musicbot/bot.py:1028
 msgid "Something is wrong, we didn't get the VoiceClient."
-msgstr "Qualcosa è sbagliato, non abbiamo ottenuto il VoiceClient."
+msgstr ""
 
 #: musicbot/bot.py:1084
 #, python-format
@@ -105,7 +105,7 @@ msgstr ""
 
 #: musicbot/bot.py:1807
 msgid "[Dev Bug] Tried sending an invalid response object."
-msgstr "[Dev Bug] Provato a inviare un oggetto di risposta non valido."
+msgstr ""
 
 #: musicbot/bot.py:2147
 msgid "Failed Discord API Login!\n\n"
@@ -160,7 +160,7 @@ msgstr ""
 
 #: musicbot/bot.py:2940
 msgid "No such command"
-msgstr "Comando inesistente"
+msgstr ""
 
 #: musicbot/bot.py:2959
 #, python-format
@@ -198,19 +198,19 @@ msgstr ""
 
 #: musicbot/bot.py:3016
 msgid "You must mention a user or provide their ID number."
-msgstr "È necessario menzionare un utente o fornire il loro numero di identità."
+msgstr ""
 
 #: musicbot/bot.py:3021
 msgid "Invalid sub-command given. Use `help blockuser` for usage examples."
-msgstr "Sottocomando fornito non valido. Usa `help blockuser` per esempi di utilizzo."
+msgstr ""
 
 #: musicbot/bot.py:3032
 msgid "MusicBot could not find the user(s) you specified."
-msgstr "MusicBot non ha trovato gli utenti specificati."
+msgstr ""
 
 #: musicbot/bot.py:3039
 msgid "The owner cannot be added to the block list."
-msgstr "Il proprietario non può essere aggiunto all'elenco dei blocchi."
+msgstr ""
 
 #: musicbot/bot.py:3059
 msgid "User block list is currently enabled."
@@ -222,7 +222,7 @@ msgstr ""
 
 #: musicbot/bot.py:3069
 msgid "Cannot add the users you listed, they are already added."
-msgstr "Non è possibile aggiungere gli utenti elencati, sono già aggiunti."
+msgstr ""
 
 #: musicbot/bot.py:3078
 #, python-format
@@ -267,11 +267,11 @@ msgstr ""
 
 #: musicbot/bot.py:3146
 msgid "You must provide a song subject if no song is currently playing."
-msgstr "Devi fornire un oggetto del brano se nessuna canzone è attualmente in riproduzione."
+msgstr ""
 
 #: musicbot/bot.py:3152
 msgid "Ivalid sub-command given. Use `help blocksong` for usage examples."
-msgstr "Sottocomando valido fornito. Usa `help blocksong` per esempi di utilizzo."
+msgstr ""
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -286,7 +286,7 @@ msgstr ""
 
 #: musicbot/bot.py:3196
 msgid "The subject is not in the song block list and cannot be removed."
-msgstr "L'oggetto non è nell'elenco dei brani e non può essere rimosso."
+msgstr ""
 
 #: musicbot/bot.py:3204
 #, python-format
@@ -320,15 +320,15 @@ msgstr ""
 
 #: musicbot/bot.py:3249
 msgid "Invalid sub-command given. Use `help autoplaylist` for usage examples."
-msgstr "Sottocomando fornito non valido. Usa `help autoplaylist` per esempi di utilizzo."
+msgstr ""
 
 #: musicbot/bot.py:3256
 msgid "The supplied song link is invalid"
-msgstr "Il link del brano fornito non è valido"
+msgstr ""
 
 #: musicbot/bot.py:3262
 msgid "The queue is empty. Add some songs with a play command!"
-msgstr "La coda è vuota. Aggiungi alcuni brani con un comando di riproduzione!"
+msgstr ""
 
 #: musicbot/bot.py:3273
 msgid "All songs in the queue are already in the autoplaylist."
@@ -346,7 +346,7 @@ msgstr ""
 
 #: musicbot/bot.py:3290
 msgid "This song is already in the autoplaylist."
-msgstr "Questo brano è già nella playlist automatica."
+msgstr ""
 
 #: musicbot/bot.py:3304
 #, python-format
@@ -355,7 +355,7 @@ msgstr ""
 
 #: musicbot/bot.py:3307
 msgid "This song is not yet in the autoplaylist."
-msgstr "Questa canzone non è ancora nella playlist automatica."
+msgstr ""
 
 #: musicbot/bot.py:3316
 #, python-format
@@ -370,7 +370,7 @@ msgstr ""
 
 #: musicbot/bot.py:3337
 msgid "You must provide a playlist filename."
-msgstr "È necessario fornire un nome file playlist."
+msgstr ""
 
 #: musicbot/bot.py:3357
 msgid "\n"
@@ -407,7 +407,7 @@ msgstr ""
 
 #: musicbot/bot.py:3428
 msgid "You are not allowed to request playlists"
-msgstr "Non sei autorizzato a richiedere playlist"
+msgstr ""
 
 #: musicbot/bot.py:3436
 #, python-format
@@ -461,19 +461,19 @@ msgstr ""
 
 #: musicbot/bot.py:3764
 msgid "Cannot use seek if there is nothing playing."
-msgstr "Impossibile usare la ricerca se non c'è niente di giocare."
+msgstr ""
 
 #: musicbot/bot.py:3769
 msgid "Cannot use seek on current track, it has an unknown duration."
-msgstr "Impossibile usare la ricerca sulla traccia corrente, ha una durata sconosciuta."
+msgstr ""
 
 #: musicbot/bot.py:3775
 msgid "Seeking is not supported for streams."
-msgstr "La ricerca non è supportata per gli streaming."
+msgstr ""
 
 #: musicbot/bot.py:3785
 msgid "Cannot use seek without a time to position playback."
-msgstr "Impossibile usare la ricerca senza un tempo per posizionare la riproduzione."
+msgstr ""
 
 #: musicbot/bot.py:3803
 #, python-format
@@ -502,7 +502,7 @@ msgstr ""
 
 #: musicbot/bot.py:3877
 msgid "Invalid sub-command. Use the command `help repeat` for usage examples."
-msgstr "Sottocomando non valido. Usa il comando `help repeat` per gli esempi di utilizzo."
+msgstr ""
 
 #: musicbot/bot.py:3883 musicbot/bot.py:3920
 msgid "Playlist is now repeating."
@@ -526,7 +526,7 @@ msgstr ""
 
 #: musicbot/bot.py:3915
 msgid "The player is not currently looping."
-msgstr "Il giocatore non si sta caricando."
+msgstr ""
 
 #: musicbot/bot.py:3926
 msgid "Song is no longer repeating."
@@ -551,11 +551,11 @@ msgstr ""
 
 #: musicbot/bot.py:3971
 msgid "Song positions must be integers!"
-msgstr "Le posizioni brano devono essere intere!"
+msgstr ""
 
 #: musicbot/bot.py:3976
 msgid "You gave a position outside the playlist size!"
-msgstr "Hai dato una posizione fuori dalla dimensione della playlist!"
+msgstr ""
 
 #: musicbot/bot.py:3984
 #, python-format
@@ -571,15 +571,15 @@ msgstr ""
 
 #: musicbot/bot.py:4114
 msgid "Local media playback is not enabled."
-msgstr "La riproduzione multimediale locale non è abilitata."
+msgstr ""
 
 #: musicbot/bot.py:4155
 msgid "Spotify URL is invalid or not currently supported."
-msgstr "L'URL di Spotify non è valido o non è attualmente supportato."
+msgstr ""
 
 #: musicbot/bot.py:4159
 msgid "Detected a spotify URL, but spotify is not enabled."
-msgstr "Rilevato un URL di spotify, ma spotify non è abilitato."
+msgstr ""
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -588,7 +588,7 @@ msgstr ""
 
 #: musicbot/bot.py:4175 musicbot/bot.py:4380 musicbot/bot.py:4474
 msgid "Karaoke mode is enabled, please try again when its disabled!"
-msgstr "La modalità Karaoke è abilitata, riprova quando è disabilitata!"
+msgstr ""
 
 #: musicbot/bot.py:4191
 #, python-format
@@ -598,7 +598,7 @@ msgstr ""
 
 #: musicbot/bot.py:4197
 msgid "That video cannot be played. Try using the stream command."
-msgstr "Questo video non può essere riprodotto. Prova a usare il comando streaming."
+msgstr ""
 
 #: musicbot/bot.py:4208
 #, python-format
@@ -656,7 +656,7 @@ msgstr ""
 
 #: musicbot/bot.py:4402
 msgid "Streaming playlists is not yet supported."
-msgstr "Le playlist in streaming non sono ancora supportate."
+msgstr ""
 
 #: musicbot/bot.py:4419
 #, python-format
@@ -688,7 +688,7 @@ msgstr ""
 
 #: musicbot/bot.py:4480
 msgid "Please specify a search query.  Use `help search` for more information."
-msgstr "Specifica una query di ricerca. Usa `help search` per maggiori informazioni."
+msgstr ""
 
 #: musicbot/bot.py:4509
 #, python-format
@@ -780,7 +780,7 @@ msgstr ""
 
 #: musicbot/bot.py:4815 musicbot/bot.py:6004
 msgid "There are no songs queued! Queue something with a play command."
-msgstr "Non ci sono brani in coda! Coda qualcosa con un comando di riproduzione."
+msgstr ""
 
 #: musicbot/bot.py:4818
 msgid "Tell MusicBot to join the channel you're in."
@@ -788,7 +788,7 @@ msgstr ""
 
 #: musicbot/bot.py:4841
 msgid "You are not connected to voice. Try joining a voice channel!"
-msgstr "Non sei connesso alla voce. Prova ad unirti a un canale vocale!"
+msgstr ""
 
 #: musicbot/bot.py:4876
 #, python-format
@@ -811,7 +811,7 @@ msgstr ""
 
 #: musicbot/bot.py:4928
 msgid "MusicBot cannot follow a user that is not a member of the server."
-msgstr "MusicBot non può seguire un utente che non è un membro del server."
+msgstr ""
 
 #: musicbot/bot.py:4935
 #, python-format
@@ -829,7 +829,7 @@ msgstr ""
 
 #: musicbot/bot.py:4956
 msgid "Player is not playing."
-msgstr "Il giocatore non sta giocando."
+msgstr ""
 
 #: musicbot/bot.py:4958
 msgid "Resumes playback if the player was previously paused."
@@ -873,7 +873,7 @@ msgstr ""
 
 #: musicbot/bot.py:5053
 msgid "Nothing in the queue to remove!"
-msgstr "Niente nella coda da rimuovere!"
+msgstr ""
 
 #: musicbot/bot.py:5068
 #, python-format
@@ -892,7 +892,7 @@ msgstr ""
 
 #: musicbot/bot.py:5090 musicbot/bot.py:5095
 msgid "Invalid entry number. Use the queue command to find queue positions."
-msgstr "Numero di voce non valido. Usa il comando coda per trovare le posizioni della coda."
+msgstr ""
 
 #: musicbot/bot.py:5105
 #, python-format
@@ -912,7 +912,7 @@ msgstr ""
 
 #: musicbot/bot.py:5145
 msgid "Can't skip! The player is not playing!"
-msgstr "Impossibile saltare! Il giocatore non sta giocando!"
+msgstr ""
 
 #: musicbot/bot.py:5153
 #, python-format
@@ -935,7 +935,7 @@ msgstr ""
 
 #: musicbot/bot.py:5197
 msgid "You do not have permission to force skip a looped song."
-msgstr "Non hai il permesso di forzare un brano in loop."
+msgstr ""
 
 #: musicbot/bot.py:5211
 #, python-format
@@ -944,11 +944,11 @@ msgstr ""
 
 #: musicbot/bot.py:5216
 msgid "You do not have permission to force skip."
-msgstr "Non hai il permesso di forzare il salto."
+msgstr ""
 
 #: musicbot/bot.py:5253 musicbot/bot.py:5286
 msgid "You do not have permission to skip a looped song."
-msgstr "Non hai il permesso di saltare una canzone in loop."
+msgstr ""
 
 #: musicbot/bot.py:5269
 #, python-format
@@ -1011,15 +1011,15 @@ msgstr ""
 
 #: musicbot/bot.py:5399
 msgid "Speed cannot be applied to streamed media."
-msgstr "La velocità non può essere applicata ai media in streaming."
+msgstr ""
 
 #: musicbot/bot.py:5404
 msgid "You must provide a speed to set."
-msgstr "Devi fornire una velocità da impostare."
+msgstr ""
 
 #: musicbot/bot.py:5413
 msgid "The speed you proivded is invalid. Use a number between 0.5 and 100."
-msgstr "La velocità che hai promesso non è valida. Usa un numero compreso tra 0.5 e 100."
+msgstr ""
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1063,7 +1063,7 @@ msgstr ""
 
 #: musicbot/bot.py:5492
 msgid "You must supply an alias and a command to alias"
-msgstr "Devi fornire un alias e un comando all'alias"
+msgstr ""
 
 #: musicbot/bot.py:5498
 #, python-format
@@ -1072,7 +1072,7 @@ msgstr ""
 
 #: musicbot/bot.py:5507
 msgid "You must supply an alias name to remove."
-msgstr "Devi fornire un nome alias da rimuovere."
+msgstr ""
 
 #: musicbot/bot.py:5512
 #, python-format
@@ -1126,7 +1126,7 @@ msgstr ""
 
 #: musicbot/bot.py:5570
 msgid "Config cannot use channel and user mentions at the same time."
-msgstr "La configurazione non può usare le menzioni del canale e dell'utente allo stesso tempo."
+msgstr ""
 
 #: musicbot/bot.py:5596
 #, python-format
@@ -1171,15 +1171,15 @@ msgstr ""
 
 #: musicbot/bot.py:5691
 msgid "Could not resolve section name from option name. Please provide a valid section and option name."
-msgstr "Impossibile risolvere il nome della sezione dal nome dell'opzione. Si prega di fornire una sezione e un nome di opzione validi."
+msgstr ""
 
 #: musicbot/bot.py:5695
 msgid "The option given is ambiguous, please provide a section name."
-msgstr "L'opzione data è ambigua, si prega di fornire un nome di sezione."
+msgstr ""
 
 #: musicbot/bot.py:5701
 msgid "You must provide a section name and option name for this command."
-msgstr "Devi fornire un nome di sezione e un nome di opzione per questo comando."
+msgstr ""
 
 #: musicbot/bot.py:5717
 #, python-format
@@ -1242,7 +1242,7 @@ msgstr ""
 
 #: musicbot/bot.py:5806 musicbot/bot.py:6732
 msgid "You must provide a section, option, and value for this sub command."
-msgstr "Devi fornire una sezione, un'opzione e un valore per questo sottocomando."
+msgstr ""
 
 #: musicbot/bot.py:5817
 #, python-format
@@ -1277,7 +1277,7 @@ msgstr ""
 
 #: musicbot/bot.py:5885
 msgid "The option command is deprecated, use the config command instead."
-msgstr "Il comando opzione è deprecato, utilizza invece il comando di configurazione."
+msgstr ""
 
 #: musicbot/bot.py:5892
 msgid "Display information about cache storage or clear cache according to configured limits.\n"
@@ -1286,15 +1286,15 @@ msgstr ""
 
 #: musicbot/bot.py:5905
 msgid "Invalid option specified, use: info, update, or clear"
-msgstr "Opzione specificata non valida, usa: info, aggiornamento o cancella"
+msgstr ""
 
 #: musicbot/bot.py:5916
 msgid "Disabled"
-msgstr "Disabilitato"
+msgstr ""
 
 #: musicbot/bot.py:5916
 msgid "Enabled"
-msgstr "Abilitato"
+msgstr ""
 
 #: musicbot/bot.py:5919
 #, python-format
@@ -1319,7 +1319,7 @@ msgstr ""
 
 #: musicbot/bot.py:5962
 msgid "**Failed** to delete cache, check logs for more info..."
-msgstr "**Non riuscito** per eliminare la cache, controlla i log per ulteriori informazioni..."
+msgstr ""
 
 #: musicbot/bot.py:5965
 msgid "No cache found to clear."
@@ -1332,7 +1332,7 @@ msgstr ""
 
 #: musicbot/bot.py:5997
 msgid "Queue page argument must be a whole number."
-msgstr "L'argomento pagina coda deve essere un numero intero."
+msgstr ""
 
 #: musicbot/bot.py:6013
 #, python-format
@@ -1385,7 +1385,7 @@ msgstr ""
 
 #: musicbot/bot.py:6215
 msgid "Cannot use purge on private DM channel."
-msgstr "Impossibile usare lo spurgo sul canale DM privato."
+msgstr ""
 
 #: musicbot/bot.py:6222
 #, python-format
@@ -1402,7 +1402,7 @@ msgstr ""
 
 #: musicbot/bot.py:6247
 msgid "The given URL was not a valid URL."
-msgstr "L'URL fornito non era un URL valido."
+msgstr ""
 
 #: musicbot/bot.py:6257
 #, python-format
@@ -1412,7 +1412,7 @@ msgstr ""
 
 #: musicbot/bot.py:6262
 msgid "This does not seem to be a playlist."
-msgstr "Questa non sembra essere una playlist."
+msgstr ""
 
 #: musicbot/bot.py:6282
 #, python-format
@@ -1455,11 +1455,11 @@ msgstr ""
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double check the ID and try again."
-msgstr "ID utente o soprannome del server non validi, ricontrolla l'ID e riprova."
+msgstr ""
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
-msgstr "Impossibile determinare l'utente discord. Riprova."
+msgstr ""
 
 #: musicbot/bot.py:6439
 #, python-format
@@ -1515,7 +1515,7 @@ msgstr ""
 
 #: musicbot/bot.py:6503
 msgid "Permissions cannot use channel and user mentions at the same time."
-msgstr "Le autorizzazioni non possono usare le menzioni del canale e dell'utente allo stesso tempo."
+msgstr ""
 
 #: musicbot/bot.py:6534
 msgid "Permissions reloaded from file successfully!"
@@ -1537,11 +1537,11 @@ msgstr ""
 
 #: musicbot/bot.py:6575
 msgid "You must provide a group or option name for this command."
-msgstr "Devi fornire un nome di gruppo o di opzione per questo comando."
+msgstr ""
 
 #: musicbot/bot.py:6579
 msgid "You must provide a group, option, and value to set for this command."
-msgstr "Devi fornire un gruppo, un'opzione e un valore da impostare per questo comando."
+msgstr ""
 
 #: musicbot/bot.py:6593
 #, python-format
@@ -1589,7 +1589,7 @@ msgstr ""
 
 #: musicbot/bot.py:6670
 msgid "Cannot remove built-in group."
-msgstr "Impossibile rimuovere il gruppo integrato."
+msgstr ""
 
 #: musicbot/bot.py:6677
 #, python-format
@@ -1599,7 +1599,7 @@ msgstr ""
 
 #: musicbot/bot.py:6688 musicbot/bot.py:6727
 msgid "The owner group is not editable."
-msgstr "Il gruppo proprietario non è modificabile."
+msgstr ""
 
 #: musicbot/bot.py:6696
 #, python-format
@@ -1655,7 +1655,7 @@ msgstr ""
 
 #: musicbot/bot.py:6812
 msgid "Unable to change nickname: no permission."
-msgstr "Impossibile cambiare il soprannome: nessun permesso."
+msgstr ""
 
 #: musicbot/bot.py:6820
 #, python-format
@@ -1683,7 +1683,7 @@ msgstr ""
 
 #: musicbot/bot.py:6860
 msgid "Custom emoji must be from this server to use as a prefix."
-msgstr "Le emoji personalizzate devono provenire da questo server per essere utilizzate come prefisso."
+msgstr ""
 
 #: musicbot/bot.py:6866
 msgid "Server command prefix is cleared."
@@ -1706,7 +1706,7 @@ msgstr ""
 
 #: musicbot/bot.py:6905
 msgid "You must provide a URL or attach a file."
-msgstr "È necessario fornire un URL o allegare un file."
+msgstr ""
 
 #: musicbot/bot.py:6915
 #, python-format
@@ -1765,7 +1765,7 @@ msgstr ""
 
 #: musicbot/bot.py:6993
 msgid "Invalid option given, use one of:  soft, full, upgrade, uppip, or upgit"
-msgstr "Opzione fornita non valida, usa una di: soft, full, upgrade, uppip, or upgit"
+msgstr ""
 
 #: musicbot/bot.py:6999
 #, python-format
@@ -1807,7 +1807,7 @@ msgstr ""
 
 #: musicbot/bot.py:7102
 msgid "You must provide an ID or name."
-msgstr "Devi fornire un ID o un nome."
+msgstr ""
 
 #: musicbot/bot.py:7113
 #, python-format
@@ -1865,7 +1865,7 @@ msgstr ""
 
 #: musicbot/bot.py:7198
 msgid "Could not import `objgraph`, is it installed?"
-msgstr "Impossibile importare `objgraph`, è installato?"
+msgstr ""
 
 #: musicbot/bot.py:7235
 msgid "This command will execute arbitrary python code in the command scope.\n"
@@ -1911,7 +1911,7 @@ msgstr ""
 
 #: musicbot/bot.py:7425
 msgid "Could not locate git executable."
-msgstr "Impossibile individuare git eseguibile."
+msgstr ""
 
 #: musicbot/bot.py:7459
 #, python-format
@@ -2034,11 +2034,11 @@ msgstr ""
 
 #: musicbot/bot.py:7674
 msgid "Cookies already enabled."
-msgstr "Cookie già abilitati."
+msgstr ""
 
 #: musicbot/bot.py:7681
 msgid "Cookies must be uploaded to be enabled. (Missing cookies file.)"
-msgstr "I cookie devono essere caricati per essere abilitati. (File dei cookie)."
+msgstr ""
 
 #: musicbot/bot.py:7694
 #, python-format
@@ -2061,7 +2061,7 @@ msgstr ""
 
 #: musicbot/bot.py:7717
 msgid "No attached uploads were found, try again while uploading a cookie file."
-msgstr "Non sono stati trovati caricamenti allegati, riprova durante il caricamento di un file di cookie."
+msgstr ""
 
 #: musicbot/bot.py:7735
 #, python-format
@@ -2088,7 +2088,7 @@ msgstr ""
 
 #: musicbot/bot.py:7962
 msgid "This command requires you to be in a Voice channel."
-msgstr "Questo comando richiede di essere in un canale vocale."
+msgstr ""
 
 #: musicbot/bot.py:8061
 #, python-format
@@ -2640,19 +2640,19 @@ msgstr ""
 
 #: musicbot/downloader.py:232
 msgid "HEAD seems to have no headers..."
-msgstr "HEAD sembra non avere intestazioni..."
+msgstr ""
 
 #: musicbot/downloader.py:381
 msgid "Song info extraction returned no data."
-msgstr "L'estrazione di informazioni brano non ha restituito dati."
+msgstr ""
 
 #: musicbot/downloader.py:444
 msgid "Cannot continue extraction, event loop is closed."
-msgstr "Impossibile continuare l'estrazione, il ciclo dell'evento è chiuso."
+msgstr ""
 
 #: musicbot/downloader.py:453
 msgid "Spotify URL is invalid or not supported."
-msgstr "Spotify URL non è valido o non supportato."
+msgstr ""
 
 #: musicbot/downloader.py:486 musicbot/downloader.py:507
 #, python-format
@@ -2661,11 +2661,11 @@ msgstr ""
 
 #: musicbot/downloader.py:503
 msgid "Cannot stream an invalid URL."
-msgstr "Impossibile trasmettere un URL non valido."
+msgstr ""
 
 #: musicbot/downloader.py:577
 msgid "The local media file could not be found."
-msgstr "Impossibile trovare il file multimediale locale."
+msgstr ""
 
 #: musicbot/entry.py:449
 #, python-format
@@ -2689,7 +2689,7 @@ msgstr ""
 
 #: musicbot/entry.py:732
 msgid "Failed to extract data for the requested media."
-msgstr "Estrazione dei dati per il supporto richiesto non riuscita."
+msgstr ""
 
 #: musicbot/permissions.py:328
 msgid "List of command names allowed for use, separated by spaces.\n"
@@ -2792,11 +2792,11 @@ msgstr ""
 
 #: musicbot/playlist.py:159
 msgid "Could not extract information"
-msgstr "Impossibile estrarre le informazioni"
+msgstr ""
 
 #: musicbot/playlist.py:163
 msgid "This is a playlist."
-msgstr "Questa è una playlist."
+msgstr ""
 
 #: musicbot/playlist.py:195
 #, python-format
@@ -2805,11 +2805,11 @@ msgstr ""
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
-msgstr "nessun dato di durata"
+msgstr ""
 
 #: musicbot/playlist.py:504
 msgid "no duration data in current entry"
-msgstr "nessun dato di durata nella voce corrente"
+msgstr ""
 
 #: musicbot/spotify.py:119
 #, python-format
@@ -2823,7 +2823,7 @@ msgstr ""
 
 #: musicbot/spotify.py:587 musicbot/spotify.py:623 musicbot/spotify.py:733
 msgid "Response JSON did not decode to a dict!"
-msgstr "La risposta JSON non ha decodificato un detto!"
+msgstr ""
 
 #: musicbot/spotify.py:602
 #, python-format
@@ -2837,7 +2837,7 @@ msgstr ""
 
 #: musicbot/spotify.py:672
 msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr "Impossibile ottenere un token ospite da Spotify, si prega di provare a specificare l'id client e il segreto client"
+msgstr ""
 
 #: musicbot/spotify.py:683
 #, python-format
@@ -2852,7 +2852,7 @@ msgstr ""
 
 #: musicbot/spotify.py:696
 msgid "Requested a token from Spotify, did not end up getting one"
-msgstr "Richiesto un token da Spotify, non è finito per ottenere uno"
+msgstr ""
 
 #: musicbot/spotify.py:727
 #, python-format
@@ -2861,9 +2861,9 @@ msgstr ""
 
 #: musicbot/utils.py:175
 msgid "Only the owner can use this command."
-msgstr "Solo il proprietario può usare questo comando."
+msgstr ""
 
 #: musicbot/utils.py:195
 msgid "Only dev users can use this command."
-msgstr "Solo gli utenti dev possono usare questo comando."
+msgstr ""
 
