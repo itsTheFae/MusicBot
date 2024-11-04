@@ -113,7 +113,7 @@ class Downloader:
 
         if bot.config.ytdlp_use_oauth2:
             # set the login info so oauth2 is prompted.
-            ytdl_format_options["username"] = "oauth2"
+            ytdl_format_options["username"] = "mb_oauth2"
             ytdl_format_options["password"] = ""
             # ytdl_format_options["extractor_args"] = {
             #    "youtubetab": {"skip": ["authcheck"]}

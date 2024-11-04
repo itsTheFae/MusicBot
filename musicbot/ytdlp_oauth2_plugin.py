@@ -341,7 +341,7 @@ def enable_ytdlp_oauth2_plugin(config: "Config") -> None:
             _use_oauth2 = False
 
             def _perform_login(self, username: str, password: str) -> Any:
-                if username == "oauth2":
+                if username == "mb_oauth2":
                     # Ensure clients are supported.
                     self._DEFAULT_CLIENTS = tuple(
                         c
