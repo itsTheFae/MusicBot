@@ -7133,14 +7133,28 @@ class MusicBot(discord.Client):
 
     @dev_only
     @command_helper(
+        usage=["{cmd} [dry]"],
         desc=_Dd(
             "Command used for testing. It prints a list of commands which can be verified by a test suite."
-        )
+        ),
     )
-    async def cmd_testready(self, message: discord.Message) -> CommandResponse:
+    async def cmd_testready(
+        self, message: discord.Message, opt: str = ""
+    ) -> CommandResponse:
         """Command used to signal command testing."""
-        cmd_list = ",".join(await self.gen_cmd_list(message, list_all_cmds=True))
-        return Response(f"CMD_TEST_LIST:[{cmd_list}]", force_text=True)
+        cmd_list = await self.gen_cmd_list(message, list_all_cmds=True)
+
+        from .testrig import run_cmd_tests
+
+        dry = False
+        if opt.lower() == "dry":
+            dry = True
+
+        await run_cmd_tests(self, message, cmd_list, dry)
+
+        return Response(
+            f"Tested commands:\n```\n{', '.join(cmd_list)}```", force_text=True
+        )
 
     @dev_only
     @command_helper(
