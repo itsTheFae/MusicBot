@@ -81,12 +81,7 @@ class SpotifyError(ExtractionError):
 
 # The user doesn't have permission to use a command
 class PermissionsError(CommandError):
-    # TODO: move this out to message error handling where it can be translated.
-    @property
-    def message(self) -> str:
-        return (
-            "You don't have permission to use that command.\nReason: " + self._message
-        )
+    pass
 
 
 # Error with pretty formatting for hand-holding users through various errors
