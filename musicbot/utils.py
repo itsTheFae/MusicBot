@@ -157,7 +157,6 @@ def _get_variable(name: str) -> Any:
     return None
 
 
-# TODO: Add some sort of `denied` argument for a message to send when someone else tries to use it
 def owner_only(func: Callable[..., Any]) -> Any:
     """
     Decorator function that checks the invoking message author ID matches

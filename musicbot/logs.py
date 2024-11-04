@@ -117,40 +117,6 @@ class MusicBotLogger(BaseLoggerClass):
             self._log(EVERYTHING, msg, args, **kwargs)
 
 
-def _add_logger_level(levelname: str, level: int, *, func_name: str = "") -> None:
-    """
-    Add a logging function and level to the musicbot logger.
-
-    :param: levelname:
-        The reference name of the level, e.g. DEBUG, WARNING, etc
-    :param: level:
-        Numeric logging level
-    :param: func_name:
-        The name of the logger function to log to a level, e.g. "info" for log.info(...)
-    """
-    _func_prototype = (
-        "def {logger_func_name}(self, message, *args, **kwargs):\n"
-        "    if self.isEnabledFor({levelname}):\n"
-        "        if os.name == 'nt':\n"
-        "            kwargs.setdefault('stacklevel', 2)\n"
-        "        self._log({levelname}, message, args, **kwargs)"
-    )
-
-    func_name = func_name or levelname.lower()
-
-    setattr(logging, levelname, level)
-    logging.addLevelName(level, levelname)
-
-    # TODO: this is cool and all, but there is likely a better way to do this.
-    # we should probably be extending logging.getLoggerClass() instead
-    exec(  # pylint: disable=exec-used
-        _func_prototype.format(logger_func_name=func_name, levelname=levelname),
-        logging.__dict__,
-        locals(),
-    )
-    setattr(logging.Logger, func_name, eval(func_name))  # pylint: disable=eval-used
-
-
 def setup_loggers() -> None:
     """set up all logging handlers for musicbot and discord.py"""
     if len(logging.getLogger("musicbot").handlers) > 1:
@@ -177,10 +143,6 @@ def setup_loggers() -> None:
             ) from e
 
     # logging checks done, we should be able to take off.
-    # _add_logger_level("EVERYTHING", 1)
-    # _add_logger_level("NOISY", 4, func_name="noise")
-    # _add_logger_level("FFMPEG", 5)
-    # _add_logger_level("VOICEDEBUG", 6)
     install_logger()
 
     logger = logging.getLogger("musicbot")

@@ -7,6 +7,3 @@ ignore = E203, E501, W503, C901
 max-line-length = 99
 max-complexity = 18
 select = B,C,E,F,W,T4,B9,TC,TC1
-
-# Adding custom gettext functions to builtins.
-builtins = _L,_Ln,_D,_Dn

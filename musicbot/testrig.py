@@ -22,6 +22,7 @@ loginfo = log.info
 
 class CmdTest:
     def __init__(self, cmd: str, cases: List[str]) -> None:
+        """Represents command test cases."""
         self.cmd = cmd
         self.cases = cases
 
@@ -32,6 +33,7 @@ class CmdTest:
         return self.cmd
 
     def command_cases(self, prefix: str) -> Generator[str, str, None]:
+        """Yields complete command strings which can be sent as a message."""
         for case in self.cases:
             cmd = f"{prefix}{self.cmd} {case}"
             yield cmd

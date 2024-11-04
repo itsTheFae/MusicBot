@@ -93,6 +93,10 @@ fi
 echo "----"
 echo ""
 
+echo "Shellcheck:"
+shellcheck -a --color ./*.sh ./i18n/*.sh
+echo "----"
+echo ""
 
 if [ "$DO_OPTIONAL" == "1" ]; then
 
