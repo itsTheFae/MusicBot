@@ -24,7 +24,10 @@ class MusicbotException(Exception):
     ) -> None:
         # This sets base exception args to the message.
         # So str() will produce the raw, untranslated message only.
-        super().__init__(message)
+        if fmt_args:
+            super().__init__(message, fmt_args)
+        else:
+            super().__init__(message)
 
         self._message = message
         self._fmt_args = fmt_args if fmt_args is not None else {}
