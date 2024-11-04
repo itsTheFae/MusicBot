@@ -52,7 +52,7 @@ DEFAULT_PERMS_FILE: str = "config/permissions.ini"
 # TODO: Remove this file constant in favor of gettext messages.
 DEFAULT_I18N_FILE: str = "config/i18n/en.json"
 DEFAULT_I18N_DIR: str = "i18n/"
-DEFAULT_I18N_LANG: str = "en"
+DEFAULT_I18N_LANG: str = "en_US"
 DEFAULT_COMMAND_ALIAS_FILE: str = "config/aliases.json"
 DEFAULT_USER_BLOCKLIST_FILE: str = "config/blocklist_users.txt"
 DEFAULT_SONG_BLOCKLIST_FILE: str = "config/blocklist_songs.txt"
