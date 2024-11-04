@@ -687,6 +687,7 @@ class Config:
             option="RemoveEmbedFooter",
             dest="remove_embed_footer",
             default=ConfigDefaults.remove_embed_footer,
+            getter="getboolean",
             comment=_Dd("Completely remove the footer from embeds."),
         )
         self.self_deafen: bool = self.register.init_option(
