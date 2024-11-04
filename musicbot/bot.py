@@ -1824,7 +1824,7 @@ class MusicBot(discord.Client):
             ch_name = str(dest.name)
 
         if reply_to and reply_to.channel == dest:
-            send_kws["reference"] = reply_to
+            send_kws["reference"] = reply_to.to_reference(fail_if_not_exists=False)
             send_kws["mention_author"] = True
 
         if content.files:
