@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-03 07:59-0800\n"
-"PO-Revision-Date: 2024-11-04 22:25\n"
+"PO-Revision-Date: 2024-11-04 23:58\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -15,12 +15,12 @@ msgstr ""
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
 "X-Crowdin-Language: ru\n"
-"X-Crowdin-File: /fae/i18n/en/LC_MESSAGES/musicbot_logs.po\n"
-"X-Crowdin-File-ID: 18\n"
+"X-Crowdin-File: /fae/i18n/en_US/LC_MESSAGES/musicbot_logs.po\n"
+"X-Crowdin-File-ID: 22\n"
 
 #: musicbot/aliases.py:52
 msgid "Aliases file not found, copying example_aliases.json"
-msgstr ""
+msgstr "Файл псевдонимов не найден, копирование example_aliases.json"
 
 #: musicbot/aliases.py:56
 msgid "Error while loading alises.\n\n"
@@ -34,13 +34,14 @@ msgstr ""
 #: musicbot/aliases.py:80
 #, python-format
 msgid "Failed to load aliases file:  %s"
-msgstr ""
+msgstr "Не удалось загрузить файл псевдонимов:  %s"
 
 #: musicbot/aliases.py:88
 #, python-format
 msgid "Failed to parse aliases file:  %s\n"
 "Ensure the file contains valid JSON and restart the bot."
-msgstr ""
+msgstr "Не удалось разобрать файл псевдонимов:  %s\n"
+"Убедитесь, что файл содержит корректный JSON и перезапустите бот."
 
 #: musicbot/aliases.py:114
 #, python-format
@@ -50,12 +51,12 @@ msgstr ""
 #: musicbot/aliases.py:122
 #, python-format
 msgid "Alias(es) skipped for invalid alias data:  %(command)s  ->  %(aliases)s"
-msgstr ""
+msgstr "Алиас(ы) пропущены для недопустимых данных алиаса:  %(command)s  ->  %(aliases)s"
 
 #: musicbot/aliases.py:132
 #, python-format
 msgid "Alias `%(alias)s` skipped as already exists on command:  %(command)s"
-msgstr ""
+msgstr "Псевдоним `%(alias)s` пропущен как уже существует в команде:  %(command)s"
 
 #: musicbot/autoplaylist.py:76
 #, python-format
@@ -70,11 +71,11 @@ msgstr ""
 #: musicbot/autoplaylist.py:126
 #, python-format
 msgid "Removing song from playlist, %(playlist)s: %(track)s"
-msgstr ""
+msgstr "Удаление песни из плейлиста, %(playlist)s: %(track)s"
 
 #: musicbot/autoplaylist.py:151
 msgid "Could not log information about the playlist URL removal."
-msgstr ""
+msgstr "Не удалось зарегистрировать информацию о удалении URL плейлиста."
 
 #: musicbot/autoplaylist.py:155
 msgid "Updating playlist file..."
@@ -83,7 +84,7 @@ msgstr ""
 #: musicbot/autoplaylist.py:171 musicbot/autoplaylist.py:208
 #, python-format
 msgid "Failed to save playlist file:  %s"
-msgstr ""
+msgstr "Не удалось сохранить файл плейлиста:  %s"
 
 #: musicbot/autoplaylist.py:180
 #, python-format
@@ -93,7 +94,7 @@ msgstr ""
 #: musicbot/autoplaylist.py:187
 #, python-format
 msgid "Adding new URL to playlist, %(playlist)s: %(track)s"
-msgstr ""
+msgstr "Добавление нового URL в плейлист, %(playlist)s: %(track)s"
 
 #: musicbot/bot.py:163
 #, python-format
