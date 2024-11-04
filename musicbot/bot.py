@@ -8191,7 +8191,7 @@ class MusicBot(discord.Client):
                     bits = case.split("\n", maxsplit=1)
                     example = bits[0]
                     text = ""
-                    if len(bits) > 1:
+                    if len(bits) > 1 and bits[1]:
                         text = "\n"
                         text += _D(bits[1], ssd)
                     cases.append(f"{example}{text}")
