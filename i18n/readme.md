@@ -1,5 +1,9 @@
 # MusicBot Translation Guide  
 
+[![Crowdin](https://badges.crowdin.net/notmusicbot/localized.svg)](https://crowdin.com/project/notmusicbot)
+
+Visit [Crowdin](https://crowdin.com/project/notmusicbot/) to get the latest available translations, or help MusicBot with translations.
+
 MusicBot makes use of GNU gettext for translation of display text.  
 We use the typical `.po`/`.mo` format to enable translations.  
 Language directories in `./i18n/` should be named using lower-case, and mostly conform to the [Locale-Names specification](https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/Locale-Names.html) by gettext.  
@@ -23,9 +27,9 @@ MusicBot will detect your system or environment language(s) setting and attempts
 
 At start-up, MusicBot looks for language files based on a longest-match first.  
 For example, assume your system language is `en_GB`.  
-When MusicBot starts, it will scan `./i18n/en_gb/LC_MESSAGES/` for translation files with the `.mo` extension. If that fails, bot will look for a shorter version of the language code, in this case just `./i18n/en/...` instead.  
+When MusicBot starts, it will scan `./i18n/en_GB/LC_MESSAGES/` for translation files with the `.mo` extension. If that fails, bot will look for a shorter version of the language code, in this case just `./i18n/en/...` instead.  
 
-Note that the locale codes are in lower-case in the file system, so `es_MX` becomes `es_mx` or just `es` when searching for files.
+Note that the locale codes are case-sensitive, and MusicBot will look for a directory with the exact code you provide.
 
 > On unix-like (Linux / Mac) systems, MusicBot makes use of the Environment Variables: `LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, `LANG` in that order.  
 The first variable with a non-empty value is selected, and multiple languages may be specified by separating them with a colon `:` character.
@@ -37,7 +41,7 @@ Adding a new language to MusicBot requires extra tools, like the GNU Gettext uti
 Otherwise, the process is relatively easy, and can be done in a few steps:  
 
 1. Pick a language code. For example: `es_ES` as in Spanish of Spain.  
-2. Create the new language directories. Ex.: `./i18n/es_es/LC_MESSAGES/`  
+2. Create the new language directories. Ex.: `./i18n/es_ES/LC_MESSAGES/`  
 3. Copy an existing `.po` or run `extract.sh` to make an empty translations `.pot` file.  
 4. Translate the strings and save the `.po` and `.mo` files using a tool like PoEdit or other gettext tools.
 5. Copy the `.mo` file to the directory made in step 2.
