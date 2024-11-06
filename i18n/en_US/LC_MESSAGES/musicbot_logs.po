@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"PO-Revision-Date: 2024-11-06 22:11\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -217,7 +217,7 @@ msgstr "MusicBot detected network is available again."
 
 #: musicbot/bot.py:515
 msgid "VoiceClient is not connected, waiting to resume MusicPlayer..."
-msgstr "VoiceClient is not connected, waiting to resume MusicPlayer..."
+msgstr "Voiceprint is not connected, waiting to resume Multiplayer..."
 
 #: musicbot/bot.py:519
 #, python-format
@@ -2299,7 +2299,7 @@ msgstr "Validating options with service data..."
 
 #: musicbot/config.py:1240
 msgid "Acquired owner ID via API"
-msgstr ""
+msgstr "Acquired owner ID via API"
 
 #: musicbot/config.py:1244
 msgid "Error while fetching 'OwnerID' automatically.\n\n"
@@ -2502,7 +2502,7 @@ msgstr "Could not load block list from file:  %s"
 #: musicbot/config.py:2610 musicbot/config.py:2643
 #, python-format
 msgid "Could not update the block list file:  %s"
-msgstr ""
+msgstr "Could not update the block list file:  %s"
 
 #: musicbot/config.py:2670
 #, python-format
@@ -3087,7 +3087,7 @@ msgstr "Setting auto 'OwnerID' for owner permissions group."
 #: musicbot/permissions.py:238
 #, python-format
 msgid "Updating group in permissions file:  %s"
-msgstr ""
+msgstr "Updating group in permissions file:  %s"
 
 #: musicbot/permissions.py:244
 #, python-format
@@ -3249,12 +3249,12 @@ msgstr "Error while trying to delete file."
 
 #: musicbot/player.py:520
 msgid "Could not delete file, giving up and moving on"
-msgstr ""
+msgstr "Could not delete file, giving up and moving on"
 
 #: musicbot/player.py:581
 #, python-format
 msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
-msgstr ""
+msgstr "Deserialize returned an object that is not a MusicPlayer:  %s"
 
 #: musicbot/player.py:586
 msgid "Failed to deserialize player"
@@ -3460,7 +3460,7 @@ msgstr "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 
 #: musicbot/spotify.py:672
 msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
-msgstr ""
+msgstr "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
 
 #: musicbot/spotify.py:679
 msgid "Created a new Guest Mode access token."
