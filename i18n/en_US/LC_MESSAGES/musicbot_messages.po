@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"PO-Revision-Date: 2024-11-06 22:11\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -473,7 +473,11 @@ msgid "Add a song to be played in the queue. If no song is playing or paused, pl
 "Playlist links will be extracted into multiple links and added to the queue.\n"
 "If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
 "MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
-msgstr ""
+msgstr "Add a song to be played in the queue. If no song is playing or paused, playback will be started.\n\n"
+"You may supply a URL to a video or audio file or the URL of a service supported by yt-dlp.\n"
+"Playlist links will be extracted into multiple links and added to the queue.\n"
+"If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
+"MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
 
 #: musicbot/bot.py:3628
 msgid "Play command that shuffles playlist entries before adding them to the queue.\n"
@@ -610,7 +614,7 @@ msgstr "You gave a position outside the playlist size!"
 #: musicbot/bot.py:3984
 #, python-format
 msgid "Successfully moved song from position %(from)s in queue to position %(to)s!"
-msgstr ""
+msgstr "Successfully moved song from position %(from)s in queue to position %(to)s!"
 
 #: musicbot/bot.py:4072
 #, python-format
@@ -631,7 +635,7 @@ msgstr "Spotify URL is invalid or not currently supported."
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "Detected a Spotify URL, but Spotify is not enabled."
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -656,7 +660,7 @@ msgstr "That video cannot be played. Try using the stream command."
 #: musicbot/bot.py:4208
 #, python-format
 msgid "YouTube search returned no results for:  %(url)s"
-msgstr ""
+msgstr "YouTube search returned no results for:  %(url)s"
 
 #: musicbot/bot.py:4249
 #, python-format
@@ -722,7 +726,8 @@ msgstr "    Search with service for a number of results with the search query.\n
 #: musicbot/bot.py:4432
 msgid "    Search YouTube for query but get a custom number of results.\n"
 "    Note: the double-quotes are required in this case.\n"
-msgstr ""
+msgstr "    Search YouTube for query but get a custom number of results.\n"
+"    Note: the double-quotes are required in this case.\n"
 
 #: musicbot/bot.py:4438
 msgid "Search a supported service and select from results to add to queue.\n"
@@ -1093,7 +1098,7 @@ msgstr "You must provide a speed to set."
 
 #: musicbot/bot.py:5413
 msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
-msgstr ""
+msgstr "The speed you provided is invalid. Use a number between 0.5 and 100."
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1185,7 +1190,7 @@ msgstr "    Display the current value of the option.\n"
 
 #: musicbot/bot.py:5546
 msgid "    Saves the current value to the options file.\n"
-msgstr ""
+msgstr "    Saves the current value to the options file.\n"
 
 #: musicbot/bot.py:5549
 msgid "    Validates the option and sets the config for the session, but not to file.\n"
@@ -1193,7 +1198,7 @@ msgstr "    Validates the option and sets the config for the session, but not to
 
 #: musicbot/bot.py:5552
 msgid "    Reset the option to its default value.\n"
-msgstr ""
+msgstr "    Reset the option to its default value.\n"
 
 #: musicbot/bot.py:5555
 msgid "Manage options.ini configuration from within Discord."
@@ -1503,7 +1508,7 @@ msgstr "Bot does not have permission to manage messages."
 
 #: musicbot/bot.py:6231
 msgid "Dump the individual URLs of a playlist to a file."
-msgstr ""
+msgstr "Dump the individual URLs of a playlist to a file."
 
 #: musicbot/bot.py:6247
 msgid "The given URL was not a valid URL."
@@ -1560,11 +1565,11 @@ msgstr "Here are the IDs you requested:"
 
 #: musicbot/bot.py:6395
 msgid "Get a list of your permissions, or the permissions of the mentioned user."
-msgstr ""
+msgstr "Get a list of your permissions, or the permissions of the mentioned user."
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double-check the ID and try again."
-msgstr ""
+msgstr "Invalid user ID or server nickname, please double-check the ID and try again."
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -1640,7 +1645,8 @@ msgstr "Permissions reloaded from file successfully!"
 #, python-format
 msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
-msgstr ""
+msgstr "Unable to reload Permissions due to an error:\n"
+"%(raw_error)s"
 
 #: musicbot/bot.py:6558
 #, python-format
@@ -1706,7 +1712,9 @@ msgstr "Cannot add group `%(group)s` it already exists."
 msgid "Successfully added new group:  `%(group)s`\n"
 "You can now customize the permissions with:  `setperms set %(group)s`\n"
 "Make sure to save the new group with:  `setperms save %(group)s`"
-msgstr ""
+msgstr "Successfully added new group:  `%(group)s`\n"
+"You can now customize the permissions with:  `setperms set %(group)s`\n"
+"Make sure to save the new group with:  `setperms save %(group)s`"
 
 #: musicbot/bot.py:6670
 msgid "Cannot remove built-in group."
@@ -1757,7 +1765,8 @@ msgstr "Permission `%(permission)s` was updated for this session.\n"
 #: musicbot/bot.py:6765
 msgid "Change the bot's username on discord.\n"
 "Note: The API may limit name changes to twice per hour."
-msgstr ""
+msgstr "Change the bot's username on discord.\n"
+"Note: The API may limit name changes to twice per hour."
 
 #: musicbot/bot.py:6784
 msgid "Failed to change username. Did you change names too many times?\n"
@@ -1967,7 +1976,8 @@ msgstr "Command used for testing. It prints a list of commands which can be veri
 #: musicbot/bot.py:7162
 msgid "This command issues a log at level CRITICAL, but does nothing else.\n"
 "Can be used to manually pinpoint events in the MusicBot log file.\n"
-msgstr ""
+msgstr "This command issues a log at level CRITICAL, but does nothing else.\n"
+"Can be used to manually pinpoint events in the MusicBot log file.\n"
 
 #: musicbot/bot.py:7173
 #, python-format
@@ -1992,7 +2002,7 @@ msgstr "    View typestats of leaking objects.\n"
 
 #: musicbot/bot.py:7192
 msgid "    Evaluate the given function and arguments on objgraph.\n"
-msgstr ""
+msgstr "    Evaluate the given function and arguments on objgraph.\n"
 
 #: musicbot/bot.py:7196
 msgid "Interact with objgraph, if it is installed, to gain insight into memory usage.\n"
@@ -2040,7 +2050,8 @@ msgstr "Failed to execute debug code:\n"
 #: musicbot/bot.py:7320
 msgid "Create 'markdown' for options, permissions, or commands from the code.\n"
 "The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
-msgstr ""
+msgstr "Create 'markdown' for options, permissions, or commands from the code.\n"
+"The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
 
 #: musicbot/bot.py:7337 musicbot/bot.py:7398
 #, python-format
@@ -2151,7 +2162,8 @@ msgstr "auto"
 #, python-format
 msgid "\n"
 "**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
-msgstr ""
+msgstr "\n"
+"**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
 
 #: musicbot/bot.py:7635
 #, python-format
@@ -2479,7 +2491,7 @@ msgstr "Enable automatic skip of auto playlist songs when a user plays a new son
 
 #: musicbot/config.py:469
 msgid "Remove songs from the auto playlist if they are found in the song block list."
-msgstr ""
+msgstr "Remove songs from the auto playlist if they are found in the song block list."
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
@@ -2526,7 +2538,17 @@ msgid "Specify a custom message to use as the bot's status. If left empty, the b
 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
 " {p0_title}    = The track title for the currently playing track.\n"
 " {p0_url}      = The track URL for the currently playing track."
-msgstr ""
+msgstr "Specify a custom message to use as the bot's status. If left empty, the bot\n"
+"will display dynamic info about music currently being played in its status instead.\n"
+"Status messages may also use the following variables:\n"
+" {n_playing}   = Number of currently Playing music players.\n"
+" {n_paused}    = Number of currently Paused music players.\n"
+" {n_connected} = Number of connected music players, in any player state.\n\n"
+"The following variables give access to information about the player and track.\n"
+"These variables may not be accurate in multi-guild bots:\n"
+" {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
+" {p0_title}    = The track title for the currently playing track.\n"
+" {p0_url}      = The track URL for the currently playing track."
 
 #: musicbot/config.py:571
 msgid "If enabled, status messages will report info on paused players."
@@ -2548,7 +2570,7 @@ msgstr "Tries to use ffmpeg to get volume normalizing options for use in playbac
 
 #: musicbot/config.py:612
 msgid "Allow MusicBot to format its messages as embeds."
-msgstr ""
+msgstr "Allow MusicBot to format its messages as embeds."
 
 #: musicbot/config.py:621
 msgid "The number of entries to show per-page when using q command to list the queue."
@@ -2556,7 +2578,7 @@ msgstr "The number of entries to show per-page when using q command to list the 
 
 #: musicbot/config.py:631
 msgid "Enable MusicBot to automatically remove unplayable entries from the auto playlist."
-msgstr ""
+msgstr "Enable MusicBot to automatically remove unplayable entries from the auto playlist."
 
 #: musicbot/config.py:640
 msgid "Display MusicBot config settings in the logs at startup."
@@ -2706,7 +2728,10 @@ msgid "Optional YouTube video URL used at start-up for triggering OAuth2 authori
 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
 "The URL set here should be an accessible YouTube video URL.\n"
 "Authorization must be completed before start-up will continue when this is set."
-msgstr ""
+msgstr "Optional YouTube video URL used at start-up for triggering OAuth2 authorization.\n"
+"This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
+"The URL set here should be an accessible YouTube video URL.\n"
+"Authorization must be completed before start-up will continue when this is set."
 
 #: musicbot/config.py:939
 msgid "Toggle the user block list feature, without emptying the block list."
@@ -2842,7 +2867,12 @@ msgid "Error while fetching 'OwnerID' automatically.\n\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
 "  Manually set the 'OwnerID' config option or try again later."
-msgstr ""
+msgstr "Error while fetching 'OwnerID' automatically.\n\n"
+"Problem:\n"
+"  Discord App info is not available.\n"
+"  This could be a temporary API outage or a bug.\n\n"
+"Solution:\n"
+"  Manually set the 'OwnerID' config option or try again later."
 
 #: musicbot/config.py:1262
 msgid "Error validating config options.\n\n"
@@ -2850,7 +2880,11 @@ msgid "Error validating config options.\n\n"
 "  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
 "  Do not use the Bot or App ID in the 'OwnerID' field."
-msgstr ""
+msgstr "Error validating config options.\n\n"
+"Problem:\n"
+"  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
+"Solution:\n"
+"  Do not use the Bot or App ID in the 'OwnerID' field."
 
 #: musicbot/config.py:1327
 #, python-format
@@ -2955,7 +2989,7 @@ msgstr "The local media file could not be found."
 #: musicbot/entry.py:449
 #, python-format
 msgid "Cannot download Spotify links, processing error with type: %(type)s"
-msgstr ""
+msgstr "Cannot download Spotify links, processing error with type: %(type)s"
 
 #: musicbot/entry.py:710
 #, python-format
@@ -3081,7 +3115,13 @@ msgid "Specify yt-dlp extractor names, separated by spaces, that are allowed to 
 "  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n\n"
 "MusicBot also provides one custom service `spotify:musicbot` to enable or disable Spotify API extraction.\n"
 "NOTICE: MusicBot might not support all services available to yt-dlp!\n"
-msgstr ""
+msgstr "Specify yt-dlp extractor names, separated by spaces, that are allowed to be used.\n"
+"When empty, hard-coded defaults are used. The defaults are displayed above, but may change between versions.\n"
+"To allow all extractors, add `%(allow_all)s` without quotes to the list.\n\n"
+"Services/extractors supported by yt-dlp are listed here:\n"
+"  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n\n"
+"MusicBot also provides one custom service `spotify:musicbot` to enable or disable Spotify API extraction.\n"
+"NOTICE: MusicBot might not support all services available to yt-dlp!\n"
 
 #: musicbot/permissions.py:613
 #, python-format
@@ -3137,7 +3177,7 @@ msgstr "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 
 #: musicbot/spotify.py:672
 msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
-msgstr ""
+msgstr "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
 
 #: musicbot/spotify.py:683
 #, python-format
