@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:17\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -123,7 +123,7 @@ msgstr ""
 #: musicbot/bot.py:2695
 #, python-brace-format
 msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr ""
+msgstr "The requested song `{subject}` is blocked by the song block list."
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -289,7 +289,7 @@ msgstr "現在再生中の曲がない場合は、曲の件名を指定する必
 
 #: musicbot/bot.py:3152
 msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
-msgstr ""
+msgstr "無効なサブコマンドが与えられました。使用例には `help blocksong` を使用してください。"
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -608,7 +608,7 @@ msgstr "SpotifyのURLが無効または現在サポートされていません�
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "Spotify の URL が検出されましたが、Spotify は有効ではありません。"
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -632,8 +632,8 @@ msgstr "動画を再生できません。streamコマンドを使用してみて
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
-msgstr "Youtube の検索結果は次のとおりです:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
+msgstr "YouTubeの検索結果が  %(url)sにはありませんでした"
 
 #: musicbot/bot.py:4249
 #, python-format
@@ -695,7 +695,8 @@ msgstr "    検索クエリで多数の結果をサービスで検索します�
 #: musicbot/bot.py:4432
 msgid "    Search YouTube for query but get a custom number of results.\n"
 "    Note: the double-quotes are required in this case.\n"
-msgstr ""
+msgstr "    YouTubeでクエリを検索しますが、カスタムの結果数を取得します。\n"
+"    注意: この場合はダブルクォートが必要です。\n"
 
 #: musicbot/bot.py:4438
 msgid "Search a supported service and select from results to add to queue.\n"
@@ -1052,7 +1053,7 @@ msgstr "設定する速度を提供する必要があります。"
 
 #: musicbot/bot.py:5413
 msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
-msgstr ""
+msgstr "指定した速度が無効です。0.5 から 100までの数字を使用してください。"
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1516,7 +1517,7 @@ msgstr "権限の一覧またはメンションされたユーザーの権限を
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double-check the ID and try again."
-msgstr ""
+msgstr "無効なユーザーIDまたはサーバーニックネームです。IDを再確認してもう一度やり直してください。"
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -1590,7 +1591,7 @@ msgstr "権限がファイルから正常に再読み込みされました！"
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
 msgstr "エラーが発生したため権限を再読み込みできません:\n"
 "%(raw_error)s"
@@ -2397,7 +2398,7 @@ msgstr "ユーザーが新しい曲を再生したときに自動プレイリス
 
 #: musicbot/config.py:469
 msgid "Remove songs from the auto playlist if they are found in the song block list."
-msgstr ""
+msgstr "曲のブロックリストから曲が見つかった場合は、自動プレイリストから曲を削除します。"
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
@@ -2813,7 +2814,7 @@ msgstr "ローカルメディアファイルが見つかりません。"
 #: musicbot/entry.py:449
 #, python-format
 msgid "Cannot download Spotify links, processing error with type: %(type)s"
-msgstr ""
+msgstr "Spotifyのリンクをダウンロードできません。 %(type)s"
 
 #: musicbot/entry.py:710
 #, python-format
@@ -2956,7 +2957,7 @@ msgstr "これはプレイリストです。"
 #: musicbot/playlist.py:195
 #, python-format
 msgid "Invalid content type `%(type)s` for URL: %(url)s"
-msgstr ""
+msgstr "無効なコンテンツタイプ`%(type)s`の URL: %(url)s"
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
