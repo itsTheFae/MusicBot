@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"PO-Revision-Date: 2024-11-06 22:11\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -473,7 +473,11 @@ msgid "Add a song to be played in the queue. If no song is playing or paused, pl
 "Playlist links will be extracted into multiple links and added to the queue.\n"
 "If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
 "MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
-msgstr ""
+msgstr "Añade una canción para que se reproduzca en la cola. Si no se reproduce ninguna canción o está en pausa, se iniciará la reproducción.\n\n"
+"Puedes proporcionar una URL a un archivo de video o audio o la URL de un servicio compatible con yt-dlp.\n"
+"Los enlaces de la lista de reproducción se extraerán en varios enlaces y se agregarán a la cola.\n"
+"Si ingresas una URL que no sea la URL, la entrada se utilizará como criterio de búsqueda en YouTube y se reproducirá el primer resultado.\n"
+"MusicBot también admite URL y URI de Spotify, pero el audio se obtiene de YouTube de todos modos.\n"
 
 #: musicbot/bot.py:3628
 msgid "Play command that shuffles playlist entries before adding them to the queue.\n"
@@ -2045,7 +2049,8 @@ msgstr "Error al ejecutar el código de depuración:\n"
 #: musicbot/bot.py:7320
 msgid "Create 'markdown' for options, permissions, or commands from the code.\n"
 "The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
-msgstr ""
+msgstr "Crea 'markdown' para opciones, permisos o comandos desde el código.\n"
+"La salida se utiliza para actualizar las páginas de GitHub y por lo tanto no es adecuada para uso de referencia normal."
 
 #: musicbot/bot.py:7337 musicbot/bot.py:7398
 #, python-format
@@ -2156,7 +2161,8 @@ msgstr "auto"
 #, python-format
 msgid "\n"
 "**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
-msgstr ""
+msgstr "\n"
+"**Latencia de voz:** `%(delay).0f ms` (`%(average).0f} ms` Prom.) en la región `%(region)s`"
 
 #: musicbot/bot.py:7635
 #, python-format
@@ -2531,7 +2537,17 @@ msgid "Specify a custom message to use as the bot's status. If left empty, the b
 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
 " {p0_title}    = The track title for the currently playing track.\n"
 " {p0_url}      = The track URL for the currently playing track."
-msgstr ""
+msgstr "Especifique un mensaje personalizado para usar como estado del bot. Si se deja vacío, el bot\n"
+"mostrará información dinámica sobre la música que se está reproduciendo actualmente en su estado.\n"
+"Los mensajes de estado también pueden usar las siguientes variables:\n"
+"  {n_playing} = Número de reproductores de música que se están reproduciendo actualmente.\n"
+"  {n_paused} = Número de reproductores de música que se encuentran en pausa actualmente.\n"
+"  {n_connected} = Número de reproductores de música conectados, en cualquier estado del reproductor.\n\n"
+"Las siguientes variables brindan acceso a información sobre el reproductor y la pista.\n"
+"Estas variables pueden no ser precisas en bots de varios gremios:\n"
+"  {p0_length} = La duración total de la pista, si está disponible. Ejemplo: [2:34]\n"
+"  {p0_title} = El título de la pista que se está reproduciendo actualmente.\n"
+"  {p0_url} = La URL de la pista que se está reproduciendo actualmente."
 
 #: musicbot/config.py:571
 msgid "If enabled, status messages will report info on paused players."
@@ -2711,7 +2727,10 @@ msgid "Optional YouTube video URL used at start-up for triggering OAuth2 authori
 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
 "The URL set here should be an accessible YouTube video URL.\n"
 "Authorization must be completed before start-up will continue when this is set."
-msgstr ""
+msgstr "URL de video de YouTube opcional que se utiliza al inicio para activar la autorización de OAuth2.\n"
+"Esto inicia el mensaje de OAuth2 antes, en lugar de esperar una solicitud de canción.\n"
+"La URL que se establece aquí debe ser una URL de video de YouTube accesible.\n"
+"La autorización debe completarse antes del inicio; si se establece esta opción, continuará."
 
 #: musicbot/config.py:939
 msgid "Toggle the user block list feature, without emptying the block list."
@@ -2847,7 +2866,12 @@ msgid "Error while fetching 'OwnerID' automatically.\n\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
 "  Manually set the 'OwnerID' config option or try again later."
-msgstr ""
+msgstr "Error al obtener 'OwnerID' automáticamente.\n\n"
+"Problema:\n"
+"  La información de la aplicación Discord no está disponible.\n"
+"  Esto podría deberse a una interrupción temporal de la API o a un error.\n\n"
+"Solución:\n"
+"  Establezca manualmente la opción de configuración 'OwnerID' o vuelva a intentarlo más tarde."
 
 #: musicbot/config.py:1262
 msgid "Error validating config options.\n\n"
@@ -2855,7 +2879,11 @@ msgid "Error validating config options.\n\n"
 "  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
 "  Do not use the Bot or App ID in the 'OwnerID' field."
-msgstr ""
+msgstr "Error al validar las opciones de configuración.\n\n"
+"Problema:\n"
+"  La configuración del Propietario es la misma que tu ID de Bot / App.\n\n"
+"Solución:\n"
+"  No utilice el Bot o el ID de la aplicación en el campo OwnerID."
 
 #: musicbot/config.py:1327
 #, python-format
