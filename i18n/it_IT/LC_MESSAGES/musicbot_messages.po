@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 06:34-0800\n"
-"PO-Revision-Date: 2024-11-06 15:17\n"
+"POT-Creation-Date: 2024-11-06 10:38-0800\n"
+"PO-Revision-Date: 2024-11-06 18:40\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -18,18 +18,13 @@ msgstr ""
 "X-Crowdin-File-ID: 28\n"
 
 #: musicbot/aliases.py:56
-msgid "Error while loading alises.\n\n"
+msgid "Error while loading aliases.\n\n"
 "Problem:\n"
 "  Your aliases files (aliases.json & example_aliases.json) are missing.\n\n"
 "Solution:\n"
 "  Replace the alias config file(s) or copy them from:\n"
 "    https://github.com/Just-Some-Bots/MusicBot/"
-msgstr "Errore durante il caricamento delle alias.\n\n"
-"Problema:\n"
-"  Mancano i tuoi file alias (aliases.json & example_aliases.json). Soluzione\n\n"
-":\n"
-"  Sostituire il file di configurazione alias o copiarlo da:\n"
-"    https://github.com/Just-Some-Bots/MusicBot/"
+msgstr ""
 
 #: musicbot/bot.py:713
 msgid "Member is not voice-enabled and cannot use this command."
@@ -133,8 +128,8 @@ msgstr "Accesso API Discord non riuscito!\n\n"
 
 #: musicbot/bot.py:2695
 #, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song blocklist."
-msgstr "La canzone richiesta `{subject}` è bloccata dalla lista dei brani."
+msgid "The requested song `{subject}` is blocked by the song block list."
+msgstr ""
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -304,8 +299,8 @@ msgid "You must provide a song subject if no song is currently playing."
 msgstr "Devi fornire un oggetto del brano se nessuna canzone è attualmente in riproduzione."
 
 #: musicbot/bot.py:3152
-msgid "Ivalid sub-command given. Use `help blocksong` for usage examples."
-msgstr "Sottocomando valido fornito. Usa `help blocksong` per esempi di utilizzo."
+msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
+msgstr ""
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -471,13 +466,9 @@ msgstr "Il bot è stato precedentemente in pausa, riprendendo la riproduzione or
 msgid "Add a song to be played in the queue. If no song is playing or paused, playback will be started.\n\n"
 "You may supply a URL to a video or audio file or the URL of a service supported by yt-dlp.\n"
 "Playlist links will be extracted into multiple links and added to the queue.\n"
-"If you enter a non-URL, the input will be used as search criteria on youtube and the first result played.\n"
-"MusicBot also supports Spotify URIs and URLs, but audio is fetched from youtube regardless.\n"
-msgstr "Aggiunge un brano da riprodurre nella coda. Se nessun brano è in riproduzione o in pausa, la riproduzione sarà avviata.\n\n"
-"È possibile fornire un URL a un file video o audio o l'URL di un servizio supportato da yt-dlp.\n"
-"I link della scaletta saranno estratti in più link e aggiunti alla coda.\n"
-"Se si immette un non-URL, l'input verrà utilizzato come criterio di ricerca su youtube e il primo risultato riprodotto.\n"
-"MusicBot supporta anche gli URI e gli URL di Spotify, ma l'audio viene recuperato da youtube indipendentemente da te.\n"
+"If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
+"MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
+msgstr ""
 
 #: musicbot/bot.py:3628
 msgid "Play command that shuffles playlist entries before adding them to the queue.\n"
@@ -634,8 +625,8 @@ msgid "Spotify URL is invalid or not currently supported."
 msgstr "L'URL di Spotify non è valido o non è attualmente supportato."
 
 #: musicbot/bot.py:4159
-msgid "Detected a spotify URL, but spotify is not enabled."
-msgstr "Rilevato un URL di spotify, ma spotify non è abilitato."
+msgid "Detected a Spotify URL, but Spotify is not enabled."
+msgstr ""
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -646,7 +637,7 @@ msgstr "Hai raggiunto il limite di canzone in coda (%(max)s)"
 msgid "Karaoke mode is enabled, please try again when its disabled!"
 msgstr "La modalità Karaoke è abilitata, riprova quando è disabilitata!"
 
-#: musicbot/bot.py:4191
+#: musicbot/bot.py:4191 musicbot/bot.py:4396
 #, python-format
 msgid "Failed to extract info due to error:\n"
 "%(raw_error)s"
@@ -710,13 +701,6 @@ msgstr "Aggiungi un URL multimediale alla coda come Stream.\n"
 "È anche possibile utilizzare i media non in streaming per riprodurli senza scaricarli.\n"
 "Nota: FFmpeg può rilasciare il flusso in modo casuale o se si verificano singhiozzi di connessione.\n"
 
-#: musicbot/bot.py:4396
-#, python-format
-msgid "Failed to exctract info due to error:\n"
-"%(raw_error)s"
-msgstr "Impossibile estrarre le informazioni a causa di errore:\n"
-"%(raw_error)s"
-
 #: musicbot/bot.py:4402
 msgid "Streaming playlists is not yet supported."
 msgstr "Le playlist in streaming non sono ancora supportate."
@@ -731,10 +715,9 @@ msgid "    Search with service for a number of results with the search query.\n"
 msgstr "    Cerca con servizio per un certo numero di risultati con la query di ricerca.\n"
 
 #: musicbot/bot.py:4432
-msgid "    Search youtube for query but get a custom number of results.\n"
+msgid "    Search YouTube for query but get a custom number of results.\n"
 "    Note: the double-quotes are required in this case.\n"
-msgstr "    Cerca youtube per la query ma ottieni un numero personalizzato di risultati.\n"
-"    Nota: in questo caso sono necessarie le doppie virgolette.\n"
+msgstr ""
 
 #: musicbot/bot.py:4438
 msgid "Search a supported service and select from results to add to queue.\n"
@@ -1104,8 +1087,8 @@ msgid "You must provide a speed to set."
 msgstr "Devi fornire una velocità da impostare."
 
 #: musicbot/bot.py:5413
-msgid "The speed you proivded is invalid. Use a number between 0.5 and 100."
-msgstr "La velocità che hai promesso non è valida. Usa un numero compreso tra 0.5 e 100."
+msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
+msgstr ""
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1575,8 +1558,8 @@ msgid "Get a list of your permissions, or the permisions of the mentioned user."
 msgstr "Ottieni un elenco dei tuoi permessi, o le permisioni dell'utente menzionato."
 
 #: musicbot/bot.py:6425
-msgid "Invalid user ID or server nickname, please double check the ID and try again."
-msgstr "ID utente o soprannome del server non validi, ricontrolla l'ID e riprova."
+msgid "Invalid user ID or server nickname, please double-check the ID and try again."
+msgstr ""
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -2495,8 +2478,8 @@ msgstr "Abilita il salto automatico dei brani della playlist automatica quando u
 "Questo vale solo per il brano in riproduzione corrente se è stato aggiunto dalla scaletta automatica."
 
 #: musicbot/config.py:469
-msgid "Remove songs from the auto playlist if they are found in the song blocklist."
-msgstr "Rimuovere i brani dalla scaletta automatica se sono trovati nella lista dei brani."
+msgid "Remove songs from the auto playlist if they are found in the song block list."
+msgstr ""
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
@@ -2729,14 +2712,11 @@ msgstr "Opzione sperimentale per abilitare yt-dlp per utilizzare un account YouT
 "Imposta sì per abilitare o no per disabilitare."
 
 #: musicbot/config.py:920
-msgid "Optional youtube video URL used at start-up for triggering OAuth2 authorization.\n"
+msgid "Optional YouTube video URL used at start-up for triggering OAuth2 authorization.\n"
 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
-"The URL set here should be an accessible youtube video URL.\n"
+"The URL set here should be an accessible YouTube video URL.\n"
 "Authorization must be completed before start-up will continue when this is set."
-msgstr "URL video youtube opzionale utilizzato all'avvio per attivare l'autorizzazione OAuth2.\n"
-"Questo avvia il prompt OAuth2 presto, piuttosto che aspettare una richiesta di canzone.\n"
-"L'URL impostato qui dovrebbe essere un URL video di youtube accessibile. L'autorizzazione\n"
-"deve essere completata prima che l'avvio continui quando è impostato."
+msgstr ""
 
 #: musicbot/config.py:939
 msgid "Toggle the user block list feature, without emptying the block list."
@@ -2866,30 +2846,21 @@ msgstr "Errore durante la lettura delle opzioni di configurazione.\n\n"
 "  Imposta l'opzione di configurazione Token o imposta la variabile di ambiente %(env_var)s con un token App."
 
 #: musicbot/config.py:1244
-msgid "Error while fetching OwnerID automatically.\n\n"
+msgid "Error while fetching 'OwnerID' automatically.\n\n"
 "Problem:\n"
 "  Discord App info is not available.\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
-"  Manually set the OwnerID config option or try again later."
-msgstr "Errore durante il recupero automatico del OwnerID.\n\n"
-"Problema:\n"
-"  Le informazioni Discord App non sono disponibili.\n"
-"  Potrebbe trattarsi di un'interruzione temporanea delle API o di un bug. Soluzione\n\n"
-":\n"
-"  Impostare manualmente l'opzione di configurazione OwnerID o riprovare più tardi."
+"  Manually set the 'OwnerID' config option or try again later."
+msgstr ""
 
 #: musicbot/config.py:1262
 msgid "Error validating config options.\n\n"
 "Problem:\n"
-"  The OwnerID config is the same as your Bot / App ID.\n\n"
+"  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
-"  Do not use the Bot or App ID in the OwnerID field."
-msgstr "Errore nella convalida delle opzioni di configurazione.\n\n"
-"Problema:\n"
-"  La configurazione proprietariaID è la stessa del tuo Bot / ID app.\n\n"
-"Soluzione:\n"
-"  Non utilizzare il Bot o l'App ID nel campo OwnerID."
+"  Do not use the Bot or App ID in the 'OwnerID' field."
+msgstr ""
 
 #: musicbot/config.py:1327
 #, python-format
@@ -2993,8 +2964,8 @@ msgstr "Impossibile trovare il file multimediale locale."
 
 #: musicbot/entry.py:449
 #, python-format
-msgid "Cannot download spotify links, processing error with type: %(type)s"
-msgstr "Impossibile scaricare i link di spotify, errore di elaborazione con il tipo: %(type)s"
+msgid "Cannot download Spotify links, processing error with type: %(type)s"
+msgstr ""
 
 #: musicbot/entry.py:710
 #, python-format
@@ -3118,15 +3089,9 @@ msgid "Specify yt-dlp extractor names, separated by spaces, that are allowed to 
 "To allow all extractors, add `%(allow_all)s` without quotes to the list.\n\n"
 "Services/extractors supported by yt-dlp are listed here:\n"
 "  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n\n"
-"MusicBot also provides one custom service `spotify:musicbot` to enable or disable spotify API extraction.\n"
+"MusicBot also provides one custom service `spotify:musicbot` to enable or disable Spotify API extraction.\n"
 "NOTICE: MusicBot might not support all services available to yt-dlp!\n"
-msgstr "Specifica i nomi degli estrattori yt-dlp, separati da spazi, che possono essere usati.\n"
-"Quando vengono usati valori predefiniti vuoti e codificati in modo rigido. I valori predefiniti sono mostrati sopra, ma possono cambiare tra le versioni.\n"
-"Per consentire a tutti gli estrattori, aggiungi `%(allow_all)s` senza virgolette alla lista.\n\n"
-"Services/extractors supportati da yt-dlp sono elencati qui:\n"
-"  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites. d \n\n"
-"MusicBot fornisce anche un servizio personalizzato `spotify:musicbot` per abilitare o disabilitare l'estrazione delle API di spotify.\n"
-"AVVISO: MusicBot potrebbe non supportare tutti i servizi disponibili per yt-dlp!\n"
+msgstr ""
 
 #: musicbot/permissions.py:613
 #, python-format
@@ -3145,8 +3110,8 @@ msgstr "Questa è una playlist."
 
 #: musicbot/playlist.py:195
 #, python-format
-msgid "Invalid content type `%(type)s` for url: %(url)s"
-msgstr "Tipo di contenuto non valido `%(type)s` per l'url: %(url)s"
+msgid "Invalid content type `%(type)s` for URL: %(url)s"
+msgstr ""
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
