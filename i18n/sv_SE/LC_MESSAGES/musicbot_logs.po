@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:17\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -550,7 +550,7 @@ msgstr "Fel vid extrahering av låt \"%(url)s\": %(raw_error)s"
 
 #: musicbot/bot.py:1441
 msgid "MusicBot needs to stop the auto playlist extraction and bail."
-msgstr ""
+msgstr "MusicBot måste stoppa auto spellista utvinning och borgen."
 
 #: musicbot/bot.py:1446
 msgid "MusicBot got an unhandled exception in player finished event."
@@ -623,7 +623,7 @@ msgstr "Skriver aktuell låt för %s"
 #: musicbot/bot.py:1802
 #, python-format
 msgid "Cannot send non-response object:  %r"
-msgstr ""
+msgstr "Kan inte skicka icke-svarsobjekt:  %r"
 
 #: musicbot/bot.py:1807
 msgid "[Dev Bug] Tried sending an invalid response object."
@@ -906,13 +906,13 @@ msgstr "Inte bunden till någon textkanal"
 
 #: musicbot/bot.py:2421
 #, python-format
-msgid "Got None for autojoin channel with ID:  %d"
-msgstr "Har ingen för att automatiskt gå med i kanal med ID:  %d"
+msgid "Got None for auto join channel with ID:  %d"
+msgstr "Har ingen för automatisk anslutning kanal med ID:  %d"
 
 #: musicbot/bot.py:2427
 #, python-format
 msgid "Cannot auto join a Private/Non-Guild channel with ID:  %d"
-msgstr ""
+msgstr "Kan inte automatiskt ansluta till en Privat/Icke-Guild kanal med ID:  %d"
 
 #: musicbot/bot.py:2435
 #, python-format
@@ -921,11 +921,11 @@ msgstr "Kan inte automatiskt ansluta till icke-anslutningsbar kanal med ID:  %d"
 
 #: musicbot/bot.py:2451
 msgid "Auto joining voice channels:"
-msgstr ""
+msgstr "Automatisk anslutning av röstkanaler:"
 
 #: musicbot/bot.py:2459 musicbot/bot.py:2462
 msgid "Not auto joining any voice channels"
-msgstr ""
+msgstr "Inte automatiskt gå med i några röstkanaler"
 
 #: musicbot/bot.py:2475
 #, python-format
@@ -1037,7 +1037,7 @@ msgstr "    Ta bort inbjudan: %s"
 #: musicbot/bot.py:2605
 #, python-format
 msgid "    Delete Now Playing: %s"
-msgstr ""
+msgstr "    Ta bort nu spela: %s"
 
 #: musicbot/bot.py:2608
 #, python-format
@@ -1142,7 +1142,7 @@ msgstr "  Runda Robin Kö: %s"
 #: musicbot/bot.py:2695
 #, python-brace-format
 msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr ""
+msgstr "Den efterfrågade låten `{subject}` blockeras av listan över låtblock."
 
 #: musicbot/bot.py:2706
 msgid "Attempted to handle Voice Channel inactivity, but Bot is not in voice..."
@@ -1224,7 +1224,7 @@ msgstr "Lägger inte till användare i blocklistan, redan blockerad:  %(id)s/%(n
 
 #: musicbot/bot.py:3052
 #, python-format
-msgid "Not removing user from blocklist, not listed:  %(id)s/%(name)s"
+msgid "Not removing user from block list, not listed:  %(id)s/%(name)s"
 msgstr "Tar inte bort användare från blocklistan, inte listad:  %(id)s/%(name)s"
 
 #: musicbot/bot.py:3069
@@ -1381,7 +1381,7 @@ msgstr "Spotify-URL är ogiltig eller stöds inte för närvarande."
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "Upptäckte en Spotify-URL, men Spotify är inte aktiverat."
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -1409,8 +1409,8 @@ msgstr "Den videon kan inte spelas. Prova att använda strömkommandot."
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
-msgstr "Youtube-sökning gav inga resultat för:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
+msgstr "YouTube-sökning gav inga resultat för:  %(url)s"
 
 #: musicbot/bot.py:4238
 #, python-format
@@ -1423,8 +1423,8 @@ msgid "No songs were added, all songs were over max duration (%(max)s seconds)"
 msgstr "Inga låtar lades till, alla låtar var över max varaktighet (%(max)s sekunder)"
 
 #: musicbot/bot.py:4265
-msgid "Extracted an entry with youtube:playlist as extractor key"
-msgstr "Extraherade en post med youtube<unk> lista som utsugningsnyckel"
+msgid "Extracted an entry with 'youtube:playlist' as extractor key"
+msgstr "Extraherade en post med \"youtube<unk> list\" som utsugningsnyckel"
 
 #: musicbot/bot.py:4277
 #, python-format
@@ -1748,7 +1748,7 @@ msgstr "Behörigheter kan inte använda kanal och användarnamn samtidigt."
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
 msgstr "Det går inte att ladda om behörigheter på grund av ett fel:\n"
 "%(raw_error)s"
@@ -2308,7 +2308,12 @@ msgid "Error while fetching 'OwnerID' automatically.\n\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
 "  Manually set the 'OwnerID' config option or try again later."
-msgstr ""
+msgstr "Fel vid hämtning av 'OwnerID' automatiskt.\n\n"
+"Problem:\n"
+"  Discord-appinfo är inte tillgänglig.\n"
+"  Detta kan vara ett tillfälligt API-avbrott eller ett fel.\n\n"
+"Lösning:\n"
+"  Ställ Manuellt in 'OwnerID' konfigurationsalternativet eller försök igen senare."
 
 #: musicbot/config.py:1256
 msgid "MusicBot does not have a user instance, cannot proceed."
@@ -2502,7 +2507,7 @@ msgstr "Kunde inte uppdatera blocklistefilen:  %s"
 #: musicbot/config.py:2670
 #, python-format
 msgid "Loaded User Block list with %s entries."
-msgstr ""
+msgstr "Laddad lista över användarblock med %s poster."
 
 #: musicbot/config.py:2681
 #, python-format
@@ -2716,7 +2721,7 @@ msgstr "Inmatningsdata har fel versionsnummer, kan inte deserialiseras."
 #: musicbot/entry.py:358
 #, python-format
 msgid "Deserialized URLPlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "Deserialized URLPlaylistEntry kan inte hitta kanal med ID:  %s"
 
 #: musicbot/entry.py:374
 #, python-format
@@ -2740,7 +2745,7 @@ msgstr "Kunde inte ladda %s"
 #: musicbot/entry.py:449
 #, python-format
 msgid "Cannot download Spotify links, processing error with type: %(type)s"
-msgstr ""
+msgstr "Kan inte ladda ner Spotify-länkar, bearbetningsfel med typ: %(type)s"
 
 #: musicbot/entry.py:461 musicbot/entry.py:924 musicbot/entry.py:1175
 #, python-format
@@ -2819,7 +2824,7 @@ msgstr "Kunde inte hitta ffmpeg på din sökväg!"
 
 #: musicbot/entry.py:631 musicbot/entry.py:1312
 msgid "Could not parse 'I' in normalize json."
-msgstr ""
+msgstr "Kunde inte tolka 'jag' i normalisera json."
 
 #: musicbot/entry.py:639 musicbot/entry.py:1320
 msgid "Could not parse 'LRA' in normalize json."
@@ -2827,15 +2832,15 @@ msgstr "Kunde inte tolka 'LRA' i normalisera json."
 
 #: musicbot/entry.py:647 musicbot/entry.py:1328
 msgid "Could not parse 'TP' in normalize json."
-msgstr ""
+msgstr "Kunde inte tolka \"TP\" i normalisera json."
 
 #: musicbot/entry.py:655 musicbot/entry.py:1336
 msgid "Could not parse 'thresh' in normalize json."
-msgstr ""
+msgstr "Kunde inte tolka 'thresh' i normalisera json."
 
 #: musicbot/entry.py:663 musicbot/entry.py:1344
 msgid "Could not parse 'offset' in normalize json."
-msgstr ""
+msgstr "Kunde inte tolka 'offset' i normalisera json."
 
 #: musicbot/entry.py:680
 #, python-format
@@ -2893,7 +2898,7 @@ msgstr "Nedladdning slutförd:  %r"
 #: musicbot/entry.py:866
 #, python-format
 msgid "Deserialized StreamPlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "Deserialized StreamPlaylistEntry kan inte hitta kanal med ID:  %s"
 
 #: musicbot/entry.py:882
 #, python-format
@@ -2903,7 +2908,7 @@ msgstr "Deserialized StreamPlaylistEntry har fel kanaltyp:  %s"
 #: musicbot/entry.py:904
 #, python-format
 msgid "Deserialized StreamPlaylistEntry cannot find author with ID:  %s"
-msgstr ""
+msgstr "Deserialized StreamPlaylistEntry kan inte hitta författare med ID:  %s"
 
 #: musicbot/entry.py:910
 msgid "Deserialized StreamPlaylistEntry has an author ID but no channel for lookup!"
@@ -2912,7 +2917,7 @@ msgstr "Deserialized StreamPlaylistEntry har ett författar-ID men ingen kanal f
 #: musicbot/entry.py:1088
 #, python-format
 msgid "Deserialized LocalFilePlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "Deserialized LocalFilePlaylistEntry kan inte hitta kanal med ID:  %s"
 
 #: musicbot/entry.py:1104
 #, python-format
@@ -2922,7 +2927,7 @@ msgstr "Deserialized LocalFilePlaylistEntry har fel kanaltyp:  %s"
 #: musicbot/entry.py:1126
 #, python-format
 msgid "Deserialized LocalFilePlaylistEntry cannot find author with ID:  %s"
-msgstr ""
+msgstr "Deserialized LocalFilePlaylistEntry kan inte hitta författare med ID:  %s"
 
 #: musicbot/entry.py:1132
 msgid "Deserialized LocalFilePlaylistEntry has an author ID but no channel for lookup!"
@@ -2984,35 +2989,35 @@ msgstr "Cache-nivån kräver rensning. %s"
 
 #: musicbot/filecache.py:302
 msgid "Auto playlist has no cache map, moving on."
-msgstr ""
+msgstr "Automatisk spellista har ingen cache-karta, går vidare."
 
 #: musicbot/filecache.py:310
 #, python-format
 msgid "Loaded auto playlist cache map with %s entries."
-msgstr ""
+msgstr "Laddade cache-karta för automatisk spellista med %s poster."
 
 #: musicbot/filecache.py:314
 msgid "Failed to load auto playlist cache map."
-msgstr ""
+msgstr "Det gick inte att läsa in cache-karta för automatisk spellista."
 
 #: musicbot/filecache.py:333
 #, python-format
 msgid "Saved auto playlist cache map with %s entries."
-msgstr ""
+msgstr "Sparade cache-karta för automatisk spellista med %s poster."
 
 #: musicbot/filecache.py:337
 msgid "Failed to save auto playlist cache map."
-msgstr ""
+msgstr "Det gick inte att spara cachekartan för automatisk spellista."
 
 #: musicbot/filecache.py:355
 #, python-format
 msgid "Auto playlist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s"
-msgstr ""
+msgstr "Auto spellista cache karta konflikt på nyckeln: %(file)s  Gammal: %(old)s  Ny: %(new)s"
 
 #: musicbot/i18n.py:229
 #, python-format
 msgid "Lang Argument Error:  %s"
-msgstr ""
+msgstr "Lang Argument fel:  %s"
 
 #: musicbot/i18n.py:290
 #, python-format
@@ -3027,7 +3032,7 @@ msgstr "Misslyckades att läsa in discord översättningar för någon av:  [%s]
 #: musicbot/json.py:14
 #, python-format
 msgid "Loading JSON file: %s"
-msgstr ""
+msgstr "Laddar JSON-fil: %s"
 
 #: musicbot/json.py:27
 #, python-format
@@ -3054,8 +3059,8 @@ msgid "Changing log level to:  %s"
 msgstr "Ändra loggnivå till:  %s"
 
 #: musicbot/logs.py:314
-msgid "MusicBot loggers have been called to shutdown."
-msgstr "MusicBot loggers har kallats till avstängning."
+msgid "MusicBot loggers have been called to shut down."
+msgstr "MusicBot loggers har kallats för att stänga av."
 
 #: musicbot/permissions.py:118
 #, python-format
@@ -3069,7 +3074,7 @@ msgstr "Fel vid kopiering av exempelbehörighetsfil:  %s"
 
 #: musicbot/permissions.py:165
 msgid "Config 'OwnerID' is set auto, will set correctly later."
-msgstr ""
+msgstr "Config 'OwnerID' är inställd automatiskt, kommer att ställa in korrekt senare."
 
 #: musicbot/permissions.py:182
 msgid "Validating permissions..."
@@ -3077,7 +3082,7 @@ msgstr "Validerar behörigheter..."
 
 #: musicbot/permissions.py:184
 msgid "Setting auto 'OwnerID' for owner permissions group."
-msgstr ""
+msgstr "Ställa in auto 'OwnerID' för ägarbehörighetsgrupp."
 
 #: musicbot/permissions.py:238
 #, python-format
@@ -3232,7 +3237,7 @@ msgstr "Kan inte ta bort filen, den används för tillfället."
 
 #: musicbot/player.py:504
 msgid "Cannot delete file due to a permission error."
-msgstr ""
+msgstr "Kan inte ta bort filen på grund av ett behörighetsfel."
 
 #: musicbot/player.py:509
 msgid "Cannot delete file, it was not found."
@@ -3299,7 +3304,7 @@ msgstr "Inmatningsinformation verkar vara en ström, lägger till ström post...
 #: musicbot/playlist.py:195
 #, python-format
 msgid "Invalid content type `%(type)s` for URL: %(url)s"
-msgstr ""
+msgstr "Ogiltig innehållstyp `%(type)s` för URL: %(url)s"
 
 #: musicbot/playlist.py:203
 msgid "Got text/html for content-type, this might be a stream."
@@ -3338,7 +3343,7 @@ msgstr "Ignorerar låt i poster av '%s', varaktighet längre än tillåtet maxim
 #: musicbot/playlist.py:317
 #, python-format
 msgid "Not adding YouTube video because it is marked private or deleted:  %s"
-msgstr ""
+msgstr "Lägger inte till YouTube-video eftersom den är markerad privat eller raderad:  %s"
 
 #: musicbot/playlist.py:342
 msgid "Could not add item"
@@ -3389,7 +3394,7 @@ msgstr "Spotify Album totalt tack:  %(total)s  Nästa URL: %(url)s"
 #: musicbot/spotify.py:492
 #, python-format
 msgid "Getting Spotify Album Next URL:  %s"
-msgstr ""
+msgstr "Hämtar Spotify Album Nästa URL:  %s"
 
 #: musicbot/spotify.py:503
 #, python-format
@@ -3408,7 +3413,7 @@ msgstr "Totalt antal Spotify-tack: %(total)s  Nästa URL: %(url)s"
 #: musicbot/spotify.py:535
 #, python-format
 msgid "Getting Spotify Playlist Next URL:  %s"
-msgstr ""
+msgstr "Hämtar Spotify spellista Nästa URL:  %s"
 
 #: musicbot/spotify.py:546
 #, python-format
@@ -3514,7 +3519,7 @@ msgstr "Det gick inte att spara ytdlp oauth2 tokendata på grund av:  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:91
 msgid "Loading YouTube TV OAuth2 token data."
-msgstr ""
+msgstr "Laddar YouTube TV OAuth2-tokendata."
 
 #: musicbot/ytdlp_oauth2_plugin.py:101
 #, python-format
@@ -3523,7 +3528,7 @@ msgstr "Det gick inte att ladda ytdlp oauth2 token data på grund av:  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:109
 msgid "Storing YouTube TV OAuth2 token data"
-msgstr ""
+msgstr "Lagra YouTube TV OAuth2 token data"
 
 #: musicbot/ytdlp_oauth2_plugin.py:139
 msgid "Invalid cached OAuth2 token data."
@@ -3535,11 +3540,11 @@ msgstr "Åtkomsttoken har löpt ut, uppdateras"
 
 #: musicbot/ytdlp_oauth2_plugin.py:175
 msgid "YouTube cookies have been provided, but OAuth2 is being used. If you encounter problems, stop providing YouTube cookies to yt-dlp."
-msgstr ""
+msgstr "YouTube-cookies har tillhandahållits, men OAuth2 används. Om du stöter på problem, sluta tillhandahålla YouTube-cookies till yt-dlp."
 
 #: musicbot/ytdlp_oauth2_plugin.py:193
 msgid "Refreshing YouTube TV oauth2 token..."
-msgstr ""
+msgstr "Uppdaterar YouTube TV oauth2 token..."
 
 #: musicbot/ytdlp_oauth2_plugin.py:211
 #, python-format
@@ -3624,7 +3629,7 @@ msgstr "PIP misslyckades vid anrop av underprocess."
 
 #: run.py:229
 msgid "PIP failed due to Permission Error."
-msgstr ""
+msgstr "PIP misslyckades på grund av behörighetsfel."
 
 #: run.py:233
 #, python-format
