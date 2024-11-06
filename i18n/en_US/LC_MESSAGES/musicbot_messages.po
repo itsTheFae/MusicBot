@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:18\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -650,8 +650,8 @@ msgstr "That video cannot be played. Try using the stream command."
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
-msgstr "Youtube search returned no results for:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
+msgstr ""
 
 #: musicbot/bot.py:4249
 #, python-format
@@ -1633,10 +1633,9 @@ msgstr "Permissions reloaded from file successfully!"
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
-msgstr "Unable to reload Permissions due to an errror:\n"
-"%(raw_error)s"
+msgstr ""
 
 #: musicbot/bot.py:6558
 #, python-format
