@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 06:34-0800\n"
-"PO-Revision-Date: 2024-11-06 15:17\n"
+"PO-Revision-Date: 2024-11-06 18:14\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -22,7 +22,7 @@ msgid "Aliases file not found, copying example_aliases.json"
 msgstr "Alias-fil hittades inte, kopierar exempel_aliases.json"
 
 #: musicbot/aliases.py:56
-msgid "Error while loading alises.\n\n"
+msgid "Error while loading aliases.\n\n"
 "Problem:\n"
 "  Your aliases files (aliases.json & example_aliases.json) are missing.\n\n"
 "Solution:\n"
@@ -426,7 +426,7 @@ msgid "Guild (%(guild)s) wants a player, optional:  %(player)r"
 msgstr "Guild (%(guild)s) vill ha en spelare, frivillig:  %(player)r"
 
 #: musicbot/bot.py:964
-msgid "[BUG] MusicPlayer is missing a VoiceClient some how.  You should probably restart the bot."
+msgid "[BUG] MusicPlayer is missing a VoiceClient somehow.  You should probably restart the bot."
 msgstr "[BUG] MusicPlayer saknar en VoiceClient lite hur. Du bör förmodligen starta om boten."
 
 #: musicbot/bot.py:969
