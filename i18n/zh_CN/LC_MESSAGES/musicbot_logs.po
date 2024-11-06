@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
-"PO-Revision-Date: 2024-11-06 19:17\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
+"PO-Revision-Date: 2024-11-06 20:44\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -2218,7 +2218,7 @@ msgid "Validating options with service data..."
 msgstr "正在通过服务数据验证选项..."
 
 #: musicbot/config.py:1240
-msgid "Acquired owner id via API"
+msgid "Acquired owner ID via API"
 msgstr "通过 API 获得所有者ID"
 
 #: musicbot/config.py:1244
@@ -2398,7 +2398,7 @@ msgstr "无法从文件加载块列表：  %s"
 
 #: musicbot/config.py:2610 musicbot/config.py:2643
 #, python-format
-msgid "Could not update the blocklist file:  %s"
+msgid "Could not update the block list file:  %s"
 msgstr "无法更新块列表文件：  %s"
 
 #: musicbot/config.py:2670
@@ -2975,8 +2975,8 @@ msgstr "为所有者权限组设置自动“所有者ID”。"
 
 #: musicbot/permissions.py:238
 #, python-format
-msgid "Updating group in permssions file:  %s"
-msgstr "正在更新许可文件中的组:  %s"
+msgid "Updating group in permissions file:  %s"
+msgstr "正在更新权限文件中的组:  %s"
 
 #: musicbot/permissions.py:244
 #, python-format
@@ -3136,13 +3136,13 @@ msgid "Error while trying to delete file."
 msgstr "删除文件时出错。"
 
 #: musicbot/player.py:521
-msgid "[Config:SaveVideos] Could not delete file, giving up and moving on"
-msgstr "[Config:SaveVideos] 无法删除文件，放弃和移动"
+msgid "Could not delete file, giving up and moving on"
+msgstr "无法删除文件，放弃并移动"
 
 #: musicbot/player.py:583
 #, python-format
-msgid "Deserialize returned a non-MusicPlayer:  %s"
-msgstr "反序列化返回了一个非音乐播放器：  %s"
+msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
+msgstr "反序列化返回的对象不是 MusicPlayer:  %s"
 
 #: musicbot/player.py:588
 msgid "Failed to deserialize player"
@@ -3347,8 +3347,8 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr ""
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr "无法从 Spotify 获取访客令牌，请尝试指定客户端ID和客户端密钥"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
+msgstr "无法从 Spotify 获取访客令牌，请尝试指定客户端 ID 和客户端密钥"
 
 #: musicbot/spotify.py:679
 msgid "Created a new Guest Mode access token."
