@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 06:34-0800\n"
-"PO-Revision-Date: 2024-11-06 15:16\n"
+"PO-Revision-Date: 2024-11-06 15:49\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -661,7 +661,7 @@ msgstr "No se pudo enviar el mensaje privado, enviando en su lugar un canal de r
 #: musicbot/bot.py:1884
 #, python-format
 msgid "Rate limited send message, retrying in %s seconds."
-msgstr ""
+msgstr "Velocidad de envío de mensajes limitada, reintentando en %s segundos."
 
 #: musicbot/bot.py:1890
 #, python-format
@@ -693,7 +693,7 @@ msgstr "No se puede eliminar el mensaje \"%s\", mensaje no encontrado"
 #: musicbot/bot.py:1955
 #, python-format
 msgid "Rate limited message delete, retrying in %s seconds."
-msgstr ""
+msgstr "Eliminación de mensajes con tasa limitada, reintentando en %s segundos."
 
 #: musicbot/bot.py:1960
 msgid "Rate limited message delete, but cannot retry!"
@@ -766,7 +766,13 @@ msgid "Failed Discord API Login!\n\n"
 "Solution:\n"
 "  Make sure you have the correct Token set in your config.\n"
 "  Check API status at the official site: discordstatus.com"
-msgstr ""
+msgstr "Error al iniciar sesión en la API de Discord.\n\n"
+"Problema:\n"
+"  MusicBot no pudo iniciar sesión en la API de Discord.\n"
+"  Es posible que tu token sea incorrecto o que haya una interrupción en la API.\n\n"
+"Solución:\n"
+"  Asegúrate de tener el token correcto configurado en tu configuración.\n"
+"  Comprueba el estado de la API en el sitio oficial: discordstatus.com"
 
 #: musicbot/bot.py:2161
 msgid "Waiting for download threads to finish up..."
@@ -870,7 +876,10 @@ msgid "To make the bot join a guild, paste this link in your browser. \n"
 "Note: You should be logged into your main account and have \n"
 "manage server permissions on the guild you want the bot to join.\n"
 "  %s"
-msgstr ""
+msgstr "Para que el bot se una a un gremio, pega este enlace en tu navegador.\n"
+"Nota: Debes iniciar sesión en tu cuenta principal y tener\n"
+"permisos de administración del servidor en el gremio al que quieres que se una el bot.\n"
+"%s"
 
 #: musicbot/bot.py:2370
 #, python-format
@@ -929,7 +938,15 @@ msgid "Detected missing config options!\n\n"
 "Solution:\n"
 "  Copy new options from the example options file.\n"
 "  Or use the config command to set and save them.\n\n"
-msgstr ""
+msgstr "¡Se detectaron opciones de configuración faltantes!\n\n"
+"Problema:\n"
+"  A su archivo de opciones de configuración le faltan algunas opciones.\n"
+"  Se utilizarán las configuraciones predeterminadas para estas opciones.\n"
+"  A continuación, se incluye una lista de opciones que no encontramos:\n"
+"  %(missing)s\n\n"
+"Solución:\n"
+"  Copie las opciones nuevas del archivo de opciones de ejemplo.\n"
+"  O utilice el comando config para configurarlas y guardarlas.\n\n"
 
 #: musicbot/bot.py:2504
 #, python-format
@@ -1493,7 +1510,7 @@ msgstr "No se ha encontrado nada en la cola del usuario `%(user)s`"
 #: musicbot/bot.py:5079 musicbot/bot.py:5114
 msgid "You do not have the permission to remove that entry from the queue.\n"
 "You must be the one who queued it or have instant skip permissions."
-msgstr ""
+msgstr "No tienes permiso para eliminar esa entrada de la cola. Debes ser tú quien la puso en cola o tener permisos de omisión instantánea."
 
 #: musicbot/bot.py:5090 musicbot/bot.py:5095
 msgid "Invalid entry number. Use the queue command to find queue positions."
@@ -2192,7 +2209,16 @@ msgid "Error while reading config.\n\n"
 "  Each [Section] must appear only once, with no other text on the same line.\n"
 "  Each section must have at least one option.\n"
 "  Use the example options as a template or copy it from the repository."
-msgstr ""
+msgstr "Error al leer la configuración.\n\n"
+"Problema:\n"
+"  Faltan una o más secciones de opciones de configuración requeridas.\n"
+"  Las secciones que faltan son:\n"
+"  %(sections)s\n\n"
+"Solución:\n"
+"  Repare el archivo de opciones de configuración.\n"
+"  Cada [Sección] debe aparecer solo una vez, sin ningún otro texto en la misma línea.\n"
+"  Cada sección debe tener al menos una opción.\n"
+"  Use las opciones de ejemplo como plantilla o cópielas del repositorio."
 
 #: musicbot/config.py:1113
 #, python-format
@@ -2227,7 +2253,12 @@ msgid "Error while validating config options.\n\n"
 "  %(raw_error)s\n\n"
 "Solution:\n"
 "  Double check the setting is a valid, accessible directory path."
-msgstr ""
+msgstr "Error al validar las opciones de configuración.\n\n"
+"Problema:\n"
+"  No se pudo configurar la opción de configuración AudioCachePath debido a un error:\n"
+"  %(raw_error)s\n\n"
+"Solución:\n"
+"  Verifique nuevamente que la configuración sea una ruta de directorio válida y accesible."
 
 #: musicbot/config.py:1165
 #, python-format
@@ -2262,7 +2293,10 @@ msgid "Cookies TXT file detected. MusicBot will pass them to yt-dlp.\n"
 "Copying cookies from your web-browser risks exposing personal data and \n"
 "in the best case can result in your accounts being banned!\n\n"
 "You have been warned!  Good Luck!  \\U0001F596\n"
-msgstr ""
+msgstr "Se detectó un archivo TXT con cookies. MusicBot se los pasará a yt-dlp.\n"
+"No se recomiendan las cookies, es posible que no sean compatibles y pueden romperse por completo.\n"
+"Copiar cookies de su navegador web corre el riesgo de exponer datos personales y, en el mejor de los casos, puede provocar que se bloqueen sus cuentas.\n\n"
+"¡Ha sido advertido! ¡Buena suerte! \\U0001F596\n"
 
 #: musicbot/config.py:1234
 msgid "Validating options with service data..."
@@ -2279,7 +2313,12 @@ msgid "Error while fetching OwnerID automatically.\n\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
 "  Manually set the OwnerID config option or try again later."
-msgstr ""
+msgstr "Error al obtener 'OwnerID' automáticamente.\n\n"
+"Problema:\n"
+"  La información de la aplicación Discord no está disponible.\n"
+"  Esto podría deberse a una interrupción temporal de la API o a un error.\n\n"
+"Solución:\n"
+"  Establezca manualmente la opción de configuración 'OwnerID' o vuelva a intentarlo más tarde."
 
 #: musicbot/config.py:1256
 msgid "MusicBot does not have a user instance, cannot proceed."
@@ -2291,7 +2330,11 @@ msgid "Error validating config options.\n\n"
 "  The OwnerID config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
 "  Do not use the Bot or App ID in the OwnerID field."
-msgstr ""
+msgstr "Error al validar las opciones de configuración.\n\n"
+"Problema:\n"
+"  La configuración del Propietario es la misma que tu ID de Bot / App.\n\n"
+"Solución:\n"
+"  No utilice el Bot o el ID de la aplicación en el campo OwnerID."
 
 #: musicbot/config.py:1286
 msgid "Config options file not found. Checking for alternatives..."
@@ -2324,7 +2367,12 @@ msgid "Error locating config.\n\n"
 "  %(raw_error)s\n\n"
 "Solution:\n"
 "  Verify the config folder and files exist and can be read by MusicBot."
-msgstr ""
+msgstr "Error al localizar la configuración.\n\n"
+"Problema:\n"
+"  No se pudo encontrar ni crear un archivo de configuración debido a un error:\n"
+"  %(raw_error)s\n\n"
+"Solución:\n"
+"  Verifique que la carpeta y los archivos de configuración existan y que MusicBot pueda leerlos."
 
 #: musicbot/config.py:1345
 #, python-format
@@ -2335,7 +2383,13 @@ msgid "Error loading config.\n\n"
 "Solution:\n"
 "  Make sure the file is accessible and error free.\n"
 "  Copy the example file from the repo if all else fails."
-msgstr ""
+msgstr "Error al cargar la configuración.\n\n"
+"Problema:\n"
+"  MusicBot no pudo leer el archivo de configuración debido a un error:\n"
+"  %(raw_error)s\n\n"
+"Solución:\n"
+"  Asegúrese de que el archivo sea accesible y no tenga errores.\n"
+"  Copie el archivo de ejemplo del repositorio si todo lo demás falla."
 
 #: musicbot/config.py:1369
 msgid "Dev Bug! Config option has getter that is not available."
@@ -2526,7 +2580,11 @@ msgid "Original OAuth2 plugin is installed and will be used instead.\n"
 "To close MusicBot, you must manually Kill the MusicBot process!\n"
 "Yt-dlp is being set to show warnings and other log messages, to show the Auth code.\n"
 "Uninstall the yt-dlp-youtube-oauth2 package to use integrated OAuth2 features instead."
-msgstr ""
+msgstr "El complemento OAuth2 original está instalado y se utilizará en su lugar.\n"
+"Esto puede provocar que MusicBot no se cierre por completo o que se quede colgado a la espera de la autorización.\n"
+"Para cerrar MusicBot, debes eliminar manualmente el proceso de MusicBot.\n"
+"Yt-dlp se está configurando para mostrar advertencias y otros mensajes de registro, para mostrar el código de autenticación.\n"
+"Desinstala el paquete yt-dlp-youtube-oauth2 para utilizar las funciones integradas de OAuth2 en su lugar."
 
 #: musicbot/downloader.py:232
 msgid "HEAD seems to have no headers..."
@@ -3304,7 +3362,7 @@ msgstr "Artículo: %s"
 #: musicbot/playlist.py:346
 #, python-format
 msgid "Skipped %s bad entries"
-msgstr ""
+msgstr "Se omitieron %s entradas incorrectas"
 
 #: musicbot/playlist.py:387
 msgid "Reorder looping over entries."
@@ -3524,7 +3582,12 @@ msgid "\n"
 "  %s\n"
 "Then enter this authorization code:  %s\n"
 "You have %s seconds to complete authorization.\n"
-msgstr ""
+msgstr "\n"
+"AVISO:\n"
+"Para dar acceso a yt-dlp a su cuenta, visite:\n"
+"  %s\n"
+"Luego ingrese este código de autorización: %s\n"
+"Tiene %s segundos para completar la autorización.\n"
 
 #: musicbot/ytdlp_oauth2_plugin.py:260
 msgid "The application may hang until authorization time out if closed at this point. This is normal."
@@ -3727,7 +3790,8 @@ msgstr "MusicBot no pudo encontrar el binario FFmpeg en su entorno.\n"
 #: run.py:535
 msgid "On Windows, you can add a pre-compiled EXE to the MusicBot `bin` folder,\n"
 "or you can install FFmpeg system-wide using WinGet or by running the install.bat file."
-msgstr ""
+msgstr "En Windows, puede añadir un EXE precompilado a la carpeta `bin` de MusicBot,\n"
+"o puede instalar FFmpeg en todo el sistema usando WinGet o ejecutando la instalación. en archivo."
 
 #: run.py:540
 msgid "On MacOS, you may be able to install FFmpeg via homebrew.\n"
@@ -3749,7 +3813,8 @@ msgstr "Menos de %sMB de espacio libre en este dispositivo"
 #: run.py:567
 msgid "\n"
 "Checking for updates to MusicBot or dependencies..."
-msgstr ""
+msgstr "\n"
+"Buscando actualizaciones para MusicBot o dependencias..."
 
 #: run.py:584
 msgid "No MusicBot updates available via `git` command."
@@ -3911,7 +3976,8 @@ msgstr "¡No puedes iniciar el bot! Has iniciado `run.py` en el directorio equiv
 #: run.py:965
 msgid "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
 "If you did not use git to clone the repository, you are strongly urged to."
-msgstr ""
+msgstr "Para obtener mejores resultados, inicie `run.py` desde la misma carpeta en la que clonó MusicBot.\n"
+"Si no utilizó git para clonar el repositorio, se le recomienda encarecidamente que lo haga."
 
 #: run.py:1019
 msgid "Certificate error is not a verification error, not trying certifi and exiting."
@@ -3971,7 +4037,18 @@ msgid "MusicBot dependencies may not be installed!\n\n"
 "    %(py_bin)s -m pip install -U -r ./requirements.txt\n\n"
 "You can also ask for help in MusicBot's support discord:\n"
 "  https://discord.gg/bots"
-msgstr ""
+msgstr "¡Es posible que las dependencias de MusicBot no estén instaladas!\n\n"
+"Problema:\n"
+"  El proceso de instalación de pip finalizó con un posible error.\n"
+"  Es posible que falten algunas o todas las dependencias.\n\n"
+"Solución:\n"
+"  Debe instalar manualmente los paquetes de dependencia.\n"
+"  Abra un símbolo del sistema o una terminal en el directorio de MusicBot.\n"
+"  Puede intentar usar los paquetes de instalación de scripts de actualización.\n"
+"  O pruebe este comando manual:\n"
+"    %(py_bin)s -m pip install -U -r ./requirements.txt\n\n"
+"También puede solicitar ayuda en el discord de soporte de MusicBot:\n"
+"  https://discord.gg/bots"
 
 #: run.py:1130
 msgid "OK, lets hope installing dependencies worked!"
