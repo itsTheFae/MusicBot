@@ -1088,7 +1088,7 @@ class Config:
                 "  %(sections)s\n"
                 "\n"
                 "Solution:\n"
-                "  Repair your config optoins file.\n"
+                "  Repair your config options file.\n"
                 "  Each [Section] must appear only once, with no other text on the same line.\n"
                 "  Each section must have at least one option.\n"
                 "  Use the example options as a template or copy it from the repository.",

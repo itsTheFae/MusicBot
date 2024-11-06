@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-986-gcfe42c0a\n"
+"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-996-g9b806fb4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 08:15-0800\n"
+"POT-Creation-Date: 2024-11-06 06:34-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2188,7 +2188,7 @@ msgid ""
 "  %(sections)s\n"
 "\n"
 "Solution:\n"
-"  Repair your config optoins file.\n"
+"  Repair your config options file.\n"
 "  Each [Section] must appear only once, with no other text on the same line.\n"
 "  Each section must have at least one option.\n"
 "  Use the example options as a template or copy it from the repository."
@@ -3002,21 +3002,21 @@ msgstr ""
 msgid "Could not grab data from JSON key: %s"
 msgstr ""
 
-#: musicbot/logs.py:158
+#: musicbot/logs.py:124
 msgid "Skipping logger setup, already set up"
 msgstr ""
 
-#: musicbot/logs.py:314
+#: musicbot/logs.py:276
 #, python-format
 msgid "Log level was previously set via override to: %s"
 msgstr ""
 
-#: musicbot/logs.py:323
+#: musicbot/logs.py:285
 #, python-format
 msgid "Changing log level to:  %s"
 msgstr ""
 
-#: musicbot/logs.py:352
+#: musicbot/logs.py:314
 msgid "MusicBot loggers have been called to shutdown."
 msgstr ""
 
@@ -3458,15 +3458,15 @@ msgstr ""
 msgid "Failed to get Guest Token due to: %(raw_error)s"
 msgstr ""
 
-#: musicbot/utils.py:175
+#: musicbot/utils.py:174
 msgid "Only the owner can use this command."
 msgstr ""
 
-#: musicbot/utils.py:195
+#: musicbot/utils.py:194
 msgid "Only dev users can use this command."
 msgstr ""
 
-#: musicbot/utils.py:281 musicbot/utils.py:323
+#: musicbot/utils.py:280 musicbot/utils.py:322
 msgid "Cannot count members when voice_channel is None."
 msgstr ""
 
@@ -3889,72 +3889,72 @@ msgstr ""
 msgid "Override the default date format used when rotating log files. This should contain values compatible with strftime().  (Default:  '%s')"
 msgstr ""
 
-#: run.py:798
+#: run.py:799
 #, python-format
 msgid "Version:  %s"
 msgstr ""
 
-#: run.py:873
+#: run.py:874
 msgid "Opened a new MusicBot instance. This terminal can be safely closed!"
-msgstr ""
-
-#: run.py:944
-#, python-format
-msgid "Loading MusicBot version:  %s"
 msgstr ""
 
 #: run.py:945
 #, python-format
-msgid "Log opened:  %s"
+msgid "Loading MusicBot version:  %s"
 msgstr ""
 
 #: run.py:946
 #, python-format
+msgid "Log opened:  %s"
+msgstr ""
+
+#: run.py:947
+#, python-format
 msgid "Python version:  %s"
 msgstr ""
 
-#: run.py:955
+#: run.py:956
 #, python-format
 msgid "Changing working directory to:  %s"
 msgstr ""
 
-#: run.py:959
+#: run.py:960
 msgid "Cannot start the bot!  You started `run.py` in the wrong directory and we could not locate `musicbot` and `.git` folders to verify a new directory location."
 msgstr ""
 
-#: run.py:964
+#: run.py:965
 msgid ""
 "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
 "If you did not use git to clone the repository, you are strongly urged to."
 msgstr ""
 
-#: run.py:1018
+#: run.py:1019
 msgid "Certificate error is not a verification error, not trying certifi and exiting."
 msgstr ""
 
-#: run.py:1020
+#: run.py:1021
 msgid "Here is the exact error, it could be a bug."
 msgstr ""
 
-#: run.py:1036
+#: run.py:1037
 msgid ""
 "To easily add a certificate to Windows trust store, \n"
 "you can open the failing site in Microsoft Edge or IE...\n"
 msgstr ""
 
-#: run.py:1042
+#: run.py:1043
 msgid "Could not get Issuer Certificate from default trust store, trying certifi instead."
 msgstr ""
 
-#: run.py:1051
+#: run.py:1052
 msgid "Syntax error (modification detected, did you edit the code?)"
 msgstr ""
 
-#: run.py:1054
+#: run.py:1055
 msgid "Syntax error (this is a bug, not your fault)"
 msgstr ""
 
-#: run.py:1066
+#: run.py:1067
 msgid ""
 "Cannot start MusicBot due to an error!\n"
 "\n"
@@ -3966,11 +3966,11 @@ msgid ""
 "  or launch without `--no-install-deps` and MusicBot will try to install them for you."
 msgstr ""
 
-#: run.py:1099
+#: run.py:1100
 msgid "Attempting to install MusicBot dependency packages automatically...\n"
 msgstr ""
 
-#: run.py:1108
+#: run.py:1109
 #, python-format
 msgid ""
 "MusicBot dependencies may not be installed!\n"
@@ -3990,43 +3990,43 @@ msgid ""
 "  https://discord.gg/bots"
 msgstr ""
 
-#: run.py:1129
+#: run.py:1130
 msgid "OK, lets hope installing dependencies worked!"
 msgstr ""
 
-#: run.py:1141
+#: run.py:1142
 msgid "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
 msgstr ""
 
-#: run.py:1143
+#: run.py:1144
 msgid "The exception which caused the above error: "
 msgstr ""
 
-#: run.py:1159
+#: run.py:1160
 msgid "MusicBot is doing a soft restart..."
 msgstr ""
 
-#: run.py:1163
+#: run.py:1164
 msgid "MusicBot is doing a full process restart..."
 msgstr ""
 
-#: run.py:1169
+#: run.py:1170
 msgid "Error starting bot"
 msgstr ""
 
-#: run.py:1174
+#: run.py:1175
 msgid "Closing event loop."
 msgstr ""
 
-#: run.py:1179
+#: run.py:1180
 #, python-format
 msgid "Restarting in %s seconds..."
 msgstr ""
 
-#: run.py:1183
+#: run.py:1184
 msgid "All done."
 msgstr ""
 
-#: run.py:1212
+#: run.py:1213
 msgid "OK, we're closing!"
 msgstr ""

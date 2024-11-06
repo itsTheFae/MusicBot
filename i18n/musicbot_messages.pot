@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-986-gcfe42c0a\n"
+"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-996-g9b806fb4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 08:15-0800\n"
+"POT-Creation-Date: 2024-11-06 06:34-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2704,7 +2704,7 @@ msgid ""
 "  %(sections)s\n"
 "\n"
 "Solution:\n"
-"  Repair your config optoins file.\n"
+"  Repair your config options file.\n"
 "  Each [Section] must appear only once, with no other text on the same line.\n"
 "  Each section must have at least one option.\n"
 "  Use the example options as a template or copy it from the repository."
@@ -3069,10 +3069,10 @@ msgstr ""
 msgid "API response status is not OK: [%(status)s]  %(reason)s"
 msgstr ""
 
-#: musicbot/utils.py:175
+#: musicbot/utils.py:174
 msgid "Only the owner can use this command."
 msgstr ""
 
-#: musicbot/utils.py:195
+#: musicbot/utils.py:194
 msgid "Only dev users can use this command."
 msgstr ""
