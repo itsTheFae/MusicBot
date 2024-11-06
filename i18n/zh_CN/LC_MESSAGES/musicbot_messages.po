@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-04 08:15-0800\n"
-"PO-Revision-Date: 2024-11-06 14:31\n"
+"POT-Creation-Date: 2024-11-06 06:34-0800\n"
+"PO-Revision-Date: 2024-11-06 15:17\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -24,15 +24,20 @@ msgid "Error while loading alises.\n\n"
 "Solution:\n"
 "  Replace the alias config file(s) or copy them from:\n"
 "    https://github.com/Just-Some-Bots/MusicBot/"
-msgstr ""
+msgstr "加载alises时出错。\n\n"
+"问题：\n"
+"  您的别名文件 (aliases.json & example_aliases.json) 丢失。\n\n"
+"解决方案：\n"
+"  替换别名配置文件或复制它们：\n"
+"    https://github.com/Just-Some-Bots/MusicBot/"
 
 #: musicbot/bot.py:713
 msgid "Member is not voice-enabled and cannot use this command."
-msgstr ""
+msgstr "会员没有语音功能，无法使用此命令。"
 
 #: musicbot/bot.py:721
 msgid "You cannot use this command when not in the voice channel."
-msgstr ""
+msgstr "您不能在语音频道中使用此命令。"
 
 #: musicbot/bot.py:764
 #, python-format
@@ -47,28 +52,30 @@ msgstr ""
 #: musicbot/bot.py:806
 msgid "MusicBot could not connect to the channel.\n"
 "Try again later, or restart the bot if this continues."
-msgstr ""
+msgstr "MusicBot 无法连接到频道。\n"
+"请稍后再尝试，如果继续，请重启机器人。"
 
 #: musicbot/bot.py:830
 msgid "MusicBot connection to voice was cancelled. This is odd. Maybe restart?"
-msgstr ""
+msgstr "MusicBot 与语音的连接已取消。这是奇异的。可能要重新启动吗？"
 
 #: musicbot/bot.py:840
 msgid "MusicBot does not have permission to speak."
-msgstr ""
+msgstr "MusicBot 没有发言权限。"
 
 #: musicbot/bot.py:844
 msgid "MusicBot could not request to speak."
-msgstr ""
+msgstr "MusicBot 无法请求发言。"
 
 #: musicbot/bot.py:1016
 msgid "The bot is not in a voice channel.\n"
 "Use the summon command to bring the bot to your voice channel."
-msgstr ""
+msgstr "机器人不在语音频道。\n"
+"使用召唤命令将机器人带到您的语音频道。"
 
 #: musicbot/bot.py:1028
 msgid "Something is wrong, we didn't get the VoiceClient."
-msgstr ""
+msgstr "出错了，我们没有得到语音客户端。"
 
 #: musicbot/bot.py:1084
 #, python-format
@@ -104,7 +111,7 @@ msgstr ""
 
 #: musicbot/bot.py:1807
 msgid "[Dev Bug] Tried sending an invalid response object."
-msgstr ""
+msgstr "[Dev Bug ] 试图发送无效的响应对象。"
 
 #: musicbot/bot.py:2147
 msgid "Failed Discord API Login!\n\n"
@@ -124,19 +131,20 @@ msgstr ""
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
 "This command will be removed in a future version, replaced by the autoplaylist command(s)."
-msgstr ""
+msgstr "重置自动播放列表队列，将其复制到玩家内存中。\n"
+"此命令将在未来版本中被删除，替换为自动布局命令(s)。"
 
 #: musicbot/bot.py:2846
 msgid "\\N{OK HAND SIGN}"
-msgstr ""
+msgstr "\\N{OK HAND SIGN}"
 
 #: musicbot/bot.py:2853
 msgid "Show usage and description of a command, or list all available commands.\n"
-msgstr ""
+msgstr "显示命令的使用情况和描述，或列出所有可用的命令。\n"
 
 #: musicbot/bot.py:2888
 msgid "**Aliases for this command:**\n"
-msgstr ""
+msgstr "**此命令的别名：**\n"
 
 #: musicbot/bot.py:2891
 #, python-format
@@ -159,7 +167,7 @@ msgstr ""
 
 #: musicbot/bot.py:2940
 msgid "No such command"
-msgstr ""
+msgstr "没有这种命令"
 
 #: musicbot/bot.py:2959
 #, python-format
@@ -180,15 +188,15 @@ msgstr ""
 
 #: musicbot/bot.py:2984
 msgid "    Block a mentioned user."
-msgstr ""
+msgstr "    屏蔽提及的用户。"
 
 #: musicbot/bot.py:2987
 msgid "    Unblock a mentioned user."
-msgstr ""
+msgstr "    取消屏蔽提及的用户。"
 
 #: musicbot/bot.py:2990
 msgid "    Show the block status of a mentioned user."
-msgstr ""
+msgstr "    显示提及用户的方块状态。"
 
 #: musicbot/bot.py:2994
 msgid "Manage the users in the user block list.\n"
@@ -197,31 +205,31 @@ msgstr ""
 
 #: musicbot/bot.py:3016
 msgid "You must mention a user or provide their ID number."
-msgstr ""
+msgstr "您必须提及用户或提供他们的身份号码。"
 
 #: musicbot/bot.py:3021
 msgid "Invalid sub-command given. Use `help blockuser` for usage examples."
-msgstr ""
+msgstr "给定的子命令无效。使用 \"help blockuser\" 作为使用示例。"
 
 #: musicbot/bot.py:3032
 msgid "MusicBot could not find the user(s) you specified."
-msgstr ""
+msgstr "MusicBot 无法找到您指定的用户。"
 
 #: musicbot/bot.py:3039
 msgid "The owner cannot be added to the block list."
-msgstr ""
+msgstr "所有者不能添加到方块列表。"
 
 #: musicbot/bot.py:3059
 msgid "User block list is currently enabled."
-msgstr ""
+msgstr "用户块列表当前已启用。"
 
 #: musicbot/bot.py:3061
 msgid "User block list is currently disabled."
-msgstr ""
+msgstr "用户块列表目前已禁用。"
 
 #: musicbot/bot.py:3069
 msgid "Cannot add the users you listed, they are already added."
-msgstr ""
+msgstr "无法添加您列出的用户，他们已经被添加。"
 
 #: musicbot/bot.py:3078
 #, python-format
@@ -231,7 +239,7 @@ msgstr ""
 
 #: musicbot/bot.py:3089
 msgid "None of those users are in the blacklist."
-msgstr ""
+msgstr "这些用户中没有一个在黑名单上。"
 
 #: musicbot/bot.py:3094
 #, python-format
@@ -266,11 +274,11 @@ msgstr ""
 
 #: musicbot/bot.py:3146
 msgid "You must provide a song subject if no song is currently playing."
-msgstr ""
+msgstr "如果没有歌曲正在播放，您必须提供一个歌曲主题。"
 
 #: musicbot/bot.py:3152
 msgid "Ivalid sub-command given. Use `help blocksong` for usage examples."
-msgstr ""
+msgstr "给出有效的子命令。使用 \"help blocksong\" 作为使用示例。"
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -285,7 +293,7 @@ msgstr ""
 
 #: musicbot/bot.py:3196
 msgid "The subject is not in the song block list and cannot be removed."
-msgstr ""
+msgstr "主题不在歌曲块列表中，无法删除。"
 
 #: musicbot/bot.py:3204
 #, python-format
@@ -295,48 +303,48 @@ msgstr ""
 
 #: musicbot/bot.py:3214
 msgid "    Adds or removes the specified song or currently playing song to/from the current playlist.\n"
-msgstr ""
+msgstr "    添加或删除指定的歌曲或正在播放的歌曲到当前播放列表中。\n"
 
 #: musicbot/bot.py:3217
 msgid "    Adds the entire queue to the guilds playlist.\n"
-msgstr ""
+msgstr "    将整个队列添加到公会播放列表。\n"
 
 #: musicbot/bot.py:3220
 msgid "    Show a list of existing playlist files.\n"
-msgstr ""
+msgstr "    显示现有播放列表文件列表。\n"
 
 #: musicbot/bot.py:3223
 msgid "    Reset the auto playlist queue, restarting at the first track unless randomized.\n"
-msgstr ""
+msgstr "    重置自动播放列表队列，除非随机重启。\n"
 
 #: musicbot/bot.py:3226
 msgid "    Set a playlist as default for this guild and reloads the guild auto playlist.\n"
-msgstr ""
+msgstr "    设置这个公会的默认播放列表并重新加载公会自动播放列表。\n"
 
 #: musicbot/bot.py:3229
 msgid "Manage auto playlist files and per-guild settings."
-msgstr ""
+msgstr "管理自动播放列表文件和每个公会设置。"
 
 #: musicbot/bot.py:3249
 msgid "Invalid sub-command given. Use `help autoplaylist` for usage examples."
-msgstr ""
+msgstr "给定的子命令无效。使用 \"help autoplaylist\" 作为使用示例。"
 
 #: musicbot/bot.py:3256
 msgid "The supplied song link is invalid"
-msgstr ""
+msgstr "提供的歌曲链接无效"
 
 #: musicbot/bot.py:3262
 msgid "The queue is empty. Add some songs with a play command!"
-msgstr ""
+msgstr "队列为空。用播放命令添加一些歌曲！"
 
 #: musicbot/bot.py:3273
 msgid "All songs in the queue are already in the autoplaylist."
-msgstr ""
+msgstr "队列中的所有歌曲已经在自动播放列表中。"
 
 #: musicbot/bot.py:3277
 #, python-format
 msgid "Added %(number)d songs to the autoplaylist."
-msgstr ""
+msgstr "%(number)d 首歌曲添加到自动布局列表。"
 
 #: musicbot/bot.py:3287
 #, python-format
@@ -345,7 +353,7 @@ msgstr ""
 
 #: musicbot/bot.py:3290
 msgid "This song is already in the autoplaylist."
-msgstr ""
+msgstr "这首歌已经在自动播放列表中。"
 
 #: musicbot/bot.py:3304
 #, python-format
@@ -354,7 +362,7 @@ msgstr ""
 
 #: musicbot/bot.py:3307
 msgid "This song is not yet in the autoplaylist."
-msgstr ""
+msgstr "这首歌尚未在自动播放列表中。"
 
 #: musicbot/bot.py:3316
 #, python-format
@@ -369,12 +377,13 @@ msgstr ""
 
 #: musicbot/bot.py:3337
 msgid "You must provide a playlist filename."
-msgstr ""
+msgstr "您必须提供一个播放列表文件名。"
 
 #: musicbot/bot.py:3357
 msgid "\n"
 "This playlist is new, you must add songs to save it to disk!"
-msgstr ""
+msgstr "\n"
+"此播放列表是新的，您必须添加歌曲才能保存到磁盘！"
 
 #: musicbot/bot.py:3362
 #, python-format
@@ -383,7 +392,7 @@ msgstr ""
 
 #: musicbot/bot.py:3373
 msgid "Generate an invite link that can be used to add this bot to another server."
-msgstr ""
+msgstr "生成一个可用于将此机器人添加到另一个服务器的邀请链接。"
 
 #: musicbot/bot.py:3385
 #, python-format
@@ -398,15 +407,15 @@ msgstr ""
 
 #: musicbot/bot.py:3403
 msgid "\\N{OK HAND SIGN} Karaoke mode is now enabled."
-msgstr ""
+msgstr "\\N{OK HAND SIGN} Karaoke模式已启用。"
 
 #: musicbot/bot.py:3405
 msgid "\\N{OK HAND SIGN} Karaoke mode is now disabled."
-msgstr ""
+msgstr "\\N{OK HAND SIGN} Karaoke模式现已禁用。"
 
 #: musicbot/bot.py:3428
 msgid "You are not allowed to request playlists"
-msgstr ""
+msgstr "您无权请求播放列表"
 
 #: musicbot/bot.py:3436
 #, python-format
@@ -422,7 +431,7 @@ msgstr ""
 
 #: musicbot/bot.py:3580
 msgid "Bot was previously paused, resuming playback now."
-msgstr ""
+msgstr "帐号先前已暂停，现在恢复播放。"
 
 #: musicbot/bot.py:3589
 msgid "Add a song to be played in the queue. If no song is playing or paused, playback will be started.\n\n"
@@ -460,19 +469,19 @@ msgstr ""
 
 #: musicbot/bot.py:3764
 msgid "Cannot use seek if there is nothing playing."
-msgstr ""
+msgstr "如果没有播放，无法使用寻找。"
 
 #: musicbot/bot.py:3769
 msgid "Cannot use seek on current track, it has an unknown duration."
-msgstr ""
+msgstr "无法在当前轨道上使用寻找，它有未知的持续时间。"
 
 #: musicbot/bot.py:3775
 msgid "Seeking is not supported for streams."
-msgstr ""
+msgstr "不支持搜索。"
 
 #: musicbot/bot.py:3785
 msgid "Cannot use seek without a time to position playback."
-msgstr ""
+msgstr "没有时间定位播放，无法使用搜索引擎。"
 
 #: musicbot/bot.py:3803
 #, python-format
@@ -497,47 +506,47 @@ msgstr ""
 
 #: musicbot/bot.py:3870
 msgid "No songs are currently playing. Play something with a play command."
-msgstr ""
+msgstr "目前没有歌曲正在播放。播放一些带有播放命令的歌曲。"
 
 #: musicbot/bot.py:3877
 msgid "Invalid sub-command. Use the command `help repeat` for usage examples."
-msgstr ""
+msgstr "无效的子命令。使用命令“help repat”作为使用示例。"
 
 #: musicbot/bot.py:3883 musicbot/bot.py:3920
 msgid "Playlist is now repeating."
-msgstr ""
+msgstr "播放列表正在重复。"
 
 #: musicbot/bot.py:3886 musicbot/bot.py:3913 musicbot/bot.py:3924
 msgid "Playlist is no longer repeating."
-msgstr ""
+msgstr "播放列表已不再重复。"
 
 #: musicbot/bot.py:3892 musicbot/bot.py:3901
 msgid "Player will now loop the current song."
-msgstr ""
+msgstr "播放器现在将循环当前歌曲。"
 
 #: musicbot/bot.py:3894 musicbot/bot.py:3908
 msgid "Player will no longer loop the current song."
-msgstr ""
+msgstr "播放器将不再循环当前歌曲。"
 
 #: musicbot/bot.py:3898
 msgid "Player is already looping a song!"
-msgstr ""
+msgstr "玩家正在循环一首歌！"
 
 #: musicbot/bot.py:3915
 msgid "The player is not currently looping."
-msgstr ""
+msgstr "玩家目前没有循环中。"
 
 #: musicbot/bot.py:3926
 msgid "Song is no longer repeating."
-msgstr ""
+msgstr "歌曲已不再重复。"
 
 #: musicbot/bot.py:3930
 msgid "Song is now repeating."
-msgstr ""
+msgstr "歌曲现在重复了。"
 
 #: musicbot/bot.py:3938
 msgid "    Move song at position FROM to position TO.\n"
-msgstr ""
+msgstr "    将歌曲放在方位上移动到方形位置，\n"
 
 #: musicbot/bot.py:3942
 msgid "Swap existing songs in the queue using their position numbers.\n"
@@ -546,15 +555,15 @@ msgstr ""
 
 #: musicbot/bot.py:3961
 msgid "There are no songs queued. Play something with a play command."
-msgstr ""
+msgstr "没有播放队列的歌曲。播放一些带有播放命令的歌曲。"
 
 #: musicbot/bot.py:3971
 msgid "Song positions must be integers!"
-msgstr ""
+msgstr "歌曲位置必须是整数！"
 
 #: musicbot/bot.py:3976
 msgid "You gave a position outside the playlist size!"
-msgstr ""
+msgstr "您提供了一个超出播放列表大小的位置！"
 
 #: musicbot/bot.py:3984
 #, python-format
@@ -570,15 +579,15 @@ msgstr ""
 
 #: musicbot/bot.py:4114
 msgid "Local media playback is not enabled."
-msgstr ""
+msgstr "本地媒体播放未启用。"
 
 #: musicbot/bot.py:4155
 msgid "Spotify URL is invalid or not currently supported."
-msgstr ""
+msgstr "Spotify URL 无效或目前不支持。"
 
 #: musicbot/bot.py:4159
 msgid "Detected a spotify URL, but spotify is not enabled."
-msgstr ""
+msgstr "检测到一个变质的 URL，但是变质未启用。"
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -587,7 +596,7 @@ msgstr ""
 
 #: musicbot/bot.py:4175 musicbot/bot.py:4380 musicbot/bot.py:4474
 msgid "Karaoke mode is enabled, please try again when its disabled!"
-msgstr ""
+msgstr "Karaoke模式已启用，请禁用后再试一次！"
 
 #: musicbot/bot.py:4191
 #, python-format
@@ -597,7 +606,7 @@ msgstr ""
 
 #: musicbot/bot.py:4197
 msgid "That video cannot be played. Try using the stream command."
-msgstr ""
+msgstr "无法播放该视频。请尝试使用流命令。"
 
 #: musicbot/bot.py:4208
 #, python-format
@@ -628,7 +637,7 @@ msgstr ""
 
 #: musicbot/bot.py:4297 musicbot/bot.py:4312
 msgid "Playing next!"
-msgstr ""
+msgstr "接下来玩！"
 
 #: musicbot/bot.py:4320
 #, python-format
@@ -655,7 +664,7 @@ msgstr ""
 
 #: musicbot/bot.py:4402
 msgid "Streaming playlists is not yet supported."
-msgstr ""
+msgstr "尚不支持流播放列表。"
 
 #: musicbot/bot.py:4419
 #, python-format
@@ -664,7 +673,7 @@ msgstr ""
 
 #: musicbot/bot.py:4428
 msgid "    Search with service for a number of results with the search query.\n"
-msgstr ""
+msgstr "    通过搜索查询服务搜索一些结果。\n"
 
 #: musicbot/bot.py:4432
 msgid "    Search youtube for query but get a custom number of results.\n"
@@ -678,7 +687,12 @@ msgid "Search a supported service and select from results to add to queue.\n"
 "- yt, youtube (default)\n"
 "- sc, soundcloud\n"
 "- yh, yahoo\n"
-msgstr ""
+msgstr "搜索支持的服务并从结果中选择添加到队列。\n"
+"服务和数字参数可以省略，默认数字为3个结果。\n"
+"从这些服务中选择：\n"
+"- yt, youtube (default)\n"
+"- sc, soundcloud\n"
+"- yh, yahoo\n"
 
 #: musicbot/bot.py:4468
 #, python-format
@@ -687,7 +701,7 @@ msgstr ""
 
 #: musicbot/bot.py:4480
 msgid "Please specify a search query.  Use `help search` for more information."
-msgstr ""
+msgstr "请指定一个搜索查询。使用 \"help search \" 获取更多信息。"
 
 #: musicbot/bot.py:4509
 #, python-format
@@ -696,7 +710,7 @@ msgstr ""
 
 #: musicbot/bot.py:4532
 msgid "Searching for videos..."
-msgstr ""
+msgstr "正在搜索视频..."
 
 #: musicbot/bot.py:4554
 #, python-format
@@ -705,11 +719,11 @@ msgstr ""
 
 #: musicbot/bot.py:4566
 msgid "No videos found."
-msgstr ""
+msgstr "未找到视频。"
 
 #: musicbot/bot.py:4575
 msgid "To select a song, type the corresponding number."
-msgstr ""
+msgstr "要选择歌曲，请输入相应的数字。"
 
 #: musicbot/bot.py:4576
 #, python-format
@@ -724,11 +738,12 @@ msgstr ""
 #: musicbot/bot.py:4594
 msgid "\n"
 "**0**. Cancel"
-msgstr ""
+msgstr "\n"
+"**0**。取消"
 
 #: musicbot/bot.py:4598
 msgid "Pick a song"
-msgstr ""
+msgstr "选择一首歌曲"
 
 #: musicbot/bot.py:4649
 #, python-format
@@ -742,31 +757,31 @@ msgstr ""
 
 #: musicbot/bot.py:4713
 msgid "Alright, coming right up!"
-msgstr ""
+msgstr "好吧，正在准备好！"
 
 #: musicbot/bot.py:4725
 msgid "Show information on what is currently playing."
-msgstr ""
+msgstr "显示当前正在播放的信息。"
 
 #: musicbot/bot.py:4777 musicbot/bot.py:6027 musicbot/bot.py:6059
 msgid "[autoplaylist]"
-msgstr ""
+msgstr "[autoplaylist]"
 
 #: musicbot/bot.py:4781
 msgid "Now playing"
-msgstr ""
+msgstr "正在播放"
 
 #: musicbot/bot.py:4784
 msgid "Currently streaming:"
-msgstr ""
+msgstr "正在串流："
 
 #: musicbot/bot.py:4786
 msgid "Currently playing:"
-msgstr ""
+msgstr "当前正在播放："
 
 #: musicbot/bot.py:4792
 msgid "Added By:"
-msgstr ""
+msgstr "添加人："
 
 #: musicbot/bot.py:4793
 #, python-format
@@ -775,19 +790,19 @@ msgstr ""
 
 #: musicbot/bot.py:4797
 msgid "Progress:"
-msgstr ""
+msgstr "进度："
 
 #: musicbot/bot.py:4815 musicbot/bot.py:6004
 msgid "There are no songs queued! Queue something with a play command."
-msgstr ""
+msgstr "没有播放队列的歌曲！队列中有播放命令的歌曲。"
 
 #: musicbot/bot.py:4818
 msgid "Tell MusicBot to join the channel you're in."
-msgstr ""
+msgstr "告诉MusicBot 加入您所加入的频道。"
 
 #: musicbot/bot.py:4841
 msgid "You are not connected to voice. Try joining a voice channel!"
-msgstr ""
+msgstr "您没有连接到语音。请尝试加入一个语音频道！"
 
 #: musicbot/bot.py:4876
 #, python-format
@@ -796,7 +811,7 @@ msgstr ""
 
 #: musicbot/bot.py:4882
 msgid "Makes MusicBot follow a user when they change channels in a server.\n"
-msgstr ""
+msgstr "当用户更改服务器中的频道时，让MusicBot跟随用户。\n"
 
 #: musicbot/bot.py:4905
 #, python-format
@@ -810,7 +825,7 @@ msgstr ""
 
 #: musicbot/bot.py:4928
 msgid "MusicBot cannot follow a user that is not a member of the server."
-msgstr ""
+msgstr "MusicBot 不能关注不是服务器成员的用户。"
 
 #: musicbot/bot.py:4935
 #, python-format
@@ -819,7 +834,7 @@ msgstr ""
 
 #: musicbot/bot.py:4941
 msgid "Pause playback if a track is currently playing."
-msgstr ""
+msgstr "如果有曲目正在播放，暂停播放。"
 
 #: musicbot/bot.py:4952
 #, python-format
@@ -828,11 +843,11 @@ msgstr ""
 
 #: musicbot/bot.py:4956
 msgid "Player is not playing."
-msgstr ""
+msgstr "播放器未播放。"
 
 #: musicbot/bot.py:4958
 msgid "Resumes playback if the player was previously paused."
-msgstr ""
+msgstr "如果玩家先前暂停，恢复播放。"
 
 #: musicbot/bot.py:4969
 #, python-format
@@ -841,27 +856,27 @@ msgstr ""
 
 #: musicbot/bot.py:4975
 msgid "Resumed music queue"
-msgstr ""
+msgstr "继续音乐队列"
 
 #: musicbot/bot.py:4977
 msgid "Player is not paused."
-msgstr ""
+msgstr "玩家未暂停。"
 
 #: musicbot/bot.py:4979
 msgid "Shuffle all current tracks in the queue."
-msgstr ""
+msgstr "随机播放队列中所有当前曲目。"
 
 #: musicbot/bot.py:5014
 msgid "Shuffled all songs in the queue."
-msgstr ""
+msgstr "随机播放队列中的所有歌曲。"
 
 #: musicbot/bot.py:5016
 msgid "Removes all songs currently in the queue."
-msgstr ""
+msgstr "移除队列中的所有歌曲。"
 
 #: musicbot/bot.py:5028
 msgid "Cleared all songs from the queue."
-msgstr ""
+msgstr "清除队列中的所有歌曲。"
 
 #: musicbot/bot.py:5033
 msgid "Remove a song from the queue, optionally at the given queue position.\n"
@@ -872,7 +887,7 @@ msgstr ""
 
 #: musicbot/bot.py:5053
 msgid "Nothing in the queue to remove!"
-msgstr ""
+msgstr "队列中没有要移除的内容！"
 
 #: musicbot/bot.py:5068
 #, python-format
@@ -887,11 +902,12 @@ msgstr ""
 #: musicbot/bot.py:5079 musicbot/bot.py:5114
 msgid "You do not have the permission to remove that entry from the queue.\n"
 "You must be the one who queued it or have instant skip permissions."
-msgstr ""
+msgstr "您没有从队列中删除该项的权限。\n"
+"您必须是排队它或拥有即时跳过权限的人。"
 
 #: musicbot/bot.py:5090 musicbot/bot.py:5095
 msgid "Invalid entry number. Use the queue command to find queue positions."
-msgstr ""
+msgstr "无效的条目编号。使用队列命令来查找队列位置。"
 
 #: musicbot/bot.py:5105
 #, python-format
@@ -911,7 +927,7 @@ msgstr ""
 
 #: musicbot/bot.py:5145
 msgid "Can't skip! The player is not playing!"
-msgstr ""
+msgstr "无法跳过！玩家没有在玩！"
 
 #: musicbot/bot.py:5153
 #, python-format
@@ -920,7 +936,7 @@ msgstr ""
 
 #: musicbot/bot.py:5161
 msgid "The next song will be played shortly. Please wait."
-msgstr ""
+msgstr "下一首歌即将播放，请稍候。"
 
 #: musicbot/bot.py:5166
 msgid "Something odd is happening.\n"
@@ -934,7 +950,7 @@ msgstr ""
 
 #: musicbot/bot.py:5197
 msgid "You do not have permission to force skip a looped song."
-msgstr ""
+msgstr "您没有权限强制跳过循环歌曲。"
 
 #: musicbot/bot.py:5211
 #, python-format
@@ -943,11 +959,11 @@ msgstr ""
 
 #: musicbot/bot.py:5216
 msgid "You do not have permission to force skip."
-msgstr ""
+msgstr "您没有强制跳过的权限。"
 
 #: musicbot/bot.py:5253 musicbot/bot.py:5286
 msgid "You do not have permission to skip a looped song."
-msgstr ""
+msgstr "您没有权限跳过循环歌曲。"
 
 #: musicbot/bot.py:5269
 #, python-format
@@ -957,7 +973,7 @@ msgstr ""
 
 #: musicbot/bot.py:5276
 msgid " Next song coming up!"
-msgstr ""
+msgstr " 下一首歌即将开始！"
 
 #: musicbot/bot.py:5293
 #, python-format
@@ -984,7 +1000,7 @@ msgstr ""
 #: musicbot/bot.py:5351
 #, python-format
 msgid "Updated volume from **%(old)d** to **%(new)d**"
-msgstr ""
+msgstr "音量从 **%(old)d** 更新到 **%(new)d"
 
 #: musicbot/bot.py:5357
 #, python-format
@@ -1006,19 +1022,20 @@ msgstr ""
 #: musicbot/bot.py:5391
 msgid "No track is playing, cannot set speed.\n"
 "Use the config command to set a default playback speed."
-msgstr ""
+msgstr "没有音轨在播放，无法设置速度。\n"
+"使用配置命令设置默认播放速度。"
 
 #: musicbot/bot.py:5399
 msgid "Speed cannot be applied to streamed media."
-msgstr ""
+msgstr "速度不能应用于流媒体。"
 
 #: musicbot/bot.py:5404
 msgid "You must provide a speed to set."
-msgstr ""
+msgstr "您必须提供一个速度来设置。"
 
 #: musicbot/bot.py:5413
 msgid "The speed you proivded is invalid. Use a number between 0.5 and 100."
-msgstr ""
+msgstr "您调查的速度是无效的。使用0.5 和 100之间的数字。"
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1027,19 +1044,19 @@ msgstr ""
 
 #: musicbot/bot.py:5441
 msgid "    Add an new alias with optional arguments.\n"
-msgstr ""
+msgstr "    添加可选参数的新别名。\n"
 
 #: musicbot/bot.py:5444
 msgid "    Remove an alias with the given name."
-msgstr ""
+msgstr "    删除给定名称的别名。"
 
 #: musicbot/bot.py:5447
 msgid "    Reload or save aliases from/to the config file."
-msgstr ""
+msgstr "    从配置文件重新加载或保存别名。"
 
 #: musicbot/bot.py:5451
 msgid "Allows management of aliases from discord. To see aliases use the help command."
-msgstr ""
+msgstr "允许管理不一致的别名。要查看别名，请使用帮助命令。"
 
 #: musicbot/bot.py:5471 musicbot/bot.py:5587 musicbot/bot.py:6519
 #, python-format
@@ -1048,11 +1065,11 @@ msgstr ""
 
 #: musicbot/bot.py:5477
 msgid "Aliases reloaded from config file."
-msgstr ""
+msgstr "已从配置文件重新加载别名。"
 
 #: musicbot/bot.py:5482
 msgid "Aliases saved to config file."
-msgstr ""
+msgstr "别名保存到配置文件。"
 
 #: musicbot/bot.py:5485
 #, python-format
@@ -1062,7 +1079,7 @@ msgstr ""
 
 #: musicbot/bot.py:5492
 msgid "You must supply an alias and a command to alias"
-msgstr ""
+msgstr "您必须为别名提供别名和命令"
 
 #: musicbot/bot.py:5498
 #, python-format
@@ -1071,7 +1088,7 @@ msgstr ""
 
 #: musicbot/bot.py:5507
 msgid "You must supply an alias name to remove."
-msgstr ""
+msgstr "您必须提供一个别名来移除。"
 
 #: musicbot/bot.py:5512
 #, python-format
@@ -1085,7 +1102,7 @@ msgstr ""
 
 #: musicbot/bot.py:5528
 msgid "    Shows help text about any missing config options.\n"
-msgstr ""
+msgstr "    显示任何缺失配置选项的帮助文本。\n"
 
 #: musicbot/bot.py:5531
 msgid "    Lists the names of options which have been changed since loading config file.\n"
@@ -1093,39 +1110,39 @@ msgstr ""
 
 #: musicbot/bot.py:5534
 msgid "    List the available config options and their sections.\n"
-msgstr ""
+msgstr "    列出可用的配置选项及其章节。\n"
 
 #: musicbot/bot.py:5537
 msgid "    Reload the options.ini file from disk.\n"
-msgstr ""
+msgstr "    从磁盘重新加载options.ini 文件。\n"
 
 #: musicbot/bot.py:5540
 msgid "    Shows help text for a specific option.\n"
-msgstr ""
+msgstr "    显示特定选项的帮助文本。\n"
 
 #: musicbot/bot.py:5543
 msgid "    Display the current value of the option.\n"
-msgstr ""
+msgstr "    显示选项的当前值。\n"
 
 #: musicbot/bot.py:5546
 msgid "    Saves the current current value to the options file.\n"
-msgstr ""
+msgstr "    将当前值保存到选项文件。\n"
 
 #: musicbot/bot.py:5549
 msgid "    Validates the option and sets the config for the session, but not to file.\n"
-msgstr ""
+msgstr "    验证选项并设置会话配置，但不设置为文件。\n"
 
 #: musicbot/bot.py:5552
 msgid "    Reset the option to it's default value.\n"
-msgstr ""
+msgstr "    重置选项为默认值。\n"
 
 #: musicbot/bot.py:5555
 msgid "Manage options.ini configuration from within Discord."
-msgstr ""
+msgstr "从 Discord 内部管理options.ini 配置。"
 
 #: musicbot/bot.py:5570
 msgid "Config cannot use channel and user mentions at the same time."
-msgstr ""
+msgstr "配置不能同时使用频道和用户提到。"
 
 #: musicbot/bot.py:5596
 #, python-format
@@ -1137,11 +1154,11 @@ msgstr ""
 
 #: musicbot/bot.py:5609
 msgid "*All config options are present and accounted for!*"
-msgstr ""
+msgstr "*所有配置选项都已存在并已核算！*"
 
 #: musicbot/bot.py:5625
 msgid "No config options appear to be changed."
-msgstr ""
+msgstr "没有配置选项被更改。"
 
 #: musicbot/bot.py:5627
 #, python-format
@@ -1160,7 +1177,7 @@ msgstr ""
 
 #: musicbot/bot.py:5669
 msgid "Config options reloaded from file successfully!"
-msgstr ""
+msgstr "配置选项从文件重新加载成功！"
 
 #: musicbot/bot.py:5673
 #, python-format
@@ -1170,15 +1187,15 @@ msgstr ""
 
 #: musicbot/bot.py:5691
 msgid "Could not resolve section name from option name. Please provide a valid section and option name."
-msgstr ""
+msgstr "无法解析选项名称中的部分名称。请提供一个有效的部分和选项名称。"
 
 #: musicbot/bot.py:5695
 msgid "The option given is ambiguous, please provide a section name."
-msgstr ""
+msgstr "给定的选项含混，请提供一个章节名称。"
 
 #: musicbot/bot.py:5701
 msgid "You must provide a section name and option name for this command."
-msgstr ""
+msgstr "您必须提供此命令的部分名称和选项名称。"
 
 #: musicbot/bot.py:5717
 #, python-format
@@ -1193,7 +1210,7 @@ msgstr ""
 
 #: musicbot/bot.py:5733
 msgid "This option can only be set by editing the config file."
-msgstr ""
+msgstr "此选项只能通过编辑配置文件来设置。"
 
 #: musicbot/bot.py:5737
 #, python-format
@@ -1241,7 +1258,7 @@ msgstr ""
 
 #: musicbot/bot.py:5806 musicbot/bot.py:6732
 msgid "You must provide a section, option, and value for this sub command."
-msgstr ""
+msgstr "您必须为此子命令提供一个章节、选项和值。"
 
 #: musicbot/bot.py:5817
 #, python-format
@@ -1272,28 +1289,29 @@ msgstr ""
 
 #: musicbot/bot.py:5872
 msgid "Deprecated command, use the config command instead."
-msgstr ""
+msgstr "已废弃的命令，改用配置命令。"
 
 #: musicbot/bot.py:5885
 msgid "The option command is deprecated, use the config command instead."
-msgstr ""
+msgstr "选项命令已废弃，请使用配置命令。"
 
 #: musicbot/bot.py:5892
 msgid "Display information about cache storage or clear cache according to configured limits.\n"
 "Using update option will scan the cache for external changes before displaying details."
-msgstr ""
+msgstr "显示缓存信息或清除缓存根据配置的限制。\n"
+"使用更新选项将在显示详细信息之前扫描缓存进行外部更改。"
 
 #: musicbot/bot.py:5905
 msgid "Invalid option specified, use: info, update, or clear"
-msgstr ""
+msgstr "指定的选项无效，使用：信息、更新或清除"
 
 #: musicbot/bot.py:5916
 msgid "Disabled"
-msgstr ""
+msgstr "已禁用"
 
 #: musicbot/bot.py:5916
 msgid "Enabled"
-msgstr ""
+msgstr "已启用"
 
 #: musicbot/bot.py:5919
 #, python-format
@@ -1302,7 +1320,7 @@ msgstr ""
 
 #: musicbot/bot.py:5925 musicbot/bot.py:5928
 msgid "Unlimited"
-msgstr ""
+msgstr "无限制"
 
 #: musicbot/bot.py:5933
 #, python-format
@@ -1314,15 +1332,15 @@ msgstr ""
 
 #: musicbot/bot.py:5956
 msgid "Cache has been cleared."
-msgstr ""
+msgstr "缓存已清除。"
 
 #: musicbot/bot.py:5962
 msgid "**Failed** to delete cache, check logs for more info..."
-msgstr ""
+msgstr "**删除缓存失败，请检查日志获取更多信息..."
 
 #: musicbot/bot.py:5965
 msgid "No cache found to clear."
-msgstr ""
+msgstr "没有找到要清除的缓存。"
 
 #: musicbot/bot.py:5973
 msgid "Display information about the current player queue.\n"
@@ -1331,7 +1349,7 @@ msgstr ""
 
 #: musicbot/bot.py:5997
 msgid "Queue page argument must be a whole number."
-msgstr ""
+msgstr "队列页面参数必须是一个整数。"
 
 #: musicbot/bot.py:6013
 #, python-format
@@ -1341,7 +1359,7 @@ msgstr ""
 
 #: musicbot/bot.py:6025
 msgid "(unknown duration)"
-msgstr ""
+msgstr "(未知持续时间)"
 
 #: musicbot/bot.py:6034
 #, python-format
@@ -1365,7 +1383,7 @@ msgstr ""
 
 #: musicbot/bot.py:6085
 msgid "Songs in queue"
-msgstr ""
+msgstr "队列中的歌曲"
 
 #: musicbot/bot.py:6105
 msgid "Try that again. MusicBot couldn't make or get a reference to the queue message.\n"
@@ -1380,11 +1398,11 @@ msgstr ""
 
 #: musicbot/bot.py:6180
 msgid "Invalid parameter. Please provide a number of messages to search."
-msgstr ""
+msgstr "参数无效。请提供一些要搜索的消息。"
 
 #: musicbot/bot.py:6215
 msgid "Cannot use purge on private DM channel."
-msgstr ""
+msgstr "无法在私有DM频道上使用净化。"
 
 #: musicbot/bot.py:6222
 #, python-format
@@ -1393,15 +1411,15 @@ msgstr ""
 
 #: musicbot/bot.py:6226
 msgid "Bot does not have permission to manage messages."
-msgstr ""
+msgstr "机器人没有管理信件的权限。"
 
 #: musicbot/bot.py:6231
 msgid "Dump the individual urls of a playlist to a file."
-msgstr ""
+msgstr "将播放列表中的个别网址转储到文件。"
 
 #: musicbot/bot.py:6247
 msgid "The given URL was not a valid URL."
-msgstr ""
+msgstr "给定的 URL 不是有效的 URL。"
 
 #: musicbot/bot.py:6257
 #, python-format
@@ -1411,7 +1429,7 @@ msgstr ""
 
 #: musicbot/bot.py:6262
 msgid "This does not seem to be a playlist."
-msgstr ""
+msgstr "这似乎不是一个播放列表。"
 
 #: musicbot/bot.py:6282
 #, python-format
@@ -1446,19 +1464,19 @@ msgstr ""
 
 #: musicbot/bot.py:6388
 msgid "Here are the IDs you requested:"
-msgstr ""
+msgstr "这里是您请求的ID："
 
 #: musicbot/bot.py:6395
 msgid "Get a list of your permissions, or the permisions of the mentioned user."
-msgstr ""
+msgstr "获取您的权限列表或上述用户的权限。"
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double check the ID and try again."
-msgstr ""
+msgstr "无效的用户ID或服务器昵称，请重新检查ID，然后重试。"
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
-msgstr ""
+msgstr "无法确定 Discord 用户，请重试。"
 
 #: musicbot/bot.py:6439
 #, python-format
@@ -1478,47 +1496,47 @@ msgstr ""
 
 #: musicbot/bot.py:6464
 msgid "    Show loaded groups and list permission options.\n"
-msgstr ""
+msgstr "    显示加载组并列出权限选项。\n"
 
 #: musicbot/bot.py:6467
 msgid "    Reloads permissions from the permissions.ini file.\n"
-msgstr ""
+msgstr "    从 permissions.ini 文件重新加载权限。\n"
 
 #: musicbot/bot.py:6470
 msgid "    Add new group with defaults.\n"
-msgstr ""
+msgstr "    添加新组为默认值。\n"
 
 #: musicbot/bot.py:6473
 msgid "    Remove existing group.\n"
-msgstr ""
+msgstr "    删除现有群组。\n"
 
 #: musicbot/bot.py:6476
 msgid "    Show help text for the permission option.\n"
-msgstr ""
+msgstr "    显示权限选项的帮助文本。\n"
 
 #: musicbot/bot.py:6479
 msgid "    Show permission value for given group and permission.\n"
-msgstr ""
+msgstr "    显示给定组的权限值和权限。\n"
 
 #: musicbot/bot.py:6482
 msgid "    Save permissions group to file.\n"
-msgstr ""
+msgstr "    保存权限组到文件。\n"
 
 #: musicbot/bot.py:6485
 msgid "    Set permission value for the group.\n"
-msgstr ""
+msgstr "    设置群组的权限值。\n"
 
 #: musicbot/bot.py:6488
 msgid "Manage permissions.ini configuration from within discord."
-msgstr ""
+msgstr "从 discord内部管理权限.ini 配置。"
 
 #: musicbot/bot.py:6503
 msgid "Permissions cannot use channel and user mentions at the same time."
-msgstr ""
+msgstr "权限不能同时使用频道和用户提到。"
 
 #: musicbot/bot.py:6534
 msgid "Permissions reloaded from file successfully!"
-msgstr ""
+msgstr "从文件重新加载权限成功！"
 
 #: musicbot/bot.py:6538
 #, python-format
@@ -1536,11 +1554,11 @@ msgstr ""
 
 #: musicbot/bot.py:6575
 msgid "You must provide a group or option name for this command."
-msgstr ""
+msgstr "您必须为此命令提供一个组或选项名称。"
 
 #: musicbot/bot.py:6579
 msgid "You must provide a group, option, and value to set for this command."
-msgstr ""
+msgstr "您必须为此命令设置一个组、选项和值。"
 
 #: musicbot/bot.py:6593
 #, python-format
@@ -1560,7 +1578,7 @@ msgstr ""
 
 #: musicbot/bot.py:6624
 msgid "This permission can only be set by editing the permissions file."
-msgstr ""
+msgstr "此权限只能通过编辑权限文件来设置。"
 
 #: musicbot/bot.py:6633
 #, python-format
@@ -1588,7 +1606,7 @@ msgstr ""
 
 #: musicbot/bot.py:6670
 msgid "Cannot remove built-in group."
-msgstr ""
+msgstr "无法删除内置组。"
 
 #: musicbot/bot.py:6677
 #, python-format
@@ -1598,7 +1616,7 @@ msgstr ""
 
 #: musicbot/bot.py:6688 musicbot/bot.py:6727
 msgid "The owner group is not editable."
-msgstr ""
+msgstr "所有者群组不可编辑。"
 
 #: musicbot/bot.py:6696
 #, python-format
@@ -1630,7 +1648,7 @@ msgstr ""
 
 #: musicbot/bot.py:6765
 msgid "Change the bot's username on discord.Note: The API may limit name changes to twice per hour."
-msgstr ""
+msgstr "在 discord上更改机器人的用户名。注意：API 可能限制名称更改每小时两次。"
 
 #: musicbot/bot.py:6784
 msgid "Failed to change username. Did you change names too many times?\n"
@@ -1650,11 +1668,11 @@ msgstr ""
 
 #: musicbot/bot.py:6798
 msgid "Change the MusicBot's nickname."
-msgstr ""
+msgstr "更改 MusicBot 的昵称。"
 
 #: musicbot/bot.py:6812
 msgid "Unable to change nickname: no permission."
-msgstr ""
+msgstr "无法更改昵称：没有权限。"
 
 #: musicbot/bot.py:6820
 #, python-format
@@ -1669,24 +1687,25 @@ msgstr ""
 
 #: musicbot/bot.py:6832
 msgid "    Set a per-server command prefix."
-msgstr ""
+msgstr "    设置每个服务器的命令前缀。"
 
 #: musicbot/bot.py:6834
 msgid "    Clear the per-server command prefix."
-msgstr ""
+msgstr "    清除每个服务器命令前缀。"
 
 #: musicbot/bot.py:6838
 msgid "Override the default command prefix in the server.\n"
 "The option EnablePrefixPerGuild must be enabled first."
-msgstr ""
+msgstr "覆盖服务器上的默认命令前缀。\n"
+"必须首先启用启用启用前缀权限的选项。"
 
 #: musicbot/bot.py:6860
 msgid "Custom emoji must be from this server to use as a prefix."
-msgstr ""
+msgstr "自定义表情必须来自此服务器才能用作前缀。"
 
 #: musicbot/bot.py:6866
 msgid "Server command prefix is cleared."
-msgstr ""
+msgstr "服务器命令前缀已被清除。"
 
 #: musicbot/bot.py:6871
 #, python-format
@@ -1696,16 +1715,18 @@ msgstr ""
 #: musicbot/bot.py:6877
 msgid "Prefix per server is not enabled!\n"
 "Use the config command to update the prefix instead."
-msgstr ""
+msgstr "每个服务器的前缀未启用！\n"
+"使用配置命令来更新前缀。"
 
 #: musicbot/bot.py:6885
 msgid "Change MusicBot's avatar.\n"
 "Attaching a file and omitting the url parameter also works.\n"
-msgstr ""
+msgstr "更改 MusicBot 头像。\n"
+"附加一个文件并省略URL参数也可以工作。\n"
 
 #: musicbot/bot.py:6905
 msgid "You must provide a URL or attach a file."
-msgstr ""
+msgstr "您必须提供一个 URL 或附加文件。"
 
 #: musicbot/bot.py:6915
 #, python-format
@@ -1715,11 +1736,11 @@ msgstr ""
 
 #: musicbot/bot.py:6919
 msgid "Changed the bot's avatar."
-msgstr ""
+msgstr "更改了机器人头像。"
 
 #: musicbot/bot.py:6922
 msgid "Force MusicBot to disconnect from the discord server."
-msgstr ""
+msgstr "强制MusicBot断开与 Discord 服务器的连接。"
 
 #: musicbot/bot.py:6933
 #, python-format
@@ -1728,7 +1749,7 @@ msgstr ""
 
 #: musicbot/bot.py:6948
 msgid "Disconnected a playerless voice client? [BUG]"
-msgstr ""
+msgstr "断开一个无声音客户端的连接? [BUG]"
 
 #: musicbot/bot.py:6952
 #, python-format
@@ -1737,7 +1758,7 @@ msgstr ""
 
 #: musicbot/bot.py:6960
 msgid "    Attempt to reload without process restart. The default option.\n"
-msgstr ""
+msgstr "    尝试重新加载而不重启进程。默认选项。\n"
 
 #: musicbot/bot.py:6962
 msgid "    Attempt to restart the entire MusicBot process, reloading everything.\n"
@@ -1745,15 +1766,15 @@ msgstr ""
 
 #: musicbot/bot.py:6964
 msgid "    Full restart, but attempt to update pip packages before restart.\n"
-msgstr ""
+msgstr "    完全重启，但尝试在重启前更新Pip包。\n"
 
 #: musicbot/bot.py:6966
 msgid "    Full restart, but update MusicBot source code with git first.\n"
-msgstr ""
+msgstr "    完全重启，但先更新 MusicBot 源代码使用 git 。\n"
 
 #: musicbot/bot.py:6968
 msgid "    Attempt to update all dependency and source code before fully restarting.\n"
-msgstr ""
+msgstr "    尝试在完全重启之前更新所有依赖关系和源代码。\n"
 
 #: musicbot/bot.py:6972
 msgid "Attempts to restart the MusicBot in a number of different ways.\n"
@@ -1764,7 +1785,7 @@ msgstr ""
 
 #: musicbot/bot.py:6993
 msgid "Invalid option given, use one of:  soft, full, upgrade, uppip, or upgit"
-msgstr ""
+msgstr "给定的选项无效，请使用其中一项：软、完整、升级、上传或上传。"
 
 #: musicbot/bot.py:6999
 #, python-format
@@ -1793,11 +1814,11 @@ msgstr ""
 
 #: musicbot/bot.py:7053
 msgid "Disconnect from all voice channels and close the MusicBot process."
-msgstr ""
+msgstr "断开所有语音频道并关闭 MusicBot 进程。"
 
 #: musicbot/bot.py:7079
 msgid "   Leave the discord server given by name or server ID."
-msgstr ""
+msgstr "   留下由名称或服务器ID指定的Discord服务器。"
 
 #: musicbot/bot.py:7083
 msgid "Force MusicBot to leave the given Discord server.\n"
@@ -1806,7 +1827,7 @@ msgstr ""
 
 #: musicbot/bot.py:7102
 msgid "You must provide an ID or name."
-msgstr ""
+msgstr "您必须提供一个ID或名称。"
 
 #: musicbot/bot.py:7113
 #, python-format
@@ -1815,7 +1836,7 @@ msgstr ""
 
 #: musicbot/bot.py:7121
 msgid "Unknown"
-msgstr ""
+msgstr "未知的"
 
 #: musicbot/bot.py:7128
 #, python-format
@@ -1824,7 +1845,7 @@ msgstr ""
 
 #: musicbot/bot.py:7138
 msgid "Command used for testing. It prints a list of commands which can be verified by a test suite."
-msgstr ""
+msgstr "用于测试的命令。它打印一个可以通过测试套装验证的命令列表。"
 
 #: musicbot/bot.py:7162
 msgid "This command issues a log at level CRITICAL, but does nothing else.\n"
@@ -1838,23 +1859,23 @@ msgstr ""
 
 #: musicbot/bot.py:7180
 msgid "    View most common types reported by objgraph.\n"
-msgstr ""
+msgstr "    查看 objgraphs 报告的最常见类型。\n"
 
 #: musicbot/bot.py:7183
 msgid "    View limited objgraph.show_growth() output.\n"
-msgstr ""
+msgstr "    查看有限的 objgraph.show_growth() 输出。\n"
 
 #: musicbot/bot.py:7186
 msgid "    View most common types of leaking objects.\n"
-msgstr ""
+msgstr "    查看最常见的泄漏对象类型。\n"
 
 #: musicbot/bot.py:7189
 msgid "    View typestats of leaking objects.\n"
-msgstr ""
+msgstr "    查看泄漏对象的类型遗产。\n"
 
 #: musicbot/bot.py:7192
 msgid "    Evaluate the given function and args on objgraph.\n"
-msgstr ""
+msgstr "    在objgraph上评估给定的函数和参数。\n"
 
 #: musicbot/bot.py:7196
 msgid "Interact with objgraph, if it is installed, to gain insight into memory usage.\n"
@@ -1864,7 +1885,7 @@ msgstr ""
 
 #: musicbot/bot.py:7212
 msgid "Could not import `objgraph`, is it installed?"
-msgstr ""
+msgstr "无法导入 `objgraph` ，是否安装？"
 
 #: musicbot/bot.py:7249
 msgid "This command will execute arbitrary python code in the command scope.\n"
@@ -1889,7 +1910,8 @@ msgstr ""
 #: musicbot/bot.py:7320
 msgid "Create 'markdown' for options, permissions, or commands from the code.\n"
 "The output is used to update github pages and is thus unsuitable for normal reference use."
-msgstr ""
+msgstr "从代码创建“markdown”选项、权限或命令。\n"
+"输出用于更新 github 页面，因此不适合正常的参考使用。"
 
 #: musicbot/bot.py:7337 musicbot/bot.py:7398
 #, python-format
@@ -1898,11 +1920,11 @@ msgstr ""
 
 #: musicbot/bot.py:7387
 msgid "Makes default INI files."
-msgstr ""
+msgstr "创建默认 INI 文件。"
 
 #: musicbot/bot.py:7410
 msgid "Saved the requested INI file to disk. Go check it"
-msgstr ""
+msgstr "保存了请求的 INI 文件到磁盘。请检查它"
 
 #: musicbot/bot.py:7415
 msgid "Display the current bot version and check for updates to MusicBot or dependencies.\n"
@@ -1910,7 +1932,7 @@ msgstr ""
 
 #: musicbot/bot.py:7439
 msgid "Could not locate git executable."
-msgstr ""
+msgstr "无法找到 git 可执行文件。"
 
 #: musicbot/bot.py:7473
 #, python-format
@@ -1924,7 +1946,7 @@ msgstr ""
 
 #: musicbot/bot.py:7484 musicbot/bot.py:7527
 msgid "Error while checking, see logs for details."
-msgstr ""
+msgstr "检查时出错，详情请查看日志。"
 
 #: musicbot/bot.py:7518
 #, python-format
@@ -1933,15 +1955,15 @@ msgstr ""
 
 #: musicbot/bot.py:7524
 msgid "No updates for dependencies found."
-msgstr ""
+msgstr "没有找到依赖关系的更新。"
 
 #: musicbot/bot.py:7530
 msgid "There are updates for MusicBot available for download."
-msgstr ""
+msgstr "MusicBot有可用下载的更新。"
 
 #: musicbot/bot.py:7532
 msgid "MusicBot is totally up-to-date!"
-msgstr ""
+msgstr "MusicBot 完全是最新版本！"
 
 #: musicbot/bot.py:7536
 #, python-format
@@ -1954,7 +1976,7 @@ msgstr ""
 
 #: musicbot/bot.py:7550
 msgid "Displays the MusicBot uptime, or time since last start / restart."
-msgstr ""
+msgstr "显示上次启动/重启后的音乐机器人时机。"
 
 #: musicbot/bot.py:7565
 #, python-format
@@ -1963,7 +1985,7 @@ msgstr ""
 
 #: musicbot/bot.py:7572
 msgid "Display latency information for Discord API and all connected voice clients."
-msgstr ""
+msgstr "显示Discord API和所有已连接的语音客户端的延迟信息。"
 
 #: musicbot/bot.py:7594
 #, python-format
@@ -1972,7 +1994,7 @@ msgstr ""
 
 #: musicbot/bot.py:7599
 msgid "No voice clients connected.\n"
-msgstr ""
+msgstr "没有语音客户端连接。\n"
 
 #: musicbot/bot.py:7604
 #, python-format
@@ -1983,12 +2005,12 @@ msgstr ""
 
 #: musicbot/bot.py:7612
 msgid "Display API latency and Voice latency if MusicBot is connected."
-msgstr ""
+msgstr "如果MusicBot 已连接，则显示 API 延迟和语音延迟。"
 
 #. TRANSLATORS: short for automatic, displayed when voice region is not selected.
 #: musicbot/bot.py:7628
 msgid "auto"
-msgstr ""
+msgstr "auto"
 
 #: musicbot/bot.py:7630
 #, python-format
@@ -2003,7 +2025,7 @@ msgstr ""
 
 #: musicbot/bot.py:7640
 msgid "Display MusicBot version number in the chat."
-msgstr ""
+msgstr "在聊天中显示 MusicBot 版本号。"
 
 #: musicbot/bot.py:7648
 #, python-format
@@ -2013,11 +2035,11 @@ msgstr ""
 
 #: musicbot/bot.py:7660
 msgid "    Update the cookies.txt file using a cookies.txt attachment."
-msgstr ""
+msgstr "    使用 cookies.txt 附件更新cookies.txt 文件。"
 
 #: musicbot/bot.py:7663
 msgid "    Enable or disable cookies.txt file without deleting it."
-msgstr ""
+msgstr "    启用或禁用 cookies.txt 文件而不删除它。"
 
 #: musicbot/bot.py:7667
 msgid "Allows management of the cookies feature in yt-dlp.\n"
@@ -2033,11 +2055,11 @@ msgstr ""
 
 #: musicbot/bot.py:7688
 msgid "Cookies already enabled."
-msgstr ""
+msgstr "Cookie 已启用。"
 
 #: musicbot/bot.py:7695
 msgid "Cookies must be uploaded to be enabled. (Missing cookies file.)"
-msgstr ""
+msgstr "Cookie 必须上传才能启用。(正在使用 cookies 文件)"
 
 #: musicbot/bot.py:7708
 #, python-format
@@ -2046,7 +2068,7 @@ msgstr ""
 
 #: musicbot/bot.py:7711
 msgid "Cookies have been enabled."
-msgstr ""
+msgstr "Cookie 已启用。"
 
 #: musicbot/bot.py:7722
 #, python-format
@@ -2056,11 +2078,11 @@ msgstr ""
 
 #: musicbot/bot.py:7726
 msgid "Cookies have been disabled."
-msgstr ""
+msgstr "Cookie 已被禁用。"
 
 #: musicbot/bot.py:7731
 msgid "No attached uploads were found, try again while uploading a cookie file."
-msgstr ""
+msgstr "没有找到附加的上传文件，上传cookie文件时再试一次。"
 
 #: musicbot/bot.py:7749
 #, python-format
@@ -2074,11 +2096,11 @@ msgstr ""
 
 #: musicbot/bot.py:7762
 msgid "Cookies uploaded and enabled."
-msgstr ""
+msgstr "Cookie已上传并启用。"
 
 #: musicbot/bot.py:7872
 msgid "You cannot use this bot in private messages."
-msgstr ""
+msgstr "您不能在私信中使用此机器人。"
 
 #: musicbot/bot.py:7941
 #, python-format
@@ -2087,7 +2109,7 @@ msgstr ""
 
 #: musicbot/bot.py:7976
 msgid "This command requires you to be in a Voice channel."
-msgstr ""
+msgstr "此命令要求您在语音频道中。"
 
 #: musicbot/bot.py:8075
 #, python-format
@@ -2096,7 +2118,7 @@ msgstr ""
 
 #: musicbot/bot.py:8134
 msgid "Exception Error"
-msgstr ""
+msgstr "异常错误"
 
 #: musicbot/bot.py:8179
 #, python-format
@@ -2106,11 +2128,11 @@ msgstr ""
 
 #: musicbot/bot.py:8183
 msgid "No description given.\n"
-msgstr ""
+msgstr "没有给出任何描述。\n"
 
 #: musicbot/bot.py:8186
 msgid "No usage given."
-msgstr ""
+msgstr "没有给出任何用法。"
 
 #: musicbot/bot.py:8220
 #, python-format
@@ -2146,7 +2168,9 @@ msgstr ""
 msgid "Provide your own Spotify Client ID to enable MusicBot to interact with Spotify API.\n"
 "MusicBot will try to use the web player API (guest mode) if nothing is set here.\n"
 "Using your own API credentials grants higher usage limits than guest mode."
-msgstr ""
+msgstr "提供您自己的 Spotify 客户端 ID以启用 MusicBot 与 Spotify API 交互。\n"
+"MusicBot 将尝试使用Web 播放器 API (访客模式)，如果这里没有设置任何内容。\n"
+"使用您自己的 API 凭据给出了高于客人模式的使用限制。"
 
 #: musicbot/config.py:174
 msgid "Provide your Spotify Client Secret to enable MusicBot to interact with Spotify API.\n"
@@ -2157,14 +2181,19 @@ msgstr ""
 msgid "Provide a Discord User ID number to set the owner of this bot.\n"
 "The word 'auto' or number 0 will set the owner based on App information.\n"
 "Only one owner ID can be set here. Generally, setting 'auto' is recommended."
-msgstr ""
+msgstr "提供一个 Discord 用户ID 号码来设置此机器人的所有者。\n"
+"单词“auto”或数字0将根据应用程序信息设置所有者。\n"
+"此处只能设置一个所有者ID。通常建议设置“自动”。"
 
 #: musicbot/config.py:201
 msgid "A list of Discord User IDs who can use the dev-only commands.\n"
 "Warning: dev-only commands can allow arbitrary remote code execution.\n"
 "Use spaces to separate multiple IDs.\n"
 "Most users should leave this setting blank."
-msgstr ""
+msgstr "可以使用仅限于dev的命令的 Discord 用户ID列表。\n"
+"警告：只有dev-only 命令可以允许任意远程代码执行。\n"
+"使用空格分隔多个ID。\n"
+"大多数用户都应该保留此设置。"
 
 #: musicbot/config.py:217
 msgid "Discord Member IDs for other bots that MusicBot should not ignore.\n"
@@ -2175,7 +2204,8 @@ msgstr ""
 #: musicbot/config.py:230
 msgid "Command prefix is how all MusicBot commands must be started in Discord messages.\n"
 "E.g., if you set this to * the play command is trigger by *play ..."
-msgstr ""
+msgstr "命令前缀是如何在 Discord 消息中启动所有 MusicBot 命令。\n"
+"例如，如果您将其设置为 * 播放命令会通过*播放触发..."
 
 #: musicbot/config.py:242
 msgid "Enable using commands with @[YourBotNameHere]\n"
@@ -2187,12 +2217,16 @@ msgid "ID numbers for text channels that MusicBot should exclusively use for com
 "This can contain IDs for channels in multiple servers.\n"
 "Use spaces to separate multiple IDs.\n"
 "All channels are used if this is not set."
-msgstr ""
+msgstr "MusicBot 应该专用于命令的文本频道ID。\n"
+"可以包含多个服务器中的频道ID。\n"
+"使用空格分隔多个ID。\n"
+"如果没有设置，所有频道都会被使用。"
 
 #: musicbot/config.py:267
 msgid "Allow responses in all channels while no specific channel is set for a server.\n"
 "Only used when BindToChannels is missing an ID for a server."
-msgstr ""
+msgstr "允许所有频道的响应，同时没有为服务器设置特定频道。\n"
+"仅在 BindToChannels 缺少服务器ID时使用。"
 
 #: musicbot/config.py:278
 msgid "A list of Voice Channel IDs that MusicBot should automatically join on start up.\n"
@@ -2201,20 +2235,21 @@ msgstr ""
 
 #: musicbot/config.py:289
 msgid "MusicBot will try to send Now Playing notices directly to the member who requested the song instead of posting in a server channel."
-msgstr ""
+msgstr "MusicBot 将尝试直接向请求歌曲而不是在服务器频道发布消息的会员发送播放通知。"
 
 #: musicbot/config.py:299
 msgid "Disable now playing messages for songs played via auto playlist."
-msgstr ""
+msgstr "禁用正在播放通过自动播放列表播放的歌曲。"
 
 #: musicbot/config.py:309
 msgid "Forces MusicBot to use a specific channel to send now playing messages.\n"
 "Only one text channel ID can be used per server."
-msgstr ""
+msgstr "强制MusicBot 使用特定频道发送正在播放的消息。\n"
+"每个服务器只能使用一个文本频道ID。"
 
 #: musicbot/config.py:319
 msgid "MusicBot will automatically delete Now Playing messages."
-msgstr ""
+msgstr "MusicBot 将自动删除正在播放的消息。"
 
 #: musicbot/config.py:329
 msgid "Sets the default volume level MusicBot will play songs at.\n"
@@ -2226,87 +2261,98 @@ msgid "Sets the default speed MusicBot will play songs at.\n"
 "Must be a value from 0.5 to 100.0 for ffmpeg to use it.\n"
 "A value of 1 is normal playback speed.\n"
 "Note: Streamed media does not support speed adjustments."
-msgstr ""
+msgstr "设置默认的速度 MusicBot 将播放歌曲。\n"
+"必须是 0.5到 100.0 的一个值来使用 ffmpeg 。\n"
+"值为1是正常播放速度。\n"
+"注意：流媒体不支持速度调整。"
 
 #: musicbot/config.py:354
 msgid "Number of channel member votes required to skip a song.\n"
 "Acts as a minimum when SkipRatio would require more votes."
-msgstr ""
+msgstr "跳过歌曲所需频道成员票数。\n"
+"在 SkipRatio 需要更多票时起码作用。"
 
 #: musicbot/config.py:366
 msgid "This percent of listeners in voice must vote for skip.\n"
 "If SkipsRequired is lower than the computed value, it will be used instead.\n"
 "You can set this from 0 to 1, or 0% to 100%."
-msgstr ""
+msgstr "此百分比的语音侦听器必须为跳过投票。\n"
+"如果跳过请求低于计算值，它将被使用。\n"
+"您可以将此设置为 0 到 1, 或 0% 到 100%。"
 
 #: musicbot/config.py:378
 msgid "Allow MusicBot to keep downloaded media, or delete it right away."
-msgstr ""
+msgstr "允许 MusicBot 保存下载的媒体，或立即删除。"
 
 #: musicbot/config.py:389
 msgid "If SaveVideos is enabled, set a limit on how much storage space should be used."
-msgstr ""
+msgstr "如果启用了保存视频，请设定存储空间的限制。"
 
 #: musicbot/config.py:400
 msgid "If SaveVideos is enabled, set a limit on how long files should be kept."
-msgstr ""
+msgstr "如果SaveVideos已启用，设置保存文件的时间限制。"
 
 #: musicbot/config.py:411
 msgid "If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."
-msgstr ""
+msgstr "如果启用SaveVideos，就永远不会从缓存中清除自动播放列表歌曲，不管限制多少。"
 
 #: musicbot/config.py:420
 msgid "Mention the user who added the song when it is played."
-msgstr ""
+msgstr "提到播放时添加歌曲的用户。"
 
 #: musicbot/config.py:429
 msgid "Automatically join the owner if they are in an accessible voice channel when bot starts."
-msgstr ""
+msgstr "如果机器人启动时他们在一个可访问的语音频道中，自动加入所有人。"
 
 #: musicbot/config.py:439
 msgid "Enable MusicBot to automatically play music from the auto playlist when the queue is empty."
-msgstr ""
+msgstr "启用 MusicBot 在队列为空时自动播放播放列表中的音乐。"
 
 #: musicbot/config.py:448
 msgid "Shuffles the auto playlist tracks before playing them."
-msgstr ""
+msgstr "播放前随机播放列表曲目。"
 
 #: musicbot/config.py:457
 msgid "Enable automatic skip of auto playlist songs when a user plays a new song.\n"
 "This only applies to the current playing song if it was added by the auto playlist."
-msgstr ""
+msgstr "当用户播放新歌曲时，自动跳过自动播放列表歌曲。\n"
+"这只适用于当前播放的歌曲，如果它是由自动播放列表添加的。"
 
 #: musicbot/config.py:469
 msgid "Remove songs from the auto playlist if they are found in the song blocklist."
-msgstr ""
+msgstr "从自动播放列表中删除歌曲，如果在歌曲块列表中找到这些歌曲。"
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
 "Delay period is controlled by DeleteDelayShort and DeleteDelayLong."
-msgstr ""
+msgstr "允许 MusicBot 在延迟后自动删除它发送的消息。\n"
+"延迟时间由DeleteDelayShort 和 DeleteDelayLong控制。"
 
 #: musicbot/config.py:498
 msgid "Auto delete valid commands after a delay."
-msgstr ""
+msgstr "延迟后自动删除有效的命令。"
 
 #: musicbot/config.py:507
 msgid "Sets the short period of seconds before deleting messages.\n"
 "This period is used by messages that require no further interaction."
-msgstr ""
+msgstr "设置删除消息之前的短秒时间。\n"
+"此时间段用于无需进一步互动的消息。"
 
 #: musicbot/config.py:518
 msgid "Sets the long delay period before deleting messages.\n"
 "This period is used by interactive or long-winded messages, like search and help."
-msgstr ""
+msgstr "设置删除消息之前的长时间延迟。\n"
+"此时间段用于交互或长时间的消息，如搜索和帮助。"
 
 #: musicbot/config.py:530
 msgid "Allow MusicBot to save the song queue, so queued songs will survive restarts."
-msgstr ""
+msgstr "允许 MusicBot 保存歌曲队列，所以队列中的歌曲将继续重启。"
 
 #: musicbot/config.py:540
 msgid "Enable MusicBot to download the next song in the queue while a song is playing.\n"
 "Currently this option does not apply to auto playlist or songs added to an empty queue."
-msgstr ""
+msgstr "在播放歌曲时启用 MusicBot 下载队列中的下一首歌曲。\n"
+"目前此选项不适用于自动播放列表或添加到空队列的歌曲。"
 
 #: musicbot/config.py:550
 #, python-brace-format
@@ -2325,48 +2371,49 @@ msgstr ""
 
 #: musicbot/config.py:571
 msgid "If enabled, status messages will report info on paused players."
-msgstr ""
+msgstr "如果启用，状态信息将报告暂停玩家的信息。"
 
 #: musicbot/config.py:582
 msgid "If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"
-msgstr ""
+msgstr "如果启用，MusicBot 将保存曲目标题到：data/[Server ID]/current.txt"
 
 #: musicbot/config.py:592
 msgid "Allow the member who requested the song to skip it, bypassing votes."
-msgstr ""
+msgstr "允许请求歌曲的会员跳过它，绕过投票。"
 
 #: musicbot/config.py:602
 msgid "Tries to use ffmpeg to get volume normalizing options for use in playback.\n"
 "This option can cause delay between playing songs, as the whole track must be processed."
-msgstr ""
+msgstr "尝试使用 ffmpeg 获取音量正常化选项以供播放使用。\n"
+"此选项可能会导致播放歌曲之间的延迟，因为整个歌曲必须处理。"
 
 #: musicbot/config.py:612
 msgid "Allow MusicBot to format it's messages as embeds."
-msgstr ""
+msgstr "允许 MusicBot 将它的消息格式化为嵌入符。"
 
 #: musicbot/config.py:621
 msgid "The number of entries to show per-page when using q command to list the queue."
-msgstr ""
+msgstr "使用 q 命令列出队列时每页显示的条目数。"
 
 #: musicbot/config.py:631
 msgid "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
-msgstr ""
+msgstr "启用 MusicBot 以自动删除无法播放的条目。"
 
 #: musicbot/config.py:640
 msgid "Display MusicBot config settings in the logs at startup."
-msgstr ""
+msgstr "启动时在日志中显示 MusicBot 配置设置。"
 
 #: musicbot/config.py:650
 msgid "Enable users with the InstaSkip permission to bypass skip voting and force skips."
-msgstr ""
+msgstr "启用 InstaSkip 权限的用户跳过投票并强制跳过操作。"
 
 #: musicbot/config.py:660
 msgid "If enabled, MusicBot will leave servers if the owner is not in their member list."
-msgstr ""
+msgstr "如果启用，MusicBot将离开服务器，如果所有者不在其会员列表中。"
 
 #: musicbot/config.py:670
 msgid "If enabled, MusicBot will allow commands to have multiple names using data in:  config/aliases.json"
-msgstr ""
+msgstr "如果启用，MusicBot将允许命令使用多个名字：config/aliases.json"
 
 #: musicbot/config.py:681
 msgid "Replace MusicBot name/version in embed footer with custom text.\n"
@@ -2375,55 +2422,63 @@ msgstr ""
 
 #: musicbot/config.py:691
 msgid "Completely remove the footer from embeds."
-msgstr ""
+msgstr "完全移除嵌套页脚。"
 
 #: musicbot/config.py:700
 msgid "MusicBot will automatically deafen itself when entering a voice channel."
-msgstr ""
+msgstr "当进入语音频道时，MusicBot 将自动自失效。"
 
 #: musicbot/config.py:711
 msgid "If enabled, MusicBot will leave a voice channel when no users are listening,\n"
 "after waiting for a period set in LeaveInactiveVCTimeOut option.\n"
 "Listeners are channel members, excluding bots, who are not deafened."
-msgstr ""
+msgstr "如果启用，MusicBot将在没有用户正在聆听时离开语音频道，\n"
+"等待在LeaveInactiveVCTimeOut 选项中设置的时间段。\n"
+"监听器是频道成员，但不包括机器人，他们没有耳聋。"
 
 #: musicbot/config.py:723
 msgid "Set a period of time to wait before leaving an inactive voice channel.\n"
 "You can set this to a number of seconds or phrase like:  4 hours"
-msgstr ""
+msgstr "设置等待时间间隔，然后离开静止的语音频道。\n"
+"您可以将其设置为几秒或短语如：4小时"
 
 #: musicbot/config.py:734
 msgid "If enabled, MusicBot will leave the channel immediately when the song queue is empty."
-msgstr ""
+msgstr "如果启用，MusicBot 将在歌曲队列为空时立即离开频道。"
 
 #: musicbot/config.py:744
 msgid "When paused or no longer playing, wait for this amount of time then leave voice.\n"
 "You can set this to a number of seconds of phrase like:  15 minutes\n"
 "Set it to 0 to disable leaving in this way."
-msgstr ""
+msgstr "当暂停或不再玩时，等待这么长的时间，然后留下声音。\n"
+"您可以设置这个短语为几秒钟，比如：15分钟\n"
+"设置为0来禁用这种离开方式。"
 
 #: musicbot/config.py:756
 msgid "If enabled, users must indicate search result choices by sending a message instead of using reactions."
-msgstr ""
+msgstr "如果启用，用户必须通过发送消息而不是使用响应来表示搜索结果选择。"
 
 #: musicbot/config.py:766
 msgid "Sets the default number of search results to fetch when using the search command without a specific number."
-msgstr ""
+msgstr "设置在没有指定号码的情况下使用搜索命令获取搜索结果的默认数。"
 
 #: musicbot/config.py:778
 msgid "Allow MusicBot to save a per-server command prefix, and enables the setprefix command."
-msgstr ""
+msgstr "允许 MusicBot 保存每个服务器的命令前缀，并启用 setprefix 命令。"
 
 #: musicbot/config.py:789
 msgid "If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member."
-msgstr ""
+msgstr "如果启用，多个成员正在添加歌曲，MusicBot将为每个成员组织播放一首歌曲。"
 
 #: musicbot/config.py:800
 msgid "Allow MusicBot to use timed pings to detect network outage and availability.\n"
 "This may be useful if you keep the bot joined to a channel or playing music 24/7.\n"
 "MusicBot must be restarted to enable network testing.\n"
 "By default this is disabled."
-msgstr ""
+msgstr "允许 MusicBot 使用定时pings 检测网络停电和可用性。\n"
+"如果您保持机器人加入频道或播放音乐24/7，这可能是有用的。\n"
+"MusicBot 必须重启才能启用网络测试。\n"
+"默认情况下已禁用。"
 
 #: musicbot/config.py:814
 #, python-format
@@ -2444,7 +2499,7 @@ msgstr ""
 
 #: musicbot/config.py:858
 msgid "Allow MusicBot to automatically unpause when play commands are used."
-msgstr ""
+msgstr "允许 MusicBot 在使用播放命令时自动取消暂停。"
 
 #: musicbot/config.py:877
 msgid "Experimental, HTTP/HTTPS proxy settings to use with ytdlp media downloader.\n"
@@ -2459,7 +2514,12 @@ msgid "Experimental option to set a static User-Agent header in yt-dlp.\n"
 "   https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent \n"
 "   https://www.useragents.me/ \n"
 "Leave blank to use default, dynamically generated UA strings."
-msgstr ""
+msgstr "在yt-dlp中设置静态用户代理头的实验选项。\n"
+"通常不是由yt-dlp推荐更改UA字符串。\n"
+"您可以在此处放置的示例，请检查以下两个链接：\n"
+"   https://developer。 ozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent \n"
+"   https://www.useragents.me/ \n"
+"留空则使用动态生成的 UA 字符串。"
 
 #: musicbot/config.py:903
 #, python-format
@@ -2480,25 +2540,27 @@ msgstr ""
 
 #: musicbot/config.py:939
 msgid "Toggle the user block list feature, without emptying the block list."
-msgstr ""
+msgstr "切换用户块列表功能，同时不清空块列表。"
 
 #: musicbot/config.py:949
 msgid "An optional file path to a text file listing Discord User IDs, one per line."
-msgstr ""
+msgstr "列出Discord用户ID的文本文件的可选文件路径，每行一个。"
 
 #: musicbot/config.py:961
 msgid "Enable the song block list feature, without emptying the block list."
-msgstr ""
+msgstr "启用歌曲方块列表功能，同时不清空方块列表。"
 
 #: musicbot/config.py:971
 msgid "An optional file path to a text file that lists URLs, words, or phrases one per line.\n"
 "Any song title or URL that contains any line in the list will be blocked."
-msgstr ""
+msgstr "一个可选的文件路径，用于列出每行的 URL、单词或短语。\n"
+"任何包含列表中任何行的歌曲标题或URL将被屏蔽。"
 
 #: musicbot/config.py:984
 msgid "An optional path to a directory containing auto playlist files.\n"
 "Each file should contain a list of playable URLs or terms, one track per line."
-msgstr ""
+msgstr "包含自动播放列表文件的目录可选路径。\n"
+"每个文件应该包含一个可播放的 URL 或条款列表、每行一个曲目。"
 
 #: musicbot/config.py:996
 #, python-format
@@ -2510,7 +2572,7 @@ msgstr ""
 
 #: musicbot/config.py:1015
 msgid "An optional directory path where MusicBot will store long and short-term cache for playback."
-msgstr ""
+msgstr "一个可选的目录路径，MusicBot 将存储长时间和短期的缓存来播放。"
 
 #: musicbot/config.py:1026
 #, python-format
@@ -2524,7 +2586,10 @@ msgid "Configure the log file date format used when LogsMaxKept is enabled.\n"
 "If left blank, a warning is logged and the default will be used instead.\n"
 "Learn more about time format codes from the tables and data here:\n"
 "    https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior"
-msgstr ""
+msgstr "配置 LogsMaxKept 启用时使用的日志文件日期格式。\n"
+"如果留空，将记录一个警告，默认值将被替换。\n"
+"从表格和数据中了解更多的时间格式代码：\n"
+"    https://docs.python.org/3/library/datetime.html#strftimestrptimebehaviour"
 
 #: musicbot/config.py:1053
 msgid "Potentially reduces CPU usage, but disables volume and speed controls.\n"
@@ -2539,7 +2604,7 @@ msgid "Error while reading config.\n\n"
 "  The missing sections are:\n"
 "  %(sections)s\n\n"
 "Solution:\n"
-"  Repair your config optoins file.\n"
+"  Repair your config options file.\n"
 "  Each [Section] must appear only once, with no other text on the same line.\n"
 "  Each section must have at least one option.\n"
 "  Use the example options as a template or copy it from the repository."
@@ -2597,7 +2662,12 @@ msgid "Error locating config.\n\n"
 "  %(raw_error)s\n\n"
 "Solution:\n"
 "  Verify the config folder and files exist and can be read by MusicBot."
-msgstr ""
+msgstr "定位配置时出错。\n\n"
+"问题：\n"
+"  由于错误无法找到或创建配置文件：\n"
+"  %(raw_error)s\n\n"
+"解决方案：\n"
+"  验证配置文件夹和文件存在并且可以通过 MusicBot 读取。"
 
 #: musicbot/config.py:1345
 #, python-format
@@ -2639,19 +2709,19 @@ msgstr ""
 
 #: musicbot/downloader.py:232
 msgid "HEAD seems to have no headers..."
-msgstr ""
+msgstr "HEAD 似乎没有信头..."
 
 #: musicbot/downloader.py:381
 msgid "Song info extraction returned no data."
-msgstr ""
+msgstr "歌曲信息提取没有返回数据。"
 
 #: musicbot/downloader.py:444
 msgid "Cannot continue extraction, event loop is closed."
-msgstr ""
+msgstr "无法继续提取，事件循环已关闭。"
 
 #: musicbot/downloader.py:453
 msgid "Spotify URL is invalid or not supported."
-msgstr ""
+msgstr "Spotify URL 无效或不支持。"
 
 #: musicbot/downloader.py:486 musicbot/downloader.py:507
 #, python-format
@@ -2660,11 +2730,11 @@ msgstr ""
 
 #: musicbot/downloader.py:503
 msgid "Cannot stream an invalid URL."
-msgstr ""
+msgstr "无法生成无效的 URL。"
 
 #: musicbot/downloader.py:577
 msgid "The local media file could not be found."
-msgstr ""
+msgstr "找不到本地媒体文件。"
 
 #: musicbot/entry.py:449
 #, python-format
@@ -2688,7 +2758,7 @@ msgstr ""
 
 #: musicbot/entry.py:732
 msgid "Failed to extract data for the requested media."
-msgstr ""
+msgstr "为请求的媒体提取数据失败。"
 
 #: musicbot/permissions.py:328
 msgid "List of command names allowed for use, separated by spaces.\n"
@@ -2700,7 +2770,8 @@ msgstr ""
 #: musicbot/permissions.py:342
 msgid "List of command names denied from use, separated by spaces.\n"
 "Will not work if CommandWhitelist is set!"
-msgstr ""
+msgstr "拒绝使用的命令名列表，用空格分隔。如果设置了 CommandWhitelist 的话，\n"
+"将无法工作！"
 
 #: musicbot/permissions.py:354
 msgid "When enabled, CommandBlacklist and CommandWhitelist are used together.\n"
@@ -2721,56 +2792,62 @@ msgstr ""
 #: musicbot/permissions.py:390
 msgid "List of Discord member IDs that are granted permissions in this group.\n"
 "This option overrides GrantToRoles."
-msgstr ""
+msgstr "在此组中被授予权限的Discord成员ID列表。\n"
+"此选项覆盖GrantToRoles。"
 
 #: musicbot/permissions.py:402
 msgid "Maximum number of songs a user is allowed to queue.\n"
 "A value of 0 means unlimited."
-msgstr ""
+msgstr "允许用户排队的最大歌曲数量。\n"
+"值为0表示无限制。"
 
 #: musicbot/permissions.py:414
 msgid "Maximum length of a song in seconds. A value of 0 means unlimited.\n"
 "This permission may not be enforced if song duration is not available."
-msgstr ""
+msgstr "歌曲的最大长度以秒为单位。值为0表示无限制。\n"
+"如果歌曲持续时间不可用，此权限可能无法执行。"
 
 #: musicbot/permissions.py:426
 msgid "Maximum number of songs a playlist is allowed to have when queued.\n"
 "A value of 0 means unlimited."
-msgstr ""
+msgstr "播放列表在队列时允许拥有的最大歌曲数量。\n"
+"值为0表示无限制。"
 
 #: musicbot/permissions.py:438
 msgid "The maximum number of items that can be returned in a search."
-msgstr ""
+msgstr "可以在搜索中返回的项目的最大数量。"
 
 #: musicbot/permissions.py:447
 msgid "Allow users to queue playlists, or multiple songs at once."
-msgstr ""
+msgstr "允许用户同时排队播放列表或多首歌曲。"
 
 #: musicbot/permissions.py:456
 msgid "Allow users to skip without voting, if LegacySkip config option is enabled."
-msgstr ""
+msgstr "如果启用了 LegacySkip 配置选项，允许用户不经投票而跳过。"
 
 #: musicbot/permissions.py:465
 msgid "Allows the user to skip a looped song."
-msgstr ""
+msgstr "允许用户跳过循环播放的歌曲。"
 
 #: musicbot/permissions.py:474
 msgid "Allows the user to remove any song from the queue.\n"
 "Does not remove or skip currently playing songs."
-msgstr ""
+msgstr "允许用户从队列中删除任何歌曲。\n"
+"不删除或跳过当前播放的歌曲。"
 
 #: musicbot/permissions.py:485
 msgid "Skip songs added by users who are not in voice when their song is played."
-msgstr ""
+msgstr "跳过播放歌曲时没有声音的用户添加的歌曲。"
 
 #: musicbot/permissions.py:495
 msgid "Allows the user to add songs to the queue when Karaoke Mode is enabled."
-msgstr ""
+msgstr "允许用户在启用Karaoke模式时添加歌曲到队列。"
 
 #: musicbot/permissions.py:505
 msgid "Auto summon to user voice channel when using play commands, if bot isn't in voice already.\n"
 "The summon command must still be allowed for this group!"
-msgstr ""
+msgstr "使用播放命令时自动召唤用户语音频道，如果机器人已经没有语音的话。\n"
+"此群组仍然必须允许召唤命令！"
 
 #: musicbot/permissions.py:516
 #, python-format
@@ -2791,11 +2868,11 @@ msgstr ""
 
 #: musicbot/playlist.py:159
 msgid "Could not extract information"
-msgstr ""
+msgstr "无法提取信息"
 
 #: musicbot/playlist.py:163
 msgid "This is a playlist."
-msgstr ""
+msgstr "这是一个播放列表。"
 
 #: musicbot/playlist.py:195
 #, python-format
@@ -2804,11 +2881,11 @@ msgstr ""
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
-msgstr ""
+msgstr "无持续时间数据"
 
 #: musicbot/playlist.py:504
 msgid "no duration data in current entry"
-msgstr ""
+msgstr "当前条目中没有持续数据"
 
 #: musicbot/spotify.py:119
 #, python-format
@@ -2822,7 +2899,7 @@ msgstr ""
 
 #: musicbot/spotify.py:587 musicbot/spotify.py:623 musicbot/spotify.py:733
 msgid "Response JSON did not decode to a dict!"
-msgstr ""
+msgstr "响应 JSON 没有解码到一个口令！"
 
 #: musicbot/spotify.py:602
 #, python-format
@@ -2836,7 +2913,7 @@ msgstr ""
 
 #: musicbot/spotify.py:672
 msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr ""
+msgstr "无法从 Spotify 获取访客令牌，请尝试指定客户端ID和客户端密钥"
 
 #: musicbot/spotify.py:683
 #, python-format
@@ -2851,18 +2928,18 @@ msgstr ""
 
 #: musicbot/spotify.py:696
 msgid "Requested a token from Spotify, did not end up getting one"
-msgstr ""
+msgstr "从 Spotify 请求一个令牌，最终没有得到一个"
 
 #: musicbot/spotify.py:727
 #, python-format
 msgid "API response status is not OK: [%(status)s]  %(reason)s"
 msgstr ""
 
-#: musicbot/utils.py:175
+#: musicbot/utils.py:174
 msgid "Only the owner can use this command."
-msgstr ""
+msgstr "只有所有者可以使用此命令。"
 
-#: musicbot/utils.py:195
+#: musicbot/utils.py:194
 msgid "Only dev users can use this command."
-msgstr ""
+msgstr "只有dev 用户可以使用此命令。"
 
