@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"PO-Revision-Date: 2024-11-06 21:43\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -2299,7 +2299,7 @@ msgstr "Validation des options avec les données du service..."
 
 #: musicbot/config.py:1240
 msgid "Acquired owner ID via API"
-msgstr ""
+msgstr "ID de propriétaire acquis via l'API"
 
 #: musicbot/config.py:1244
 msgid "Error while fetching 'OwnerID' automatically.\n\n"
@@ -3244,7 +3244,7 @@ msgstr "Erreur lors de la tentative de suppression du fichier."
 
 #: musicbot/player.py:521
 msgid "Could not delete file, giving up and moving on"
-msgstr ""
+msgstr "Impossible de supprimer le fichier, d'abandonner et de déplacer le"
 
 #: musicbot/player.py:583
 #, python-format
@@ -3455,7 +3455,7 @@ msgstr "Impossible de faire POST à l'URL :  %(url)s  Raison :  %(raw_error)s"
 
 #: musicbot/spotify.py:672
 msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
-msgstr ""
+msgstr "Impossible d'obtenir un jeton d'invité de Spotify, veuillez essayer de spécifier l'ID client et le secret du client"
 
 #: musicbot/spotify.py:679
 msgid "Created a new Guest Mode access token."
