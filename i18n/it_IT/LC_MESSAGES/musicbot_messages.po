@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
-"PO-Revision-Date: 2024-11-06 19:17\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
+"PO-Revision-Date: 2024-11-06 20:44\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -2159,9 +2159,9 @@ msgstr "auto"
 #: musicbot/bot.py:7630
 #, python-format
 msgid "\n"
-"**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`"
+"**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
 msgstr "\n"
-"**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) nella regione `%(region)s`"
+"**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) nella regione `%(region)s`"
 
 #: musicbot/bot.py:7635
 #, python-format
@@ -3174,8 +3174,8 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr "Impossibile rendere POST all'URL:  %(url)s  Motivo:  %(raw_error)s"
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr "Impossibile ottenere un token ospite da Spotify, si prega di provare a specificare l'id client e il segreto client"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
+msgstr "Impossibile ottenere un token ospite da Spotify, si prega di provare a specificare l'ID client e il segreto client"
 
 #: musicbot/spotify.py:683
 #, python-format
