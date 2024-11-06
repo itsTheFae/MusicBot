@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
-"PO-Revision-Date: 2024-11-06 19:18\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
+"PO-Revision-Date: 2024-11-06 20:44\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -2009,7 +2009,7 @@ msgstr "auto"
 #: musicbot/bot.py:7630
 #, python-format
 msgid "\n"
-"**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`"
+"**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
 msgstr ""
 
 #: musicbot/bot.py:7635
@@ -2910,8 +2910,8 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr ""
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr "无法从 Spotify 获取访客令牌，请尝试指定客户端ID和客户端密钥"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
+msgstr "无法从 Spotify 获取访客令牌，请尝试指定客户端 ID 和客户端密钥"
 
 #: musicbot/spotify.py:683
 #, python-format
