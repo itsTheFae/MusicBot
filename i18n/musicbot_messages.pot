@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-998-g92bb1b56\n"
+"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-999-gd93a29bf\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2100,7 +2100,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`"
+"**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
 msgstr ""
 
 #: musicbot/bot.py:7635
@@ -3038,7 +3038,7 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr ""
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
 msgstr ""
 
 #: musicbot/spotify.py:683

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-998-g92bb1b56\n"
+"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-999-gd93a29bf\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2265,7 +2265,7 @@ msgid "Validating options with service data..."
 msgstr ""
 
 #: musicbot/config.py:1240
-msgid "Acquired owner id via API"
+msgid "Acquired owner ID via API"
 msgstr ""
 
 #: musicbot/config.py:1244
@@ -2457,7 +2457,7 @@ msgstr ""
 
 #: musicbot/config.py:2610 musicbot/config.py:2643
 #, python-format
-msgid "Could not update the blocklist file:  %s"
+msgid "Could not update the block list file:  %s"
 msgstr ""
 
 #: musicbot/config.py:2670
@@ -3037,7 +3037,7 @@ msgstr ""
 
 #: musicbot/permissions.py:238
 #, python-format
-msgid "Updating group in permssions file:  %s"
+msgid "Updating group in permissions file:  %s"
 msgstr ""
 
 #: musicbot/permissions.py:244
@@ -3199,12 +3199,12 @@ msgid "Error while trying to delete file."
 msgstr ""
 
 #: musicbot/player.py:521
-msgid "[Config:SaveVideos] Could not delete file, giving up and moving on"
+msgid "Could not delete file, giving up and moving on"
 msgstr ""
 
 #: musicbot/player.py:583
 #, python-format
-msgid "Deserialize returned a non-MusicPlayer:  %s"
+msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
 msgstr ""
 
 #: musicbot/player.py:588
@@ -3410,7 +3410,7 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr ""
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
 msgstr ""
 
 #: musicbot/spotify.py:679

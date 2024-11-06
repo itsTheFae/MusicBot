@@ -1237,7 +1237,7 @@ class Config:
         if self.owner_id == 0:
             if bot.cached_app_info:
                 self.owner_id = bot.cached_app_info.owner.id
-                log.debug("Acquired owner id via API")
+                log.debug("Acquired owner ID via API")
             else:
                 raise HelpfulError(
                     # fmt: off
@@ -2607,7 +2607,7 @@ class Blocklist:
             return True
         except OSError:
             log.error(
-                "Could not update the blocklist file:  %s",
+                "Could not update the block list file:  %s",
                 self._blocklist_file,
                 exc_info=True,
             )
@@ -2640,7 +2640,7 @@ class Blocklist:
 
         except OSError:
             log.error(
-                "Could not update the blocklist file:  %s",
+                "Could not update the block list file:  %s",
                 self._blocklist_file,
                 exc_info=True,
             )

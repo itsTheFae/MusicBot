@@ -235,7 +235,7 @@ class Permissions:
             if group in set(cu.keys()):
                 # update
                 if group in self.groups:
-                    log.debug("Updating group in permssions file:  %s", group)
+                    log.debug("Updating group in permissions file:  %s", group)
                     for option in set(cu[group].keys()):
                         cu[group][option].value = self.register.to_ini(opts[option])
 

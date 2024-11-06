@@ -7627,7 +7627,7 @@ class MusicBot(discord.Client):
                 # TRANSLATORS: short for automatic, displayed when voice region is not selected.
                 vcr = vc.channel.rtc_region or _D("auto", ssd_)
                 voice_lat = _D(
-                    "\n**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`",
+                    "\n**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`",
                     ssd_,
                 ) % {"delay": vl, "average": vla, "region": vcr}
         sl = self.latency * 1000

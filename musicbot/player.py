@@ -518,7 +518,7 @@ class MusicPlayer(EventEmitter, Serializable):
                         break
                 else:
                     log.debug(
-                        "[Config:SaveVideos] Could not delete file, giving up and moving on"
+                        "Could not delete file, giving up and moving on"
                     )
 
     def __json__(self) -> Dict[str, Any]:
@@ -580,7 +580,7 @@ class MusicPlayer(EventEmitter, Serializable):
             if isinstance(obj, MusicPlayer):
                 return obj
             log.error(
-                "Deserialize returned a non-MusicPlayer:  %s",
+                "Deserialize returned an object that is not a MusicPlayer:  %s",
                 type(obj),
             )
             return None

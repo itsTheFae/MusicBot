@@ -669,7 +669,7 @@ class Spotify:
             token = await self._request_guest_token()
             if not token:
                 raise SpotifyError(
-                    "Failed to get a guest token from Spotify, please try specifying client id and client secret"
+                    "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
                 )
             try:
                 self._token = {
