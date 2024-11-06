@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -906,8 +906,8 @@ msgstr "Not bound to any text channels"
 
 #: musicbot/bot.py:2421
 #, python-format
-msgid "Got None for autojoin channel with ID:  %d"
-msgstr "Got None for autojoin channel with ID:  %d"
+msgid "Got None for auto join channel with ID:  %d"
+msgstr ""
 
 #: musicbot/bot.py:2427
 #, python-format
@@ -1224,8 +1224,8 @@ msgstr "Not adding user to block list, already blocked:  %(id)s/%(name)s"
 
 #: musicbot/bot.py:3052
 #, python-format
-msgid "Not removing user from blocklist, not listed:  %(id)s/%(name)s"
-msgstr "Not removing user from blocklist, not listed:  %(id)s/%(name)s"
+msgid "Not removing user from block list, not listed:  %(id)s/%(name)s"
+msgstr ""
 
 #: musicbot/bot.py:3069
 msgid "Cannot add the users you listed, they are already added."
@@ -1409,8 +1409,8 @@ msgstr "That video cannot be played. Try using the stream command."
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
-msgstr "Youtube search returned no results for:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
+msgstr ""
 
 #: musicbot/bot.py:4238
 #, python-format
@@ -1423,8 +1423,8 @@ msgid "No songs were added, all songs were over max duration (%(max)s seconds)"
 msgstr "No songs were added, all songs were over max duration (%(max)s seconds)"
 
 #: musicbot/bot.py:4265
-msgid "Extracted an entry with youtube:playlist as extractor key"
-msgstr "Extracted an entry with youtube:playlist as extractor key"
+msgid "Extracted an entry with 'youtube:playlist' as extractor key"
+msgstr ""
 
 #: musicbot/bot.py:4277
 #, python-format
@@ -1748,10 +1748,9 @@ msgstr "Permissions cannot use channel and user mentions at the same time."
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
-msgstr "Unable to reload Permissions due to an errror:\n"
-"%(raw_error)s"
+msgstr ""
 
 #: musicbot/bot.py:6575
 msgid "You must provide a group or option name for this command."
@@ -3050,8 +3049,8 @@ msgid "Changing log level to:  %s"
 msgstr "Changing log level to:  %s"
 
 #: musicbot/logs.py:314
-msgid "MusicBot loggers have been called to shutdown."
-msgstr "MusicBot loggers have been called to shutdown."
+msgid "MusicBot loggers have been called to shut down."
+msgstr ""
 
 #: musicbot/permissions.py:118
 #, python-format
