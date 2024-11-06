@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:18\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -127,7 +127,7 @@ msgstr "Ошибка входа в Discord API!\n\n"
 #: musicbot/bot.py:2695
 #, python-brace-format
 msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr ""
+msgstr "Запрошенная песня `{subject}` заблокирована списком блоков песен."
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -297,7 +297,7 @@ msgstr "Вы должны предоставить тему песни, если
 
 #: musicbot/bot.py:3152
 msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
-msgstr ""
+msgstr "Неверная субкоманда. Используйте `help blocksong` для примеров использования."
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -463,7 +463,11 @@ msgid "Add a song to be played in the queue. If no song is playing or paused, pl
 "Playlist links will be extracted into multiple links and added to the queue.\n"
 "If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
 "MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
-msgstr ""
+msgstr "Добавьте песню для воспроизведения в очереди. Если песня не воспроизводится или приостановлена, будет запущено воспроизведение.\n\n"
+"Вы можете предоставить URL-адрес для видео или аудио файла или URL-адреса сервиса, поддерживаемого yt-dlp.\n"
+"Ссылки на плейлист будут извлечены из нескольких ссылок и добавлены в очередь.\n"
+"Если вы введете не-URL, ввод будет использоваться в качестве критериев поиска на YouTube и первый результат воспроизведен.\n"
+"MusicBot также поддерживает Spotify URIs и URL, но звук загружается с YouTube regardless.\n"
 
 #: musicbot/bot.py:3628
 msgid "Play command that shuffles playlist entries before adding them to the queue.\n"
@@ -616,7 +620,7 @@ msgstr "URL-адрес Spotify недействителен или в насто
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "Обнаружен URL-адрес Spotify, но Spotify не включен."
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -640,8 +644,8 @@ msgstr "Это видео не может быть воспроизведено.
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
-msgstr "Поиск на Youtube не дал результатов для:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
+msgstr "Поиск YouTube не дал результатов по запросу:  %(url)s"
 
 #: musicbot/bot.py:4249
 #, python-format
@@ -1062,7 +1066,7 @@ msgstr "Вы должны предоставить скорость для ус�
 
 #: musicbot/bot.py:5413
 msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
-msgstr ""
+msgstr "Предоставленная вами скорость является недопустимой. Используйте число в диапазоне от 0.5 до 100."
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1527,7 +1531,7 @@ msgstr "Получить список разрешений, или разреш�
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double-check the ID and try again."
-msgstr ""
+msgstr "Неверный ID пользователя или имя сервера, проверьте ID и повторите попытку."
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -1601,9 +1605,9 @@ msgstr "Права доступа успешно перезагружены из
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
-msgstr "Не удалось перезагрузить разрешения из-за ошибки:\n"
+msgstr "Не удается перезагрузить разрешения из-за ошибки:\n"
 "%(raw_error)s"
 
 #: musicbot/bot.py:6558
@@ -2412,7 +2416,7 @@ msgstr "Включить автоматическое пропуск треко�
 
 #: musicbot/config.py:469
 msgid "Remove songs from the auto playlist if they are found in the song block list."
-msgstr ""
+msgstr "Удалить песни из автоплейлиста, если они находятся в списке блоков песни."
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
@@ -2867,7 +2871,7 @@ msgstr "Локальный медиа-файл не найден."
 #: musicbot/entry.py:449
 #, python-format
 msgid "Cannot download Spotify links, processing error with type: %(type)s"
-msgstr ""
+msgstr "Не удается загрузить ссылки Spotify, ошибка обработки типа %(type)s"
 
 #: musicbot/entry.py:710
 #, python-format
@@ -2985,7 +2989,13 @@ msgid "Specify yt-dlp extractor names, separated by spaces, that are allowed to 
 "  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n\n"
 "MusicBot also provides one custom service `spotify:musicbot` to enable or disable Spotify API extraction.\n"
 "NOTICE: MusicBot might not support all services available to yt-dlp!\n"
-msgstr ""
+msgstr "Укажите имена экстракторов yt-dlp, разделенные пробелами, которые разрешены к использованию.\n"
+"При пустых словах используются значения по умолчанию. По умолчанию отображаются выше, но могут меняться между версиями.\n"
+"Чтобы разрешить все экстракторы, добавьте `%(allow_all)s` без кавычек в список.\n\n"
+"Сервисы/экстракторы поддерживаемые yt-dlp перечислены здесь:\n"
+"  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites. d \n\n"
+"MusicBot также предоставляет один пользовательский сервис `spotify:musicbot`, чтобы включить или отключить извлечение Spotify API.\n"
+"ЗАМЕЧАНИЕ: MusicBot может не поддерживать все сервисы yt-dlp!\n"
 
 #: musicbot/permissions.py:613
 #, python-format
@@ -3004,7 +3014,7 @@ msgstr "Это плейлист."
 #: musicbot/playlist.py:195
 #, python-format
 msgid "Invalid content type `%(type)s` for URL: %(url)s"
-msgstr ""
+msgstr "Недопустимый тип содержимого `%(type)s` для URL: %(url)s"
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
