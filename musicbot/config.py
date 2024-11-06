@@ -558,7 +558,7 @@ class Config:
                 "These variables may not be accurate in multi-guild bots:\n"
                 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
                 " {p0_title}    = The track title for the currently playing track.\n"
-                " {p0_url}      = The track url for the currently playing track."
+                " {p0_url}      = The track URL for the currently playing track."
             ),
         )
         self.status_include_paused: bool = self.register.init_option(
@@ -609,7 +609,7 @@ class Config:
             dest="embeds",
             default=ConfigDefaults.embeds,
             getter="getboolean",
-            comment=_Dd("Allow MusicBot to format it's messages as embeds."),
+            comment=_Dd("Allow MusicBot to format its messages as embeds."),
         )
         self.queue_length: int = self.register.init_option(
             section="MusicBot",
@@ -628,7 +628,7 @@ class Config:
             default=ConfigDefaults.remove_ap,
             getter="getboolean",
             comment=_Dd(
-                "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
+                "Enable MusicBot to automatically remove unplayable entries from the auto playlist."
             ),
         )
         self.show_config_at_start: bool = self.register.init_option(

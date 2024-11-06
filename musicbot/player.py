@@ -517,9 +517,7 @@ class MusicPlayer(EventEmitter, Serializable):
                         )
                         break
                 else:
-                    log.debug(
-                        "Could not delete file, giving up and moving on"
-                    )
+                    log.debug("Could not delete file, giving up and moving on")
 
     def __json__(self) -> Dict[str, Any]:
         return self._enclose_json(

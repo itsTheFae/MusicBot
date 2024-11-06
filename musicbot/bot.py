@@ -3981,7 +3981,7 @@ class MusicBot(discord.Client):
             channel,
             Response(
                 _D(
-                    "Successfully moved song from positon %(from)s in queue to position %(to)s!",
+                    "Successfully moved song from position %(from)s in queue to position %(to)s!",
                     self.server_data[guild.id],
                 )
                 % {"from": indexes[0] + 1, "to": indexes[1] + 1},
@@ -5543,13 +5543,13 @@ class MusicBot(discord.Client):
             + _Dd("    Display the current value of the option.\n"),
 
             "{cmd} save <SECTION> <OPTION>\n"
-            + _Dd("    Saves the current current value to the options file.\n"),
+            + _Dd("    Saves the current value to the options file.\n"),
 
             "{cmd} set <SECTION> <OPTION> <VALUE>\n"
             + _Dd("    Validates the option and sets the config for the session, but not to file.\n"),
 
             "{cmd} reset <SECTION> <OPTION>\n"
-            + _Dd("    Reset the option to it's default value.\n"),
+            + _Dd("    Reset the option to its default value.\n"),
         ],
         # fmt: on
         desc=_Dd("Manage options.ini configuration from within Discord."),
@@ -6228,7 +6228,7 @@ class MusicBot(discord.Client):
 
     @command_helper(
         usage=["{cmd} <URL>"],
-        desc=_Dd("Dump the individual urls of a playlist to a file."),
+        desc=_Dd("Dump the individual URLs of a playlist to a file."),
     )
     async def cmd_pldump(
         self,
@@ -6392,7 +6392,7 @@ class MusicBot(discord.Client):
     @command_helper(
         usage=["{cmd} [@USER]"],
         desc=_Dd(
-            "Get a list of your permissions, or the permisions of the mentioned user."
+            "Get a list of your permissions, or the permissions of the mentioned user."
         ),
     )
     async def cmd_perms(
@@ -6658,7 +6658,7 @@ class MusicBot(discord.Client):
             return Response(
                 _D(
                     "Successfully added new group:  `%(group)s`\n"
-                    "You can now customizse the permissions with:  `setperms set %(group)s`\n"
+                    "You can now customize the permissions with:  `setperms set %(group)s`\n"
                     "Make sure to save the new group with:  `setperms save %(group)s`",
                     ssd_,
                 )
@@ -6762,7 +6762,7 @@ class MusicBot(discord.Client):
     @command_helper(
         usage=["{cmd} <NAME>"],
         desc=_Dd(
-            "Change the bot's username on discord."
+            "Change the bot's username on discord.\n"
             "Note: The API may limit name changes to twice per hour."
         ),
     )
@@ -7160,7 +7160,7 @@ class MusicBot(discord.Client):
     @command_helper(
         desc=_Dd(
             "This command issues a log at level CRITICAL, but does nothing else.\n"
-            "Can be used to manually pin-point events in the MusicBot log file.\n"
+            "Can be used to manually pinpoint events in the MusicBot log file.\n"
         ),
     )
     async def cmd_breakpoint(self, guild: discord.Guild) -> CommandResponse:
@@ -7189,7 +7189,7 @@ class MusicBot(discord.Client):
             + _Dd("    View typestats of leaking objects.\n"),
 
             "{cmd} [objgraph.function(...)]\n"
-            + _Dd("    Evaluate the given function and args on objgraph.\n"),
+            + _Dd("    Evaluate the given function and arguments on objgraph.\n"),
         ],
         # fmt: on
         desc=_Dd(
@@ -7318,7 +7318,7 @@ class MusicBot(discord.Client):
         usage=["{cmd} < opts | perms | help >"],
         desc=_Dd(
             "Create 'markdown' for options, permissions, or commands from the code.\n"
-            "The output is used to update github pages and is thus unsuitable for normal reference use."
+            "The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
         ),
     )
     async def cmd_makemarkdown(
