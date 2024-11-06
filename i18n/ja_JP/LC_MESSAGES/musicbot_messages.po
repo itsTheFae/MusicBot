@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"POT-Creation-Date: 2024-11-06 13:49-0800\n"
+"PO-Revision-Date: 2024-11-06 21:53\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -586,8 +586,8 @@ msgstr "プレイリストのサイズ以外の位置を指定しました！"
 
 #: musicbot/bot.py:3984
 #, python-format
-msgid "Successfully moved song from positon %(from)s in queue to position %(to)s!"
-msgstr "曲を順番に %(from)s から %(to)sに移動しました！"
+msgid "Successfully moved song from position %(from)s in queue to position %(to)s!"
+msgstr "曲をキューの %(from)s から %(to)sに移動しました！"
 
 #: musicbot/bot.py:4072
 #, python-format
@@ -1144,7 +1144,7 @@ msgid "    Display the current value of the option.\n"
 msgstr "    オプションの現在の値を表示します。\n"
 
 #: musicbot/bot.py:5546
-msgid "    Saves the current current value to the options file.\n"
+msgid "    Saves the current value to the options file.\n"
 msgstr "    現在の値をオプションファイルに保存します。\n"
 
 #: musicbot/bot.py:5549
@@ -1152,7 +1152,7 @@ msgid "    Validates the option and sets the config for the session, but not to 
 msgstr "    オプションを検証し、セッションの設定をファイルではなく設定します。\n"
 
 #: musicbot/bot.py:5552
-msgid "    Reset the option to it's default value.\n"
+msgid "    Reset the option to its default value.\n"
 msgstr "    オプションをデフォルト値にリセットします。\n"
 
 #: musicbot/bot.py:5555
@@ -1458,7 +1458,7 @@ msgid "Bot does not have permission to manage messages."
 msgstr "Botにメッセージを管理する権限がありません。"
 
 #: musicbot/bot.py:6231
-msgid "Dump the individual urls of a playlist to a file."
+msgid "Dump the individual URLs of a playlist to a file."
 msgstr "プレイリストの個々の URL をファイルにダンプします。"
 
 #: musicbot/bot.py:6247
@@ -1512,8 +1512,8 @@ msgid "Here are the IDs you requested:"
 msgstr "要求されたIDは次のとおりです："
 
 #: musicbot/bot.py:6395
-msgid "Get a list of your permissions, or the permisions of the mentioned user."
-msgstr "権限の一覧またはメンションされたユーザーの権限を取得します。"
+msgid "Get a list of your permissions, or the permissions of the mentioned user."
+msgstr "アクセス権の一覧、またはメンションされたユーザーの権限を取得します。"
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double-check the ID and try again."
@@ -1658,7 +1658,7 @@ msgstr "グループを追加できません`%(group)s` が既に存在します
 #: musicbot/bot.py:6660
 #, python-format
 msgid "Successfully added new group:  `%(group)s`\n"
-"You can now customizse the permissions with:  `setperms set %(group)s`\n"
+"You can now customize the permissions with:  `setperms set %(group)s`\n"
 "Make sure to save the new group with:  `setperms save %(group)s`"
 msgstr ""
 
@@ -1706,8 +1706,10 @@ msgstr "パーミッション`%(permission)s` が更新されました。\n"
 "変更を保存するには、 `setperms save %(section)s %(option)s ` を使います。"
 
 #: musicbot/bot.py:6765
-msgid "Change the bot's username on discord.Note: The API may limit name changes to twice per hour."
-msgstr "注意: APIは、名前の変更を1時間に2回まで制限する場合があります。"
+msgid "Change the bot's username on discord.\n"
+"Note: The API may limit name changes to twice per hour."
+msgstr "discord上のボットのユーザー名を変更します。\n"
+"注意: APIは名前の変更を1時間に2回まで制限する場合があります。"
 
 #: musicbot/bot.py:6784
 msgid "Failed to change username. Did you change names too many times?\n"
@@ -1913,9 +1915,9 @@ msgstr "テストに使用されるコマンド。テストスイートで確認
 
 #: musicbot/bot.py:7162
 msgid "This command issues a log at level CRITICAL, but does nothing else.\n"
-"Can be used to manually pin-point events in the MusicBot log file.\n"
+"Can be used to manually pinpoint events in the MusicBot log file.\n"
 msgstr "このコマンドはレベルCRITICALでログを発行しますが、それ以外は何もしません。\n"
-"MusicBot のログファイルで手動でピンポイントイベントに使用できます。\n"
+"MusicBotログファイルのイベントを手動で特定するために使用できます。\n"
 
 #: musicbot/bot.py:7173
 #, python-format
@@ -1939,7 +1941,7 @@ msgid "    View typestats of leaking objects.\n"
 msgstr "    漏れたオブジェクトの型番を表示します。\n"
 
 #: musicbot/bot.py:7192
-msgid "    Evaluate the given function and args on objgraph.\n"
+msgid "    Evaluate the given function and arguments on objgraph.\n"
 msgstr "    objgraphで与えられた関数と引数を評価します。\n"
 
 #: musicbot/bot.py:7196
@@ -1978,9 +1980,9 @@ msgstr "デバッグコードの実行に失敗しました:\n"
 
 #: musicbot/bot.py:7320
 msgid "Create 'markdown' for options, permissions, or commands from the code.\n"
-"The output is used to update github pages and is thus unsuitable for normal reference use."
+"The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
 msgstr "コードからオプション、権限、またはコマンドの 'markdown' を作成します。\n"
-"出力は github ページの更新に使用されるため、通常の参照使用には適していません。"
+"出力は GitHub Pages の更新に使用されるため、通常の参照使用には適していません。"
 
 #: musicbot/bot.py:7337 musicbot/bot.py:7398
 #, python-format
@@ -2444,7 +2446,7 @@ msgid "Specify a custom message to use as the bot's status. If left empty, the b
 "These variables may not be accurate in multi-guild bots:\n"
 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
 " {p0_title}    = The track title for the currently playing track.\n"
-" {p0_url}      = The track url for the currently playing track."
+" {p0_url}      = The track URL for the currently playing track."
 msgstr ""
 
 #: musicbot/config.py:571
@@ -2466,7 +2468,7 @@ msgstr "ffmpegを使用して、再生時に使用するボリューム正規化
 "トラック全体を処理する必要があるため、このオプションは曲を再生する間の遅延を引き起こす可能性があります。"
 
 #: musicbot/config.py:612
-msgid "Allow MusicBot to format it's messages as embeds."
+msgid "Allow MusicBot to format its messages as embeds."
 msgstr "MusicBot がメッセージを埋め込み形式にすることを許可します。"
 
 #: musicbot/config.py:621
@@ -2474,8 +2476,8 @@ msgid "The number of entries to show per-page when using q command to list the q
 msgstr "キューを一覧表示するために q コマンドを使用するときに、ページごとに表示するエントリ数です。"
 
 #: musicbot/config.py:631
-msgid "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
-msgstr "自動プレイリストから再生できないエントリを自動的に削除するには、MusicBotを有効にします。"
+msgid "Enable MusicBot to automatically remove unplayable entries from the auto playlist."
+msgstr "自動再生リストから再生できないエントリを自動的に削除するには、MusicBotを有効にします。"
 
 #: musicbot/config.py:640
 msgid "Display MusicBot config settings in the logs at startup."
