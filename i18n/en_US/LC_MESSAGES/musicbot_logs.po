@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"PO-Revision-Date: 2024-11-06 21:44\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -3779,7 +3779,7 @@ msgstr "On Windows, you can add a pre-compiled EXE to the MusicBot `bin` folder,
 #: run.py:540
 msgid "On MacOS, you may be able to install FFmpeg via homebrew.\n"
 "Otherwise, check the official FFmpeg site for build or install steps."
-msgstr "On MacOS, you may be able to install FFmpeg via homebrew.\n"
+msgstr "On macOS, you may be able to install FFmpeg via homebrew.\n"
 "Otherwise, check the official FFmpeg site for build or install steps."
 
 #: run.py:545
@@ -3860,7 +3860,7 @@ msgstr "Launch a music playing discord bot built using discord.py, youtubeDL, an
 
 #: run.py:669
 msgid "Available via Github:"
-msgstr "Available via Github:"
+msgstr "Available via GitHub:"
 
 #: run.py:673
 msgid "For more help and support with this bot, join our discord:"
