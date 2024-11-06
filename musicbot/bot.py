@@ -2418,7 +2418,7 @@ class MusicBot(discord.Client):
             for ch_id in self.config.autojoin_channels:
                 ch = self.get_channel(ch_id)
                 if not ch:
-                    log.warning("Got None for autojoin channel with ID:  %d", ch_id)
+                    log.warning("Got None for auto join channel with ID:  %d", ch_id)
                     invalids.add(ch_id)
                     continue
 
@@ -3049,7 +3049,7 @@ class MusicBot(discord.Client):
                 user
             ):
                 log.info(
-                    "Not removing user from blocklist, not listed:  %(id)s/%(name)s",
+                    "Not removing user from block list, not listed:  %(id)s/%(name)s",
                     {"id": user.id, "name": user.name},
                 )
                 user_mentions.remove(user)
@@ -4205,7 +4205,7 @@ class MusicBot(discord.Client):
                 if info.extractor.startswith("youtube:search"):
                     # TOOD: UI, i18n stuff
                     raise exceptions.CommandError(
-                        "Youtube search returned no results for:  %(url)s",
+                        "YouTube search returned no results for:  %(url)s",
                         fmt_args={"url": song_url},
                     )
 
@@ -4262,7 +4262,7 @@ class MusicBot(discord.Client):
                 # ^ wish I had a URL for this one.
                 if info.get("extractor", "").startswith("youtube:playlist"):
                     log.noise(  # type: ignore[attr-defined]
-                        "Extracted an entry with youtube:playlist as extractor key"
+                        "Extracted an entry with 'youtube:playlist' as extractor key"
                     )
 
                 # Check the block list again, with the info this time.
@@ -6535,7 +6535,7 @@ class MusicBot(discord.Client):
                 )
             except Exception as e:
                 raise exceptions.CommandError(
-                    "Unable to reload Permissions due to an errror:\n%(raw_error)s",
+                    "Unable to reload Permissions due to an error:\n%(raw_error)s",
                     fmt_args={"raw_error": e},
                 ) from e
 

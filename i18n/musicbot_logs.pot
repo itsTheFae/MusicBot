@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-997-g7c8463ad\n"
+"Project-Id-Version: Just-Some-Bots/MusicBot release-250723-998-g92bb1b56\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -893,7 +893,7 @@ msgstr ""
 
 #: musicbot/bot.py:2421
 #, python-format
-msgid "Got None for autojoin channel with ID:  %d"
+msgid "Got None for auto join channel with ID:  %d"
 msgstr ""
 
 #: musicbot/bot.py:2427
@@ -1207,7 +1207,7 @@ msgstr ""
 
 #: musicbot/bot.py:3052
 #, python-format
-msgid "Not removing user from blocklist, not listed:  %(id)s/%(name)s"
+msgid "Not removing user from block list, not listed:  %(id)s/%(name)s"
 msgstr ""
 
 #: musicbot/bot.py:3069
@@ -1391,7 +1391,7 @@ msgstr ""
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
 msgstr ""
 
 #: musicbot/bot.py:4238
@@ -1405,7 +1405,7 @@ msgid "No songs were added, all songs were over max duration (%(max)s seconds)"
 msgstr ""
 
 #: musicbot/bot.py:4265
-msgid "Extracted an entry with youtube:playlist as extractor key"
+msgid "Extracted an entry with 'youtube:playlist' as extractor key"
 msgstr ""
 
 #: musicbot/bot.py:4277
@@ -1731,7 +1731,7 @@ msgstr ""
 #: musicbot/bot.py:6538
 #, python-format
 msgid ""
-"Unable to reload Permissions due to an errror:\n"
+"Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
 msgstr ""
 
@@ -3010,7 +3010,7 @@ msgid "Changing log level to:  %s"
 msgstr ""
 
 #: musicbot/logs.py:314
-msgid "MusicBot loggers have been called to shutdown."
+msgid "MusicBot loggers have been called to shut down."
 msgstr ""
 
 #: musicbot/permissions.py:118
