@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:17\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -536,7 +536,7 @@ msgstr "曲 \"%(url)s\" の抽出中にエラーが発生しました： %(raw_e
 
 #: musicbot/bot.py:1441
 msgid "MusicBot needs to stop the auto playlist extraction and bail."
-msgstr ""
+msgstr "MusicBotは自動プレイリストの抽出と保釈を停止する必要があります。"
 
 #: musicbot/bot.py:1446
 msgid "MusicBot got an unhandled exception in player finished event."
@@ -609,7 +609,7 @@ msgstr "%s のために現在の曲を書き込み中"
 #: musicbot/bot.py:1802
 #, python-format
 msgid "Cannot send non-response object:  %r"
-msgstr ""
+msgstr "応答しないオブジェクトを送信できません:  %r"
 
 #: musicbot/bot.py:1807
 msgid "[Dev Bug] Tried sending an invalid response object."
@@ -883,13 +883,13 @@ msgstr "テキストチャンネルにバインドされていません"
 
 #: musicbot/bot.py:2421
 #, python-format
-msgid "Got None for autojoin channel with ID:  %d"
-msgstr "IDを持つ自動参加チャンネルに対してNoneを取得しました:  %d"
+msgid "Got None for auto join channel with ID:  %d"
+msgstr "IDを持つ自動参加チャンネルにNoneを取得しました:  %d"
 
 #: musicbot/bot.py:2427
 #, python-format
 msgid "Cannot auto join a Private/Non-Guild channel with ID:  %d"
-msgstr ""
+msgstr "IDを持つプライベート/非ギルドチャンネルに自動的に参加できません:  %d"
 
 #: musicbot/bot.py:2435
 #, python-format
@@ -898,11 +898,11 @@ msgstr "IDを持つ非接続可能なチャンネルに自動的に参加でき�
 
 #: musicbot/bot.py:2451
 msgid "Auto joining voice channels:"
-msgstr ""
+msgstr "ボイスチャンネルの自動結合:"
 
 #: musicbot/bot.py:2459 musicbot/bot.py:2462
 msgid "Not auto joining any voice channels"
-msgstr ""
+msgstr "音声チャンネルに自動的に参加しません"
 
 #: musicbot/bot.py:2475
 #, python-format
@@ -1006,7 +1006,7 @@ msgstr "    呼び出しを削除: %s"
 #: musicbot/bot.py:2605
 #, python-format
 msgid "    Delete Now Playing: %s"
-msgstr ""
+msgstr "    今すぐプレイを削除: %s"
 
 #: musicbot/bot.py:2608
 #, python-format
@@ -1111,7 +1111,7 @@ msgstr "  ラウンドロビン隊列： %s"
 #: musicbot/bot.py:2695
 #, python-brace-format
 msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr ""
+msgstr "The requested song `{subject}` is blocked by the song block list."
 
 #: musicbot/bot.py:2706
 msgid "Attempted to handle Voice Channel inactivity, but Bot is not in voice..."
@@ -1193,8 +1193,8 @@ msgstr "ユーザーをブロックリストに追加していません。既に
 
 #: musicbot/bot.py:3052
 #, python-format
-msgid "Not removing user from blocklist, not listed:  %(id)s/%(name)s"
-msgstr "ブロックリストからユーザーを削除していません。リストにありません:  %(id)s/%(name)s"
+msgid "Not removing user from block list, not listed:  %(id)s/%(name)s"
+msgstr "リストにないブロックリストからユーザーを削除していません:  %(id)s/%(name)s"
 
 #: musicbot/bot.py:3069
 msgid "Cannot add the users you listed, they are already added."
@@ -1348,7 +1348,7 @@ msgstr "SpotifyのURLが無効または現在サポートされていません�
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "Spotify の URL が検出されましたが、Spotify は有効ではありません。"
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -1376,8 +1376,8 @@ msgstr "動画を再生できません。streamコマンドを使用してみて
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
-msgstr "Youtube の検索結果は次のとおりです:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
+msgstr "YouTubeの検索結果が  %(url)sにはありませんでした"
 
 #: musicbot/bot.py:4238
 #, python-format
@@ -1390,8 +1390,8 @@ msgid "No songs were added, all songs were over max duration (%(max)s seconds)"
 msgstr "曲が追加されていません。すべての曲が最大時間（%(max)s 秒）を超えています。"
 
 #: musicbot/bot.py:4265
-msgid "Extracted an entry with youtube:playlist as extractor key"
-msgstr "抽出キーとして youtube:playlist でエントリを抽出しました"
+msgid "Extracted an entry with 'youtube:playlist' as extractor key"
+msgstr "抽出キーとして 'youtube:playlist' でエントリを抽出しました"
 
 #: musicbot/bot.py:4277
 #, python-format
@@ -1714,7 +1714,7 @@ msgstr "権限は同時にチャンネルとユーザーメンションを使用
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
 msgstr "エラーが発生したため権限を再読み込みできません:\n"
 "%(raw_error)s"
@@ -2425,7 +2425,7 @@ msgstr "ブロックリストファイルを更新できませんでした:  %s"
 #: musicbot/config.py:2670
 #, python-format
 msgid "Loaded User Block list with %s entries."
-msgstr ""
+msgstr "%s エントリでユーザーブロックリストを読み込みました。"
 
 #: musicbot/config.py:2681
 #, python-format
@@ -2635,7 +2635,7 @@ msgstr "Entry data has the wrong version number, cannot deerialize."
 #: musicbot/entry.py:358
 #, python-format
 msgid "Deserialized URLPlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "Deserialized URLPlaylistEntry cannot find channel with ID:  %s"
 
 #: musicbot/entry.py:374
 #, python-format
@@ -2659,7 +2659,7 @@ msgstr "%s を読み込めませんでした"
 #: musicbot/entry.py:449
 #, python-format
 msgid "Cannot download Spotify links, processing error with type: %(type)s"
-msgstr ""
+msgstr "Spotifyのリンクをダウンロードできません。 %(type)s"
 
 #: musicbot/entry.py:461 musicbot/entry.py:924 musicbot/entry.py:1175
 #, python-format
@@ -2738,7 +2738,7 @@ msgstr "パス上にffmpegが見つかりませんでした！"
 
 #: musicbot/entry.py:631 musicbot/entry.py:1312
 msgid "Could not parse 'I' in normalize json."
-msgstr ""
+msgstr "jsonの正規化で「I」を解析できませんでした。"
 
 #: musicbot/entry.py:639 musicbot/entry.py:1320
 msgid "Could not parse 'LRA' in normalize json."
@@ -2746,15 +2746,15 @@ msgstr "jsonの正規化で「LRA」を解析できませんでした。"
 
 #: musicbot/entry.py:647 musicbot/entry.py:1328
 msgid "Could not parse 'TP' in normalize json."
-msgstr ""
+msgstr "jsonの正規化で「TP」を解析できませんでした。"
 
 #: musicbot/entry.py:655 musicbot/entry.py:1336
 msgid "Could not parse 'thresh' in normalize json."
-msgstr ""
+msgstr "json正規化で「しきい値」を解析できませんでした。"
 
 #: musicbot/entry.py:663 musicbot/entry.py:1344
 msgid "Could not parse 'offset' in normalize json."
-msgstr ""
+msgstr "jsonの正規化で「オフセット」を解析できませんでした。"
 
 #: musicbot/entry.py:680
 #, python-format
@@ -2812,7 +2812,7 @@ msgstr "ダウンロードが完了しました:  %r"
 #: musicbot/entry.py:866
 #, python-format
 msgid "Deserialized StreamPlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "Deserialized StreamPlaylistEntry cannot find channel with ID:  %s"
 
 #: musicbot/entry.py:882
 #, python-format
@@ -2822,7 +2822,7 @@ msgstr "Deserialized StreamPlaylistEntry has the wrong channel type:  %s"
 #: musicbot/entry.py:904
 #, python-format
 msgid "Deserialized StreamPlaylistEntry cannot find author with ID:  %s"
-msgstr ""
+msgstr "Deserialized StreamPlaylistEntry cannot find author with ID:  %s"
 
 #: musicbot/entry.py:910
 msgid "Deserialized StreamPlaylistEntry has an author ID but no channel for lookup!"
@@ -2831,7 +2831,7 @@ msgstr "Deserialized StreamPlaylistEntry には作者IDがありますが、検�
 #: musicbot/entry.py:1088
 #, python-format
 msgid "Deserialized LocalFilePlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "Deserialized LocalFilePlaylistEntry cannot find channel with ID:  %s"
 
 #: musicbot/entry.py:1104
 #, python-format
@@ -2841,7 +2841,7 @@ msgstr "Deserialized LocalFilePlaylistEntry has the wrong channel type:  %s"
 #: musicbot/entry.py:1126
 #, python-format
 msgid "Deserialized LocalFilePlaylistEntry cannot find author with ID:  %s"
-msgstr ""
+msgstr "Deserialized LocalFilePlaylistEntry cannot find author with ID:  %s"
 
 #: musicbot/entry.py:1132
 msgid "Deserialized LocalFilePlaylistEntry has an author ID but no channel for lookup!"
@@ -2903,35 +2903,35 @@ msgstr "キャッシュレベルをクリアする必要があります。 %s"
 
 #: musicbot/filecache.py:302
 msgid "Auto playlist has no cache map, moving on."
-msgstr ""
+msgstr "自動プレイリストにキャッシュマップがありません。移動中です。"
 
 #: musicbot/filecache.py:310
 #, python-format
 msgid "Loaded auto playlist cache map with %s entries."
-msgstr ""
+msgstr "%s エントリで自動プレイリストキャッシュマップをロードしました。"
 
 #: musicbot/filecache.py:314
 msgid "Failed to load auto playlist cache map."
-msgstr ""
+msgstr "自動プレイリストキャッシュマップの読み込みに失敗しました。"
 
 #: musicbot/filecache.py:333
 #, python-format
 msgid "Saved auto playlist cache map with %s entries."
-msgstr ""
+msgstr "%s のエントリで自動プレイリストキャッシュマップを保存しました。"
 
 #: musicbot/filecache.py:337
 msgid "Failed to save auto playlist cache map."
-msgstr ""
+msgstr "自動プレイリストキャッシュマップの保存に失敗しました。"
 
 #: musicbot/filecache.py:355
 #, python-format
 msgid "Auto playlist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s"
-msgstr ""
+msgstr "キー: %(file)s  古い: %(old)s  新着: %(new)s"
 
 #: musicbot/i18n.py:229
 #, python-format
 msgid "Lang Argument Error:  %s"
-msgstr ""
+msgstr "ラング引数エラー:  %s"
 
 #: musicbot/i18n.py:290
 #, python-format
@@ -2946,7 +2946,7 @@ msgstr "いずれかの不和翻訳の読み込みに失敗しました:  [%s]  
 #: musicbot/json.py:14
 #, python-format
 msgid "Loading JSON file: %s"
-msgstr ""
+msgstr "JSON ファイルの読み込み中: %s"
 
 #: musicbot/json.py:27
 #, python-format
@@ -2973,8 +2973,8 @@ msgid "Changing log level to:  %s"
 msgstr "ログレベルを  %sに変更しました"
 
 #: musicbot/logs.py:314
-msgid "MusicBot loggers have been called to shutdown."
-msgstr "MusicBotロガーはシャットダウンするように呼び出されました。"
+msgid "MusicBot loggers have been called to shut down."
+msgstr "MusicBotロガーがシャットダウンするように呼び出されました。"
 
 #: musicbot/permissions.py:118
 #, python-format
@@ -2988,7 +2988,7 @@ msgstr "例のパーミッションファイルのコピーエラー:  %s"
 
 #: musicbot/permissions.py:165
 msgid "Config 'OwnerID' is set auto, will set correctly later."
-msgstr ""
+msgstr "設定 'OwnerID' が auto に設定されており、後で正しく設定されます。"
 
 #: musicbot/permissions.py:182
 msgid "Validating permissions..."
@@ -2996,7 +2996,7 @@ msgstr "権限を検証しています..."
 
 #: musicbot/permissions.py:184
 msgid "Setting auto 'OwnerID' for owner permissions group."
-msgstr ""
+msgstr "オーナー権限グループに自動的に 'OwnerID' を設定します。"
 
 #: musicbot/permissions.py:238
 #, python-format
@@ -3151,7 +3151,7 @@ msgstr "ファイルを削除できません。現在使用中です。"
 
 #: musicbot/player.py:504
 msgid "Cannot delete file due to a permission error."
-msgstr ""
+msgstr "パーミッションエラーのためファイルを削除できません。"
 
 #: musicbot/player.py:509
 msgid "Cannot delete file, it was not found."
@@ -3218,7 +3218,7 @@ msgstr "Entry info appears to be a stream, adding stream entry..."
 #: musicbot/playlist.py:195
 #, python-format
 msgid "Invalid content type `%(type)s` for URL: %(url)s"
-msgstr ""
+msgstr "無効なコンテンツタイプ`%(type)s`の URL: %(url)s"
 
 #: musicbot/playlist.py:203
 msgid "Got text/html for content-type, this might be a stream."
@@ -3257,7 +3257,7 @@ msgstr "「%s」のエントリ内の曲を無視しています。許可され�
 #: musicbot/playlist.py:317
 #, python-format
 msgid "Not adding YouTube video because it is marked private or deleted:  %s"
-msgstr ""
+msgstr "プライベートまたは削除のマークがあるため、YouTube 動画を追加しません:  %s"
 
 #: musicbot/playlist.py:342
 msgid "Could not add item"
@@ -3308,7 +3308,7 @@ msgstr "Spotifyのアルバムの合計タック数：  %(total)s  次のURL： 
 #: musicbot/spotify.py:492
 #, python-format
 msgid "Getting Spotify Album Next URL:  %s"
-msgstr ""
+msgstr "Spotifyアルバムの次のURLを取得:  %s"
 
 #: musicbot/spotify.py:503
 #, python-format
@@ -3327,7 +3327,7 @@ msgstr "Spotifyプレイリストの合計タック数： %(total)s  次のURL�
 #: musicbot/spotify.py:535
 #, python-format
 msgid "Getting Spotify Playlist Next URL:  %s"
-msgstr ""
+msgstr "Spotifyプレイリストを取得する 次のURL:  %s"
 
 #: musicbot/spotify.py:546
 #, python-format
@@ -3433,7 +3433,7 @@ msgstr "Ytdlp oauth2トークンデータの保存に失敗しました:  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:91
 msgid "Loading YouTube TV OAuth2 token data."
-msgstr ""
+msgstr "YouTube TV OAuth2トークンデータを読み込んでいます。"
 
 #: musicbot/ytdlp_oauth2_plugin.py:101
 #, python-format
@@ -3442,7 +3442,7 @@ msgstr "Ytdlp oauth2トークンデータの読み込みに失敗しました:  
 
 #: musicbot/ytdlp_oauth2_plugin.py:109
 msgid "Storing YouTube TV OAuth2 token data"
-msgstr ""
+msgstr "YouTube TV OAuth2トークンデータの保存"
 
 #: musicbot/ytdlp_oauth2_plugin.py:139
 msgid "Invalid cached OAuth2 token data."
@@ -3454,11 +3454,11 @@ msgstr "アクセストークンの有効期限が切れました。更新して
 
 #: musicbot/ytdlp_oauth2_plugin.py:175
 msgid "YouTube cookies have been provided, but OAuth2 is being used. If you encounter problems, stop providing YouTube cookies to yt-dlp."
-msgstr ""
+msgstr "YouTubeクッキーが提供されていますが、OAuth2が使用されています。問題が発生した場合は、yt-dlpにYouTubeクッキーを提供するのをやめてください。"
 
 #: musicbot/ytdlp_oauth2_plugin.py:193
 msgid "Refreshing YouTube TV oauth2 token..."
-msgstr ""
+msgstr "YouTube TV oauth2トークンを更新中..."
 
 #: musicbot/ytdlp_oauth2_plugin.py:211
 #, python-format
@@ -3538,7 +3538,7 @@ msgstr "サブプロセスの呼び出し中にPIPが失敗しました。"
 
 #: run.py:229
 msgid "PIP failed due to Permission Error."
-msgstr ""
+msgstr "パーミッションエラーのため、PIP が失敗しました。"
 
 #: run.py:233
 #, python-format
