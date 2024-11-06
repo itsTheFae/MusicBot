@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"POT-Creation-Date: 2024-11-06 13:49-0800\n"
+"PO-Revision-Date: 2024-11-06 21:53\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -613,8 +613,8 @@ msgstr "Hai dato una posizione fuori dalla dimensione della playlist!"
 
 #: musicbot/bot.py:3984
 #, python-format
-msgid "Successfully moved song from positon %(from)s in queue to position %(to)s!"
-msgstr "Hai spostato il brano dal positon %(from)s in coda alla posizione %(to)s!"
+msgid "Successfully moved song from position %(from)s in queue to position %(to)s!"
+msgstr "Hai spostato il brano dalla posizione %(from)s in coda alla posizione %(to)s!"
 
 #: musicbot/bot.py:4072
 #, python-format
@@ -1189,7 +1189,7 @@ msgid "    Display the current value of the option.\n"
 msgstr "    Mostra il valore corrente dell'opzione.\n"
 
 #: musicbot/bot.py:5546
-msgid "    Saves the current current value to the options file.\n"
+msgid "    Saves the current value to the options file.\n"
 msgstr "    Salva il valore corrente nel file delle opzioni.\n"
 
 #: musicbot/bot.py:5549
@@ -1197,8 +1197,8 @@ msgid "    Validates the option and sets the config for the session, but not to 
 msgstr "    Convalida l'opzione e imposta la configurazione per la sessione, ma non per il file.\n"
 
 #: musicbot/bot.py:5552
-msgid "    Reset the option to it's default value.\n"
-msgstr "    Reimposta l'opzione al suo valore predefinito.\n"
+msgid "    Reset the option to its default value.\n"
+msgstr "    Reimposta l'opzione al valore predefinito.\n"
 
 #: musicbot/bot.py:5555
 msgid "Manage options.ini configuration from within Discord."
@@ -1507,8 +1507,8 @@ msgid "Bot does not have permission to manage messages."
 msgstr "Il bot non ha i permessi per gestire i messaggi."
 
 #: musicbot/bot.py:6231
-msgid "Dump the individual urls of a playlist to a file."
-msgstr "Ricarica i singoli URL di una playlist su un file."
+msgid "Dump the individual URLs of a playlist to a file."
+msgstr "Ricarica i singoli URL di una scaletta su un file."
 
 #: musicbot/bot.py:6247
 msgid "The given URL was not a valid URL."
@@ -1564,8 +1564,8 @@ msgid "Here are the IDs you requested:"
 msgstr "Ecco gli ID che hai richiesto:"
 
 #: musicbot/bot.py:6395
-msgid "Get a list of your permissions, or the permisions of the mentioned user."
-msgstr "Ottieni un elenco dei tuoi permessi, o le permisioni dell'utente menzionato."
+msgid "Get a list of your permissions, or the permissions of the mentioned user."
+msgstr "Ottieni un elenco dei tuoi permessi, o i permessi dell'utente menzionato."
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double-check the ID and try again."
@@ -1710,7 +1710,7 @@ msgstr "Impossibile aggiungere il gruppo `%(group)s` che esiste già."
 #: musicbot/bot.py:6660
 #, python-format
 msgid "Successfully added new group:  `%(group)s`\n"
-"You can now customizse the permissions with:  `setperms set %(group)s`\n"
+"You can now customize the permissions with:  `setperms set %(group)s`\n"
 "Make sure to save the new group with:  `setperms save %(group)s`"
 msgstr "Nuovo gruppo aggiunto con successo: `%(group)s`\n"
 "Ora puoi personalizzare i permessi con: `setperms set %(group)s`\n"
@@ -1763,8 +1763,10 @@ msgstr "Il permesso `%(permission)s` è stato aggiornato per questa sessione.\n"
 "Per salvare il cambiamento usa `setperms save %(section)s %(option)s`"
 
 #: musicbot/bot.py:6765
-msgid "Change the bot's username on discord.Note: The API may limit name changes to twice per hour."
-msgstr "Modifica il nome utente del bot su discord.Nota: l'API può limitare le modifiche del nome a due volte all'ora."
+msgid "Change the bot's username on discord.\n"
+"Note: The API may limit name changes to twice per hour."
+msgstr "Cambia il nome utente del bot su discord.\n"
+"Nota: l'API può limitare le modifiche del nome a due volte all'ora."
 
 #: musicbot/bot.py:6784
 msgid "Failed to change username. Did you change names too many times?\n"
@@ -1973,7 +1975,7 @@ msgstr "Comando utilizzato per il test. Stampa un elenco di comandi che possono 
 
 #: musicbot/bot.py:7162
 msgid "This command issues a log at level CRITICAL, but does nothing else.\n"
-"Can be used to manually pin-point events in the MusicBot log file.\n"
+"Can be used to manually pinpoint events in the MusicBot log file.\n"
 msgstr "Questo comando emette un log a livello CRITICA, ma non fa altro.\n"
 "Può essere usato per individuare manualmente gli eventi nel file di registro di MusicBot.\n"
 
@@ -1999,8 +2001,8 @@ msgid "    View typestats of leaking objects.\n"
 msgstr "    Visualizza i tipestat degli oggetti fuoriusciti.\n"
 
 #: musicbot/bot.py:7192
-msgid "    Evaluate the given function and args on objgraph.\n"
-msgstr "    Valuta la funzione data e gli args su objgraph.\n"
+msgid "    Evaluate the given function and arguments on objgraph.\n"
+msgstr "    Valuta la funzione e gli argomenti dati su objgraph.\n"
 
 #: musicbot/bot.py:7196
 msgid "Interact with objgraph, if it is installed, to gain insight into memory usage.\n"
@@ -2047,9 +2049,9 @@ msgstr "Esecuzione del codice di debug non riuscita:\n"
 
 #: musicbot/bot.py:7320
 msgid "Create 'markdown' for options, permissions, or commands from the code.\n"
-"The output is used to update github pages and is thus unsuitable for normal reference use."
+"The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
 msgstr "Crea 'markdown' per opzioni, permessi o comandi dal codice.\n"
-"L'output viene utilizzato per aggiornare le pagine di github ed è quindi inadatto per un uso normale."
+"L'output viene utilizzato per aggiornare le pagine di GitHub ed è quindi inadatto per un uso di riferimento normale."
 
 #: musicbot/bot.py:7337 musicbot/bot.py:7398
 #, python-format
@@ -2535,7 +2537,7 @@ msgid "Specify a custom message to use as the bot's status. If left empty, the b
 "These variables may not be accurate in multi-guild bots:\n"
 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
 " {p0_title}    = The track title for the currently playing track.\n"
-" {p0_url}      = The track url for the currently playing track."
+" {p0_url}      = The track URL for the currently playing track."
 msgstr "Specifica un messaggio personalizzato da usare come stato del bot. Se lasciato vuoto, il bot\n"
 "visualizzerà informazioni dinamiche sulla musica attualmente in riproduzione nel suo stato.\n"
 "I messaggi di stato possono anche utilizzare le seguenti variabili:\n"
@@ -2546,7 +2548,7 @@ msgstr "Specifica un messaggio personalizzato da usare come stato del bot. Se la
 "Queste variabili potrebbero non essere accurate nei bot multi-gilda:\n"
 " {p0_length}   = La durata totale della traccia, se disponibile. Ex: [2:34]\n"
 " {p0_title}    = Il titolo della traccia per la traccia in riproduzione.\n"
-" {p0_url}      = L'url della traccia per la traccia in riproduzione."
+" {p0_url}      = L'URL della traccia per la traccia in riproduzione."
 
 #: musicbot/config.py:571
 msgid "If enabled, status messages will report info on paused players."
@@ -2567,7 +2569,7 @@ msgstr "Cerca di usare ffmpeg per ottenere opzioni di normalizzazione del volume
 "Questa opzione può causare ritardi tra la riproduzione dei brani, poiché l'intera traccia deve essere elaborata."
 
 #: musicbot/config.py:612
-msgid "Allow MusicBot to format it's messages as embeds."
+msgid "Allow MusicBot to format its messages as embeds."
 msgstr "Permetti a MusicBot di formattare i suoi messaggi come incorporati."
 
 #: musicbot/config.py:621
@@ -2575,8 +2577,8 @@ msgid "The number of entries to show per-page when using q command to list the q
 msgstr "Il numero di voci da mostrare per pagina quando si usa il comando q per elencare la coda."
 
 #: musicbot/config.py:631
-msgid "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
-msgstr "Abilita MusicBot per rimuovere automaticamente le voci non riproducibili dalla playlist automatica."
+msgid "Enable MusicBot to automatically remove unplayable entries from the auto playlist."
+msgstr "Abilita MusicBot per rimuovere automaticamente le voci non riproducibili dalla scaletta automatica."
 
 #: musicbot/config.py:640
 msgid "Display MusicBot config settings in the logs at startup."
