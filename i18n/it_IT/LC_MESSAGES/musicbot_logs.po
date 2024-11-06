@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 06:34-0800\n"
-"PO-Revision-Date: 2024-11-06 18:14\n"
+"POT-Creation-Date: 2024-11-06 10:38-0800\n"
+"PO-Revision-Date: 2024-11-06 18:40\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -474,8 +474,8 @@ msgstr "Impostazione della gilda cronologia URL %(guild_id)s == %(url)s"
 
 #: musicbot/bot.py:1172 musicbot/bot.py:4806
 #, python-format
-msgid "No thumbnail set for entry with url: %s"
-msgstr "Nessuna miniatura impostata per la voce con url: %s"
+msgid "No thumbnail set for entry with URL: %s"
+msgstr "Nessuna miniatura impostata per la voce con URL: %s"
 
 #: musicbot/bot.py:1184
 msgid "no channel to put now playing message into"
@@ -549,8 +549,8 @@ msgid "Error extracting song \"%(url)s\": %(raw_error)s"
 msgstr "Errore nell'estrarre il brano \"%(url)s\": %(raw_error)s"
 
 #: musicbot/bot.py:1441
-msgid "MusicBot needs to stop the autoplaylist extraction and bail."
-msgstr "MusicBot ha bisogno di fermare l'estrazione autoplaylist e la cauzione."
+msgid "MusicBot needs to stop the auto playlist extraction and bail."
+msgstr ""
 
 #: musicbot/bot.py:1446
 msgid "MusicBot got an unhandled exception in player finished event."
@@ -622,8 +622,8 @@ msgstr "Scrittura del brano corrente per %s"
 
 #: musicbot/bot.py:1802
 #, python-format
-msgid "Cannot send non-reponse object:  %r"
-msgstr "Impossibile inviare l'oggetto non-reponse:  %r"
+msgid "Cannot send non-response object:  %r"
+msgstr ""
 
 #: musicbot/bot.py:1807
 msgid "[Dev Bug] Tried sending an invalid response object."
@@ -888,8 +888,8 @@ msgstr "Non c'è nessuno per il canale collegato con ID:  %d"
 
 #: musicbot/bot.py:2376
 #, python-format
-msgid "Cannot bind to non-messagable channel with ID:  %d"
-msgstr "Impossibile collegare al canale non messaggistico con ID:  %d"
+msgid "Cannot bind to non Messageable channel with ID:  %d"
+msgstr "Impossibile collegare al canale non Messaggiabile con ID:  %d"
 
 #: musicbot/bot.py:2390
 msgid "Bound to text channels:"
@@ -911,21 +911,21 @@ msgstr "Non c'è nessuno per il canale autojoin con ID:  %d"
 
 #: musicbot/bot.py:2427
 #, python-format
-msgid "Cannot autojoin a Private/Non-Guild channel with ID:  %d"
-msgstr "Impossibile entrare automaticamente in un canale Privato/Non-Gilda con ID:  %d"
+msgid "Cannot auto join a Private/Non-Guild channel with ID:  %d"
+msgstr ""
 
 #: musicbot/bot.py:2435
 #, python-format
-msgid "Cannot autojoin to non-connectable channel with ID:  %d"
-msgstr "Impossibile autoentrare nel canale non connettibile con ID:  %d"
+msgid "Cannot auto join to non-connectable channel with ID:  %d"
+msgstr "Impossibile entrare automaticamente nel canale non connettibile con ID:  %d"
 
 #: musicbot/bot.py:2451
-msgid "Autojoining voice channels:"
-msgstr "Collegamento automatico canali vocali:"
+msgid "Auto joining voice channels:"
+msgstr ""
 
 #: musicbot/bot.py:2459 musicbot/bot.py:2462
-msgid "Not autojoining any voice channels"
-msgstr "Nessun canale vocale autoaderente"
+msgid "Not auto joining any voice channels"
+msgstr ""
 
 #: musicbot/bot.py:2475
 #, python-format
@@ -1036,8 +1036,8 @@ msgstr "    Elimina Invoking: %s"
 
 #: musicbot/bot.py:2605
 #, python-format
-msgid "    Delete Nowplaying: %s"
-msgstr "    Elimina Nowplaying: %s"
+msgid "    Delete Now Playing: %s"
+msgstr ""
 
 #: musicbot/bot.py:2608
 #, python-format
@@ -1141,8 +1141,8 @@ msgstr "  Coda Round Robin: %s"
 
 #: musicbot/bot.py:2695
 #, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song blocklist."
-msgstr "La canzone richiesta `{subject}` è bloccata dalla lista dei brani."
+msgid "The requested song `{subject}` is blocked by the song block list."
+msgstr ""
 
 #: musicbot/bot.py:2706
 msgid "Attempted to handle Voice Channel inactivity, but Bot is not in voice..."
@@ -1236,8 +1236,8 @@ msgid "You must provide a song subject if no song is currently playing."
 msgstr "Devi fornire un oggetto del brano se nessuna canzone è attualmente in riproduzione."
 
 #: musicbot/bot.py:3152
-msgid "Ivalid sub-command given. Use `help blocksong` for usage examples."
-msgstr "Sottocomando valido fornito. Usa `help blocksong` per esempi di utilizzo."
+msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
+msgstr "Sottocomando fornito non valido. Usa `help blocksong` per esempi di utilizzo."
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -1380,8 +1380,8 @@ msgid "Spotify URL is invalid or not currently supported."
 msgstr "L'URL di Spotify non è valido o non è attualmente supportato."
 
 #: musicbot/bot.py:4159
-msgid "Detected a spotify URL, but spotify is not enabled."
-msgstr "Rilevato un URL di spotify, ma spotify non è abilitato."
+msgid "Detected a Spotify URL, but Spotify is not enabled."
+msgstr ""
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -1396,7 +1396,7 @@ msgstr "La modalità Karaoke è abilitata, riprova quando è disabilitata!"
 msgid "Issue with extract_info(): "
 msgstr "Problema con extract_info(): "
 
-#: musicbot/bot.py:4191
+#: musicbot/bot.py:4191 musicbot/bot.py:4396
 #, python-format
 msgid "Failed to extract info due to error:\n"
 "%(raw_error)s"
@@ -1445,13 +1445,6 @@ msgstr "Impossibile stimare il tempo di riproduzione per la posizione: %d"
 #, python-format
 msgid "Failed to get info from the stream request: %s"
 msgstr "Recupero delle informazioni dalla richiesta dello stream non riuscito: %s"
-
-#: musicbot/bot.py:4396
-#, python-format
-msgid "Failed to exctract info due to error:\n"
-"%(raw_error)s"
-msgstr "Impossibile estrarre le informazioni a causa di errore:\n"
-"%(raw_error)s"
 
 #: musicbot/bot.py:4402
 msgid "Streaming playlists is not yet supported."
@@ -1565,8 +1558,8 @@ msgid "You must provide a speed to set."
 msgstr "Devi fornire una velocità da impostare."
 
 #: musicbot/bot.py:5413
-msgid "The speed you proivded is invalid. Use a number between 0.5 and 100."
-msgstr "La velocità che hai promesso non è valida. Usa un numero compreso tra 0.5 e 100."
+msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
+msgstr "La velocità fornita non è valida. Usa un numero compreso tra 0.5 e 100."
 
 #: musicbot/bot.py:5471 musicbot/bot.py:5587 musicbot/bot.py:6519
 #, python-format
@@ -1742,8 +1735,8 @@ msgid "This does not seem to be a playlist."
 msgstr "Questa non sembra essere una playlist."
 
 #: musicbot/bot.py:6425
-msgid "Invalid user ID or server nickname, please double check the ID and try again."
-msgstr "ID utente o soprannome del server non validi, ricontrolla l'ID e riprova."
+msgid "Invalid user ID or server nickname, please double-check the ID and try again."
+msgstr "ID utente o soprannome del server non validi, si prega di ricontrollare l'ID e riprovare."
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -2309,18 +2302,13 @@ msgid "Acquired owner id via API"
 msgstr "Id proprietario acquisito tramite API"
 
 #: musicbot/config.py:1244
-msgid "Error while fetching OwnerID automatically.\n\n"
+msgid "Error while fetching 'OwnerID' automatically.\n\n"
 "Problem:\n"
 "  Discord App info is not available.\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
-"  Manually set the OwnerID config option or try again later."
-msgstr "Errore durante il recupero automatico del OwnerID.\n\n"
-"Problema:\n"
-"  Le informazioni Discord App non sono disponibili.\n"
-"  Potrebbe trattarsi di un'interruzione temporanea delle API o di un bug. Soluzione\n\n"
-":\n"
-"  Impostare manualmente l'opzione di configurazione OwnerID o riprovare più tardi."
+"  Manually set the 'OwnerID' config option or try again later."
+msgstr ""
 
 #: musicbot/config.py:1256
 msgid "MusicBot does not have a user instance, cannot proceed."
@@ -2329,14 +2317,14 @@ msgstr "MusicBot non ha un'istanza utente, non può procedere."
 #: musicbot/config.py:1262
 msgid "Error validating config options.\n\n"
 "Problem:\n"
-"  The OwnerID config is the same as your Bot / App ID.\n\n"
+"  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
-"  Do not use the Bot or App ID in the OwnerID field."
+"  Do not use the Bot or App ID in the 'OwnerID' field."
 msgstr "Errore nella convalida delle opzioni di configurazione.\n\n"
 "Problema:\n"
-"  La configurazione proprietariaID è la stessa del tuo Bot / ID app.\n\n"
+"  La configurazione 'OwnerID' è la stessa del tuo Bot / ID app.\n\n"
 "Soluzione:\n"
-"  Non utilizzare il Bot o l'App ID nel campo OwnerID."
+"  Non utilizzare il Bot o l'App ID nel campo 'OwnerID'."
 
 #: musicbot/config.py:1286
 msgid "Config options file not found. Checking for alternatives..."
@@ -2498,8 +2486,8 @@ msgstr "Impossibile aggiornare la configurazione. Dovrai aggiornarla manualmente
 
 #: musicbot/config.py:2551
 #, python-format
-msgid "Blocklist file not found:  %s"
-msgstr "File Blocklist non trovato:  %s"
+msgid "Block list file not found:  %s"
+msgstr "File elenco blocco non trovato:  %s"
 
 #: musicbot/config.py:2572
 #, python-format
@@ -2513,8 +2501,8 @@ msgstr "Impossibile aggiornare il file della blocklist:  %s"
 
 #: musicbot/config.py:2670
 #, python-format
-msgid "Loaded User Blocklist with %s entires."
-msgstr "Blocklist utente caricata con voci %s."
+msgid "Loaded User Block list with %s entries."
+msgstr ""
 
 #: musicbot/config.py:2681
 #, python-format
@@ -2523,8 +2511,8 @@ msgstr "Abbiamo trovato un file di blacklist legacy, che verrà rinominato in:  
 
 #: musicbot/config.py:2727
 #, python-format
-msgid "Loaded a Song Blocklist with %s entries."
-msgstr "Caricato un Blocklist brano con voci %s."
+msgid "Loaded a Song Block list with %s entries."
+msgstr "Caricato un elenco di blocchi brani con voci %s."
 
 #: musicbot/constructs.py:221
 msgid "Cannot load data for guild with ID 0. This is likely a bug in the code!"
@@ -2727,8 +2715,8 @@ msgstr "I dati dell'elemento hanno il numero di versione sbagliato, non è possi
 
 #: musicbot/entry.py:358
 #, python-format
-msgid "Deserialized URLPlaylistEntry cannot find channel with id:  %s"
-msgstr "L'URLPlaylistEntry deserializzato non può trovare il canale con id:  %s"
+msgid "Deserialized URLPlaylistEntry cannot find channel with ID:  %s"
+msgstr ""
 
 #: musicbot/entry.py:374
 #, python-format
@@ -2737,8 +2725,8 @@ msgstr "L'URLPlaylistEntry deserializzato ha il tipo di canale sbagliato:  %s"
 
 #: musicbot/entry.py:396
 #, python-format
-msgid "Deserialized URLPlaylistEntry cannot find author with id:  %s"
-msgstr "L'URLPlaylistEntry deserializzato non può trovare l'autore con id:  %s"
+msgid "Deserialized URLPlaylistEntry cannot find author with ID:  %s"
+msgstr "L'URLPlaylistEntry deserializzato non può trovare l'autore con ID:  %s"
 
 #: musicbot/entry.py:402
 msgid "Deserialized URLPlaylistEntry has an author ID but no channel for lookup!"
@@ -2751,8 +2739,8 @@ msgstr "Impossibile caricare %s"
 
 #: musicbot/entry.py:449
 #, python-format
-msgid "Cannot download spotify links, processing error with type: %(type)s"
-msgstr "Impossibile scaricare i link di spotify, errore di elaborazione con il tipo: %(type)s"
+msgid "Cannot download Spotify links, processing error with type: %(type)s"
+msgstr ""
 
 #: musicbot/entry.py:461 musicbot/entry.py:924 musicbot/entry.py:1175
 #, python-format
@@ -2787,7 +2775,7 @@ msgid "Got duration of %(time)s seconds for file:  %(file)s"
 msgstr "Durata di %(time)s secondi per il file:  %(file)s"
 
 #: musicbot/entry.py:529 musicbot/entry.py:1209
-msgid "There as a problem with working out EQ, likely caused by a strange installation of FFmpeg. This has not impacted the ability for the bot to work, but will mean your tracks will not be equalised."
+msgid "There as a problem with working out EQ, likely caused by a strange installation of FFmpeg. This has not impacted the ability for the bot to work, but will mean your tracks will not be equalized."
 msgstr "C'è un problema con il lavoro EQ, probabilmente causato da una strana installazione di FFmpeg. Questo non ha influenzato la capacità del bot di funzionare, ma significa che le tue tracce non saranno equalizzate."
 
 #: musicbot/entry.py:541 musicbot/entry.py:1222
@@ -2830,24 +2818,24 @@ msgid "Could not locate ffmpeg on your path!"
 msgstr "Impossibile individuare ffmpeg sul tuo percorso!"
 
 #: musicbot/entry.py:631 musicbot/entry.py:1312
-msgid "Could not parse I in normalise json."
-msgstr "Impossibile analizzare I nel normalizzare json."
+msgid "Could not parse 'I' in normalize json."
+msgstr ""
 
 #: musicbot/entry.py:639 musicbot/entry.py:1320
-msgid "Could not parse LRA in normalise json."
-msgstr "Impossibile analizzare l'LRA nella normalizzazione json."
+msgid "Could not parse 'LRA' in normalize json."
+msgstr "Impossibile analizzare 'LRA' nella normalizzazione json."
 
 #: musicbot/entry.py:647 musicbot/entry.py:1328
-msgid "Could not parse TP in normalise json."
-msgstr "Impossibile analizzare TP nella normalizzazione json."
+msgid "Could not parse 'TP' in normalize json."
+msgstr ""
 
 #: musicbot/entry.py:655 musicbot/entry.py:1336
-msgid "Could not parse thresh in normalise json."
-msgstr "Impossibile analizzare la soglia nella normalizzazione json."
+msgid "Could not parse 'thresh' in normalize json."
+msgstr ""
 
 #: musicbot/entry.py:663 musicbot/entry.py:1344
-msgid "Could not parse offset in normalise json."
-msgstr "Impossibile analizzare l'offset nella normalizzazione json."
+msgid "Could not parse 'offset' in normalize json."
+msgstr ""
 
 #: musicbot/entry.py:680
 #, python-format
@@ -2904,8 +2892,8 @@ msgstr "Download completato:  %r"
 
 #: musicbot/entry.py:866
 #, python-format
-msgid "Deserialized StreamPlaylistEntry cannot find channel with id:  %s"
-msgstr "StreamPlaylistEntry deserializzato non può trovare il canale con id:  %s"
+msgid "Deserialized StreamPlaylistEntry cannot find channel with ID:  %s"
+msgstr ""
 
 #: musicbot/entry.py:882
 #, python-format
@@ -2914,8 +2902,8 @@ msgstr "StreamPlaylistEntry deserializzato ha il tipo di canale sbagliato:  %s"
 
 #: musicbot/entry.py:904
 #, python-format
-msgid "Deserialized StreamPlaylistEntry cannot find author with id:  %s"
-msgstr "StreamPlaylistEntry deserializzato non può trovare l'autore con id:  %s"
+msgid "Deserialized StreamPlaylistEntry cannot find author with ID:  %s"
+msgstr ""
 
 #: musicbot/entry.py:910
 msgid "Deserialized StreamPlaylistEntry has an author ID but no channel for lookup!"
@@ -2923,8 +2911,8 @@ msgstr "Deserialized StreamPlaylistEntry ha un ID autore ma nessun canale per la
 
 #: musicbot/entry.py:1088
 #, python-format
-msgid "Deserialized LocalFilePlaylistEntry cannot find channel with id:  %s"
-msgstr "Deserialized LocalFilePlaylistEntry non può trovare il canale con id:  %s"
+msgid "Deserialized LocalFilePlaylistEntry cannot find channel with ID:  %s"
+msgstr ""
 
 #: musicbot/entry.py:1104
 #, python-format
@@ -2933,8 +2921,8 @@ msgstr "Deserializzato LocalFilePlaylistEntry ha il tipo di canale sbagliato:  %
 
 #: musicbot/entry.py:1126
 #, python-format
-msgid "Deserialized LocalFilePlaylistEntry cannot find author with id:  %s"
-msgstr "Deserialized LocalFilePlaylistEntry non può trovare l'autore con id:  %s"
+msgid "Deserialized LocalFilePlaylistEntry cannot find author with ID:  %s"
+msgstr ""
 
 #: musicbot/entry.py:1132
 msgid "Deserialized LocalFilePlaylistEntry has an author ID but no channel for lookup!"
@@ -2995,36 +2983,36 @@ msgid "Cache level requires cleanup. %s"
 msgstr "Il livello della cache richiede la pulizia. %s"
 
 #: musicbot/filecache.py:302
-msgid "Autoplaylist has no cache map, moving on."
-msgstr "La playlist automatica non ha mappa cache, in movimento."
+msgid "Auto playlist has no cache map, moving on."
+msgstr ""
 
 #: musicbot/filecache.py:310
 #, python-format
-msgid "Loaded autoplaylist cache map with %s entries."
-msgstr "Mappa cache playlist automatica caricata con voci %s."
+msgid "Loaded auto playlist cache map with %s entries."
+msgstr ""
 
 #: musicbot/filecache.py:314
-msgid "Failed to load autoplaylist cache map."
-msgstr "Impossibile caricare la mappa cache della playlist automatica."
+msgid "Failed to load auto playlist cache map."
+msgstr ""
 
 #: musicbot/filecache.py:333
 #, python-format
-msgid "Saved autoplaylist cache map with %s entries."
-msgstr "Mappa della cache della scaletta automatica salvata con voci %s."
+msgid "Saved auto playlist cache map with %s entries."
+msgstr ""
 
 #: musicbot/filecache.py:337
-msgid "Failed to save autoplaylist cache map."
-msgstr "Impossibile salvare la mappa della cache della playlist automatica."
+msgid "Failed to save auto playlist cache map."
+msgstr ""
 
 #: musicbot/filecache.py:355
 #, python-format
-msgid "Autoplaylist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s"
-msgstr "Conflitto della mappa della cache della playlist automatica sulla chiave: %(file)s  Vecchio: %(old)s  Nuovo: %(new)s"
+msgid "Auto playlist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s"
+msgstr ""
 
 #: musicbot/i18n.py:229
 #, python-format
-msgid "Lang Args Error:  %s"
-msgstr "Errore Argomenti Lang:  %s"
+msgid "Lang Argument Error:  %s"
+msgstr ""
 
 #: musicbot/i18n.py:290
 #, python-format
@@ -3038,8 +3026,8 @@ msgstr "Caricamento delle traduzioni discord non riuscito per uno qualsiasi di: 
 
 #: musicbot/json.py:14
 #, python-format
-msgid "Init JSON obj from file: %s"
-msgstr "Init JSON obj from file: %s"
+msgid "Loading JSON file: %s"
+msgstr ""
 
 #: musicbot/json.py:27
 #, python-format
@@ -3080,16 +3068,16 @@ msgid "Error copying example permissions file:  %s"
 msgstr "Errore nel copiare il file dei permessi di esempio:  %s"
 
 #: musicbot/permissions.py:165
-msgid "OwnerID is set auto, will set correctly later."
-msgstr "Il OwnerID è impostato automaticamente, verrà impostato correttamente più tardi."
+msgid "Config 'OwnerID' is set auto, will set correctly later."
+msgstr ""
 
 #: musicbot/permissions.py:182
 msgid "Validating permissions..."
 msgstr "Convalida dei permessi..."
 
 #: musicbot/permissions.py:184
-msgid "Setting auto OwnerID for owner permissions group."
-msgstr "Impostazione auto OwnerID per il gruppo di permessi del proprietario."
+msgid "Setting auto 'OwnerID' for owner permissions group."
+msgstr ""
 
 #: musicbot/permissions.py:238
 #, python-format
@@ -3243,8 +3231,8 @@ msgid "Cannot delete file, it is currently in use."
 msgstr "Impossibile eliminare il file, è attualmente in uso."
 
 #: musicbot/player.py:504
-msgid "Cannot delete file due to a permissions error."
-msgstr "Impossibile eliminare il file a causa di un errore di autorizzazioni."
+msgid "Cannot delete file due to a permission error."
+msgstr ""
 
 #: musicbot/player.py:509
 msgid "Cannot delete file, it was not found."
@@ -3310,8 +3298,8 @@ msgstr "Le informazioni di immissione sembrano essere un flusso, aggiungendo voc
 
 #: musicbot/playlist.py:195
 #, python-format
-msgid "Invalid content type `%(type)s` for url: %(url)s"
-msgstr "Tipo di contenuto non valido `%(type)s` per l'url: %(url)s"
+msgid "Invalid content type `%(type)s` for URL: %(url)s"
+msgstr ""
 
 #: musicbot/playlist.py:203
 msgid "Got text/html for content-type, this might be a stream."
@@ -3349,8 +3337,8 @@ msgstr "Ignorare il brano nelle voci di '%s', durata più lunga del massimo cons
 
 #: musicbot/playlist.py:317
 #, python-format
-msgid "Not adding youtube video because it is marked private or deleted:  %s"
-msgstr "Non aggiungere youtube video perché è contrassegnato privato o cancellato:  %s"
+msgid "Not adding YouTube video because it is marked private or deleted:  %s"
+msgstr ""
 
 #: musicbot/playlist.py:342
 msgid "Could not add item"
@@ -3400,8 +3388,8 @@ msgstr "Puntate totali dell'album Spotify:  %(total)s  URL successivo: %(url)s"
 
 #: musicbot/spotify.py:492
 #, python-format
-msgid "Getting Spofity Album Next URL:  %s"
-msgstr "Ottenere L'Album Spofity Prossimo Url:  %s"
+msgid "Getting Spotify Album Next URL:  %s"
+msgstr ""
 
 #: musicbot/spotify.py:503
 #, python-format
@@ -3419,8 +3407,8 @@ msgstr "Punteggi totali della scaletta Spotify: %(total)s  URL successivo: %(url
 
 #: musicbot/spotify.py:535
 #, python-format
-msgid "Getting Spofity Playlist Next URL:  %s"
-msgstr "Recupero Playlist Spofity Prossimo URL:  %s"
+msgid "Getting Spotify Playlist Next URL:  %s"
+msgstr ""
 
 #: musicbot/spotify.py:546
 #, python-format
@@ -3525,8 +3513,8 @@ msgid "Failed to save ytdlp oauth2 token data due to:  %s"
 msgstr "Impossibile salvare i dati del token ytdlp oauth2 a causa di:  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:91
-msgid "Loading Youtube TV OAuth2 token data."
-msgstr "Caricamento dei dati token Youtube TV OAuth2."
+msgid "Loading YouTube TV OAuth2 token data."
+msgstr ""
 
 #: musicbot/ytdlp_oauth2_plugin.py:101
 #, python-format
@@ -3534,49 +3522,37 @@ msgid "Failed to load ytdlp oauth2 token data due to:  %s"
 msgstr "Caricamento dei dati del token ytdlp oauth2 non riuscito a causa di:  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:109
-msgid "Storing Youtube TV OAuth2 token data"
-msgstr "Memorizzazione dati token Youtube TV OAuth2"
+msgid "Storing YouTube TV OAuth2 token data"
+msgstr ""
 
-#: musicbot/ytdlp_oauth2_plugin.py:127
-msgid "validate ytdlp token..."
-msgstr "validate ytdlp token..."
-
-#: musicbot/ytdlp_oauth2_plugin.py:137
-msgid "init oauth for ytdlp"
-msgstr "init oauth for ytdlp"
-
-#: musicbot/ytdlp_oauth2_plugin.py:141
+#: musicbot/ytdlp_oauth2_plugin.py:139
 msgid "Invalid cached OAuth2 token data."
 msgstr "Dati token OAuth2 nella cache non validi."
 
-#: musicbot/ytdlp_oauth2_plugin.py:156
+#: musicbot/ytdlp_oauth2_plugin.py:154
 msgid "Access token expired, refreshing"
 msgstr "Token di accesso scaduto, aggiornamento"
 
-#: musicbot/ytdlp_oauth2_plugin.py:167
-msgid "handling oauth2"
-msgstr "gestione di oauth2"
+#: musicbot/ytdlp_oauth2_plugin.py:175
+msgid "YouTube cookies have been provided, but OAuth2 is being used. If you encounter problems, stop providing YouTube cookies to yt-dlp."
+msgstr ""
 
-#: musicbot/ytdlp_oauth2_plugin.py:178
-msgid "Youtube cookies have been provided, but OAuth2 is being used. If you encounter problems, stop providing Youtube cookies to yt-dlp."
-msgstr "Sono stati forniti i cookie Youtube, ma viene utilizzato OAuth2. In caso di problemi, smetta di fornire cookie Youtube a yt-dlp."
+#: musicbot/ytdlp_oauth2_plugin.py:193
+msgid "Refreshing YouTube TV oauth2 token..."
+msgstr ""
 
-#: musicbot/ytdlp_oauth2_plugin.py:196
-msgid "refreshing oauth2 token"
-msgstr "aggiornamento token oauth2"
-
-#: musicbot/ytdlp_oauth2_plugin.py:214
+#: musicbot/ytdlp_oauth2_plugin.py:211
 #, python-format
 msgid "Failed to refresh OAuth2 access token due to:  %s\n"
 "Restarting authorization flow..."
 msgstr "Impossibile aggiornare il token di accesso OAuth2 a causa di:  %s\n"
 "Riavvio del flusso di autorizzazione..."
 
-#: musicbot/ytdlp_oauth2_plugin.py:232
+#: musicbot/ytdlp_oauth2_plugin.py:229
 msgid "Starting oauth2 flow..."
 msgstr "Avvio flusso oauth2..."
 
-#: musicbot/ytdlp_oauth2_plugin.py:251
+#: musicbot/ytdlp_oauth2_plugin.py:248
 #, python-format
 msgid "\n"
 "NOTICE:\n"
@@ -3591,28 +3567,28 @@ msgstr "\n"
 "Quindi inserisci questo codice di autorizzazione:  %s\n"
 "Hai %s secondi per completare l'autorizzazione.\n"
 
-#: musicbot/ytdlp_oauth2_plugin.py:260
+#: musicbot/ytdlp_oauth2_plugin.py:257
 msgid "The application may hang until authorization time out if closed at this point. This is normal."
 msgstr "L'applicazione può essere sospesa fino al tempo di autorizzazione se chiusa a questo punto. Ciò è normale."
 
-#: musicbot/ytdlp_oauth2_plugin.py:266
+#: musicbot/ytdlp_oauth2_plugin.py:263
 msgid "Timed out while waiting for OAuth2 token."
 msgstr "Tempo scaduto durante l'attesa del token OAuth2."
 
-#: musicbot/ytdlp_oauth2_plugin.py:294
+#: musicbot/ytdlp_oauth2_plugin.py:291
 msgid "The device code has expired, restarting authorization flow for yt-dlp."
 msgstr "Il codice del dispositivo è scaduto, riavviare il flusso di autorizzazione per yt-dlp."
 
-#: musicbot/ytdlp_oauth2_plugin.py:300
+#: musicbot/ytdlp_oauth2_plugin.py:297
 msgid "Yt-dlp OAuth2 authorization successful."
 msgstr "Autorizzazione Yt-dlp OAuth2 riuscita."
 
-#: musicbot/ytdlp_oauth2_plugin.py:330
+#: musicbot/ytdlp_oauth2_plugin.py:327
 #, python-format
 msgid "Adding OAuth2 Plugin to Yt-dlp IE:  %s"
 msgstr "Aggiunta del plugin OAuth2 a Yt-dlp IE:  %s"
 
-#: musicbot/ytdlp_oauth2_plugin.py:352
+#: musicbot/ytdlp_oauth2_plugin.py:349
 #, python-format
 msgid "Default Yt-dlp Clients:  %s"
 msgstr "Client Yt-dlp Predefiniti:  %s"
@@ -3647,8 +3623,8 @@ msgid "PIP failed while calling sub-process."
 msgstr "PIP non è riuscito durante la chiamata del sottoprocesso."
 
 #: run.py:229
-msgid "PIP failed due to Permissions Error."
-msgstr "PIP non riuscito a causa di un errore di autorizzazione."
+msgid "PIP failed due to Permission Error."
+msgstr ""
 
 #: run.py:233
 #, python-format
