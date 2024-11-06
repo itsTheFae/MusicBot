@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 06:34-0800\n"
-"PO-Revision-Date: 2024-11-06 15:17\n"
+"POT-Creation-Date: 2024-11-06 10:38-0800\n"
+"PO-Revision-Date: 2024-11-06 18:40\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -18,7 +18,7 @@ msgstr ""
 "X-Crowdin-File-ID: 28\n"
 
 #: musicbot/aliases.py:56
-msgid "Error while loading alises.\n\n"
+msgid "Error while loading aliases.\n\n"
 "Problem:\n"
 "  Your aliases files (aliases.json & example_aliases.json) are missing.\n\n"
 "Solution:\n"
@@ -122,8 +122,8 @@ msgstr ""
 
 #: musicbot/bot.py:2695
 #, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song blocklist."
-msgstr "The requested song `{subject}` is blocked by the song blocklist."
+msgid "The requested song `{subject}` is blocked by the song block list."
+msgstr ""
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -288,8 +288,8 @@ msgid "You must provide a song subject if no song is currently playing."
 msgstr "現在再生中の曲がない場合は、曲の件名を指定する必要があります。"
 
 #: musicbot/bot.py:3152
-msgid "Ivalid sub-command given. Use `help blocksong` for usage examples."
-msgstr "無効なサブコマンドが与えられました。使用例には `help blocksong` を使いましょう。"
+msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
+msgstr ""
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -453,8 +453,8 @@ msgstr "Botは以前に一時停止されていました。再生を再開して
 msgid "Add a song to be played in the queue. If no song is playing or paused, playback will be started.\n\n"
 "You may supply a URL to a video or audio file or the URL of a service supported by yt-dlp.\n"
 "Playlist links will be extracted into multiple links and added to the queue.\n"
-"If you enter a non-URL, the input will be used as search criteria on youtube and the first result played.\n"
-"MusicBot also supports Spotify URIs and URLs, but audio is fetched from youtube regardless.\n"
+"If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
+"MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
 msgstr ""
 
 #: musicbot/bot.py:3628
@@ -607,8 +607,8 @@ msgid "Spotify URL is invalid or not currently supported."
 msgstr "SpotifyのURLが無効または現在サポートされていません。"
 
 #: musicbot/bot.py:4159
-msgid "Detected a spotify URL, but spotify is not enabled."
-msgstr "SpotifyのURLが検出されましたが、Spotifyは有効になっていません。"
+msgid "Detected a Spotify URL, but Spotify is not enabled."
+msgstr ""
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -619,7 +619,7 @@ msgstr "キューに登録された曲の上限に達しました (%(max)s)"
 msgid "Karaoke mode is enabled, please try again when its disabled!"
 msgstr "カラオケモードが有効になっています。無効になったらもう一度お試しください！"
 
-#: musicbot/bot.py:4191
+#: musicbot/bot.py:4191 musicbot/bot.py:4396
 #, python-format
 msgid "Failed to extract info due to error:\n"
 "%(raw_error)s"
@@ -679,13 +679,6 @@ msgid "Add a media URL to the queue as a Stream.\n"
 "Note: FFmpeg may drop the stream randomly or if connection hiccups happen.\n"
 msgstr ""
 
-#: musicbot/bot.py:4396
-#, python-format
-msgid "Failed to exctract info due to error:\n"
-"%(raw_error)s"
-msgstr "エラーのための情報のエクスポートに失敗しました:\n"
-"%(raw_error)s"
-
 #: musicbot/bot.py:4402
 msgid "Streaming playlists is not yet supported."
 msgstr "ストリーミングプレイリストはまだサポートされていません。"
@@ -700,10 +693,9 @@ msgid "    Search with service for a number of results with the search query.\n"
 msgstr "    検索クエリで多数の結果をサービスで検索します。\n"
 
 #: musicbot/bot.py:4432
-msgid "    Search youtube for query but get a custom number of results.\n"
+msgid "    Search YouTube for query but get a custom number of results.\n"
 "    Note: the double-quotes are required in this case.\n"
-msgstr "    クエリのためにyoutubeを検索しますが、カスタムの結果数を取得します。\n"
-"    注意: この場合はダブルクォートが必要です。\n"
+msgstr ""
 
 #: musicbot/bot.py:4438
 msgid "Search a supported service and select from results to add to queue.\n"
@@ -1059,8 +1051,8 @@ msgid "You must provide a speed to set."
 msgstr "設定する速度を提供する必要があります。"
 
 #: musicbot/bot.py:5413
-msgid "The speed you proivded is invalid. Use a number between 0.5 and 100."
-msgstr "提案した速度が無効です。0.5から100までの数字を使用してください。"
+msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
+msgstr ""
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1523,8 +1515,8 @@ msgid "Get a list of your permissions, or the permisions of the mentioned user."
 msgstr "権限の一覧またはメンションされたユーザーの権限を取得します。"
 
 #: musicbot/bot.py:6425
-msgid "Invalid user ID or server nickname, please double check the ID and try again."
-msgstr "無効なユーザーIDまたはサーバーニックネームです。IDを再確認して、もう一度やり直してください。"
+msgid "Invalid user ID or server nickname, please double-check the ID and try again."
+msgstr ""
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -2404,8 +2396,8 @@ msgstr "ユーザーが新しい曲を再生したときに自動プレイリス
 "自動プレイリストで追加された場合にのみ、現在再生中の曲に適用されます。"
 
 #: musicbot/config.py:469
-msgid "Remove songs from the auto playlist if they are found in the song blocklist."
-msgstr "曲のブロックリストにある場合は、自動プレイリストから曲を削除します。"
+msgid "Remove songs from the auto playlist if they are found in the song block list."
+msgstr ""
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
@@ -2611,9 +2603,9 @@ msgid "Experimental option to enable yt-dlp to use a YouTube account via OAuth2.
 msgstr ""
 
 #: musicbot/config.py:920
-msgid "Optional youtube video URL used at start-up for triggering OAuth2 authorization.\n"
+msgid "Optional YouTube video URL used at start-up for triggering OAuth2 authorization.\n"
 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
-"The URL set here should be an accessible youtube video URL.\n"
+"The URL set here should be an accessible YouTube video URL.\n"
 "Authorization must be completed before start-up will continue when this is set."
 msgstr ""
 
@@ -2720,20 +2712,20 @@ msgid "Error while reading config options.\n\n"
 msgstr ""
 
 #: musicbot/config.py:1244
-msgid "Error while fetching OwnerID automatically.\n\n"
+msgid "Error while fetching 'OwnerID' automatically.\n\n"
 "Problem:\n"
 "  Discord App info is not available.\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
-"  Manually set the OwnerID config option or try again later."
+"  Manually set the 'OwnerID' config option or try again later."
 msgstr ""
 
 #: musicbot/config.py:1262
 msgid "Error validating config options.\n\n"
 "Problem:\n"
-"  The OwnerID config is the same as your Bot / App ID.\n\n"
+"  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
-"  Do not use the Bot or App ID in the OwnerID field."
+"  Do not use the Bot or App ID in the 'OwnerID' field."
 msgstr ""
 
 #: musicbot/config.py:1327
@@ -2820,8 +2812,8 @@ msgstr "ローカルメディアファイルが見つかりません。"
 
 #: musicbot/entry.py:449
 #, python-format
-msgid "Cannot download spotify links, processing error with type: %(type)s"
-msgstr "Spotifyのリンクをダウンロードできません。タイプ： %(type)s"
+msgid "Cannot download Spotify links, processing error with type: %(type)s"
+msgstr ""
 
 #: musicbot/entry.py:710
 #, python-format
@@ -2942,7 +2934,7 @@ msgid "Specify yt-dlp extractor names, separated by spaces, that are allowed to 
 "To allow all extractors, add `%(allow_all)s` without quotes to the list.\n\n"
 "Services/extractors supported by yt-dlp are listed here:\n"
 "  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n\n"
-"MusicBot also provides one custom service `spotify:musicbot` to enable or disable spotify API extraction.\n"
+"MusicBot also provides one custom service `spotify:musicbot` to enable or disable Spotify API extraction.\n"
 "NOTICE: MusicBot might not support all services available to yt-dlp!\n"
 msgstr ""
 
@@ -2963,8 +2955,8 @@ msgstr "これはプレイリストです。"
 
 #: musicbot/playlist.py:195
 #, python-format
-msgid "Invalid content type `%(type)s` for url: %(url)s"
-msgstr "無効なコンテンツタイプ `%(type)s` for url: %(url)s"
+msgid "Invalid content type `%(type)s` for URL: %(url)s"
+msgstr ""
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
