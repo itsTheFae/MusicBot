@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
-"PO-Revision-Date: 2024-11-06 19:18\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
+"PO-Revision-Date: 2024-11-06 20:44\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -24,7 +24,12 @@ msgid "Error while loading aliases.\n\n"
 "Solution:\n"
 "  Replace the alias config file(s) or copy them from:\n"
 "    https://github.com/Just-Some-Bots/MusicBot/"
-msgstr ""
+msgstr "Error while loading aliases.\n\n"
+"Problem:\n"
+"  Your aliases files (aliases.json & example_aliases.json) are missing.\n\n"
+"Solution:\n"
+"  Replace the alias config file(s) or copy them from:\n"
+"    https://github.com/Just-Some-Bots/MusicBot/"
 
 #: musicbot/bot.py:713
 msgid "Member is not voice-enabled and cannot use this command."
@@ -129,7 +134,7 @@ msgstr "Failed Discord API Login!\n\n"
 #: musicbot/bot.py:2695
 #, python-brace-format
 msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr ""
+msgstr "The requested song `{subject}` is blocked by the song block list."
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -300,7 +305,7 @@ msgstr "You must provide a song subject if no song is currently playing."
 
 #: musicbot/bot.py:3152
 msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
-msgstr ""
+msgstr "Invalid sub-command given. Use `help blocksong` for usage examples."
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -2148,9 +2153,8 @@ msgstr "auto"
 #: musicbot/bot.py:7630
 #, python-format
 msgid "\n"
-"**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`"
-msgstr "\n"
-"**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`"
+"**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s`"
+msgstr ""
 
 #: musicbot/bot.py:7635
 #, python-format
@@ -3110,7 +3114,7 @@ msgstr "This is a playlist."
 #: musicbot/playlist.py:195
 #, python-format
 msgid "Invalid content type `%(type)s` for URL: %(url)s"
-msgstr ""
+msgstr "Invalid content type `%(type)s` for URL: %(url)s"
 
 #: musicbot/playlist.py:495
 msgid "no duration data"
@@ -3145,8 +3149,8 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr "Failed to get a guest token from Spotify, please try specifying client id and client secret"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
+msgstr ""
 
 #: musicbot/spotify.py:683
 #, python-format
