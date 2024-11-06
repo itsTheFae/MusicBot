@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"POT-Creation-Date: 2024-11-06 13:49-0800\n"
+"PO-Revision-Date: 2024-11-06 21:53\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -3135,39 +3135,39 @@ msgstr "无法删除文件，找不到。"
 msgid "Error while trying to delete file."
 msgstr "删除文件时出错。"
 
-#: musicbot/player.py:521
+#: musicbot/player.py:520
 msgid "Could not delete file, giving up and moving on"
 msgstr "无法删除文件，放弃并移动"
 
-#: musicbot/player.py:583
+#: musicbot/player.py:581
 #, python-format
 msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
 msgstr "反序列化返回的对象不是 MusicPlayer:  %s"
 
-#: musicbot/player.py:588
+#: musicbot/player.py:586
 msgid "Failed to deserialize player"
 msgstr "无法反序列化播放器"
 
-#: musicbot/player.py:650
+#: musicbot/player.py:648
 #, python-format
 msgid "Data from ffmpeg: %s"
 msgstr "来自 ffmpeg的数据: %s"
 
-#: musicbot/player.py:660
+#: musicbot/player.py:658
 #, python-format
 msgid "Error from ffmpeg: %s"
 msgstr "来自 ffmpeg的错误: %s"
 
-#: musicbot/player.py:668
+#: musicbot/player.py:666
 #, python-format
 msgid "Warning from ffmpeg:  %s"
 msgstr "来自 ffmpeg的警告:  %s"
 
-#: musicbot/player.py:697
+#: musicbot/player.py:695
 msgid "Unknown error decoding message from ffmpeg"
 msgstr "未知错误解码来自 ffmpeg 的消息"
 
-#: musicbot/player.py:701
+#: musicbot/player.py:699
 #, python-format
 msgid "Decoded data from ffmpeg: %s"
 msgstr "解码来自 ffmpeg的数据: %s"
