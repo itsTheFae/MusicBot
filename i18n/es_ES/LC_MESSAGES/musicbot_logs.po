@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"POT-Creation-Date: 2024-11-06 13:49-0800\n"
+"PO-Revision-Date: 2024-11-06 21:53\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -3236,39 +3236,39 @@ msgstr "No se puede eliminar el archivo, no se ha encontrado."
 msgid "Error while trying to delete file."
 msgstr "Error al intentar eliminar el archivo."
 
-#: musicbot/player.py:521
+#: musicbot/player.py:520
 msgid "Could not delete file, giving up and moving on"
 msgstr "No se pudo eliminar el archivo, abandonando y moviéndose"
 
-#: musicbot/player.py:583
+#: musicbot/player.py:581
 #, python-format
 msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
 msgstr "Deserializar devolvió un objeto que no es MusicPlayer:  %s"
 
-#: musicbot/player.py:588
+#: musicbot/player.py:586
 msgid "Failed to deserialize player"
 msgstr "Error al deserializar al jugador"
 
-#: musicbot/player.py:650
+#: musicbot/player.py:648
 #, python-format
 msgid "Data from ffmpeg: %s"
 msgstr "Datos de ffmpeg: %s"
 
-#: musicbot/player.py:660
+#: musicbot/player.py:658
 #, python-format
 msgid "Error from ffmpeg: %s"
 msgstr "Error de ffmpeg: %s"
 
-#: musicbot/player.py:668
+#: musicbot/player.py:666
 #, python-format
 msgid "Warning from ffmpeg:  %s"
 msgstr "Advertencia de ffmpeg:  %s"
 
-#: musicbot/player.py:697
+#: musicbot/player.py:695
 msgid "Unknown error decoding message from ffmpeg"
 msgstr "Mensaje de descodificación de error desconocido de ffmpeg"
 
-#: musicbot/player.py:701
+#: musicbot/player.py:699
 #, python-format
 msgid "Decoded data from ffmpeg: %s"
 msgstr "Datos decodificados de ffmpeg: %s"
