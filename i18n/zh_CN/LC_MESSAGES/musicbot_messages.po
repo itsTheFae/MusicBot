@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"POT-Creation-Date: 2024-11-06 13:49-0800\n"
+"PO-Revision-Date: 2024-11-06 21:53\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -567,7 +567,7 @@ msgstr "您提供了一个超出播放列表大小的位置！"
 
 #: musicbot/bot.py:3984
 #, python-format
-msgid "Successfully moved song from positon %(from)s in queue to position %(to)s!"
+msgid "Successfully moved song from position %(from)s in queue to position %(to)s!"
 msgstr ""
 
 #: musicbot/bot.py:4072
@@ -1119,7 +1119,7 @@ msgid "    Display the current value of the option.\n"
 msgstr "    显示选项的当前值。\n"
 
 #: musicbot/bot.py:5546
-msgid "    Saves the current current value to the options file.\n"
+msgid "    Saves the current value to the options file.\n"
 msgstr "    将当前值保存到选项文件。\n"
 
 #: musicbot/bot.py:5549
@@ -1127,7 +1127,7 @@ msgid "    Validates the option and sets the config for the session, but not to 
 msgstr "    验证选项并设置会话配置，但不设置为文件。\n"
 
 #: musicbot/bot.py:5552
-msgid "    Reset the option to it's default value.\n"
+msgid "    Reset the option to its default value.\n"
 msgstr "    重置选项为默认值。\n"
 
 #: musicbot/bot.py:5555
@@ -1408,8 +1408,8 @@ msgid "Bot does not have permission to manage messages."
 msgstr "机器人没有管理信件的权限。"
 
 #: musicbot/bot.py:6231
-msgid "Dump the individual urls of a playlist to a file."
-msgstr "将播放列表中的个别网址转储到文件。"
+msgid "Dump the individual URLs of a playlist to a file."
+msgstr "将播放列表中的单个URL转储到一个文件。"
 
 #: musicbot/bot.py:6247
 msgid "The given URL was not a valid URL."
@@ -1461,7 +1461,7 @@ msgid "Here are the IDs you requested:"
 msgstr "这里是您请求的ID："
 
 #: musicbot/bot.py:6395
-msgid "Get a list of your permissions, or the permisions of the mentioned user."
+msgid "Get a list of your permissions, or the permissions of the mentioned user."
 msgstr "获取您的权限列表或上述用户的权限。"
 
 #: musicbot/bot.py:6425
@@ -1594,7 +1594,7 @@ msgstr ""
 #: musicbot/bot.py:6660
 #, python-format
 msgid "Successfully added new group:  `%(group)s`\n"
-"You can now customizse the permissions with:  `setperms set %(group)s`\n"
+"You can now customize the permissions with:  `setperms set %(group)s`\n"
 "Make sure to save the new group with:  `setperms save %(group)s`"
 msgstr ""
 
@@ -1641,8 +1641,10 @@ msgid "Permission `%(permission)s` was updated for this session.\n"
 msgstr ""
 
 #: musicbot/bot.py:6765
-msgid "Change the bot's username on discord.Note: The API may limit name changes to twice per hour."
-msgstr "在 discord上更改机器人的用户名。注意：API 可能限制名称更改每小时两次。"
+msgid "Change the bot's username on discord.\n"
+"Note: The API may limit name changes to twice per hour."
+msgstr "在 discord上更改机器人的用户名。\n"
+"注意：API 可能限制每小时更改两次。"
 
 #: musicbot/bot.py:6784
 msgid "Failed to change username. Did you change names too many times?\n"
@@ -1843,7 +1845,7 @@ msgstr "用于测试的命令。它打印一个可以通过测试套装验证的
 
 #: musicbot/bot.py:7162
 msgid "This command issues a log at level CRITICAL, but does nothing else.\n"
-"Can be used to manually pin-point events in the MusicBot log file.\n"
+"Can be used to manually pinpoint events in the MusicBot log file.\n"
 msgstr ""
 
 #: musicbot/bot.py:7173
@@ -1868,7 +1870,7 @@ msgid "    View typestats of leaking objects.\n"
 msgstr "    查看泄漏对象的类型遗产。\n"
 
 #: musicbot/bot.py:7192
-msgid "    Evaluate the given function and args on objgraph.\n"
+msgid "    Evaluate the given function and arguments on objgraph.\n"
 msgstr "    在objgraph上评估给定的函数和参数。\n"
 
 #: musicbot/bot.py:7196
@@ -1903,9 +1905,9 @@ msgstr ""
 
 #: musicbot/bot.py:7320
 msgid "Create 'markdown' for options, permissions, or commands from the code.\n"
-"The output is used to update github pages and is thus unsuitable for normal reference use."
+"The output is used to update GitHub Pages and is thus unsuitable for normal reference use."
 msgstr "从代码创建“markdown”选项、权限或命令。\n"
-"输出用于更新 github 页面，因此不适合正常的参考使用。"
+"输出用于更新 GitHub 页面，因此不适合正常的参考使用。"
 
 #: musicbot/bot.py:7337 musicbot/bot.py:7398
 #, python-format
@@ -2360,7 +2362,7 @@ msgid "Specify a custom message to use as the bot's status. If left empty, the b
 "These variables may not be accurate in multi-guild bots:\n"
 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
 " {p0_title}    = The track title for the currently playing track.\n"
-" {p0_url}      = The track url for the currently playing track."
+" {p0_url}      = The track URL for the currently playing track."
 msgstr ""
 
 #: musicbot/config.py:571
@@ -2382,16 +2384,16 @@ msgstr "尝试使用 ffmpeg 获取音量正常化选项以供播放使用。\n"
 "此选项可能会导致播放歌曲之间的延迟，因为整个歌曲必须处理。"
 
 #: musicbot/config.py:612
-msgid "Allow MusicBot to format it's messages as embeds."
-msgstr "允许 MusicBot 将它的消息格式化为嵌入符。"
+msgid "Allow MusicBot to format its messages as embeds."
+msgstr "允许 MusicBot 将其消息格式化为嵌入板块。"
 
 #: musicbot/config.py:621
 msgid "The number of entries to show per-page when using q command to list the queue."
 msgstr "使用 q 命令列出队列时每页显示的条目数。"
 
 #: musicbot/config.py:631
-msgid "Enable MusicBot to automatically remove unplayable entries from tha auto playlist."
-msgstr "启用 MusicBot 以自动删除无法播放的条目。"
+msgid "Enable MusicBot to automatically remove unplayable entries from the auto playlist."
+msgstr "启用 MusicBot 自动从自动播放列表中删除不可播放的条目。"
 
 #: musicbot/config.py:640
 msgid "Display MusicBot config settings in the logs at startup."
