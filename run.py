@@ -226,7 +226,7 @@ class PIP:
             log.exception("PIP failed while calling sub-process.")
             return False
         except PermissionError:
-            log.exception("PIP failed due to Permissions Error.")
+            log.exception("PIP failed due to Permission Error.")
             return False
         except FileNotFoundError:
             log.exception(

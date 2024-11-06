@@ -614,7 +614,7 @@ class YtdlpResponseDict(YUserDict):
         if not subject:
             log.warning("Missing __input_subject from YtdlpResponseDict")
 
-        entries = self.data.get("entires", [])
+        entries = self.data.get("entries", [])
         if not isinstance(entries, list):
             log.warning(
                 "Entries is not a list in YtdlpResponseDict, set process=True to avoid this."

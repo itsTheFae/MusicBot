@@ -53,7 +53,7 @@ class Aliases:
             else:
                 raise HelpfulError(
                     # fmt: off
-                    "Error while loading alises.\n"
+                    "Error while loading aliases.\n"
                     "\n"
                     "Problem:\n"
                     "  Your aliases files (aliases.json & example_aliases.json) are missing.\n"

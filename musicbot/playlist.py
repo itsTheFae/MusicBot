@@ -192,7 +192,7 @@ class Playlist(EventEmitter, Serializable):
                     if not any(x in content_type for x in ("/ogg", "/octet-stream")):
                         # How does a server say `application/ogg` what the actual fuck
                         raise ExtractionError(
-                            "Invalid content type `%(type)s` for url: %(url)s",
+                            "Invalid content type `%(type)s` for URL: %(url)s",
                             fmt_args={"type": content_type, "url": info.url},
                         )
 
@@ -314,7 +314,7 @@ class Playlist(EventEmitter, Serializable):
                 or "[deleted video]" == item.get("title", "").lower()
             ):
                 log.warning(
-                    "Not adding youtube video because it is marked private or deleted:  %s",
+                    "Not adding YouTube video because it is marked private or deleted:  %s",
                     item.get_playable_url(),
                 )
                 baditems += 1

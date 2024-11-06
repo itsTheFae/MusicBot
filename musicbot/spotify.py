@@ -489,7 +489,7 @@ class Spotify:
         )
         while True:
             if next_url:
-                log.debug("Getting Spofity Album Next URL:  %s", next_url)
+                log.debug("Getting Spotify Album Next URL:  %s", next_url)
                 next_data = await self.make_api_req(self.api_safe_url(next_url))
                 next_tracks = next_data.get("items", None)
                 if next_tracks:
@@ -532,7 +532,7 @@ class Spotify:
         )
         while True:
             if next_url:
-                log.debug("Getting Spofity Playlist Next URL:  %s", next_url)
+                log.debug("Getting Spotify Playlist Next URL:  %s", next_url)
                 next_data = await self.make_api_req(self.api_safe_url(next_url))
                 next_tracks = next_data.get("items", None)
                 if next_tracks:

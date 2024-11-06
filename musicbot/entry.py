@@ -355,7 +355,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
                 if not o_channel:
                     log.warning(
-                        "Deserialized URLPlaylistEntry cannot find channel with id:  %s",
+                        "Deserialized URLPlaylistEntry cannot find channel with ID:  %s",
                         raw_json["channel_id"],
                     )
 
@@ -393,7 +393,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
 
                     if not author:
                         log.warning(
-                            "Deserialized URLPlaylistEntry cannot find author with id:  %s",
+                            "Deserialized URLPlaylistEntry cannot find author with ID:  %s",
                             raw_json["author_id"],
                         )
                 else:
@@ -446,7 +446,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 self.info = info
             else:
                 raise InvalidDataError(
-                    "Cannot download spotify links, processing error with type: %(type)s",
+                    "Cannot download Spotify links, processing error with type: %(type)s",
                     fmt_args={"type": info.ytdl_type},
                 )
 
@@ -527,7 +527,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
                 except Exception:  # pylint: disable=broad-exception-caught
                     log.error(
                         "There as a problem with working out EQ, likely caused by a strange installation of FFmpeg. "
-                        "This has not impacted the ability for the bot to work, but will mean your tracks will not be equalised.",
+                        "This has not impacted the ability for the bot to work, but will mean your tracks will not be equalized.",
                         exc_info=True,
                     )
 
@@ -628,7 +628,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # log.debug("i_matches=%s", i_matches[0][0])
             i_value = float(i_matches[0][0])
         else:
-            log.debug("Could not parse I in normalise json.")
+            log.debug("Could not parse 'I' in normalize json.")
             i_value = float(0)
 
         lra_matches = re.findall(r'"input_lra" : "(-?([0-9]*\.[0-9]+))",', output)
@@ -636,7 +636,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # log.debug("lra_matches=%s", lra_matches[0][0])
             lra_value = float(lra_matches[0][0])
         else:
-            log.debug("Could not parse LRA in normalise json.")
+            log.debug("Could not parse 'LRA' in normalize json.")
             lra_value = float(0)
 
         tp_matches = re.findall(r'"input_tp" : "(-?([0-9]*\.[0-9]+))",', output)
@@ -644,7 +644,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # log.debug("tp_matches=%s", tp_matches[0][0])
             tp_value = float(tp_matches[0][0])
         else:
-            log.debug("Could not parse TP in normalise json.")
+            log.debug("Could not parse 'TP' in normalize json.")
             tp_value = float(0)
 
         thresh_matches = re.findall(r'"input_thresh" : "(-?([0-9]*\.[0-9]+))",', output)
@@ -652,7 +652,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # log.debug("thresh_matches=%s", thresh_matches[0][0])
             thresh = float(thresh_matches[0][0])
         else:
-            log.debug("Could not parse thresh in normalise json.")
+            log.debug("Could not parse 'thresh' in normalize json.")
             thresh = float(0)
 
         offset_matches = re.findall(r'"target_offset" : "(-?([0-9]*\.[0-9]+))', output)
@@ -660,7 +660,7 @@ class URLPlaylistEntry(BasePlaylistEntry):
             # log.debug("offset_matches=%s", offset_matches[0][0])
             offset = float(offset_matches[0][0])
         else:
-            log.debug("Could not parse offset in normalise json.")
+            log.debug("Could not parse 'offset' in normalize json.")
             offset = float(0)
 
         loudnorm_opts = (
@@ -863,7 +863,7 @@ class StreamPlaylistEntry(BasePlaylistEntry):
 
                 if not o_channel:
                     log.warning(
-                        "Deserialized StreamPlaylistEntry cannot find channel with id:  %s",
+                        "Deserialized StreamPlaylistEntry cannot find channel with ID:  %s",
                         raw_json["channel_id"],
                     )
 
@@ -901,7 +901,7 @@ class StreamPlaylistEntry(BasePlaylistEntry):
 
                     if not author:
                         log.warning(
-                            "Deserialized StreamPlaylistEntry cannot find author with id:  %s",
+                            "Deserialized StreamPlaylistEntry cannot find author with ID:  %s",
                             raw_json["author_id"],
                         )
                 else:
@@ -1085,7 +1085,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
 
                 if not o_channel:
                     log.warning(
-                        "Deserialized LocalFilePlaylistEntry cannot find channel with id:  %s",
+                        "Deserialized LocalFilePlaylistEntry cannot find channel with ID:  %s",
                         raw_json["channel_id"],
                     )
 
@@ -1123,7 +1123,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
 
                     if not author:
                         log.warning(
-                            "Deserialized LocalFilePlaylistEntry cannot find author with id:  %s",
+                            "Deserialized LocalFilePlaylistEntry cannot find author with ID:  %s",
                             raw_json["author_id"],
                         )
                 else:
@@ -1207,7 +1207,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
                 except Exception:  # pylint: disable=broad-exception-caught
                     log.error(
                         "There as a problem with working out EQ, likely caused by a strange installation of FFmpeg. "
-                        "This has not impacted the ability for the bot to work, but will mean your tracks will not be equalised.",
+                        "This has not impacted the ability for the bot to work, but will mean your tracks will not be equalized.",
                         exc_info=True,
                     )
 
@@ -1309,7 +1309,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
             # log.debug("i_matches=%s", i_matches[0][0])
             i_value = float(i_matches[0][0])
         else:
-            log.debug("Could not parse I in normalise json.")
+            log.debug("Could not parse 'I' in normalize json.")
             i_value = float(0)
 
         lra_matches = re.findall(r'"input_lra" : "(-?([0-9]*\.[0-9]+))",', output)
@@ -1317,7 +1317,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
             # log.debug("lra_matches=%s", lra_matches[0][0])
             lra_value = float(lra_matches[0][0])
         else:
-            log.debug("Could not parse LRA in normalise json.")
+            log.debug("Could not parse 'LRA' in normalize json.")
             lra_value = float(0)
 
         tp_matches = re.findall(r'"input_tp" : "(-?([0-9]*\.[0-9]+))",', output)
@@ -1325,7 +1325,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
             # log.debug("tp_matches=%s", tp_matches[0][0])
             tp_value = float(tp_matches[0][0])
         else:
-            log.debug("Could not parse TP in normalise json.")
+            log.debug("Could not parse 'TP' in normalize json.")
             tp_value = float(0)
 
         thresh_matches = re.findall(r'"input_thresh" : "(-?([0-9]*\.[0-9]+))",', output)
@@ -1333,7 +1333,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
             # log.debug("thresh_matches=%s", thresh_matches[0][0])
             thresh = float(thresh_matches[0][0])
         else:
-            log.debug("Could not parse thresh in normalise json.")
+            log.debug("Could not parse 'thresh' in normalize json.")
             thresh = float(0)
 
         offset_matches = re.findall(r'"target_offset" : "(-?([0-9]*\.[0-9]+))', output)
@@ -1341,7 +1341,7 @@ class LocalFilePlaylistEntry(BasePlaylistEntry):
             # log.debug("offset_matches=%s", offset_matches[0][0])
             offset = float(offset_matches[0][0])
         else:
-            log.debug("Could not parse offset in normalise json.")
+            log.debug("Could not parse 'offset' in normalize json.")
             offset = float(0)
 
         loudnorm_opts = (

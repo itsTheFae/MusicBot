@@ -961,7 +961,7 @@ class MusicBot(discord.Client):
         if log.getEffectiveLevel() <= logging.VOICEDEBUG:  # type: ignore[attr-defined]
             if p and not p.voice_client:
                 log.error(
-                    "[BUG] MusicPlayer is missing a VoiceClient some how.  You should probably restart the bot."
+                    "[BUG] MusicPlayer is missing a VoiceClient somehow.  You should probably restart the bot."
                 )
             if p and p.voice_client and not p.voice_client.is_connected():
                 # This is normal if the bot is still connecting to voice, or
@@ -1169,7 +1169,7 @@ class MusicBot(discord.Client):
             content.set_image(url=entry.thumbnail_url)
         else:
             log.warning(
-                "No thumbnail set for entry with url: %s",
+                "No thumbnail set for entry with URL: %s",
                 entry.url,
             )
 
@@ -1438,7 +1438,7 @@ class MusicBot(discord.Client):
 
                 except exceptions.MusicbotException:
                     log.exception(
-                        "MusicBot needs to stop the autoplaylist extraction and bail."
+                        "MusicBot needs to stop the auto playlist extraction and bail."
                     )
                     return
                 except Exception:  # pylint: disable=broad-exception-caught
@@ -1799,7 +1799,7 @@ class MusicBot(discord.Client):
         """
         if not isinstance(content, MusicBotResponse):
             log.error(
-                "Cannot send non-reponse object:  %r",
+                "Cannot send non-response object:  %r",
                 content,
                 exc_info=self.config.debug_mode,
             )
@@ -2373,7 +2373,7 @@ class MusicBot(discord.Client):
 
                 if not isinstance(ch, discord.abc.Messageable):
                     log.warning(
-                        "Cannot bind to non-messagable channel with ID:  %d",
+                        "Cannot bind to non Messageable channel with ID:  %d",
                         ch_id,
                     )
                     invalid_ids.add(ch_id)
@@ -2424,7 +2424,7 @@ class MusicBot(discord.Client):
 
                 if isinstance(ch, discord.abc.PrivateChannel):
                     log.warning(
-                        "Cannot autojoin a Private/Non-Guild channel with ID:  %d",
+                        "Cannot auto join a Private/Non-Guild channel with ID:  %d",
                         ch_id,
                     )
                     invalids.add(ch_id)
@@ -2432,7 +2432,7 @@ class MusicBot(discord.Client):
 
                 if not isinstance(ch, (discord.VoiceChannel, discord.StageChannel)):
                     log.warning(
-                        "Cannot autojoin to non-connectable channel with ID:  %d",
+                        "Cannot auto join to non-connectable channel with ID:  %d",
                         ch_id,
                     )
                     invalids.add(ch_id)
@@ -2448,7 +2448,7 @@ class MusicBot(discord.Client):
 
             # log what we're connecting to.
             if vc_chlist:
-                log.info("Autojoining voice channels:")
+                log.info("Auto joining voice channels:")
                 for ch in vc_chlist:
                     log.info(
                         " - %(guild)s/%(channel)s",
@@ -2456,10 +2456,10 @@ class MusicBot(discord.Client):
                     )
 
             else:
-                log.info("Not autojoining any voice channels")
+                log.info("Not auto joining any voice channels")
 
         else:
-            log.info("Not autojoining any voice channels")
+            log.info("Not auto joining any voice channels")
 
         # Display and log the config settings.
         if self.config.show_config_at_start:
@@ -2602,7 +2602,7 @@ class MusicBot(discord.Client):
                 on_or_off(self.config.delete_invoking),
             )
             log.info(
-                "    Delete Nowplaying: %s",
+                "    Delete Now Playing: %s",
                 on_or_off(self.config.delete_nowplaying),
             )
         log.info("  Debug Mode: %s", on_or_off(self.config.debug_mode))
@@ -2692,7 +2692,7 @@ class MusicBot(discord.Client):
 
         if self.config.song_blocklist.is_blocked(song_subject):
             raise exceptions.CommandError(
-                "The requested song `{subject}` is blocked by the song blocklist.",
+                "The requested song `{subject}` is blocked by the song block list.",
                 fmt_args={"subject": song_subject},
             )
 
@@ -3134,7 +3134,7 @@ class MusicBot(discord.Client):
         song_subject: str = "",
     ) -> CommandResponse:
         """
-        Command for managing the song blocklist.
+        Command for managing the song block list.
         """
         if leftover_args:
             song_subject = " ".join([song_subject, *leftover_args])
@@ -3149,7 +3149,7 @@ class MusicBot(discord.Client):
 
         if option not in ["+", "-", "add", "remove"]:
             raise exceptions.CommandError(
-                "Ivalid sub-command given. Use `help blocksong` for usage examples."
+                "Invalid sub-command given. Use `help blocksong` for usage examples."
             )
 
         # allow management regardless, but tell the user if it will apply.
@@ -3590,8 +3590,8 @@ class MusicBot(discord.Client):
             "\n"
             "You may supply a URL to a video or audio file or the URL of a service supported by yt-dlp.\n"
             "Playlist links will be extracted into multiple links and added to the queue.\n"
-            "If you enter a non-URL, the input will be used as search criteria on youtube and the first result played.\n"
-            "MusicBot also supports Spotify URIs and URLs, but audio is fetched from youtube regardless.\n"
+            "If you enter a non-URL, the input will be used as search criteria on YouTube and the first result played.\n"
+            "MusicBot also supports Spotify URIs and URLs, but audio is fetched from YouTube regardless.\n"
         ),
     )
     async def cmd_play(
@@ -4156,7 +4156,7 @@ class MusicBot(discord.Client):
                     )
             else:
                 raise exceptions.CommandError(
-                    "Detected a spotify URL, but spotify is not enabled."
+                    "Detected a Spotify URL, but Spotify is not enabled."
                 )
 
         # This lock prevent spamming play commands to add entries that exceeds time limit/ maximum song limit
@@ -4393,7 +4393,7 @@ class MusicBot(discord.Client):
                     "Failed to get info from the stream request: %s", song_url
                 )
                 raise exceptions.CommandError(
-                    "Failed to exctract info due to error:\n%(raw_error)s",
+                    "Failed to extract info due to error:\n%(raw_error)s",
                     fmt_args={"raw_error": e},
                 ) from e
 
@@ -4429,7 +4429,7 @@ class MusicBot(discord.Client):
 
             "{cmd} [NUMBER] \"<QUERY>\"\n"
             + _Dd(
-                "    Search youtube for query but get a custom number of results.\n"
+                "    Search YouTube for query but get a custom number of results.\n"
                 "    Note: the double-quotes are required in this case.\n"
             ),
         ],
@@ -4803,7 +4803,7 @@ class MusicBot(discord.Client):
             if entry.thumbnail_url:
                 content.set_image(url=entry.thumbnail_url)
             else:
-                log.warning("No thumbnail set for entry with url: %s", entry.url)
+                log.warning("No thumbnail set for entry with URL: %s", entry.url)
 
             self.server_data[guild.id].last_np_msg = await self.safe_send_message(
                 channel,
@@ -5410,7 +5410,7 @@ class MusicBot(discord.Client):
                 raise ValueError("Value out of range.")
         except (ValueError, TypeError) as e:
             raise exceptions.CommandError(
-                "The speed you proivded is invalid. Use a number between 0.5 and 100.",
+                "The speed you provided is invalid. Use a number between 0.5 and 100.",
             ) from e
 
         # Set current playback progress and speed then restart playback.
@@ -6422,7 +6422,7 @@ class MusicBot(discord.Client):
                     user = await self.fetch_user(int(target))
                 except (discord.NotFound, ValueError) as e:
                     raise exceptions.CommandError(
-                        "Invalid user ID or server nickname, please double check the ID and try again.",
+                        "Invalid user ID or server nickname, please double-check the ID and try again.",
                     ) from e
             else:
                 user = getuser

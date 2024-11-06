@@ -466,7 +466,7 @@ class Config:
             default=ConfigDefaults.auto_playlist_remove_on_block,
             getter="getboolean",
             comment=_Dd(
-                "Remove songs from the auto playlist if they are found in the song blocklist."
+                "Remove songs from the auto playlist if they are found in the song block list."
             ),
         )
         self.auto_pause: bool = self.register.init_option(
@@ -917,9 +917,9 @@ class Config:
             getter="getstr",
             default=ConfigDefaults.ytdlp_oauth2_url,
             comment=_Dd(
-                "Optional youtube video URL used at start-up for triggering OAuth2 authorization.\n"
+                "Optional YouTube video URL used at start-up for triggering OAuth2 authorization.\n"
                 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
-                "The URL set here should be an accessible youtube video URL.\n"
+                "The URL set here should be an accessible YouTube video URL.\n"
                 "Authorization must be completed before start-up will continue when this is set."
             ),
         )
@@ -1241,14 +1241,14 @@ class Config:
             else:
                 raise HelpfulError(
                     # fmt: off
-                    "Error while fetching OwnerID automatically.\n"
+                    "Error while fetching 'OwnerID' automatically.\n"
                     "\n"
                     "Problem:\n"
                     "  Discord App info is not available.\n"
                     "  This could be a temporary API outage or a bug.\n"
                     "\n"
                     "Solution:\n"
-                    "  Manually set the OwnerID config option or try again later."
+                    "  Manually set the 'OwnerID' config option or try again later."
                     # fmt: on
                 )
 
@@ -1262,10 +1262,10 @@ class Config:
                 "Error validating config options.\n"
                 "\n"
                 "Problem:\n"
-                "  The OwnerID config is the same as your Bot / App ID.\n"
+                "  The 'OwnerID' config is the same as your Bot / App ID.\n"
                 "\n"
                 "Solution:\n"
-                "  Do not use the Bot or App ID in the OwnerID field."
+                "  Do not use the Bot or App ID in the 'OwnerID' field."
                 # fmt: on
             )
 
@@ -2548,7 +2548,7 @@ class Blocklist:
         :returns:  True if loading finished False if it could not for any reason.
         """
         if not self._blocklist_file.is_file():
-            log.warning("Blocklist file not found:  %s", self._blocklist_file)
+            log.warning("Block list file not found:  %s", self._blocklist_file)
             return False
 
         try:
@@ -2667,7 +2667,7 @@ class UserBlocklist(Blocklist):
         )
         super().__init__(blocklist_file, comment_char)
         log.debug(
-            "Loaded User Blocklist with %s entires.",
+            "Loaded User Block list with %s entries.",
             len(self.items),
         )
 
@@ -2724,7 +2724,7 @@ class SongBlocklist(Blocklist):
             ],
         )
         super().__init__(blocklist_file, comment_char)
-        log.debug("Loaded a Song Blocklist with %s entries.", len(self.items))
+        log.debug("Loaded a Song Block list with %s entries.", len(self.items))
 
     def is_blocked(self, song_subject: str) -> bool:
         """

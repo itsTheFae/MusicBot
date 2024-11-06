@@ -501,7 +501,7 @@ class MusicPlayer(EventEmitter, Serializable):
                             log.warning("Cannot delete file, it is currently in use.")
                         else:
                             log.warning(
-                                "Cannot delete file due to a permissions error.",
+                                "Cannot delete file due to a permission error.",
                                 exc_info=True,
                             )
                     except FileNotFoundError:

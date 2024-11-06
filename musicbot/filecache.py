@@ -299,7 +299,7 @@ class AudioFileCache:
             return
 
         if not self.cachemap_file.is_file():
-            log.debug("Autoplaylist has no cache map, moving on.")
+            log.debug("Auto playlist has no cache map, moving on.")
             self.auto_playlist_cachemap = {}
             return
 
@@ -307,11 +307,11 @@ class AudioFileCache:
             try:
                 self.auto_playlist_cachemap = json.load(fh)
                 log.info(
-                    "Loaded autoplaylist cache map with %s entries.",
+                    "Loaded auto playlist cache map with %s entries.",
                     len(self.auto_playlist_cachemap),
                 )
             except json.JSONDecodeError:
-                log.exception("Failed to load autoplaylist cache map.")
+                log.exception("Failed to load auto playlist cache map.")
                 self.auto_playlist_cachemap = {}
 
     async def save_autoplay_cachemap(self) -> None:
@@ -330,11 +330,11 @@ class AudioFileCache:
                 with open(self.cachemap_file, "w", encoding="utf8") as fh:
                     json.dump(self.auto_playlist_cachemap, fh)
                     log.debug(
-                        "Saved autoplaylist cache map with %s entries.",
+                        "Saved auto playlist cache map with %s entries.",
                         len(self.auto_playlist_cachemap),
                     )
             except (TypeError, ValueError, RecursionError):
-                log.exception("Failed to save autoplaylist cache map.")
+                log.exception("Failed to save auto playlist cache map.")
 
     def add_autoplay_cachemap_entry(self, entry: "BasePlaylistEntry") -> None:
         """
@@ -352,7 +352,7 @@ class AudioFileCache:
         if filename in self.auto_playlist_cachemap:
             if self.auto_playlist_cachemap[filename] != entry.url:
                 log.warning(
-                    "Autoplaylist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s",
+                    "Auto playlist cache map conflict on Key: %(file)s  Old: %(old)s  New: %(new)s",
                     {
                         "file": filename,
                         "old": self.auto_playlist_cachemap[filename],

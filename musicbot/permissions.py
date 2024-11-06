@@ -162,7 +162,7 @@ class Permissions:
     def set_owner_id(self, owner_id: int) -> None:
         """Sets the given id as the owner ID in the owner permission group."""
         if owner_id == 0:
-            log.debug("OwnerID is set auto, will set correctly later.")
+            log.debug("Config 'OwnerID' is set auto, will set correctly later.")
         self.groups[DEFAULT_OWNER_GROUP_NAME].user_list = set([owner_id])
 
     @property
@@ -181,7 +181,7 @@ class Permissions:
         """
         log.debug("Validating permissions...")
         if 0 in self.owner_group.user_list:
-            log.debug("Setting auto OwnerID for owner permissions group.")
+            log.debug("Setting auto 'OwnerID' for owner permissions group.")
             self.owner_group.user_list = {bot.config.owner_id}
 
     def for_user(self, user: Union[discord.Member, discord.User]) -> "PermissionGroup":
@@ -520,7 +520,7 @@ class PermissionGroup:
                 "Services/extractors supported by yt-dlp are listed here:\n"
                 "  https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md \n"
                 "\n"
-                "MusicBot also provides one custom service `spotify:musicbot` to enable or disable spotify API extraction.\n"
+                "MusicBot also provides one custom service `spotify:musicbot` to enable or disable Spotify API extraction.\n"
                 "NOTICE: MusicBot might not support all services available to yt-dlp!\n"
             ),
             comment_args={"allow_all": PERMS_ALLOW_ALL_EXTRACTOR_NAME},
@@ -829,7 +829,7 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
             # add owner section comment
             owner_comment = (
                 "This permission group is used by the Owner only, and cannot be edited at all.\n"
-                "It grants all access to MusicBot for the user specified in OwnerID config option."
+                "It grants all access to MusicBot for the user specified in 'OwnerID' config option."
             )
             for line in owner_comment.split("\n"):
                 adder.comment(line, comment_prefix=";")

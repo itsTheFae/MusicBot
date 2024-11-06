@@ -226,7 +226,7 @@ class I18n:
 
         # Make sure argparser does not exit or print.
         def _error(message: str) -> NoReturn:  # type: ignore[misc]
-            log.debug("Lang Args Error:  %s", message)
+            log.debug("Lang Argument Error:  %s", message)
 
         ap.error = _error  # type: ignore[method-assign]
 
