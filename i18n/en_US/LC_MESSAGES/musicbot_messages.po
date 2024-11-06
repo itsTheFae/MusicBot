@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 12:40-0800\n"
-"PO-Revision-Date: 2024-11-06 20:44\n"
+"PO-Revision-Date: 2024-11-06 21:44\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -1872,7 +1872,7 @@ msgstr "Not currently connected to server `%(guild)s`"
 
 #: musicbot/bot.py:6960
 msgid "    Attempt to reload without process restart. The default option.\n"
-msgstr "    Attempt to reload without process restart. The default option.\n"
+msgstr "    Attempt to reload without process restart. The default tion.\n"
 
 #: musicbot/bot.py:6962
 msgid "    Attempt to restart the entire MusicBot process, reloading everything.\n"
