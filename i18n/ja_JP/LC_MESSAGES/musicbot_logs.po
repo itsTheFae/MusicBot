@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
-"PO-Revision-Date: 2024-11-06 19:17\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
+"PO-Revision-Date: 2024-11-06 20:44\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -2243,7 +2243,7 @@ msgid "Validating options with service data..."
 msgstr "サービスデータを使用してオプションを検証しています..."
 
 #: musicbot/config.py:1240
-msgid "Acquired owner id via API"
+msgid "Acquired owner ID via API"
 msgstr "API経由で取得した所有者ID"
 
 #: musicbot/config.py:1244
@@ -2419,7 +2419,7 @@ msgstr "ファイルからブロックリストを読み込めませんでした
 
 #: musicbot/config.py:2610 musicbot/config.py:2643
 #, python-format
-msgid "Could not update the blocklist file:  %s"
+msgid "Could not update the block list file:  %s"
 msgstr "ブロックリストファイルを更新できませんでした:  %s"
 
 #: musicbot/config.py:2670
@@ -3000,8 +3000,8 @@ msgstr "オーナー権限グループに自動的に 'OwnerID' を設定しま�
 
 #: musicbot/permissions.py:238
 #, python-format
-msgid "Updating group in permssions file:  %s"
-msgstr "Permssions ファイルのグループを更新中:  %s"
+msgid "Updating group in permissions file:  %s"
+msgstr "権限ファイルのグループを更新中:  %s"
 
 #: musicbot/permissions.py:244
 #, python-format
@@ -3162,13 +3162,13 @@ msgid "Error while trying to delete file."
 msgstr "ファイルの削除中にエラーが発生しました。"
 
 #: musicbot/player.py:521
-msgid "[Config:SaveVideos] Could not delete file, giving up and moving on"
-msgstr "[Config:SaveVideos] ファイルを削除できませんでした。あきらめて移動します。"
+msgid "Could not delete file, giving up and moving on"
+msgstr "ファイルを削除できませんでした。あきらめて次に進みます"
 
 #: musicbot/player.py:583
 #, python-format
-msgid "Deserialize returned a non-MusicPlayer:  %s"
-msgstr "Deserializeが非MusicPlayerを返しました:  %s"
+msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
+msgstr "MusicPlayerではないオブジェクトをデシリアライズして返されました:  %s"
 
 #: musicbot/player.py:588
 msgid "Failed to deserialize player"
@@ -3373,7 +3373,7 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr "URLへのPOSTを作成できませんでした:  %(url)s  理由:  %(raw_error)s"
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
 msgstr "Spotifyからゲスト トークンを取得できませんでした。クライアント IDとクライアント シークレットを指定してみてください"
 
 #: musicbot/spotify.py:679
