@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:17\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -533,7 +533,7 @@ msgstr ""
 
 #: musicbot/bot.py:1441
 msgid "MusicBot needs to stop the auto playlist extraction and bail."
-msgstr ""
+msgstr "MusicBot 需要停止自动播放列表提取和保释。"
 
 #: musicbot/bot.py:1446
 msgid "MusicBot got an unhandled exception in player finished event."
@@ -606,7 +606,7 @@ msgstr ""
 #: musicbot/bot.py:1802
 #, python-format
 msgid "Cannot send non-response object:  %r"
-msgstr ""
+msgstr "无法发送无响应对象：  %r"
 
 #: musicbot/bot.py:1807
 msgid "[Dev Bug] Tried sending an invalid response object."
@@ -879,13 +879,13 @@ msgstr "不绑定到任何文本频道"
 
 #: musicbot/bot.py:2421
 #, python-format
-msgid "Got None for autojoin channel with ID:  %d"
-msgstr ""
+msgid "Got None for auto join channel with ID:  %d"
+msgstr "没有自动加入频道ID:  %d"
 
 #: musicbot/bot.py:2427
 #, python-format
 msgid "Cannot auto join a Private/Non-Guild channel with ID:  %d"
-msgstr ""
+msgstr "无法自动加入私有/非公会频道与 ID:  %d"
 
 #: musicbot/bot.py:2435
 #, python-format
@@ -894,11 +894,11 @@ msgstr "无法自动加入不可连接的频道 ID:  %d"
 
 #: musicbot/bot.py:2451
 msgid "Auto joining voice channels:"
-msgstr ""
+msgstr "自动加入语音频道："
 
 #: musicbot/bot.py:2459 musicbot/bot.py:2462
 msgid "Not auto joining any voice channels"
-msgstr ""
+msgstr "不自动加入任何语音频道"
 
 #: musicbot/bot.py:2475
 #, python-format
@@ -1002,7 +1002,7 @@ msgstr ""
 #: musicbot/bot.py:2605
 #, python-format
 msgid "    Delete Now Playing: %s"
-msgstr ""
+msgstr "    删除正在播放中: %s"
 
 #: musicbot/bot.py:2608
 #, python-format
@@ -1189,7 +1189,7 @@ msgstr ""
 
 #: musicbot/bot.py:3052
 #, python-format
-msgid "Not removing user from blocklist, not listed:  %(id)s/%(name)s"
+msgid "Not removing user from block list, not listed:  %(id)s/%(name)s"
 msgstr ""
 
 #: musicbot/bot.py:3069
@@ -1344,7 +1344,7 @@ msgstr "Spotify URL 无效或目前不支持。"
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "检测到 Spotify 网址，但Spotify 未启用。"
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -1371,7 +1371,7 @@ msgstr "无法播放该视频。请尝试使用流命令。"
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
 msgstr ""
 
 #: musicbot/bot.py:4238
@@ -1385,8 +1385,8 @@ msgid "No songs were added, all songs were over max duration (%(max)s seconds)"
 msgstr ""
 
 #: musicbot/bot.py:4265
-msgid "Extracted an entry with youtube:playlist as extractor key"
-msgstr "用提取器键提取一个 youtube:playlist 的条目"
+msgid "Extracted an entry with 'youtube:playlist' as extractor key"
+msgstr "提取了“youtube:playlist”作为提取器键的条目"
 
 #: musicbot/bot.py:4277
 #, python-format
@@ -1701,7 +1701,7 @@ msgstr "权限不能同时使用频道和用户提到。"
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
 msgstr ""
 
@@ -2404,7 +2404,7 @@ msgstr "无法更新块列表文件：  %s"
 #: musicbot/config.py:2670
 #, python-format
 msgid "Loaded User Block list with %s entries."
-msgstr ""
+msgstr "使用 %s 条目加载用户块列表。"
 
 #: musicbot/config.py:2681
 #, python-format
@@ -2612,7 +2612,7 @@ msgstr "条目数据有错误的版本号，不能反序列化。"
 #: musicbot/entry.py:358
 #, python-format
 msgid "Deserialized URLPlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "反序列化的 URL 播放列表条目无法找到 ID 的频道:  %s"
 
 #: musicbot/entry.py:374
 #, python-format
@@ -2713,7 +2713,7 @@ msgstr "无法在您的路径上找到 ffmpeg ！"
 
 #: musicbot/entry.py:631 musicbot/entry.py:1312
 msgid "Could not parse 'I' in normalize json."
-msgstr ""
+msgstr "无法解析 json。"
 
 #: musicbot/entry.py:639 musicbot/entry.py:1320
 msgid "Could not parse 'LRA' in normalize json."
@@ -2721,15 +2721,15 @@ msgstr "无法解析 json 正常化 “LRA”。"
 
 #: musicbot/entry.py:647 musicbot/entry.py:1328
 msgid "Could not parse 'TP' in normalize json."
-msgstr ""
+msgstr "无法解析 json 正常化 “TP”。"
 
 #: musicbot/entry.py:655 musicbot/entry.py:1336
 msgid "Could not parse 'thresh' in normalize json."
-msgstr ""
+msgstr "无法解析 json 正常化 “阈值”。"
 
 #: musicbot/entry.py:663 musicbot/entry.py:1344
 msgid "Could not parse 'offset' in normalize json."
-msgstr ""
+msgstr "无法解析 json 正常化 'offset' 。"
 
 #: musicbot/entry.py:680
 #, python-format
@@ -2787,7 +2787,7 @@ msgstr "下载完成：  %r"
 #: musicbot/entry.py:866
 #, python-format
 msgid "Deserialized StreamPlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "反序列化的 StreamPlaylistEnter无法找到与 ID:  %s 的频道"
 
 #: musicbot/entry.py:882
 #, python-format
@@ -2797,7 +2797,7 @@ msgstr "反序列化的 StreamPlaylistentre 有错误的频道类型:  %s"
 #: musicbot/entry.py:904
 #, python-format
 msgid "Deserialized StreamPlaylistEntry cannot find author with ID:  %s"
-msgstr ""
+msgstr "反序列化的 StreamPlaylistEnter无法找到 ID 的作者：  %s"
 
 #: musicbot/entry.py:910
 msgid "Deserialized StreamPlaylistEntry has an author ID but no channel for lookup!"
@@ -2806,7 +2806,7 @@ msgstr "反序列化的 StreamPlaylistEnter有作者ID，但没有查找渠道�
 #: musicbot/entry.py:1088
 #, python-format
 msgid "Deserialized LocalFilePlaylistEntry cannot find channel with ID:  %s"
-msgstr ""
+msgstr "反序列化的 LocalFilePlaylistEnter无法找到与 ID:  %s 的频道"
 
 #: musicbot/entry.py:1104
 #, python-format
@@ -2816,7 +2816,7 @@ msgstr "反序列化的本地文件播放列表条目有错误的通道类型：
 #: musicbot/entry.py:1126
 #, python-format
 msgid "Deserialized LocalFilePlaylistEntry cannot find author with ID:  %s"
-msgstr ""
+msgstr "反序列化的 LocalFilePlaylistEnter无法找到ID:  %s 的作者"
 
 #: musicbot/entry.py:1132
 msgid "Deserialized LocalFilePlaylistEntry has an author ID but no channel for lookup!"
@@ -2878,25 +2878,25 @@ msgstr "缓存级别需要清理。 %s"
 
 #: musicbot/filecache.py:302
 msgid "Auto playlist has no cache map, moving on."
-msgstr ""
+msgstr "自动播放列表没有缓存地图，正在继续。"
 
 #: musicbot/filecache.py:310
 #, python-format
 msgid "Loaded auto playlist cache map with %s entries."
-msgstr ""
+msgstr "加载了带有 %s 条目的自动播放列表缓存图。"
 
 #: musicbot/filecache.py:314
 msgid "Failed to load auto playlist cache map."
-msgstr ""
+msgstr "自动载入播放列表缓存映射失败。"
 
 #: musicbot/filecache.py:333
 #, python-format
 msgid "Saved auto playlist cache map with %s entries."
-msgstr ""
+msgstr "保存了带有 %s 条条目的自动播放列表缓存图。"
 
 #: musicbot/filecache.py:337
 msgid "Failed to save auto playlist cache map."
-msgstr ""
+msgstr "保存自动播放列表缓存映射失败。"
 
 #: musicbot/filecache.py:355
 #, python-format
@@ -2906,7 +2906,7 @@ msgstr ""
 #: musicbot/i18n.py:229
 #, python-format
 msgid "Lang Argument Error:  %s"
-msgstr ""
+msgstr "Lang 参数错误:  %s"
 
 #: musicbot/i18n.py:290
 #, python-format
@@ -2921,7 +2921,7 @@ msgstr ""
 #: musicbot/json.py:14
 #, python-format
 msgid "Loading JSON file: %s"
-msgstr ""
+msgstr "正在加载 JSON 文件： %s"
 
 #: musicbot/json.py:27
 #, python-format
@@ -2948,8 +2948,8 @@ msgid "Changing log level to:  %s"
 msgstr ""
 
 #: musicbot/logs.py:314
-msgid "MusicBot loggers have been called to shutdown."
-msgstr "MusicBot 伐木者已被召唤关机。"
+msgid "MusicBot loggers have been called to shut down."
+msgstr "MusicBot 伐木者已被召唤关闭。"
 
 #: musicbot/permissions.py:118
 #, python-format
@@ -2963,7 +2963,7 @@ msgstr "复制示例权限文件时出错：  %s"
 
 #: musicbot/permissions.py:165
 msgid "Config 'OwnerID' is set auto, will set correctly later."
-msgstr ""
+msgstr "配置“所有者ID”设置为自动设置，稍后会正确设置。"
 
 #: musicbot/permissions.py:182
 msgid "Validating permissions..."
@@ -2971,7 +2971,7 @@ msgstr "正在验证权限..."
 
 #: musicbot/permissions.py:184
 msgid "Setting auto 'OwnerID' for owner permissions group."
-msgstr ""
+msgstr "为所有者权限组设置自动“所有者ID”。"
 
 #: musicbot/permissions.py:238
 #, python-format
@@ -3125,7 +3125,7 @@ msgstr "无法删除文件，它目前正在使用。"
 
 #: musicbot/player.py:504
 msgid "Cannot delete file due to a permission error."
-msgstr ""
+msgstr "由于权限错误，无法删除文件。"
 
 #: musicbot/player.py:509
 msgid "Cannot delete file, it was not found."
@@ -3231,7 +3231,7 @@ msgstr "以 '%s' 忽略条目中的歌曲，持续时间超过允许的最大值
 #: musicbot/playlist.py:317
 #, python-format
 msgid "Not adding YouTube video because it is marked private or deleted:  %s"
-msgstr ""
+msgstr "不添加 YouTube 视频，因为它已标记为私有或已删除：  %s"
 
 #: musicbot/playlist.py:342
 msgid "Could not add item"
@@ -3282,7 +3282,7 @@ msgstr ""
 #: musicbot/spotify.py:492
 #, python-format
 msgid "Getting Spotify Album Next URL:  %s"
-msgstr ""
+msgstr "获取 Spotify 相册下一个URL:  %s"
 
 #: musicbot/spotify.py:503
 #, python-format
@@ -3301,7 +3301,7 @@ msgstr ""
 #: musicbot/spotify.py:535
 #, python-format
 msgid "Getting Spotify Playlist Next URL:  %s"
-msgstr ""
+msgstr "获取 Spotify 播放列表下一个URL:  %s"
 
 #: musicbot/spotify.py:546
 #, python-format
@@ -3406,7 +3406,7 @@ msgstr "保存 ytdlp ooth2 令牌数据失败，原因是：  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:91
 msgid "Loading YouTube TV OAuth2 token data."
-msgstr ""
+msgstr "正在加载 YouTube TV OAuth2 令牌数据。"
 
 #: musicbot/ytdlp_oauth2_plugin.py:101
 #, python-format
@@ -3415,7 +3415,7 @@ msgstr "无法加载 ytdlp ooth2 令牌数据，原因是：  %s"
 
 #: musicbot/ytdlp_oauth2_plugin.py:109
 msgid "Storing YouTube TV OAuth2 token data"
-msgstr ""
+msgstr "存储 YouTube TV OAuth2 令牌数据"
 
 #: musicbot/ytdlp_oauth2_plugin.py:139
 msgid "Invalid cached OAuth2 token data."
@@ -3427,11 +3427,11 @@ msgstr "访问令牌已过期，正在刷新"
 
 #: musicbot/ytdlp_oauth2_plugin.py:175
 msgid "YouTube cookies have been provided, but OAuth2 is being used. If you encounter problems, stop providing YouTube cookies to yt-dlp."
-msgstr ""
+msgstr "YouTube cookie 已经提供，但是OAuth2 正在使用。如果您遇到问题，停止提供 YouTube cookie 到 yt-dlp。"
 
 #: musicbot/ytdlp_oauth2_plugin.py:193
 msgid "Refreshing YouTube TV oauth2 token..."
-msgstr ""
+msgstr "正在刷新 YouTube TV oauth2 令牌..."
 
 #: musicbot/ytdlp_oauth2_plugin.py:211
 #, python-format
@@ -3511,7 +3511,7 @@ msgstr "调用子进程时PIP失败。"
 
 #: run.py:229
 msgid "PIP failed due to Permission Error."
-msgstr ""
+msgstr "由于权限错误，PIP失败。"
 
 #: run.py:233
 #, python-format
