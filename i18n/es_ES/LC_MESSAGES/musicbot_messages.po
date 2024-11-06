@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-06 06:34-0800\n"
-"PO-Revision-Date: 2024-11-06 15:17\n"
+"PO-Revision-Date: 2024-11-06 15:49\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -123,7 +123,13 @@ msgid "Failed Discord API Login!\n\n"
 "Solution:\n"
 "  Make sure you have the correct Token set in your config.\n"
 "  Check API status at the official site: discordstatus.com"
-msgstr ""
+msgstr "Error al iniciar sesión en la API de Discord.\n\n"
+"Problema:\n"
+"  MusicBot no pudo iniciar sesión en la API de Discord.\n"
+"  Es posible que tu token sea incorrecto o que haya una interrupción en la API.\n\n"
+"Solución:\n"
+"  Asegúrate de tener el token correcto configurado en tu configuración.\n"
+"  Comprueba el estado de la API en el sitio oficial: discordstatus.com"
 
 #: musicbot/bot.py:2695
 #, python-brace-format
@@ -133,7 +139,8 @@ msgstr "La canción solicitada `{subject}` está bloqueada por la lista de bloqu
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
 "This command will be removed in a future version, replaced by the autoplaylist command(s)."
-msgstr ""
+msgstr "Restablezca la cola de reproducción automática copiándola nuevamente en la memoria del reproductor.\n"
+"Este comando se eliminará en una versión futura y se reemplazará por el comando o los comandos de lista de reproducción automática."
 
 #: musicbot/bot.py:2846
 msgid "\\N{OK HAND SIGN}"
@@ -247,7 +254,8 @@ msgstr "No se pueden agregar los usuarios que has listado, que ya han sido añad
 #, python-format
 msgid "%(number)s user(s) have been added to the block list.\n"
 "%(status)s"
-msgstr ""
+msgstr "%(number)s usuarios han sido añadidos a la lista de bloqueados.\n"
+"%(status)s"
 
 #: musicbot/bot.py:3089
 msgid "None of those users are in the blacklist."
@@ -276,7 +284,8 @@ msgstr "**Estado de la lista de bloqueos:**\n"
 #, python-format
 msgid "%(number)s user(s) have been removed from the block list.\n"
 "%(status)s"
-msgstr ""
+msgstr "%(number)s usuarios han sido eliminados de la lista de bloqueados.\n"
+"%(status)s"
 
 #: musicbot/bot.py:3118
 msgid "Manage a block list applied to song requests and extracted song data.\n"
@@ -284,7 +293,11 @@ msgid "Manage a block list applied to song requests and extracted song data.\n"
 "If subject is omitted, any currently playing track URL will be added instead.\n\n"
 "The song block list matches loosely, but is case-sensitive.\n"
 "This means adding 'Pie' will match 'cherry Pie' but not 'piecrust' in checks.\n"
-msgstr ""
+msgstr "Administrar una lista de bloqueos aplicada a las solicitudes de canciones y a los datos extraídos de las mismas.\n"
+"Un asunto puede ser la URL de una canción o una palabra o frase que se encuentre en el título de la pista.\n"
+"Si se omite el asunto, se agregará en su lugar la URL de cualquier pista que se esté reproduciendo en ese momento.\n\n"
+"La lista de bloqueos de canciones coincide de forma aproximada, pero distingue entre mayúsculas y minúsculas.\n"
+"Esto significa que si se agrega \"Pie\", se coincidirá con \"cherry Pie\" pero no con \"piecrust\" en las comprobaciones.\n"
 
 #: musicbot/bot.py:3146
 msgid "You must provide a song subject if no song is currently playing."
@@ -460,7 +473,11 @@ msgid "Add a song to be played in the queue. If no song is playing or paused, pl
 "Playlist links will be extracted into multiple links and added to the queue.\n"
 "If you enter a non-URL, the input will be used as search criteria on youtube and the first result played.\n"
 "MusicBot also supports Spotify URIs and URLs, but audio is fetched from youtube regardless.\n"
-msgstr ""
+msgstr "Añade una canción para que se reproduzca en la cola. Si no se reproduce ninguna canción o está en pausa, se iniciará la reproducción.\n\n"
+"Puedes proporcionar una URL a un archivo de video o audio o la URL de un servicio compatible con yt-dlp.\n"
+"Los enlaces de la lista de reproducción se extraerán en varios enlaces y se agregarán a la cola.\n"
+"Si ingresas una URL que no sea la URL, la entrada se utilizará como criterio de búsqueda en YouTube y se reproducirá el primer resultado.\n"
+"MusicBot también admite URL y URI de Spotify, pero el audio se obtiene de YouTube de todos modos.\n"
 
 #: musicbot/bot.py:3628
 msgid "Play command that shuffles playlist entries before adding them to the queue.\n"
@@ -474,7 +491,8 @@ msgstr "Elementos de la lista de reproducción mezclados en la cola desde `%(req
 #: musicbot/bot.py:3672
 msgid "A play command that adds the song as the next to play rather than last.\n"
 "Read help for the play command for information on supported inputs.\n"
-msgstr ""
+msgstr "Un comando de reproducción que agrega la canción como la siguiente en reproducirse en lugar de la última.\n"
+"Lea la ayuda del comando de reproducción para obtener información sobre las entradas admitidas.\n"
 
 #: musicbot/bot.py:3707
 msgid "A play command which skips any current song and plays immediately.\n"
@@ -527,7 +545,9 @@ msgstr "Buscando en el tiempo `%(input)s` (`%(seconds).2f` segundos) en la canci
 msgid "Toggles playlist or song looping.\n"
 "If no option is provided the current song will be repeated.\n"
 "If no option is provided and the song is already repeating, repeating will be turned off.\n"
-msgstr ""
+msgstr "Activa o desactiva la repetición de la lista de reproducción o de la canción.\n"
+"Si no se proporciona ninguna opción, se repetirá la canción actual.\n"
+"Si no se proporciona ninguna opción y la canción ya se está repitiendo, la repetición se desactivará.\n"
 
 #: musicbot/bot.py:3870
 msgid "No songs are currently playing. Play something with a play command."
@@ -685,7 +705,10 @@ msgid "Add a media URL to the queue as a Stream.\n"
 "The URL may be actual streaming media, like Twitch, Youtube, or a shoutcast like service.\n"
 "You can also use non-streamed media to play it without downloading it.\n"
 "Note: FFmpeg may drop the stream randomly or if connection hiccups happen.\n"
-msgstr ""
+msgstr "Agrega una URL de contenido multimedia a la cola como una transmisión.\n"
+"La URL puede ser un contenido multimedia en streaming real, como Twitch, YouTube o un servicio similar a Shoutcast.\n"
+"También puedes usar contenido multimedia que no haya sido transmitido en streaming para reproducirlo sin descargarlo.\n"
+"Nota: FFmpeg puede interrumpir la transmisión aleatoriamente o si ocurren problemas de conexión.\n"
 
 #: musicbot/bot.py:4396
 #, python-format
@@ -771,7 +794,8 @@ msgstr "**%(index)s**. **%(track)s** | %(length)s"
 #: musicbot/bot.py:4594
 msgid "\n"
 "**0**. Cancel"
-msgstr ""
+msgstr "\n"
+"**0**. Cancela"
 
 #: musicbot/bot.py:4598
 msgid "Pick a song"
@@ -797,7 +821,7 @@ msgstr "Mostrar información sobre lo que se está reproduciendo actualmente."
 
 #: musicbot/bot.py:4777 musicbot/bot.py:6027 musicbot/bot.py:6059
 msgid "[autoplaylist]"
-msgstr ""
+msgstr "[autoplaylist]"
 
 #: musicbot/bot.py:4781
 msgid "Now playing"
@@ -915,7 +939,10 @@ msgid "Remove a song from the queue, optionally at the given queue position.\n"
 "If the position is omitted, the song at the end of the queue is removed.\n"
 "Use the queue command to find position number of your track.\n"
 "However, positions of all songs are changed when a new song starts playing.\n"
-msgstr ""
+msgstr "Quitar una canción de la cola, opcionalmente en la posición de cola indicada.\n"
+"Si se omite la posición, se elimina la canción que se encuentra al final de la cola.\n"
+"Utilice el comando queue para encontrar el número de posición de su pista.\n"
+"Sin embargo, las posiciones de todas las canciones se modifican cuando comienza a reproducirse una nueva canción.\n"
 
 #: musicbot/bot.py:5053
 msgid "Nothing in the queue to remove!"
@@ -934,7 +961,7 @@ msgstr "No se ha encontrado nada en la cola del usuario `%(user)s`"
 #: musicbot/bot.py:5079 musicbot/bot.py:5114
 msgid "You do not have the permission to remove that entry from the queue.\n"
 "You must be the one who queued it or have instant skip permissions."
-msgstr ""
+msgstr "No tienes permiso para eliminar esa entrada de la cola. Debes ser tú quien la puso en cola o tener permisos de omisión instantánea."
 
 #: musicbot/bot.py:5090 musicbot/bot.py:5095
 msgid "Invalid entry number. Use the queue command to find queue positions."
@@ -954,7 +981,9 @@ msgstr "Se ha eliminado la entrada `%(track)s`"
 msgid "Skip or vote to skip the current playing song.\n"
 "Members with InstaSkip permission may use force parameter to bypass voting.\n"
 "If LegacySkip option is enabled, the force parameter can be ignored.\n"
-msgstr ""
+msgstr "Saltar o votar para omitir la canción actual.\n"
+"Los miembros con permiso InstaSkip pueden usar el parámetro de fuerza para omitir el voto.\n"
+"Si la opción LegacySkip está activada, el parámetro de fuerza puede ser ignorado.\n"
 
 #: musicbot/bot.py:5145
 msgid "Can't skip! The player is not playing!"
@@ -1020,7 +1049,9 @@ msgstr "Tu salto para `%(track)s` ha sido reconocido.\n"
 msgid "Set the output volume level of MusicBot from 1 to 100.\n"
 "Volume parameter allows a leading + or - for relative adjustments.\n"
 "The volume setting is retained until MusicBot is restarted.\n"
-msgstr ""
+msgstr "Establezca el nivel de volumen de salida de MusicBot de 1 a 100.\n"
+"El parámetro de volumen permite introducir un signo + o - inicial para realizar ajustes relativos.\n"
+"La configuración de volumen se conserva hasta que se reinicia MusicBot.\n"
 
 #: musicbot/bot.py:5323
 #, python-format
@@ -1353,7 +1384,8 @@ msgstr "El comando de opción está obsoleto, utilice el comando de configuraci�
 #: musicbot/bot.py:5892
 msgid "Display information about cache storage or clear cache according to configured limits.\n"
 "Using update option will scan the cache for external changes before displaying details."
-msgstr ""
+msgstr "Muestra información sobre el almacenamiento en caché o borra la caché según los límites configurados.\n"
+"Al utilizar la opción de actualización, se escaneará la caché en busca de cambios externos antes de mostrar los detalles."
 
 #: musicbot/bot.py:5905
 msgid "Invalid option specified, use: info, update, or clear"
@@ -1459,7 +1491,9 @@ msgstr "Inténtelo de nuevo. MusicBot no pudo hacer ni obtener una referencia al
 msgid "Search for and remove bot messages and commands from the calling text channel.\n"
 "Optionally supply a number of messages to search through, 50 by default 500 max.\n"
 "This command may be slow if larger ranges are given.\n"
-msgstr ""
+msgstr "Busca y elimina mensajes y comandos del bot del canal de texto llamado.\n"
+"Opcionalmente suministra un número de mensajes para buscar, 50 por defecto 500 max.\n"
+"Este comando puede ser lento si se dan rangos más grandes.\n"
 
 #: musicbot/bot.py:6180
 msgid "Invalid parameter. Please provide a number of messages to search."
@@ -1505,7 +1539,8 @@ msgstr "Aquí está el volcado de la lista de reproducción para:  %(url)s"
 #: musicbot/bot.py:6292
 msgid "Display your Discord User ID, or the ID of a mentioned user.\n"
 "This command is deprecated in favor of Developer Mode in Discord clients.\n"
-msgstr ""
+msgstr "Muestra tu ID de usuario de Discord o la ID de un usuario mencionado.\n"
+"Este comando está en desuso y se ha sustituido por el modo de desarrollador en los clientes de Discord.\n"
 
 #: musicbot/bot.py:6307
 #, python-format
@@ -1849,7 +1884,7 @@ msgstr "Actualmente no conectado al servidor `%(guild)s`"
 
 #: musicbot/bot.py:6960
 msgid "    Attempt to reload without process restart. The default option.\n"
-msgstr ""
+msgstr "    Intento de recargar sin reiniciar el proceso. La opción predeterminada.\n"
 
 #: musicbot/bot.py:6962
 msgid "    Attempt to restart the entire MusicBot process, reloading everything.\n"
@@ -1872,7 +1907,10 @@ msgid "Attempts to restart the MusicBot in a number of different ways.\n"
 "With no option supplied, a `soft` restart is implied.\n"
 "It can be used to remotely update a MusicBot installation, but should be used with care.\n"
 "If you have a service manager, we recommend using it instead of this command for restarts.\n"
-msgstr ""
+msgstr "Intenta reiniciar MusicBot de distintas maneras.\n"
+"Si no se proporciona ninguna opción, se da por sentado un reinicio \"suave\".\n"
+"Se puede utilizar para actualizar de forma remota una instalación de MusicBot, pero debe utilizarse con cuidado.\n"
+"Si tiene un administrador de servicios, le recomendamos que lo utilice en lugar de este comando para reiniciar.\n"
 
 #: musicbot/bot.py:6993
 msgid "Invalid option given, use one of:  soft, full, upgrade, uppip, or upgit"
@@ -1974,7 +2012,9 @@ msgstr "    Evaluar la función y argumentos dados sobre el objeto.\n"
 msgid "Interact with objgraph, if it is installed, to gain insight into memory usage.\n"
 "You can pass an arbitrary method with arguments (but no spaces!) that is a member of objgraph.\n"
 "Since this method evaluates arbitrary code, it is considered dangerous like the debug command.\n"
-msgstr ""
+msgstr "Interactúe con objgraph, si está instalado, para obtener información sobre el uso de la memoria.\n"
+"Puede pasar un método arbitrario con argumentos (¡pero sin espacios!) que sea miembro de objgraph.\n"
+"Dado que este método evalúa código arbitrario, se considera peligroso, al igual que el comando de depuración.\n"
 
 #: musicbot/bot.py:7212
 msgid "Could not import `objgraph`, is it installed?"
@@ -1989,7 +2029,14 @@ msgid "This command will execute arbitrary python code in the command scope.\n"
 "Otherwise only a single line may be executed.\n\n"
 "This command may be removed in a future version, and is used by developers to debug MusicBot behaviour.\n"
 "The danger of this command cannot be understated. Do not use it or give access to it if you do not understand the risks!\n"
-msgstr ""
+msgstr "Este comando ejecutará código Python arbitrario en el ámbito del comando.\n"
+"Primero se intenta ejecutar eval(), si se lanzan excepciones, luego se intenta ejecutar exec().\n"
+"Si eval tiene éxito, se muestra su valor de retorno.\n"
+"Si exec tiene éxito, se puede establecer un valor en la variable local `result` y se devolverá ese valor.\n\n"
+"Se puede ejecutar código de varias líneas si se envuelve en un bloque de código.\n"
+"De lo contrario, solo se puede ejecutar una sola línea.\n\n"
+"Este comando puede eliminarse en una versión futura y los desarrolladores lo usan para depurar el comportamiento de MusicBot.\n"
+"El peligro de este comando no se puede subestimar. ¡No lo use ni le dé acceso si no comprende los riesgos!\n"
 
 #: musicbot/bot.py:7302
 #, python-format
@@ -2119,7 +2166,8 @@ msgstr "auto"
 #, python-format
 msgid "\n"
 "**Voice Latency:** `%(delay).0f ms` (`%(average).0f} ms` Avg.) in region `%(region)s`"
-msgstr ""
+msgstr "\n"
+"**Latencia de voz:** `%(delay).0f ms` (`%(average).0f} ms` Prom.) en la región `%(region)s`"
 
 #: musicbot/bot.py:7635
 #, python-format
@@ -2155,7 +2203,15 @@ msgid "Allows management of the cookies feature in yt-dlp.\n"
 "  and may result in account bans or theft if you are not careful.\n"
 "  It is not recommended due to these risks, and you should not use this\n"
 "  feature if you do not understand how to avoid the risks."
-msgstr ""
+msgstr "Permite la gestión de la función de cookies en yt-dlp.\n"
+"Al actualizar las cookies, debes cargar un archivo llamado cookies.txt\n"
+"Si las cookies están deshabilitadas, la carga habilitará la función.\n"
+"Las cargas eliminarán las cookies existentes, incluido el archivo de cookies deshabilitado.\n\n"
+"ADVERTENCIA:\n"
+"  Copiar cookies puede poner en riesgo tu información personal o tus cuentas,\n"
+"  y puede resultar en la prohibición o robo de cuentas si no tienes cuidado.\n"
+"  No se recomienda debido a estos riesgos, y no debes usar esta\n"
+"  función si no entiendes cómo evitarlos."
 
 #: musicbot/bot.py:7688
 msgid "Cookies already enabled."
@@ -2281,7 +2337,9 @@ msgstr "Token de autenticación de bot de Discord para tu Bot.\n"
 msgid "Provide your own Spotify Client ID to enable MusicBot to interact with Spotify API.\n"
 "MusicBot will try to use the web player API (guest mode) if nothing is set here.\n"
 "Using your own API credentials grants higher usage limits than guest mode."
-msgstr ""
+msgstr "Proporciona tu propia ID de cliente de Spotify para permitir que MusicBot interactúe con la API de Spotify.\n"
+"MusicBot intentará usar la API del reproductor web (modo invitado) si no se configura nada aquí.\n"
+"El uso de tus propias credenciales de API otorga límites de uso más altos que el modo invitado."
 
 #: musicbot/config.py:174
 msgid "Provide your Spotify Client Secret to enable MusicBot to interact with Spotify API.\n"
@@ -2293,25 +2351,33 @@ msgstr "Proporcione su secreto de cliente de Spotify para permitir a MusicBot in
 msgid "Provide a Discord User ID number to set the owner of this bot.\n"
 "The word 'auto' or number 0 will set the owner based on App information.\n"
 "Only one owner ID can be set here. Generally, setting 'auto' is recommended."
-msgstr ""
+msgstr "Proporciona un número de ID de usuario de Discord para establecer el propietario de este bot.\n"
+"La palabra \"auto\" o el número 0 establecerán el propietario según la información de la aplicación.\n"
+"Solo se puede establecer un ID de propietario aquí. Por lo general, se recomienda establecer \"auto\"."
 
 #: musicbot/config.py:201
 msgid "A list of Discord User IDs who can use the dev-only commands.\n"
 "Warning: dev-only commands can allow arbitrary remote code execution.\n"
 "Use spaces to separate multiple IDs.\n"
 "Most users should leave this setting blank."
-msgstr ""
+msgstr "Una lista de los ID de usuarios de Discord que pueden usar los comandos exclusivos para desarrolladores.\n"
+"Advertencia: los comandos exclusivos para desarrolladores pueden permitir la ejecución remota de código arbitrario.\n"
+"Use espacios para separar varios ID.\n"
+"La mayoría de los usuarios deben dejar esta configuración en blanco."
 
 #: musicbot/config.py:217
 msgid "Discord Member IDs for other bots that MusicBot should not ignore.\n"
 "Use spaces to separate multiple IDs.\n"
 "All bots are ignored by default."
-msgstr ""
+msgstr "ID de miembros de Discord para otros bots que MusicBot no debe ignorar.\n"
+"Use espacios para separar varios ID.\n"
+"Todos los bots se ignoran de forma predeterminada."
 
 #: musicbot/config.py:230
 msgid "Command prefix is how all MusicBot commands must be started in Discord messages.\n"
 "E.g., if you set this to * the play command is trigger by *play ..."
-msgstr ""
+msgstr "El prefijo de comando es la forma en que deben iniciarse todos los comandos de MusicBot en los mensajes de Discord.\n"
+"Por ejemplo, si lo configuras en *, el comando de reproducción se activa con *play..."
 
 #: musicbot/config.py:242
 msgid "Enable using commands with @[YourBotNameHere]\n"
@@ -2324,12 +2390,16 @@ msgid "ID numbers for text channels that MusicBot should exclusively use for com
 "This can contain IDs for channels in multiple servers.\n"
 "Use spaces to separate multiple IDs.\n"
 "All channels are used if this is not set."
-msgstr ""
+msgstr "Números de identificación de los canales de texto que MusicBot debe usar exclusivamente para comandos.\n"
+"Puede contener identificaciones de canales en varios servidores.\n"
+"Use espacios para separar varias identificaciones.\n"
+"Si no se configura esta opción, se usarán todos los canales."
 
 #: musicbot/config.py:267
 msgid "Allow responses in all channels while no specific channel is set for a server.\n"
 "Only used when BindToChannels is missing an ID for a server."
-msgstr ""
+msgstr "Permitir respuestas en todos los canales mientras no hay canal específico establecido para un servidor.\n"
+"solo se usa cuando BindToChannels no tiene un ID para un servidor."
 
 #: musicbot/config.py:278
 msgid "A list of Voice Channel IDs that MusicBot should automatically join on start up.\n"
@@ -2366,7 +2436,10 @@ msgid "Sets the default speed MusicBot will play songs at.\n"
 "Must be a value from 0.5 to 100.0 for ffmpeg to use it.\n"
 "A value of 1 is normal playback speed.\n"
 "Note: Streamed media does not support speed adjustments."
-msgstr ""
+msgstr "Establece la velocidad predeterminada a la que MusicBot reproducirá las canciones.\n"
+"Debe ser un valor entre 0,5 y 100,0 para que ffmpeg lo use.\n"
+"Un valor de 1 es la velocidad de reproducción normal.\n"
+"Nota: Los medios transmitidos no admiten ajustes de velocidad."
 
 #: musicbot/config.py:354
 msgid "Number of channel member votes required to skip a song.\n"
@@ -2378,7 +2451,9 @@ msgstr "Número de votos de miembro del canal requeridos para saltar una canció
 msgid "This percent of listeners in voice must vote for skip.\n"
 "If SkipsRequired is lower than the computed value, it will be used instead.\n"
 "You can set this from 0 to 1, or 0% to 100%."
-msgstr ""
+msgstr "Este porcentaje de oyentes en voz debe votar por omitir.\n"
+"Si SkipsRequired es menor que el valor calculado, se utilizará en su lugar.\n"
+"Puede configurarlo de 0 a 1, o de 0 % a 100 %."
 
 #: musicbot/config.py:378
 msgid "Allow MusicBot to keep downloaded media, or delete it right away."
@@ -2415,7 +2490,8 @@ msgstr "Mezclar las pistas de lista de reproducción automática antes de reprod
 #: musicbot/config.py:457
 msgid "Enable automatic skip of auto playlist songs when a user plays a new song.\n"
 "This only applies to the current playing song if it was added by the auto playlist."
-msgstr ""
+msgstr "Habilitar la omisión automática de canciones de la lista de reproducción automática cuando un usuario reproduce una canción nueva.\n"
+"Esto solo se aplica a la canción que se está reproduciendo actualmente si fue agregada por la lista de reproducción automática."
 
 #: musicbot/config.py:469
 msgid "Remove songs from the auto playlist if they are found in the song blocklist."
@@ -2466,7 +2542,17 @@ msgid "Specify a custom message to use as the bot's status. If left empty, the b
 " {p0_length}   = The total duration of the track, if available. Ex: [2:34]\n"
 " {p0_title}    = The track title for the currently playing track.\n"
 " {p0_url}      = The track url for the currently playing track."
-msgstr ""
+msgstr "Especifique un mensaje personalizado para usar como estado del bot. Si se deja vacío, el bot\n"
+"mostrará información dinámica sobre la música que se está reproduciendo actualmente en su estado.\n"
+"Los mensajes de estado también pueden usar las siguientes variables:\n"
+"  {n_playing} = Número de reproductores de música que se están reproduciendo actualmente.\n"
+"  {n_paused} = Número de reproductores de música que se encuentran en pausa actualmente.\n"
+"  {n_connected} = Número de reproductores de música conectados, en cualquier estado del reproductor.\n\n"
+"Las siguientes variables brindan acceso a información sobre el reproductor y la pista.\n"
+"Estas variables pueden no ser precisas en bots de varios gremios:\n"
+"  {p0_length} = La duración total de la pista, si está disponible. Ejemplo: [2:34]\n"
+"  {p0_title} = El título de la pista que se está reproduciendo actualmente.\n"
+"  {p0_url} = La URL de la pista que se está reproduciendo actualmente."
 
 #: musicbot/config.py:571
 msgid "If enabled, status messages will report info on paused players."
@@ -2483,7 +2569,8 @@ msgstr "Permitir que el miembro que solicitó la canción se salte, evitando vot
 #: musicbot/config.py:602
 msgid "Tries to use ffmpeg to get volume normalizing options for use in playback.\n"
 "This option can cause delay between playing songs, as the whole track must be processed."
-msgstr ""
+msgstr "Intenta usar ffmpeg para obtener opciones de normalización de volumen para usar en la reproducción.\n"
+"Esta opción puede causar demoras entre la reproducción de canciones, ya que se debe procesar toda la pista."
 
 #: musicbot/config.py:612
 msgid "Allow MusicBot to format it's messages as embeds."
@@ -2531,12 +2618,15 @@ msgstr "MusicBot automáticamente se ensordece cuando entra en un canal de voz."
 msgid "If enabled, MusicBot will leave a voice channel when no users are listening,\n"
 "after waiting for a period set in LeaveInactiveVCTimeOut option.\n"
 "Listeners are channel members, excluding bots, who are not deafened."
-msgstr ""
+msgstr "Si está habilitado, MusicBot abandonará un canal de voz cuando ningún usuario esté escuchando,\n"
+"después de esperar un período establecido en la opción LeaveInactiveVCTimeOut.\n"
+"Los oyentes son miembros del canal, excluidos los bots, que no están sordos."
 
 #: musicbot/config.py:723
 msgid "Set a period of time to wait before leaving an inactive voice channel.\n"
 "You can set this to a number of seconds or phrase like:  4 hours"
-msgstr ""
+msgstr "Establezca un período de tiempo de espera antes de abandonar un canal de voz inactivo. \n"
+"Puede configurarlo en una cantidad de segundos o una frase como: 4 horas"
 
 #: musicbot/config.py:734
 msgid "If enabled, MusicBot will leave the channel immediately when the song queue is empty."
@@ -2546,7 +2636,9 @@ msgstr "Si está activado, MusicBot dejará el canal inmediatamente cuando la co
 msgid "When paused or no longer playing, wait for this amount of time then leave voice.\n"
 "You can set this to a number of seconds of phrase like:  15 minutes\n"
 "Set it to 0 to disable leaving in this way."
-msgstr ""
+msgstr "Cuando esté en pausa o ya no se reproduzca, espere este tiempo y luego salga de la voz.\n"
+"Puede configurar esto en una cantidad de segundos de frase como: 15 minutos\n"
+"Configúrelo en 0 para desactivar la salida de esta manera."
 
 #: musicbot/config.py:756
 msgid "If enabled, users must indicate search result choices by sending a message instead of using reactions."
@@ -2569,7 +2661,10 @@ msgid "Allow MusicBot to use timed pings to detect network outage and availabili
 "This may be useful if you keep the bot joined to a channel or playing music 24/7.\n"
 "MusicBot must be restarted to enable network testing.\n"
 "By default this is disabled."
-msgstr ""
+msgstr "Permitir que MusicBot utilice pings cronometrados para detectar interrupciones y disponibilidad de la red.\n"
+"Esto puede ser útil si mantienes al bot conectado a un canal o reproduciendo música las 24 horas del día, los 7 días de la semana.\n"
+"MusicBot debe reiniciarse para habilitar las pruebas de red.\n"
+"De forma predeterminada, esta opción está deshabilitada."
 
 #: musicbot/config.py:814
 #, python-format
@@ -2599,7 +2694,9 @@ msgstr "Permitir a MusicBot reanudar automáticamente cuando se utilizan comando
 msgid "Experimental, HTTP/HTTPS proxy settings to use with ytdlp media downloader.\n"
 "The value set here is passed to `ytdlp --proxy` and aiohttp header checking.\n"
 "Leave blank to disable."
-msgstr ""
+msgstr "Configuración de proxy HTTP/HTTPS experimental para usar con el descargador de medios ytdlp.\n"
+"El valor establecido aquí se pasa a `ytdlp --proxy` y a la verificación del encabezado aiohttp.\n"
+"Deje en blanco para deshabilitarlo."
 
 #: musicbot/config.py:888
 msgid "Experimental option to set a static User-Agent header in yt-dlp.\n"
@@ -2608,7 +2705,12 @@ msgid "Experimental option to set a static User-Agent header in yt-dlp.\n"
 "   https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent \n"
 "   https://www.useragents.me/ \n"
 "Leave blank to use default, dynamically generated UA strings."
-msgstr ""
+msgstr "Opción experimental para configurar un encabezado de agente de usuario estático en yt-dlp.\n"
+"Yt-dlp no suele recomendar cambiar la cadena de agente de usuario.\n"
+"Para ver ejemplos de lo que podría incluir aquí, consulte los dos enlaces siguientes:\n"
+"  https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent\n"
+"  https://www.useragents.me/\n"
+"Déjelo en blanco para utilizar cadenas de agente de usuario predeterminadas y generadas dinámicamente."
 
 #: musicbot/config.py:903
 #, python-format
@@ -2618,14 +2720,22 @@ msgid "Experimental option to enable yt-dlp to use a YouTube account via OAuth2.
 "This option should not be used when cookies are enabled.\n"
 "Using a personal account may not be recommended.\n"
 "Set yes to enable or no to disable."
-msgstr ""
+msgstr "Opción experimental para permitir que yt-dlp use una cuenta de YouTube a través de OAuth2.\n"
+"Cuando está habilitada, debe usar la URL y el código generados para autorizar una cuenta.\n"
+"Luego, el token de autorización se almacena en el archivo `%(oauthfile)s`.\n"
+"Esta opción no debe usarse cuando las cookies están habilitadas.\n"
+"Es posible que no se recomiende usar una cuenta personal.\n"
+"Configure sí para habilitar o no para deshabilitar."
 
 #: musicbot/config.py:920
 msgid "Optional youtube video URL used at start-up for triggering OAuth2 authorization.\n"
 "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
 "The URL set here should be an accessible youtube video URL.\n"
 "Authorization must be completed before start-up will continue when this is set."
-msgstr ""
+msgstr "URL de video de YouTube opcional que se utiliza al inicio para activar la autorización de OAuth2.\n"
+"Esto inicia el mensaje de OAuth2 antes, en lugar de esperar una solicitud de canción.\n"
+"La URL que se establece aquí debe ser una URL de video de YouTube accesible.\n"
+"La autorización debe completarse antes del inicio; si se establece esta opción, continuará."
 
 #: musicbot/config.py:939
 msgid "Toggle the user block list feature, without emptying the block list."
@@ -2648,7 +2758,8 @@ msgstr "Una ruta opcional de archivo a un archivo de texto que muestra URLs, pal
 #: musicbot/config.py:984
 msgid "An optional path to a directory containing auto playlist files.\n"
 "Each file should contain a list of playable URLs or terms, one track per line."
-msgstr ""
+msgstr "Una ruta opcional a un directorio que contiene archivos de listas de reproducción automáticas.\n"
+"Cada archivo debe contener una lista de términos o URL reproducibles, una pista por línea."
 
 #: musicbot/config.py:996
 #, python-format
@@ -2656,7 +2767,10 @@ msgid "An optional directory path where playable media files can be stored.\n"
 "All files and sub-directories can then be accessed by using 'file://' as a protocol.\n"
 "Example:  file://some/folder/name/file.ext\n"
 "Maps to:  %(path)s/some/folder/name/file.ext"
-msgstr ""
+msgstr "Una ruta opcional de directorio donde se pueden almacenar archivos multimedia reproducibles.\n"
+"Todos los archivos y subdirectorios pueden ser accedidos usando 'file://' como protocolo.\n"
+"Ejemplo: file://some/folder/name/file.ext\n"
+"Mapas a:  %(path)s/some/folder/name/file.ext"
 
 #: musicbot/config.py:1015
 msgid "An optional directory path where MusicBot will store long and short-term cache for playback."
@@ -2667,14 +2781,19 @@ msgstr "Una ruta opcional de directorio donde MusicBot almacenará la caché a c
 msgid "Configure automatic log file rotation at restart, and limit the number of files kept.\n"
 "When disabled, only one log is kept and its contents are replaced each run.\n"
 "Set to 0 to disable.  Maximum allowed number is %(max)s."
-msgstr ""
+msgstr "Configure la rotación automática de archivos de registro al reiniciar y limite la cantidad de archivos que se conservan.\n"
+"Cuando está deshabilitada, solo se conserva un registro y su contenido se reemplaza en cada ejecución.\n"
+"Establezca en 0 para deshabilitarla. La cantidad máxima permitida es %(max)s."
 
 #: musicbot/config.py:1039
 msgid "Configure the log file date format used when LogsMaxKept is enabled.\n"
 "If left blank, a warning is logged and the default will be used instead.\n"
 "Learn more about time format codes from the tables and data here:\n"
 "    https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior"
-msgstr ""
+msgstr "Configura el formato de fecha del archivo de registro que se utiliza cuando LogsMaxKept está habilitado.\n"
+"Si se deja en blanco, se registra una advertencia y se utiliza el valor predeterminado en su lugar.\n"
+"Obtén más información sobre los códigos de formato de hora de las tablas y los datos aquí:\n"
+"    https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior"
 
 #: musicbot/config.py:1053
 msgid "Potentially reduces CPU usage, but disables volume and speed controls.\n"
@@ -2694,7 +2813,16 @@ msgid "Error while reading config.\n\n"
 "  Each [Section] must appear only once, with no other text on the same line.\n"
 "  Each section must have at least one option.\n"
 "  Use the example options as a template or copy it from the repository."
-msgstr ""
+msgstr "Error al leer la configuración.\n\n"
+"Problema:\n"
+"  Faltan una o más secciones de opciones de configuración requeridas.\n"
+"  Las secciones que faltan son:\n"
+"  %(sections)s\n\n"
+"Solución:\n"
+"  Repare el archivo de opciones de configuración.\n"
+"  Cada [Sección] debe aparecer solo una vez, sin ningún otro texto en la misma línea.\n"
+"  Cada sección debe tener al menos una opción.\n"
+"  Use las opciones de ejemplo como plantilla o cópielas del repositorio."
 
 #: musicbot/config.py:1132
 msgid "Error while validating config options.\n\n"
@@ -2716,7 +2844,12 @@ msgid "Error while validating config options.\n\n"
 "  %(raw_error)s\n\n"
 "Solution:\n"
 "  Double check the setting is a valid, accessible directory path."
-msgstr ""
+msgstr "Error al validar las opciones de configuración.\n\n"
+"Problema:\n"
+"  No se pudo configurar la opción de configuración AudioCachePath debido a un error:\n"
+"  %(raw_error)s\n\n"
+"Solución:\n"
+"  Verifique nuevamente que la configuración sea una ruta de directorio válida y accesible."
 
 #: musicbot/config.py:1176
 #, python-format
@@ -2738,7 +2871,12 @@ msgid "Error while fetching OwnerID automatically.\n\n"
 "  This could be a temporary API outage or a bug.\n\n"
 "Solution:\n"
 "  Manually set the OwnerID config option or try again later."
-msgstr ""
+msgstr "Error al obtener 'OwnerID' automáticamente.\n\n"
+"Problema:\n"
+"  La información de la aplicación Discord no está disponible.\n"
+"  Esto podría deberse a una interrupción temporal de la API o a un error.\n\n"
+"Solución:\n"
+"  Establezca manualmente la opción de configuración 'OwnerID' o vuelva a intentarlo más tarde."
 
 #: musicbot/config.py:1262
 msgid "Error validating config options.\n\n"
@@ -2746,7 +2884,11 @@ msgid "Error validating config options.\n\n"
 "  The OwnerID config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
 "  Do not use the Bot or App ID in the OwnerID field."
-msgstr ""
+msgstr "Error al validar las opciones de configuración.\n\n"
+"Problema:\n"
+"  La configuración del Propietario es la misma que tu ID de Bot / App.\n\n"
+"Solución:\n"
+"  No utilice el Bot o el ID de la aplicación en el campo OwnerID."
 
 #: musicbot/config.py:1327
 #, python-format
@@ -2756,7 +2898,12 @@ msgid "Error locating config.\n\n"
 "  %(raw_error)s\n\n"
 "Solution:\n"
 "  Verify the config folder and files exist and can be read by MusicBot."
-msgstr ""
+msgstr "Error al localizar la configuración.\n\n"
+"Problema:\n"
+"  No se pudo encontrar ni crear un archivo de configuración debido a un error:\n"
+"  %(raw_error)s\n\n"
+"Solución:\n"
+"  Verifique que la carpeta y los archivos de configuración existan y que MusicBot pueda leerlos."
 
 #: musicbot/config.py:1345
 #, python-format
@@ -2767,7 +2914,13 @@ msgid "Error loading config.\n\n"
 "Solution:\n"
 "  Make sure the file is accessible and error free.\n"
 "  Copy the example file from the repo if all else fails."
-msgstr ""
+msgstr "Error al cargar la configuración.\n\n"
+"Problema:\n"
+"  MusicBot no pudo leer el archivo de configuración debido a un error:\n"
+"  %(raw_error)s\n\n"
+"Solución:\n"
+"  Asegúrese de que el archivo sea accesible y no tenga errores.\n"
+"  Copie el archivo de ejemplo del repositorio si todo lo demás falla."
 
 #: musicbot/config.py:2184
 #, python-format
@@ -2887,7 +3040,9 @@ msgstr "Cuando está activado, CommandBlacklist y CommandWhitelist se utilizan j
 msgid "List of command names that can only be used while in the same voice channel as MusicBot.\n"
 "Some commands will always require the user to be in voice, regardless of this list.\n"
 "Command names should be separated by spaces."
-msgstr ""
+msgstr "Lista de nombres de comandos que solo se pueden usar en el mismo canal de voz que MusicBot.\n"
+"Algunos comandos siempre requerirán que el usuario esté en el canal de voz, independientemente de esta lista.\n"
+"Los nombres de los comandos deben estar separados por espacios."
 
 #: musicbot/permissions.py:378
 msgid "List of Discord server role IDs that are granted this permission group.\n"
@@ -2910,7 +3065,8 @@ msgstr "Número máximo de canciones que un usuario puede poner en cola.\n"
 #: musicbot/permissions.py:414
 msgid "Maximum length of a song in seconds. A value of 0 means unlimited.\n"
 "This permission may not be enforced if song duration is not available."
-msgstr ""
+msgstr "Duración máxima de una canción en segundos. Un valor de 0 significa que no hay límite.\n"
+"Es posible que este permiso no se aplique si la duración de la canción no está disponible."
 
 #: musicbot/permissions.py:426
 msgid "Maximum number of songs a playlist is allowed to have when queued.\n"
@@ -2951,7 +3107,8 @@ msgstr "Permite al usuario añadir canciones a la cola cuando el modo Karaoke es
 #: musicbot/permissions.py:505
 msgid "Auto summon to user voice channel when using play commands, if bot isn't in voice already.\n"
 "The summon command must still be allowed for this group!"
-msgstr ""
+msgstr "Auto-invocar al canal de voz del usuario cuando se usan comandos de reproducción, si el bot ya no está en la voz.\n"
+"¡El comando de invocación debe ser permitido para este grupo!"
 
 #: musicbot/permissions.py:516
 #, python-format
