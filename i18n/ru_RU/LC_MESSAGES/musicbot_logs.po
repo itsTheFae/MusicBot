@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 11:15-0800\n"
-"PO-Revision-Date: 2024-11-06 19:17\n"
+"POT-Creation-Date: 2024-11-06 12:40-0800\n"
+"PO-Revision-Date: 2024-11-06 20:44\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -2257,8 +2257,8 @@ msgid "Validating options with service data..."
 msgstr "Проверка параметров с данными сервиса..."
 
 #: musicbot/config.py:1240
-msgid "Acquired owner id via API"
-msgstr "Приобретенный идентификатор владельца через API"
+msgid "Acquired owner ID via API"
+msgstr "Приобретенный ID владельца через API"
 
 #: musicbot/config.py:1244
 msgid "Error while fetching 'OwnerID' automatically.\n\n"
@@ -2451,8 +2451,8 @@ msgstr "Не удалось загрузить список блокировок
 
 #: musicbot/config.py:2610 musicbot/config.py:2643
 #, python-format
-msgid "Could not update the blocklist file:  %s"
-msgstr "Не удалось обновить файл черного списка:  %s"
+msgid "Could not update the block list file:  %s"
+msgstr "Не удалось обновить файл списка блоков:  %s"
 
 #: musicbot/config.py:2670
 #, python-format
@@ -3034,7 +3034,7 @@ msgstr "Установка автоматического 'ID владельца
 
 #: musicbot/permissions.py:238
 #, python-format
-msgid "Updating group in permssions file:  %s"
+msgid "Updating group in permissions file:  %s"
 msgstr "Обновление группы в файле разрешений:  %s"
 
 #: musicbot/permissions.py:244
@@ -3195,13 +3195,13 @@ msgid "Error while trying to delete file."
 msgstr "Ошибка при попытке удалить файл."
 
 #: musicbot/player.py:521
-msgid "[Config:SaveVideos] Could not delete file, giving up and moving on"
-msgstr "[Config:SaveVideos] Не удалось удалить файл, отказаться от него и переместить"
+msgid "Could not delete file, giving up and moving on"
+msgstr "Не удалось удалить файл, отправка и перемещение"
 
 #: musicbot/player.py:583
 #, python-format
-msgid "Deserialize returned a non-MusicPlayer:  %s"
-msgstr ""
+msgid "Deserialize returned an object that is not a MusicPlayer:  %s"
+msgstr "Десериализация вернула объект, который не является MusicPlayer:  %s"
 
 #: musicbot/player.py:588
 msgid "Failed to deserialize player"
@@ -3406,8 +3406,8 @@ msgid "Could not make POST to URL:  %(url)s  Reason:  %(raw_error)s"
 msgstr "Не удалось сделать POST по URL:  %(url)s  Причина:  %(raw_error)s"
 
 #: musicbot/spotify.py:672
-msgid "Failed to get a guest token from Spotify, please try specifying client id and client secret"
-msgstr "Не удалось получить токен гостя из Spotify, попробуйте указать идентификатор клиента и секретный ключ клиента"
+msgid "Failed to get a guest token from Spotify, please try specifying client ID and client secret"
+msgstr "Не удалось получить токен гостя из Spotify, попробуйте указать ID клиента и секретный ключ клиента"
 
 #: musicbot/spotify.py:679
 msgid "Created a new Guest Mode access token."
