@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 10:38-0800\n"
-"PO-Revision-Date: 2024-11-06 18:40\n"
+"POT-Creation-Date: 2024-11-06 11:15-0800\n"
+"PO-Revision-Date: 2024-11-06 19:18\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -24,7 +24,12 @@ msgid "Error while loading aliases.\n\n"
 "Solution:\n"
 "  Replace the alias config file(s) or copy them from:\n"
 "    https://github.com/Just-Some-Bots/MusicBot/"
-msgstr ""
+msgstr "加载别名时出错。\n\n"
+"问题：\n"
+"  您的别名文件 (aliases.json & example_aliases.json) 丢失。\n\n"
+"解决方案：\n"
+"  替换别名配置文件或复制它们：\n"
+"    https://github.com/Just-Some-Bots/MusicBot/"
 
 #: musicbot/bot.py:713
 msgid "Member is not voice-enabled and cannot use this command."
@@ -273,7 +278,7 @@ msgstr "如果没有歌曲正在播放，您必须提供一个歌曲主题。"
 
 #: musicbot/bot.py:3152
 msgid "Invalid sub-command given. Use `help blocksong` for usage examples."
-msgstr ""
+msgstr "给定的子命令无效。使用 \"help blocksong\" 作为使用示例。"
 
 #: musicbot/bot.py:3164
 #, python-format
@@ -582,7 +587,7 @@ msgstr "Spotify URL 无效或目前不支持。"
 
 #: musicbot/bot.py:4159
 msgid "Detected a Spotify URL, but Spotify is not enabled."
-msgstr ""
+msgstr "检测到 Spotify 网址，但Spotify 未启用。"
 
 #: musicbot/bot.py:4169 musicbot/bot.py:4374
 #, python-format
@@ -605,7 +610,7 @@ msgstr "无法播放该视频。请尝试使用流命令。"
 
 #: musicbot/bot.py:4208
 #, python-format
-msgid "Youtube search returned no results for:  %(url)s"
+msgid "YouTube search returned no results for:  %(url)s"
 msgstr ""
 
 #: musicbot/bot.py:4249
@@ -1024,7 +1029,7 @@ msgstr "您必须提供一个速度来设置。"
 
 #: musicbot/bot.py:5413
 msgid "The speed you provided is invalid. Use a number between 0.5 and 100."
-msgstr ""
+msgstr "您提供的速度无效。请使用0.5 至 100之间的数字。"
 
 #: musicbot/bot.py:5432
 #, python-format
@@ -1461,7 +1466,7 @@ msgstr "获取您的权限列表或上述用户的权限。"
 
 #: musicbot/bot.py:6425
 msgid "Invalid user ID or server nickname, please double-check the ID and try again."
-msgstr ""
+msgstr "无效的用户ID或服务器昵称，请重新检查ID，然后重试。"
 
 #: musicbot/bot.py:6432
 msgid "Could not determine the discord User.  Try again."
@@ -1529,7 +1534,7 @@ msgstr "从文件重新加载权限成功！"
 
 #: musicbot/bot.py:6538
 #, python-format
-msgid "Unable to reload Permissions due to an errror:\n"
+msgid "Unable to reload Permissions due to an error:\n"
 "%(raw_error)s"
 msgstr ""
 
@@ -2309,7 +2314,7 @@ msgstr "当用户播放新歌曲时，自动跳过自动播放列表歌曲。\n"
 
 #: musicbot/config.py:469
 msgid "Remove songs from the auto playlist if they are found in the song block list."
-msgstr ""
+msgstr "从自动播放列表中删除歌曲，如果在歌曲块列表中找到这些歌曲。"
 
 #: musicbot/config.py:488
 msgid "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
@@ -2641,7 +2646,11 @@ msgid "Error validating config options.\n\n"
 "  The 'OwnerID' config is the same as your Bot / App ID.\n\n"
 "Solution:\n"
 "  Do not use the Bot or App ID in the 'OwnerID' field."
-msgstr ""
+msgstr "验证配置选项时出错。\n\n"
+"问题：\n"
+"  “所有者ID”配置与您的 Bot / App ID相同。\n\n"
+"解决方案：\n"
+"  不要在“所有者ID”字段中使用机器人或App ID。"
 
 #: musicbot/config.py:1327
 #, python-format
