@@ -751,7 +751,7 @@ def main():
         elif opt in ("-x", "--exclude-file"):
             options.excludefilename = arg
         elif opt in ("-X", "--no-docstrings"):
-            with open(arg, encoding="utf8") as fp:
+            with open(arg, encoding="UTF-8") as fp:
                 while 1:
                     line = fp.readline()
                     if not line:
@@ -776,7 +776,7 @@ def main():
     # initialize list of strings to exclude
     if options.excludefilename:
         try:
-            with open(options.excludefilename, encoding="utf8") as fp:
+            with open(options.excludefilename, encoding="UTF-8") as fp:
                 options.toexclude = fp.readlines()
         except IOError:
             print(
@@ -808,7 +808,7 @@ def main():
             if options.verbose:
                 print(_("Working on %s") % filename)
             fp = open(  # pylint: disable=consider-using-with
-                filename, "rb", encoding="utf8"
+                filename, "rb"
             )
             closep = 1
         try:
@@ -835,7 +835,7 @@ def main():
         if options.outpath:
             options.outfile = os.path.join(options.outpath, options.outfile)
         fp = open(  # pylint: disable=consider-using-with
-            options.outfile, "w", encoding="utf8"
+            options.outfile, "w", encoding="UTF-8"
         )
         closep = 1
     try:
