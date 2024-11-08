@@ -41,19 +41,28 @@ class LangTool:
             print("Failed to get version info from git!")
             self.version = "unknown"
 
+    def _check_polib(self):
+        try:
+            import polib
+        except Exception:  # pylint: disable=broad-exception-caught
+            print("Fatal error, could not load the 'polib' module.")
+            print("Install polib with pip or via your system package manager first.")
+            sys.exit(2)
+
     def compile(self):
         """
         Compiles all existing .po files into .mo files.
         """
+        self._check_polib()
+        import polib
+
         print("Compiling existing PO files to MO...")
-        po_files = [str(f) for f in self.basedir.glob("*/LC_MESSAGES/*.po")]
-        subprocess.check_output(
-            [
-                sys.executable,
-                self._msgfmt_path,
-                *po_files,
-            ]
-        )
+        for po_file in self.basedir.glob("*/LC_MESSAGES/*.po"):
+            print(po_file)
+            mo_file = po_file.with_suffix(".mo")
+            po = polib.pofile(po_file)
+            po.save_as_mofile(mo_file)
+            
         print("Done.")
 
     def extract(self):
@@ -174,12 +183,8 @@ class LangTool:
         Reads in an existing POT file and creates the 'xx' test language.
         Directories and the .po / .mo files are updated by this method.
         """
-        try:
-            import polib
-        except Exception:  # pylint: disable=broad-exception-caught
-            print("Fatal error, could not load the 'polib' module.")
-            print("Install polib with pip or via your system package manager first.")
-            sys.exit(2)
+        self._check_polib()
+        import polib
 
         self._xx_lang_path.mkdir(parents=True, exist_ok=True)
 
