@@ -2,14 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 22:11\n"
+"POT-Creation-Date: 2024-11-08 07:52-0800\n"
+"PO-Revision-Date: 2024-11-08 18:12\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generated-By: pygettext.py 1.5-mb01\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
@@ -1140,9 +1141,9 @@ msgid "  Round Robin Queue: %s"
 msgstr "  Round Robin Queue: %s"
 
 #: musicbot/bot.py:2695
-#, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr "The requested song `{subject}` is blocked by the song block list."
+#, python-format
+msgid "The requested song `%(subject)s` is blocked by the song block list."
+msgstr ""
 
 #: musicbot/bot.py:2706
 msgid "Attempted to handle Voice Channel inactivity, but Bot is not in voice..."
@@ -2172,11 +2173,11 @@ msgid "Guild update for:  %s"
 msgstr "Guild update for:  %s"
 
 #: musicbot/bot.py:8636
-#, python-brace-format
-msgid "Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
-msgstr "Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
+#, python-format
+msgid "Guild attribute %(attr)s is now: %(new)s  -- Was: %(old)s"
+msgstr ""
 
-#: musicbot/bot.py:8667
+#: musicbot/bot.py:8668
 #, python-format
 msgid "Channel update for:  %(channel)s  --  %(changes)s"
 msgstr "Channel update for:  %(channel)s  --  %(changes)s"
@@ -2614,66 +2615,66 @@ msgstr "Sanitized YTDL Extraction Info (not JSON):  %s"
 msgid "Song info extraction returned no data."
 msgstr "Song info extraction returned no data."
 
-#: musicbot/downloader.py:436
-#, python-brace-format
-msgid "Called extract_info with:  '{song_subject}', {args}, {kwargs}"
-msgstr "Called extract_info with:  '{song_subject}', {args}, {kwargs}"
+#: musicbot/downloader.py:437
+#, python-format
+msgid "Called extract_info with:  '%(subject)s', %(args)s, %(kws)s"
+msgstr ""
 
-#: musicbot/downloader.py:442
+#: musicbot/downloader.py:445
 msgid "Cannot run extraction, loop is closed. (This is normal on shutdowns.)"
 msgstr "Cannot run extraction, loop is closed. (This is normal on shutdowns.)"
 
-#: musicbot/downloader.py:444
+#: musicbot/downloader.py:447
 msgid "Cannot continue extraction, event loop is closed."
 msgstr "Cannot continue extraction, event loop is closed."
 
-#: musicbot/downloader.py:453
+#: musicbot/downloader.py:456
 msgid "Spotify URL is invalid or not supported."
 msgstr "Spotify URL is invalid or not supported."
 
-#: musicbot/downloader.py:486 musicbot/downloader.py:507
+#: musicbot/downloader.py:489 musicbot/downloader.py:510
 #, python-format
 msgid "Error in yt-dlp while downloading data: %(raw_error)s"
 msgstr "Error in yt-dlp while downloading data: %(raw_error)s"
 
-#: musicbot/downloader.py:490
+#: musicbot/downloader.py:493
 msgid "Download Error with stream URL"
 msgstr "Download Error with stream URL"
 
-#: musicbot/downloader.py:495
+#: musicbot/downloader.py:498
 msgid "Assuming content is a direct stream"
 msgstr "Assuming content is a direct stream"
 
-#: musicbot/downloader.py:503
+#: musicbot/downloader.py:506
 msgid "Cannot stream an invalid URL."
 msgstr "Cannot stream an invalid URL."
 
-#: musicbot/downloader.py:514
+#: musicbot/downloader.py:517
 msgid "Caught NoSupportingHandlers, trying again after replacing colon with space."
 msgstr "Caught NoSupportingHandlers, trying again after replacing colon with space."
 
-#: musicbot/downloader.py:541
+#: musicbot/downloader.py:544
 msgid "Extractor youtube:search returned single-entry result, replacing base info with entry info."
 msgstr "Extractor youtube:search returned single-entry result, replacing base info with entry info."
 
-#: musicbot/downloader.py:557
+#: musicbot/downloader.py:560
 #, python-format
 msgid "Called safe_extract_info with:  %(args)s, %(kws)s"
 msgstr "Called safe_extract_info with:  %(args)s, %(kws)s"
 
-#: musicbot/downloader.py:577
+#: musicbot/downloader.py:580
 msgid "The local media file could not be found."
 msgstr "The local media file could not be found."
 
-#: musicbot/downloader.py:615
+#: musicbot/downloader.py:618
 msgid "Missing __input_subject from YtdlpResponseDict"
 msgstr "Missing __input_subject from YtdlpResponseDict"
 
-#: musicbot/downloader.py:620
+#: musicbot/downloader.py:623
 msgid "Entries is not a list in YtdlpResponseDict, set process=True to avoid this."
 msgstr "Entries is not a list in YtdlpResponseDict, set process=True to avoid this."
 
-#: musicbot/downloader.py:849
+#: musicbot/downloader.py:852
 #, python-format
 msgid "Warning, duration error for: %(url)s"
 msgstr "Warning, duration error for: %(url)s"
@@ -3923,72 +3924,72 @@ msgstr "Override the log level settings set in config. Must be one of: %s"
 msgid "Override the default date format used when rotating log files. This should contain values compatible with strftime().  (Default:  '%s')"
 msgstr "Override the default date format used when rotating log files. This should contain values compatible with strftime().  (Default:  '%s')"
 
-#: run.py:799
+#: run.py:798
 #, python-format
 msgid "Version:  %s"
 msgstr "Version:  %s"
 
-#: run.py:874
+#: run.py:873
 msgid "Opened a new MusicBot instance. This terminal can be safely closed!"
 msgstr "Opened a new MusicBot instance. This terminal can be safely closed!"
 
-#: run.py:945
+#: run.py:944
 #, python-format
 msgid "Loading MusicBot version:  %s"
 msgstr "Loading MusicBot version:  %s"
 
-#: run.py:946
+#: run.py:945
 #, python-format
 msgid "Log opened:  %s"
 msgstr "Log opened:  %s"
 
-#: run.py:947
+#: run.py:946
 #, python-format
 msgid "Python version:  %s"
 msgstr "Python version:  %s"
 
-#: run.py:956
+#: run.py:955
 #, python-format
 msgid "Changing working directory to:  %s"
 msgstr "Changing working directory to:  %s"
 
-#: run.py:960
+#: run.py:959
 msgid "Cannot start the bot!  You started `run.py` in the wrong directory and we could not locate `musicbot` and `.git` folders to verify a new directory location."
 msgstr "Cannot start the bot!  You started `run.py` in the wrong directory and we could not locate `musicbot` and `.git` folders to verify a new directory location."
 
-#: run.py:965
+#: run.py:964
 msgid "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
 "If you did not use git to clone the repository, you are strongly urged to."
 msgstr "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
 "If you did not use git to clone the repository, you are strongly urged to."
 
-#: run.py:1019
+#: run.py:1018
 msgid "Certificate error is not a verification error, not trying certifi and exiting."
 msgstr "Certificate error is not a verification error, not trying certifi and exiting."
 
-#: run.py:1021
+#: run.py:1020
 msgid "Here is the exact error, it could be a bug."
 msgstr "Here is the exact error, it could be a bug."
 
-#: run.py:1037
+#: run.py:1036
 msgid "To easily add a certificate to Windows trust store, \n"
 "you can open the failing site in Microsoft Edge or IE...\n"
 msgstr "To easily add a certificate to Windows trust store, \n"
 "you can open the failing site in Microsoft Edge or IE...\n"
 
-#: run.py:1043
+#: run.py:1042
 msgid "Could not get Issuer Certificate from default trust store, trying certifi instead."
 msgstr "Could not get Issuer Certificate from default trust store, trying certifi instead."
 
-#: run.py:1052
+#: run.py:1051
 msgid "Syntax error (modification detected, did you edit the code?)"
 msgstr "Syntax error (modification detected, did you edit the code?)"
 
-#: run.py:1055
+#: run.py:1054
 msgid "Syntax error (this is a bug, not your fault)"
 msgstr "Syntax error (this is a bug, not your fault)"
 
-#: run.py:1067
+#: run.py:1066
 msgid "Cannot start MusicBot due to an error!\n\n"
 "Problem:\n"
 "  There was an error importing MusicBot or a dependency package.\n\n"
@@ -4002,11 +4003,11 @@ msgstr "Cannot start MusicBot due to an error!\n\n"
 "  You need to manually install pip packages for MusicBot\n"
 "  or launch without `--no-install-deps` and MusicBot will try to install them for you."
 
-#: run.py:1100
+#: run.py:1099
 msgid "Attempting to install MusicBot dependency packages automatically...\n"
 msgstr "Attempting to install MusicBot dependency packages automatically...\n"
 
-#: run.py:1109
+#: run.py:1108
 #, python-format
 msgid "MusicBot dependencies may not be installed!\n\n"
 "Problem:\n"
@@ -4033,44 +4034,44 @@ msgstr "MusicBot dependencies may not be installed!\n\n"
 "You can also ask for help in MusicBot's support discord:\n"
 "  https://discord.gg/bots"
 
-#: run.py:1130
+#: run.py:1129
 msgid "OK, lets hope installing dependencies worked!"
 msgstr "OK, lets hope installing dependencies worked!"
 
-#: run.py:1142
+#: run.py:1141
 msgid "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
 msgstr "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
 
-#: run.py:1144
+#: run.py:1143
 msgid "The exception which caused the above error: "
 msgstr "The exception which caused the above error: "
 
-#: run.py:1160
+#: run.py:1159
 msgid "MusicBot is doing a soft restart..."
 msgstr "MusicBot is doing a soft restart..."
 
-#: run.py:1164
+#: run.py:1163
 msgid "MusicBot is doing a full process restart..."
 msgstr "MusicBot is doing a full process restart..."
 
-#: run.py:1170
+#: run.py:1169
 msgid "Error starting bot"
 msgstr "Error starting bot"
 
-#: run.py:1175
+#: run.py:1174
 msgid "Closing event loop."
 msgstr "Closing event loop."
 
-#: run.py:1180
+#: run.py:1179
 #, python-format
 msgid "Restarting in %s seconds..."
 msgstr "Restarting in %s seconds..."
 
-#: run.py:1184
+#: run.py:1183
 msgid "All done."
 msgstr "All done."
 
-#: run.py:1213
+#: run.py:1212
 msgid "OK, we're closing!"
 msgstr "OK, we're closing!"
 

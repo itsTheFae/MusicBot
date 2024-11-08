@@ -2,14 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"POT-Creation-Date: 2024-11-08 07:52-0800\n"
+"PO-Revision-Date: 2024-11-08 18:12\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generated-By: pygettext.py 1.5-mb01\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
@@ -121,9 +122,9 @@ msgid "Failed Discord API Login!\n\n"
 msgstr ""
 
 #: musicbot/bot.py:2695
-#, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr "The requested song `{subject}` is blocked by the song block list."
+#, python-format
+msgid "The requested song `%(subject)s` is blocked by the song block list."
+msgstr "The requested song `%(subject)s` is blocked by the song block list."
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -2364,14 +2365,17 @@ msgstr ""
 msgid "Allow MusicBot to keep downloaded media, or delete it right away."
 msgstr "MusicBot がダウンロードしたメディアを保存したり、すぐに削除したりできます。"
 
+#. TRANSLATORS: SaveVideos is not translated.
 #: musicbot/config.py:389
 msgid "If SaveVideos is enabled, set a limit on how much storage space should be used."
 msgstr "SaveVideoが有効になっている場合は、使用するストレージ容量の上限を設定します。"
 
+#. TRANSLATORS: SaveVideos should not be translated.
 #: musicbot/config.py:400
 msgid "If SaveVideos is enabled, set a limit on how long files should be kept."
 msgstr "SaveVideoが有効になっている場合、ファイルの保持時間の制限を設定します。"
 
+#. TRANSLATORS: SaveVideos should not be translated.
 #: musicbot/config.py:411
 msgid "If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."
 msgstr "SaveVideoが有効になっている場合、制限に関係なく自動プレイリスト曲をキャッシュから削除することはありません。"
@@ -2435,7 +2439,6 @@ msgstr "MusicBotを有効にすると、曲の再生中に次の曲をキュー�
 "現在、このオプションは、空のキューに追加された自動プレイリストや曲には適用されません。"
 
 #: musicbot/config.py:550
-#, python-brace-format
 msgid "Specify a custom message to use as the bot's status. If left empty, the bot\n"
 "will display dynamic info about music currently being played in its status instead.\n"
 "Status messages may also use the following variables:\n"
@@ -2453,6 +2456,7 @@ msgstr ""
 msgid "If enabled, status messages will report info on paused players."
 msgstr "有効にすると、ステータスメッセージは一時停止中のプレイヤーに情報を報告します。"
 
+#. TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
 #: musicbot/config.py:582
 msgid "If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"
 msgstr "有効にすると、MusicBotはトラックタイトルをdata/[Server ID]/current.txt に保存します。"
@@ -2483,6 +2487,7 @@ msgstr "自動再生リストから再生できないエントリを自動的に
 msgid "Display MusicBot config settings in the logs at startup."
 msgstr "起動時にログに MusicBot の設定を表示します。"
 
+#. TRANSLATORS: InstaSkip should not be translated.
 #: musicbot/config.py:650
 msgid "Enable users with the InstaSkip permission to bypass skip voting and force skips."
 msgstr "InstaSkip権限を持つユーザーを有効にして、スキップ投票とスキップをバイパスします。"
@@ -2541,6 +2546,7 @@ msgstr "有効にした場合、ユーザーはリアクションを使用する
 msgid "Sets the default number of search results to fetch when using the search command without a specific number."
 msgstr "検索コマンドを特定の番号なしで使用する場合に取得する検索結果のデフォルトの数を設定します。"
 
+#. TRANSLATORS: setprefix should not be translated.
 #: musicbot/config.py:778
 msgid "Allow MusicBot to save a per-server command prefix, and enables the setprefix command."
 msgstr "MusicBot がサーバー毎のコマンドプレフィックスを保存できるようにし、setprefix コマンドを有効にします。"
@@ -2563,6 +2569,7 @@ msgid "Enable saving all songs played by MusicBot to a global playlist file:  %(
 msgstr "MusicBotで再生されたすべての曲をグローバルプレイリストファイルに保存することを有効にします:  %(filename)s\n"
 "すべてのサーバーのすべての曲が含まれます。"
 
+#. TRANSLATORS:  [Server ID] is a descriptive placeholder, and can be translated.
 #: musicbot/config.py:829
 #, python-format
 msgid "Enable saving songs played per-server to a playlist file:  %(basename)s[Server ID]%(ext)s"
@@ -2792,24 +2799,24 @@ msgstr "ヘッダがないみたいだな。"
 msgid "Song info extraction returned no data."
 msgstr "曲情報の抽出はデータを返しませんでした。"
 
-#: musicbot/downloader.py:444
+#: musicbot/downloader.py:447
 msgid "Cannot continue extraction, event loop is closed."
 msgstr "抽出を続行できません。イベントループは閉じられています。"
 
-#: musicbot/downloader.py:453
+#: musicbot/downloader.py:456
 msgid "Spotify URL is invalid or not supported."
 msgstr "SpotifyのURLが無効かサポートされていません。"
 
-#: musicbot/downloader.py:486 musicbot/downloader.py:507
+#: musicbot/downloader.py:489 musicbot/downloader.py:510
 #, python-format
 msgid "Error in yt-dlp while downloading data: %(raw_error)s"
 msgstr "データのダウンロード中にyt-dlpでエラーが発生しました: %(raw_error)s"
 
-#: musicbot/downloader.py:503
+#: musicbot/downloader.py:506
 msgid "Cannot stream an invalid URL."
 msgstr "無効なURLをストリーミングできません。"
 
-#: musicbot/downloader.py:577
+#: musicbot/downloader.py:580
 msgid "The local media file could not be found."
 msgstr "ローカルメディアファイルが見つかりません。"
 

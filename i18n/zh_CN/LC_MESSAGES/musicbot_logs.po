@@ -2,14 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"POT-Creation-Date: 2024-11-08 07:52-0800\n"
+"PO-Revision-Date: 2024-11-08 18:12\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generated-By: pygettext.py 1.5-mb01\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
@@ -1105,8 +1106,8 @@ msgid "  Round Robin Queue: %s"
 msgstr ""
 
 #: musicbot/bot.py:2695
-#, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song block list."
+#, python-format
+msgid "The requested song `%(subject)s` is blocked by the song block list."
 msgstr ""
 
 #: musicbot/bot.py:2706
@@ -2114,11 +2115,11 @@ msgid "Guild update for:  %s"
 msgstr "公会更新:  %s"
 
 #: musicbot/bot.py:8636
-#, python-brace-format
-msgid "Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
+#, python-format
+msgid "Guild attribute %(attr)s is now: %(new)s  -- Was: %(old)s"
 msgstr ""
 
-#: musicbot/bot.py:8667
+#: musicbot/bot.py:8668
 #, python-format
 msgid "Channel update for:  %(channel)s  --  %(changes)s"
 msgstr ""
@@ -2507,66 +2508,66 @@ msgstr "已卫生化的 YTDL 提取信息(而不是JSON ):  %s"
 msgid "Song info extraction returned no data."
 msgstr "歌曲信息提取没有返回数据。"
 
-#: musicbot/downloader.py:436
-#, python-brace-format
-msgid "Called extract_info with:  '{song_subject}', {args}, {kwargs}"
+#: musicbot/downloader.py:437
+#, python-format
+msgid "Called extract_info with:  '%(subject)s', %(args)s, %(kws)s"
 msgstr ""
 
-#: musicbot/downloader.py:442
+#: musicbot/downloader.py:445
 msgid "Cannot run extraction, loop is closed. (This is normal on shutdowns.)"
 msgstr "无法运行提取，循环已关闭。(关机时这是正常的。)"
 
-#: musicbot/downloader.py:444
+#: musicbot/downloader.py:447
 msgid "Cannot continue extraction, event loop is closed."
 msgstr "无法继续提取，事件循环已关闭。"
 
-#: musicbot/downloader.py:453
+#: musicbot/downloader.py:456
 msgid "Spotify URL is invalid or not supported."
 msgstr "Spotify URL 无效或不支持。"
 
-#: musicbot/downloader.py:486 musicbot/downloader.py:507
+#: musicbot/downloader.py:489 musicbot/downloader.py:510
 #, python-format
 msgid "Error in yt-dlp while downloading data: %(raw_error)s"
 msgstr ""
 
-#: musicbot/downloader.py:490
+#: musicbot/downloader.py:493
 msgid "Download Error with stream URL"
 msgstr "下载流URL错误"
 
-#: musicbot/downloader.py:495
+#: musicbot/downloader.py:498
 msgid "Assuming content is a direct stream"
 msgstr "假设内容是直接流"
 
-#: musicbot/downloader.py:503
+#: musicbot/downloader.py:506
 msgid "Cannot stream an invalid URL."
 msgstr "无法生成无效的 URL。"
 
-#: musicbot/downloader.py:514
+#: musicbot/downloader.py:517
 msgid "Caught NoSupportingHandlers, trying again after replacing colon with space."
 msgstr "捕捉到NoSupportingHanders，在用空格替换冒号后再次尝试。"
 
-#: musicbot/downloader.py:541
+#: musicbot/downloader.py:544
 msgid "Extractor youtube:search returned single-entry result, replacing base info with entry info."
 msgstr "Extractor youtube:search 返回了单条目结果，以条目信息取代基础信息。"
 
-#: musicbot/downloader.py:557
+#: musicbot/downloader.py:560
 #, python-format
 msgid "Called safe_extract_info with:  %(args)s, %(kws)s"
 msgstr ""
 
-#: musicbot/downloader.py:577
+#: musicbot/downloader.py:580
 msgid "The local media file could not be found."
 msgstr "找不到本地媒体文件。"
 
-#: musicbot/downloader.py:615
+#: musicbot/downloader.py:618
 msgid "Missing __input_subject from YtdlpResponseDict"
 msgstr "YtdlpResponseDict 缺少__input_subject"
 
-#: musicbot/downloader.py:620
+#: musicbot/downloader.py:623
 msgid "Entries is not a list in YtdlpResponseDict, set process=True to avoid this."
 msgstr "条目不是 YtdlpResponseDict 中的列表, 设置进程=True 以避免这种情况。"
 
-#: musicbot/downloader.py:849
+#: musicbot/downloader.py:852
 #, python-format
 msgid "Warning, duration error for: %(url)s"
 msgstr ""
@@ -3802,72 +3803,72 @@ msgstr "覆盖配置中设置的日志级别设置。必须是: %s"
 msgid "Override the default date format used when rotating log files. This should contain values compatible with strftime().  (Default:  '%s')"
 msgstr "重写旋转日志文件时使用的默认日期格式。这应该包含与 strftime()兼容的值。(默认：'%s')"
 
-#: run.py:799
+#: run.py:798
 #, python-format
 msgid "Version:  %s"
 msgstr "版本:  %s"
 
-#: run.py:874
+#: run.py:873
 msgid "Opened a new MusicBot instance. This terminal can be safely closed!"
 msgstr "打开了一个新的 MusicBot 实例。此终端可以安全地关闭！"
 
-#: run.py:945
+#: run.py:944
 #, python-format
 msgid "Loading MusicBot version:  %s"
 msgstr "正在加载 MusicBot 版本：  %s"
 
-#: run.py:946
+#: run.py:945
 #, python-format
 msgid "Log opened:  %s"
 msgstr "日志已打开:  %s"
 
-#: run.py:947
+#: run.py:946
 #, python-format
 msgid "Python version:  %s"
 msgstr "Python version:  %s"
 
-#: run.py:956
+#: run.py:955
 #, python-format
 msgid "Changing working directory to:  %s"
 msgstr "更改工作目录到:  %s"
 
-#: run.py:960
+#: run.py:959
 msgid "Cannot start the bot!  You started `run.py` in the wrong directory and we could not locate `musicbot` and `.git` folders to verify a new directory location."
 msgstr "无法启动机器人！您在错误的目录中启动了`run.py`，我们无法定位`musicbot`和`。 它的文件夹以验证新的目录位置。"
 
-#: run.py:965
+#: run.py:964
 msgid "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
 "If you did not use git to clone the repository, you are strongly urged to."
 msgstr "为了取得最好的结果，从同一个文件夹中开始`run.py`，你克隆了MusicBot。\n"
 "如果你没有使用 git 来克隆仓库，你会被强烈敦促."
 
-#: run.py:1019
+#: run.py:1018
 msgid "Certificate error is not a verification error, not trying certifi and exiting."
 msgstr "证书错误不是验证错误，而不是尝试验证和退出。"
 
-#: run.py:1021
+#: run.py:1020
 msgid "Here is the exact error, it could be a bug."
 msgstr "这是一个确切的错误，它可能是一个错误。"
 
-#: run.py:1037
+#: run.py:1036
 msgid "To easily add a certificate to Windows trust store, \n"
 "you can open the failing site in Microsoft Edge or IE...\n"
 msgstr "若要轻松将证书添加到Windows信任商店， \n"
 "您可以在 Microsoft Edge 或 IE中打开失败站点...\n"
 
-#: run.py:1043
+#: run.py:1042
 msgid "Could not get Issuer Certificate from default trust store, trying certifi instead."
 msgstr "无法从默认的信任商店获取发行者证书，请改用 certifi。"
 
-#: run.py:1052
+#: run.py:1051
 msgid "Syntax error (modification detected, did you edit the code?)"
 msgstr "语法错误(检测到更改，您是否编辑代码？)"
 
-#: run.py:1055
+#: run.py:1054
 msgid "Syntax error (this is a bug, not your fault)"
 msgstr "语法错误 (这是一个bug, 而不是你的错误)"
 
-#: run.py:1067
+#: run.py:1066
 msgid "Cannot start MusicBot due to an error!\n\n"
 "Problem:\n"
 "  There was an error importing MusicBot or a dependency package.\n\n"
@@ -3876,11 +3877,11 @@ msgid "Cannot start MusicBot due to an error!\n\n"
 "  or launch without `--no-install-deps` and MusicBot will try to install them for you."
 msgstr ""
 
-#: run.py:1100
+#: run.py:1099
 msgid "Attempting to install MusicBot dependency packages automatically...\n"
 msgstr "尝试自动安装 MusicBot 依赖软件包...\n"
 
-#: run.py:1109
+#: run.py:1108
 #, python-format
 msgid "MusicBot dependencies may not be installed!\n\n"
 "Problem:\n"
@@ -3896,44 +3897,44 @@ msgid "MusicBot dependencies may not be installed!\n\n"
 "  https://discord.gg/bots"
 msgstr ""
 
-#: run.py:1130
+#: run.py:1129
 msgid "OK, lets hope installing dependencies worked!"
 msgstr "好的，让我们希望安装依赖关系成功！"
 
-#: run.py:1142
+#: run.py:1141
 msgid "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
 msgstr "MusicBot 在尝试安装软件包后发生导入错误。MusicBot必须退出..."
 
-#: run.py:1144
+#: run.py:1143
 msgid "The exception which caused the above error: "
 msgstr "造成上述错误的异常： "
 
-#: run.py:1160
+#: run.py:1159
 msgid "MusicBot is doing a soft restart..."
 msgstr "MusicBot 正在进行软重启..."
 
-#: run.py:1164
+#: run.py:1163
 msgid "MusicBot is doing a full process restart..."
 msgstr "MusicBot 正在重启整个进程..."
 
-#: run.py:1170
+#: run.py:1169
 msgid "Error starting bot"
 msgstr "启动机器人出错"
 
-#: run.py:1175
+#: run.py:1174
 msgid "Closing event loop."
 msgstr "关闭活动循环。"
 
-#: run.py:1180
+#: run.py:1179
 #, python-format
 msgid "Restarting in %s seconds..."
 msgstr "在 %s 秒后重启..."
 
-#: run.py:1184
+#: run.py:1183
 msgid "All done."
 msgstr "全部完成。"
 
-#: run.py:1213
+#: run.py:1212
 msgid "OK, we're closing!"
 msgstr "好的，我们正在关闭！"
 

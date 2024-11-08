@@ -2,14 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"POT-Creation-Date: 2024-11-08 07:52-0800\n"
+"PO-Revision-Date: 2024-11-08 18:12\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generated-By: pygettext.py 1.5-mb01\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
@@ -1140,9 +1141,9 @@ msgid "  Round Robin Queue: %s"
 msgstr "  Runda Robin Kö: %s"
 
 #: musicbot/bot.py:2695
-#, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr "Den efterfrågade låten `{subject}` blockeras av listan över låtblock."
+#, python-format
+msgid "The requested song `%(subject)s` is blocked by the song block list."
+msgstr "Den efterfrågade låten `%(subject)s` blockeras av listan över låtblock."
 
 #: musicbot/bot.py:2706
 msgid "Attempted to handle Voice Channel inactivity, but Bot is not in voice..."
@@ -2172,11 +2173,11 @@ msgid "Guild update for:  %s"
 msgstr "Guild uppdatering för:  %s"
 
 #: musicbot/bot.py:8636
-#, python-brace-format
-msgid "Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
-msgstr "Guild-attribut {name} är nu: {a_val}  -- Var: {b_val}"
+#, python-format
+msgid "Guild attribute %(attr)s is now: %(new)s  -- Was: %(old)s"
+msgstr "Guild-attribut %(attr)s är nu: %(new)s  -- Var: %(old)s"
 
-#: musicbot/bot.py:8667
+#: musicbot/bot.py:8668
 #, python-format
 msgid "Channel update for:  %(channel)s  --  %(changes)s"
 msgstr "Kanaluppdatering för:  %(channel)s  --  %(changes)s"
@@ -2614,66 +2615,66 @@ msgstr "Sanitized YTDL extraktionsinformation (ej JSON):  %s"
 msgid "Song info extraction returned no data."
 msgstr "Song info extrahering returnerade inga data."
 
-#: musicbot/downloader.py:436
-#, python-brace-format
-msgid "Called extract_info with:  '{song_subject}', {args}, {kwargs}"
-msgstr "Kallas extrah_info med: '{song_subject}', {args}, {kwargs}"
+#: musicbot/downloader.py:437
+#, python-format
+msgid "Called extract_info with:  '%(subject)s', %(args)s, %(kws)s"
+msgstr "Kallas extrah_info med: '%(subject)s', %(args)s, %(kws)s"
 
-#: musicbot/downloader.py:442
+#: musicbot/downloader.py:445
 msgid "Cannot run extraction, loop is closed. (This is normal on shutdowns.)"
 msgstr "Kan inte köra extraktion, loop är stängd. (Detta är normalt vid avstängningar.)"
 
-#: musicbot/downloader.py:444
+#: musicbot/downloader.py:447
 msgid "Cannot continue extraction, event loop is closed."
 msgstr "Kan inte fortsätta extraktionen, händelseslingan är stängd."
 
-#: musicbot/downloader.py:453
+#: musicbot/downloader.py:456
 msgid "Spotify URL is invalid or not supported."
 msgstr "Spotify-URL är ogiltig eller stöds inte."
 
-#: musicbot/downloader.py:486 musicbot/downloader.py:507
+#: musicbot/downloader.py:489 musicbot/downloader.py:510
 #, python-format
 msgid "Error in yt-dlp while downloading data: %(raw_error)s"
 msgstr "Fel i yt-dlp vid nedladdning av data: %(raw_error)s"
 
-#: musicbot/downloader.py:490
+#: musicbot/downloader.py:493
 msgid "Download Error with stream URL"
 msgstr "Fel vid nedladdning med ström-URL"
 
-#: musicbot/downloader.py:495
+#: musicbot/downloader.py:498
 msgid "Assuming content is a direct stream"
 msgstr "Anta att innehållet är en direkt ström"
 
-#: musicbot/downloader.py:503
+#: musicbot/downloader.py:506
 msgid "Cannot stream an invalid URL."
 msgstr "Kan inte strömma en ogiltig URL."
 
-#: musicbot/downloader.py:514
+#: musicbot/downloader.py:517
 msgid "Caught NoSupportingHandlers, trying again after replacing colon with space."
 msgstr "Caught NoSupportingHandlers, försöker igen efter att ha ersatt kolon med utrymme."
 
-#: musicbot/downloader.py:541
+#: musicbot/downloader.py:544
 msgid "Extractor youtube:search returned single-entry result, replacing base info with entry info."
 msgstr "Extraktor youtube:search returnerade resultat med en enda post, ersätter basinfo med post info."
 
-#: musicbot/downloader.py:557
+#: musicbot/downloader.py:560
 #, python-format
 msgid "Called safe_extract_info with:  %(args)s, %(kws)s"
 msgstr "Kallas safe_extract_info med:  %(args)s, %(kws)s"
 
-#: musicbot/downloader.py:577
+#: musicbot/downloader.py:580
 msgid "The local media file could not be found."
 msgstr "Den lokala mediefilen kunde inte hittas."
 
-#: musicbot/downloader.py:615
+#: musicbot/downloader.py:618
 msgid "Missing __input_subject from YtdlpResponseDict"
 msgstr "Saknar __input_subject från YtdlpResponseDict"
 
-#: musicbot/downloader.py:620
+#: musicbot/downloader.py:623
 msgid "Entries is not a list in YtdlpResponseDict, set process=True to avoid this."
 msgstr "Poster är inte en lista i YtdlpResponseDict, sätt process=True för att undvika detta."
 
-#: musicbot/downloader.py:849
+#: musicbot/downloader.py:852
 #, python-format
 msgid "Warning, duration error for: %(url)s"
 msgstr "Varning, varaktighet fel för: %(url)s"
@@ -3923,72 +3924,72 @@ msgstr "Åsidosätt loggnivåinställningar som är inställda i konfigurationen
 msgid "Override the default date format used when rotating log files. This should contain values compatible with strftime().  (Default:  '%s')"
 msgstr "Åsidosätt standarddatumformatet som används vid roterande loggfiler. Detta bör innehålla värden som är kompatibla med strftime(). (Standard: '%s')"
 
-#: run.py:799
+#: run.py:798
 #, python-format
 msgid "Version:  %s"
 msgstr "Version:  %s"
 
-#: run.py:874
+#: run.py:873
 msgid "Opened a new MusicBot instance. This terminal can be safely closed!"
 msgstr "Öppnade en ny MusicBot instans. Denna terminal kan stängas säkert!"
 
-#: run.py:945
+#: run.py:944
 #, python-format
 msgid "Loading MusicBot version:  %s"
 msgstr "Laddar MusicBot version:  %s"
 
-#: run.py:946
+#: run.py:945
 #, python-format
 msgid "Log opened:  %s"
 msgstr "Loggen öppnad:  %s"
 
-#: run.py:947
+#: run.py:946
 #, python-format
 msgid "Python version:  %s"
 msgstr "Python version:  %s"
 
-#: run.py:956
+#: run.py:955
 #, python-format
 msgid "Changing working directory to:  %s"
 msgstr "Byter arbetskatalog till:  %s"
 
-#: run.py:960
+#: run.py:959
 msgid "Cannot start the bot!  You started `run.py` in the wrong directory and we could not locate `musicbot` and `.git` folders to verify a new directory location."
 msgstr "Kan inte starta boten! Du startade `run.py` i fel katalog och vi kunde inte hitta `musicbot` och` . den` mappar för att verifiera en ny katalogplats."
 
-#: run.py:965
+#: run.py:964
 msgid "For best results, start `run.py` from the same folder you cloned MusicBot into.\n"
 "If you did not use git to clone the repository, you are strongly urged to."
 msgstr "För bästa resultat, starta `run.py` från samma mapp som du klonade MusicBot in.\n"
 "Om du inte använde git för att klona utvecklingskatalogen, är du starkt uppmanad."
 
-#: run.py:1019
+#: run.py:1018
 msgid "Certificate error is not a verification error, not trying certifi and exiting."
 msgstr "Certifikatfel är inte ett verifieringsfel, försöker inte certifi och avslutar."
 
-#: run.py:1021
+#: run.py:1020
 msgid "Here is the exact error, it could be a bug."
 msgstr "Här är det exakta felet, det kan vara en bugg."
 
-#: run.py:1037
+#: run.py:1036
 msgid "To easily add a certificate to Windows trust store, \n"
 "you can open the failing site in Microsoft Edge or IE...\n"
 msgstr "För att enkelt lägga till ett certifikat i Windows trustbutik, \n"
 "kan du öppna den misslyckade webbplatsen i Microsoft Edge eller IE...\n"
 
-#: run.py:1043
+#: run.py:1042
 msgid "Could not get Issuer Certificate from default trust store, trying certifi instead."
 msgstr "Kunde inte hämta Utfärdarcertifikat från standard trustbutik, försöker certifi istället."
 
-#: run.py:1052
+#: run.py:1051
 msgid "Syntax error (modification detected, did you edit the code?)"
 msgstr "Syntaxfel (ändring upptäcktes, har du redigerat koden?)"
 
-#: run.py:1055
+#: run.py:1054
 msgid "Syntax error (this is a bug, not your fault)"
 msgstr "Syntaxfel (detta är en bugg, inte ditt fel)"
 
-#: run.py:1067
+#: run.py:1066
 msgid "Cannot start MusicBot due to an error!\n\n"
 "Problem:\n"
 "  There was an error importing MusicBot or a dependency package.\n\n"
@@ -4002,11 +4003,11 @@ msgstr "Kan inte starta MusicBot på grund av ett fel!\n\n"
 "  Du måste manuellt installera pip-paket för MusicBot\n"
 "  eller starta utan `--no-install-deps` och MusicBot kommer att försöka installera dem åt dig."
 
-#: run.py:1100
+#: run.py:1099
 msgid "Attempting to install MusicBot dependency packages automatically...\n"
 msgstr "Försöker installera MusicBot beroendepaket automatiskt...\n"
 
-#: run.py:1109
+#: run.py:1108
 #, python-format
 msgid "MusicBot dependencies may not be installed!\n\n"
 "Problem:\n"
@@ -4033,44 +4034,44 @@ msgstr "Musicbot-beroenden kanske inte är installerade!\n\n"
 "Du kan också be om hjälp i MusicBots supportdisk:\n"
 "  https://discord.gg/bots"
 
-#: run.py:1130
+#: run.py:1129
 msgid "OK, lets hope installing dependencies worked!"
 msgstr "OK, låt hoppas installera beroenden fungerade!"
 
-#: run.py:1142
+#: run.py:1141
 msgid "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
 msgstr "MusicBot fick ett ImportError efter att ha försökt installera paket. MusicBot måste avslutas..."
 
-#: run.py:1144
+#: run.py:1143
 msgid "The exception which caused the above error: "
 msgstr "Undantaget som orsakade ovanstående fel: "
 
-#: run.py:1160
+#: run.py:1159
 msgid "MusicBot is doing a soft restart..."
 msgstr "MusicBot gör en mjuk omstart..."
 
-#: run.py:1164
+#: run.py:1163
 msgid "MusicBot is doing a full process restart..."
 msgstr "MusicBot gör en fullständig process omstart..."
 
-#: run.py:1170
+#: run.py:1169
 msgid "Error starting bot"
 msgstr "Fel vid start av bot"
 
-#: run.py:1175
+#: run.py:1174
 msgid "Closing event loop."
 msgstr "Stänger händelseloop."
 
-#: run.py:1180
+#: run.py:1179
 #, python-format
 msgid "Restarting in %s seconds..."
 msgstr "Startar om %s sekunder..."
 
-#: run.py:1184
+#: run.py:1183
 msgid "All done."
 msgstr "Allt klart."
 
-#: run.py:1213
+#: run.py:1212
 msgid "OK, we're closing!"
 msgstr "OK, vi stänger!"
 

@@ -2,14 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-06 13:49-0800\n"
-"PO-Revision-Date: 2024-11-06 21:53\n"
+"POT-Creation-Date: 2024-11-08 07:52-0800\n"
+"PO-Revision-Date: 2024-11-08 18:12\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generated-By: pygettext.py 1.5-mb01\n"
 "Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
 "X-Crowdin-Project: notmusicbot\n"
 "X-Crowdin-Project-ID: 734017\n"
@@ -125,9 +126,9 @@ msgstr "Ошибка входа в Discord API!\n\n"
 "  Проверка статуса API на официальном сайте: discordstatus.com"
 
 #: musicbot/bot.py:2695
-#, python-brace-format
-msgid "The requested song `{subject}` is blocked by the song block list."
-msgstr "Запрошенная песня `{subject}` заблокирована списком блоков песен."
+#, python-format
+msgid "The requested song `%(subject)s` is blocked by the song block list."
+msgstr "Запрошенная песня `%(subject)s` заблокирована списком блоков песен."
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
@@ -2381,14 +2382,17 @@ msgstr "Этот процент слушателей в голосе долже�
 msgid "Allow MusicBot to keep downloaded media, or delete it right away."
 msgstr "Разрешить Музыкаботу сохранять загруженный носитель или удалять его прямо сейчас."
 
+#. TRANSLATORS: SaveVideos is not translated.
 #: musicbot/config.py:389
 msgid "If SaveVideos is enabled, set a limit on how much storage space should be used."
 msgstr "Если включено SaveVideos, установите ограничение на количество памяти."
 
+#. TRANSLATORS: SaveVideos should not be translated.
 #: musicbot/config.py:400
 msgid "If SaveVideos is enabled, set a limit on how long files should be kept."
 msgstr "Если SaveVideos включен, установите ограничение на время хранения файлов."
 
+#. TRANSLATORS: SaveVideos should not be translated.
 #: musicbot/config.py:411
 msgid "If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."
 msgstr "Если SaveVideos включен, никогда не очищать автоплейлисты из кэша вне зависимости от ограничений."
@@ -2449,7 +2453,6 @@ msgstr "Включите MusicBot, чтобы загрузить следующ�
 "В настоящее время эта опция не применяется к автоматическому плейлисту или трекам, добавленным в пустую очередь."
 
 #: musicbot/config.py:550
-#, python-brace-format
 msgid "Specify a custom message to use as the bot's status. If left empty, the bot\n"
 "will display dynamic info about music currently being played in its status instead.\n"
 "Status messages may also use the following variables:\n"
@@ -2467,6 +2470,7 @@ msgstr ""
 msgid "If enabled, status messages will report info on paused players."
 msgstr "Если включено, сообщения о состоянии будут сообщать о приостановленных игроках."
 
+#. TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
 #: musicbot/config.py:582
 msgid "If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"
 msgstr "Если включено, MusicBot сохранит заголовок трека в: data/[Server ID]/current.txt"
@@ -2497,6 +2501,7 @@ msgstr "Включите MusicBot, чтобы автоматически уда�
 msgid "Display MusicBot config settings in the logs at startup."
 msgstr "Отображать настройки MusicBot в журналах при запуске."
 
+#. TRANSLATORS: InstaSkip should not be translated.
 #: musicbot/config.py:650
 msgid "Enable users with the InstaSkip permission to bypass skip voting and force skips."
 msgstr "Разрешить пользователям с правом InstaSkip пропускать пропуск голосования и пропускать пропуска."
@@ -2556,6 +2561,7 @@ msgstr "Если этот параметр включен, пользовате�
 msgid "Sets the default number of search results to fetch when using the search command without a specific number."
 msgstr "Устанавливает количество результатов поиска по умолчанию при использовании команды поиска без определенного числа."
 
+#. TRANSLATORS: setprefix should not be translated.
 #: musicbot/config.py:778
 msgid "Allow MusicBot to save a per-server command prefix, and enables the setprefix command."
 msgstr "Разрешить MusicBot сохранять префикс для каждого сервера и включать команду setprefix."
@@ -2581,6 +2587,7 @@ msgid "Enable saving all songs played by MusicBot to a global playlist file:  %(
 msgstr "Включить сохранение всех треков, исполняемых MusicBot в глобальный файл плейлиста:  %(filename)s\n"
 "Это будет содержать все песни со всех серверов."
 
+#. TRANSLATORS:  [Server ID] is a descriptive placeholder, and can be translated.
 #: musicbot/config.py:829
 #, python-format
 msgid "Enable saving songs played per-server to a playlist file:  %(basename)s[Server ID]%(ext)s"
@@ -2848,24 +2855,24 @@ msgstr "HEAD не имеет заголовков..."
 msgid "Song info extraction returned no data."
 msgstr "Извлечение информации о треке не дало никаких данных."
 
-#: musicbot/downloader.py:444
+#: musicbot/downloader.py:447
 msgid "Cannot continue extraction, event loop is closed."
 msgstr "Невозможно продолжить извлечение. Цикл события закрыт."
 
-#: musicbot/downloader.py:453
+#: musicbot/downloader.py:456
 msgid "Spotify URL is invalid or not supported."
 msgstr "URL-адрес Spotify недействителен или не поддерживается."
 
-#: musicbot/downloader.py:486 musicbot/downloader.py:507
+#: musicbot/downloader.py:489 musicbot/downloader.py:510
 #, python-format
 msgid "Error in yt-dlp while downloading data: %(raw_error)s"
 msgstr "Ошибка yt-dlp при загрузке данных: %(raw_error)s"
 
-#: musicbot/downloader.py:503
+#: musicbot/downloader.py:506
 msgid "Cannot stream an invalid URL."
 msgstr "Невозможно провести некорректный URL-адрес."
 
-#: musicbot/downloader.py:577
+#: musicbot/downloader.py:580
 msgid "The local media file could not be found."
 msgstr "Локальный медиа-файл не найден."
 
