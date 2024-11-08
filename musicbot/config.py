@@ -1983,7 +1983,9 @@ class ConfigOptionRegistry:
             return ", ".join(str(x) for x in conf_value)
 
         if getter == "getdatasize" and isinstance(conf_value, int):
-            return format_size_from_bytes(conf_value)
+            if conf_value:
+                return format_size_from_bytes(conf_value)
+            return str(conf_value)
 
         if getter == "getduration" and isinstance(conf_value, (int, float)):
             td = datetime.timedelta(seconds=round(conf_value))
