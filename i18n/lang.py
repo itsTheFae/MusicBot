@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
-import sys
-import subprocess
-import re
-import pathlib
 import difflib
+import os
+import pathlib
+import re
+import subprocess
+import sys
 
 
 class LangTool:
     def __init__(self, args, basedir):
+        """
+        Container for common i18n related tasks.
+        Most tasks depend only on the bundled pygettext and msgfmt scripts.
+        """
         self.args = args
         self.basedir = basedir
         self.workdir = basedir.parent
@@ -25,7 +29,7 @@ class LangTool:
         self._gettext_path = basedir.joinpath("pygettext.py")
         self._msgfmt_path = basedir.joinpath("msgfmt.py")
         self._do_diff = False
-        
+
         try:
             # Get the last release tag, number of commits since, and g{commit_id} as string.
             self.version = (
@@ -33,11 +37,14 @@ class LangTool:
                 .decode("ascii")
                 .strip()
             )
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             print("Failed to get version info from git!")
             self.version = "unknown"
 
     def compile(self):
+        """
+        Compiles all existing .po files into .mo files.
+        """
         print("Compiling existing PO files to MO...")
         po_files = [str(f) for f in self.basedir.glob("*/LC_MESSAGES/*.po")]
         subprocess.check_output(
@@ -50,7 +57,10 @@ class LangTool:
         print("Done.")
 
     def extract(self):
-        # universal list for shared domain keywords. 
+        """
+        Extract strings from source files to create the POT domain files.
+        """
+        # universal list for shared domain keywords.
         shared_keywords = [
             # Cross domain keywords.
             "--keyword=_X",
@@ -125,6 +135,10 @@ class LangTool:
         print("Extraction finished.")
 
     def diff(self, short=False):
+        """
+        Display a short or long diff of changes in the POT file.
+        Short simply excludes the file:line comments from the diff output.
+        """
         print("Preparing diff for source strings...")
         self._do_diff = True
         self.extract()
@@ -132,7 +146,9 @@ class LangTool:
         print("Diff for logs domain:")
         a = self._logs_pot_path.read_text().split("\n")
         b = self._logs_diff_path.read_text().split("\n")
-        for line in difflib.unified_diff(a, b, fromfile="old", tofile="new", n=0, lineterm=""):
+        for line in difflib.unified_diff(
+            a, b, fromfile="old", tofile="new", n=0, lineterm=""
+        ):
             if short and line.startswith("#:"):
                 continue
             print(line)
@@ -141,7 +157,9 @@ class LangTool:
         print("Diff for messages domain:")
         a = self._msgs_pot_path.read_text().split("\n")
         b = self._msgs_diff_path.read_text().split("\n")
-        for line in difflib.unified_diff(a, b, fromfile="old", tofile="new", n=0, lineterm=""):
+        for line in difflib.unified_diff(
+            a, b, fromfile="old", tofile="new", n=0, lineterm=""
+        ):
             if short and line.startswith("#:"):
                 continue
             print(line)
@@ -152,14 +170,21 @@ class LangTool:
         print("Done.")
 
     def mktestlang(self):
+        """
+        Reads in an existing POT file and creates the 'xx' test language.
+        Directories and the .po / .mo files are updated by this method.
+        """
         try:
             import polib
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             print("Fatal error, could not load the 'polib' module.")
             print("Install polib with pip or via your system package manager first.")
             sys.exit(2)
 
+        self._xx_lang_path.mkdir(parents=True, exist_ok=True)
+
         subs = re.compile(r"([a-z]+|f[0-9]+\.)(\)[a-z\._]+\()?%")
+
         def reverse_msgid_as_msgstr(po):
             for entry in po:
                 # reverse the msgid
@@ -178,8 +203,8 @@ class LangTool:
             reverse_msgid_as_msgstr(p1)
             p1.metadata["Language"] = "xx"
             p1.metadata["Content-Type"] = "text/plain; charset=UTF-8"
-            p1.save("./i18n/xx/LC_MESSAGES/musicbot_logs.po")
-            p1.save_as_mofile("./i18n/xx/LC_MESSAGES/musicbot_logs.mo")
+            p1.save(self._xx_lang_path.joinpath("musicbot_logs.po"))
+            p1.save_as_mofile(self._xx_lang_path.joinpath("musicbot_logs.mo"))
         else:
             print("Skipped logs domain, no musicbot_logs.pot file found.")
 
@@ -189,18 +214,17 @@ class LangTool:
             reverse_msgid_as_msgstr(p2)
             p2.metadata["Language"] = "xx"
             p2.metadata["Content-Type"] = "text/plain; charset=UTF-8"
-            p2.save("./i18n/xx/LC_MESSAGES/musicbot_messages.po")
-            p2.save_as_mofile("./i18n/xx/LC_MESSAGES/musicbot_messages.mo")
+            p2.save(self._xx_lang_path.joinpath("musicbot_messages.po"))
+            p2.save_as_mofile(self._xx_lang_path.joinpath("musicbot_messages.mo"))
         else:
             print("Skipped messages domain, no musicbot_messages.pot file found.")
 
 
-if __name__ == "__main__":
+def main():
+    """MusicBot i18n tool entry point."""
     ap = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description=(
-            "Helper tool for i18n tasks in MusicBot."
-        ),
+        description=("Helper tool for i18n tasks in MusicBot."),
         epilog=(
             "For more help and support with this bot, join our discord:"
             "\n  https://discord.gg/bots\n\n"
@@ -216,28 +240,28 @@ if __name__ == "__main__":
         action="store_true",
         help="Compile existing PO files into MO files.",
     )
-    
+
     ap.add_argument(
         "-e",
         dest="do_extract",
         action="store_true",
         help="Extract strings to POT files.",
     )
-    
+
     ap.add_argument(
         "-d",
         dest="do_diff_short",
         action="store_true",
         help="Diff new extractions to the existing POT file.  Ignores location comment changes.",
     )
-    
+
     ap.add_argument(
         "-D",
         dest="do_diff_long",
         action="store_true",
         help="Same as -d but show all changes.",
     )
-    
+
     ap.add_argument(
         "-t",
         dest="do_testlang",
@@ -245,31 +269,35 @@ if __name__ == "__main__":
         help="Create or update the 'xx' test language.",
     )
 
-    args = ap.parse_args()
-    basedir = pathlib.Path(__file__).parent.resolve()
+    _args = ap.parse_args()
+    _basedir = pathlib.Path(__file__).parent.resolve()
 
-    if basedir.name != "i18n":
+    if _basedir.name != "i18n":
         print("Script not inside the i18n directory.")
         print("This cannot continue!")
         sys.exit(1)
 
-    if not basedir.parent.joinpath("musicbot").is_dir():
+    if not _basedir.parent.joinpath("musicbot").is_dir():
         print("Script cannot locate musicbot source files.")
         print("This cannot continue!")
         sys.exit(1)
 
-    langtool = LangTool(args, basedir)
-    
-    if args.do_diff_short or args.do_diff_long:
-        langtool.diff(short=not args.do_diff_long)
+    langtool = LangTool(_args, _basedir)
+
+    if _args.do_diff_short or _args.do_diff_long:
+        langtool.diff(short=not _args.do_diff_long)
         sys.exit(0)
-    
-    if args.do_testlang:
+
+    if _args.do_testlang:
         langtool.mktestlang()
         sys.exit(0)
-    
-    if args.do_extract:
+
+    if _args.do_extract:
         langtool.extract()
 
-    if args.do_compile:
+    if _args.do_compile:
         langtool.compile()
+
+
+if __name__ == "__main__":
+    main()
