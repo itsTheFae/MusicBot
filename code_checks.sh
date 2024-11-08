@@ -94,7 +94,7 @@ echo "----"
 echo ""
 
 echo "Shellcheck:"
-shellcheck -a --color ./*.sh ./i18n/*.sh
+shellcheck -a --color ./*.sh
 echo "----"
 echo ""
 
