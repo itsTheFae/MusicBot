@@ -2025,7 +2025,11 @@ class ConfigOptionRegistry:
 
             # TODO: default values need to be consistent i18n will probably change this.
             # fmt: off
-            comment = opt.comment.replace("\n", "<br>\n")
+            if opt.comment_args:
+                comment = opt.comment % opt.comment_args
+            else:
+                comment = opt.comment
+            comment = comment.replace("\n", "<br>\n")
             md_option = (
                 f"<details>\n  <summary>{opt.option}</summary>\n\n"
                 f"{comment}<br>  \n"
