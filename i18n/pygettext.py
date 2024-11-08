@@ -807,9 +807,7 @@ def main():
         else:
             if options.verbose:
                 print(_("Working on %s") % filename)
-            fp = open(  # pylint: disable=consider-using-with
-                filename, "rb"
-            )
+            fp = open(filename, "rb")  # pylint: disable=consider-using-with
             closep = 1
         try:
             eater.set_filename(filename)
