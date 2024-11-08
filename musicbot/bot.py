@@ -7400,11 +7400,13 @@ class MusicBot(discord.Client):
             )
 
         if cfg == "opts":
-            self.config.register.write_default_ini(pathlib.Path("./config/ex_opts.ini"))
+            self.config.register.write_default_ini(
+                pathlib.Path("./config/example_options.ini")
+            )
 
         if cfg == "perms":
             self.permissions.register.write_default_ini(
-                pathlib.Path("./config/ex_perms.ini")
+                pathlib.Path("./config/example_permissions.ini")
             )
 
         return Response(_D("Saved the requested INI file to disk. Go check it", ssd_))
