@@ -42,8 +42,11 @@ class LangTool:
             self.version = "unknown"
 
     def _check_polib(self):
+        """Test-load polib and fail softly."""
         try:
             import polib
+
+            print(f"Loaded polib version {polib.__version__}")
         except Exception:  # pylint: disable=broad-exception-caught
             print("Fatal error, could not load the 'polib' module.")
             print("Install polib with pip or via your system package manager first.")
@@ -62,7 +65,7 @@ class LangTool:
             mo_file = po_file.with_suffix(".mo")
             po = polib.pofile(po_file)
             po.save_as_mofile(mo_file)
-            
+
         print("Done.")
 
     def extract(self):
