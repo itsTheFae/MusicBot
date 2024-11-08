@@ -2692,7 +2692,7 @@ class MusicBot(discord.Client):
 
         if self.config.song_blocklist.is_blocked(song_subject):
             raise exceptions.CommandError(
-                "The requested song `{subject}` is blocked by the song block list.",
+                "The requested song `%(subject)s` is blocked by the song block list.",
                 fmt_args={"subject": song_subject},
             )
 
@@ -8633,7 +8633,8 @@ class MusicBot(discord.Client):
                 b_val = getattr(before, name, None)
                 if b_val != a_val:
                     log.everything(  # type: ignore[attr-defined]
-                        f"Guild attribute {name} is now: {a_val}  -- Was: {b_val}"
+                        "Guild attribute %(attr)s is now: %(new)s  -- Was: %(old)s",
+                        {"attr": name, "new": a_val, "old": b_val},
                     )
 
     async def on_guild_channel_update(

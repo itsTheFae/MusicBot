@@ -433,7 +433,10 @@ class Downloader:
         :raises: yt_dlp.networking.exceptions.RequestError
             as a base exception for any networking errors raised by yt_dlp.
         """
-        log.noise(f"Called extract_info with:  '{song_subject}', {args}, {kwargs}")  # type: ignore[attr-defined]
+        log.noise(  # type: ignore[attr-defined]
+            "Called extract_info with:  '%(subject)s', %(args)s, %(kws)s",
+            {"subject": song_subject, "args": args, "kws": kwargs},
+        )
         as_stream_url = kwargs.pop("as_stream", False)
 
         # check if loop is closed and exit.

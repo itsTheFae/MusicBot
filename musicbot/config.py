@@ -183,8 +183,8 @@ class Config:
             option="OwnerID",
             dest="owner_id",
             default=ConfigDefaults.owner_id,
-            # TRANSLATORS: 'auto' should not be translated.
             comment=_Dd(
+                # TRANSLATORS: 'auto' should not be translated.
                 "Provide a Discord User ID number to set the owner of this bot.\n"
                 "The word 'auto' or number 0 will set the owner based on App information.\n"
                 "Only one owner ID can be set here. Generally, setting 'auto' is recommended."
@@ -237,8 +237,8 @@ class Config:
             dest="commands_via_mention",
             default=ConfigDefaults.commands_via_mention,
             getter="getboolean",
-            # TRANSLATORS: YourBotNameHere can be translated.  CommandPrefix should not be translated.
             comment=_Dd(
+                # TRANSLATORS: YourBotNameHere can be translated.  CommandPrefix should not be translated.
                 "Enable using commands with @[YourBotNameHere]\n"
                 "The CommandPrefix is still available, but can be replaced with @ mention."
             ),
@@ -262,8 +262,8 @@ class Config:
             dest="unbound_servers",
             default=ConfigDefaults.unbound_servers,
             getter="getboolean",
-            # TRANSLATORS: BindToChannels should not be translated.
             comment=_Dd(
+                # TRANSLATORS: BindToChannels should not be translated.
                 "Allow responses in all channels while no specific channel is set for a server.\n"
                 "Only used when BindToChannels is missing an ID for a server."
             ),
@@ -349,8 +349,8 @@ class Config:
             dest="skips_required",
             default=ConfigDefaults.skips_required,
             getter="getint",
-            # TRANSLATORS: SkipRatio should not be translated.
             comment=_Dd(
+                # TRANSLATORS: SkipRatio should not be translated.
                 "Number of channel member votes required to skip a song.\n"
                 "Acts as a minimum when SkipRatio would require more votes."
             ),
@@ -361,8 +361,8 @@ class Config:
             dest="skip_ratio_required",
             default=ConfigDefaults.skip_ratio_required,
             getter="getpercent",
-            # TRANSLATORS: SkipsRequired is not translated
             comment=_Dd(
+                # TRANSLATORS: SkipsRequired is not translated
                 "This percent of listeners in voice must vote for skip.\n"
                 "If SkipsRequired is lower than the computed value, it will be used instead.\n"
                 "You can set this from 0 to 1, or 0% to 100%."
@@ -384,8 +384,8 @@ class Config:
             dest="storage_limit_bytes",
             default=ConfigDefaults.storage_limit_bytes,
             getter="getdatasize",
-            # TRANSLATORS: SaveVideos is not translated.
             comment=_Dd(
+                # TRANSLATORS: SaveVideos is not translated.
                 "If SaveVideos is enabled, set a limit on how much storage space should be used."
             ),
         )
@@ -395,8 +395,8 @@ class Config:
             dest="storage_limit_days",
             default=ConfigDefaults.storage_limit_days,
             getter="getint",
-            # TRANSLATORS: SaveVideos should not be translated.
             comment=_Dd(
+                # TRANSLATORS: SaveVideos should not be translated.
                 "If SaveVideos is enabled, set a limit on how long files should be kept."
             ),
         )
@@ -406,8 +406,8 @@ class Config:
             dest="storage_retain_autoplay",
             default=ConfigDefaults.storage_retain_autoplay,
             getter="getboolean",
-            # TRANSLATORS: SaveVideos should not be translated
             comment=_Dd(
+                # TRANSLATORS: SaveVideos should not be translated.
                 "If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits."
             ),
         )
@@ -483,8 +483,8 @@ class Config:
             dest="delete_messages",
             default=ConfigDefaults.delete_messages,
             getter="getboolean",
-            # TRANSLATORS: DeleteDelayShort and DeleteDelayLong should not be translated.
             comment=_Dd(
+                # TRANSLATORS: DeleteDelayShort and DeleteDelayLong should not be translated.
                 "Allow MusicBot to automatically delete messages it sends, after a delay.\n"
                 "Delay period is controlled by DeleteDelayShort and DeleteDelayLong."
             ),
@@ -577,8 +577,8 @@ class Config:
             dest="write_current_song",
             default=ConfigDefaults.write_current_song,
             getter="getboolean",
-            # TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
             comment=_Dd(
+                # TRANSLATORS: [Server ID] is a descriptive placeholder and may be translated.
                 "If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt"
             ),
         )
@@ -645,8 +645,8 @@ class Config:
             dest="legacy_skip",
             default=ConfigDefaults.legacy_skip,
             getter="getboolean",
-            # TRANSLATORS: InstaSkip should not be translated.
             comment=_Dd(
+                # TRANSLATORS: InstaSkip should not be translated.
                 "Enable users with the InstaSkip permission to bypass skip voting and force skips."
             ),
         )
@@ -676,8 +676,8 @@ class Config:
             option="CustomEmbedFooter",
             dest="footer_text",
             default=ConfigDefaults.footer_text,
-            # TRANSLATORS: UseEmbeds should not be translated.
             comment=_Dd(
+                # TRANSLATORS: UseEmbeds should not be translated.
                 "Replace MusicBot name/version in embed footer with custom text.\n"
                 "Only applied when UseEmbeds is enabled and it is not blank."
             ),
@@ -706,8 +706,8 @@ class Config:
             dest="leave_inactive_channel",
             default=ConfigDefaults.leave_inactive_channel,
             getter="getboolean",
-            # TRANSLATORS: LeaveInactiveVCTimeOut should not be translated.
             comment=_Dd(
+                # TRANSLATORS: LeaveInactiveVCTimeOut should not be translated.
                 "If enabled, MusicBot will leave a voice channel when no users are listening,\n"
                 "after waiting for a period set in LeaveInactiveVCTimeOut option.\n"
                 "Listeners are channel members, excluding bots, who are not deafened."
@@ -773,8 +773,8 @@ class Config:
             dest="enable_options_per_guild",
             default=ConfigDefaults.enable_options_per_guild,
             getter="getboolean",
-            # TRANSLATORS: setprefix should not be translated.
             comment=_Dd(
+                # TRANSLATORS: setprefix should not be translated.
                 "Allow MusicBot to save a per-server command prefix, and enables the setprefix command."
             ),
         )
@@ -824,8 +824,8 @@ class Config:
             dest="enable_queue_history_guilds",
             default=ConfigDefaults.enable_queue_history_guilds,
             getter="getboolean",
-            # TRANSLATORS:  [Server ID] is a descriptive placeholder, and can be translated.
             comment=_Dd(
+                # TRANSLATORS:  [Server ID] is a descriptive placeholder, and can be translated.
                 "Enable saving songs played per-server to a playlist file:  %(basename)s[Server ID]%(ext)s"
             ),
             comment_args={
@@ -840,8 +840,8 @@ class Config:
             dest="enable_local_media",
             default=ConfigDefaults.enable_local_media,
             getter="getboolean",
-            # TRANSLATORS: MediaFileDirectory should not be translated.
             comment=_Dd(
+                # TRANSLATORS: MediaFileDirectory should not be translated.
                 "Enable playback of local media files using the play command.\n"
                 "When enabled, users can use:  `play file://path/to/file.ext`\n"
                 "to play files from the local MediaFileDirectory path."
