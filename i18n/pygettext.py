@@ -12,6 +12,12 @@
 # directory (including globbing chars, important for Win32).
 # Made docstring fit in 80 chars wide displays using pydoc.
 #
+# 2024-11-07 Fae
+# Updated header to match xgettext header.
+# Added flags: --package-name, --package-version, --copyright-holder
+# Added flag --add-comments for adding comments to translations. Only supports one-line comments.
+# Adjusted string extraction to leave escape sequences \N, \U, and \u alone.
+
 
 # for selftesting
 try:
@@ -158,6 +164,7 @@ If `inputfile' is -, standard input is read.
 import os
 import importlib.machinery
 import importlib.util
+import re
 import sys
 import glob
 import time
@@ -178,22 +185,28 @@ EMPTYSTRING = ''
 # there.
 pot_header = _('''\
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR ORGANIZATION
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the %(package_name)s package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\\n"
+"Project-Id-Version: %(package_name)s %(package_version)s\\n"
+"Report-Msgid-Bugs-To: \\n"
 "POT-Creation-Date: %(time)s\\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
 "Language-Team: LANGUAGE <LL@li.org>\\n"
+"Language: \\n"
 "MIME-Version: 1.0\\n"
 "Content-Type: text/plain; charset=%(charset)s\\n"
 "Content-Transfer-Encoding: %(encoding)s\\n"
-"Generated-By: pygettext.py %(version)s\\n"
+"X-Generated-By: pygettext.py %(version)s-mb01\\n"
 
 ''')
+# Matches literal escape sequences so they can be preserved.
+pre_escape = re.compile(r'(?<!\\)(\\[NUu](?:[a-fA-F0-9]+|\{[^\}]+\}))')
 
 
 def usage(code, msg=''):
@@ -236,6 +249,8 @@ def is_literal_string(s):
 
 
 def safe_eval(s):
+    # escape literal sequences.
+    s = pre_escape.sub(r'\\\1', s)
     # unwrap quotes, safely
     return eval(s, {'__builtins__':{}}, {})
 
@@ -254,6 +269,9 @@ def normalize(s, encoding):
             lines[i] = escape(lines[i], encoding)
         lineterm = '\\n"\n"'
         s = '""\n"' + lineterm.join(lines) + '"'
+        b = s.split("\n")
+        if len(b) == 2 and b[0] == '""':
+            s = s.replace("\"\"\n", "")
     return s
 
 
@@ -308,8 +326,12 @@ def getFilesForName(name):
 
 class TokenEater:
     def __init__(self, options):
+        self.pyformat = re.compile(r'%(\([a-z0-9_-]+\))?[0-9\.,#+-]*[a-z]+', re.I)
         self.__options = options
         self.__messages = {}
+        self.__comments = []
+        self.__comment_open = False
+        self.__comment_last_line = -1
         self.__state = self.__waiting
         self.__data = []
         self.__lineno = -1
@@ -319,13 +341,13 @@ class TokenEater:
 
     def __call__(self, ttype, tstring, stup, etup, line):
         # dispatch
-##        import token
-##        print('ttype:', token.tok_name[ttype], 'tstring:', tstring,
-##              file=sys.stderr)
+        # print('ttype:', token.tok_name[ttype], 'tstring:', tstring, file=sys.stderr)
         self.__state(ttype, tstring, stup[0])
 
     def __waiting(self, ttype, tstring, lineno):
         opts = self.__options
+        self.__commentary(ttype, tstring, lineno)
+
         # Do docstring extractions, if enabled
         if opts.docstrings and not opts.nodocstrings.get(self.__curfile):
             # module docstring?
@@ -420,13 +442,14 @@ class TokenEater:
     def __keywordseen(self, ttype, tstring, lineno):
         if ttype == tokenize.OP and tstring == '(':
             self.__data = []
-            self.__lineno = lineno
             self.__state = self.__openseen
         else:
             self.__state = self.__waiting
 
     def __openseen(self, ttype, tstring, lineno):
-        if ttype == tokenize.OP and tstring == ')':
+        self.__commentary(ttype, tstring, lineno)
+
+        if ttype == tokenize.OP and (tstring == ')' or tstring == ','):
             # We've seen the last of the translatable strings.  Record the
             # line number of the first line of the strings and update the list
             # of messages seen.  Reset state for the next batch.  If there
@@ -435,25 +458,52 @@ class TokenEater:
                 self.__addentry(EMPTYSTRING.join(self.__data))
             self.__state = self.__waiting
         elif ttype == tokenize.STRING and is_literal_string(tstring):
+            if self.__lineno == -1:
+                self.__lineno = lineno
             self.__data.append(safe_eval(tstring))
         elif ttype not in [tokenize.COMMENT, token.INDENT, token.DEDENT,
                            token.NEWLINE, tokenize.NL]:
             # warn if we see anything else than STRING or whitespace
+            ''' # hopefully not an issue. :)
             print(_(
                 '*** %(file)s:%(lineno)s: Seen unexpected token "%(token)s"'
                 ) % {
                 'token': tstring,
                 'file': self.__curfile,
-                'lineno': self.__lineno
+                'lineno': lineno
                 }, file=sys.stderr)
+            # '''
             self.__state = self.__waiting
+
+    def __commentary(self, ttype, tstring, lineno):
+        opts = self.__options
+        if self.__comment_open and ttype not in (tokenize.COMMENT, tokenize.NL):
+            self.__comment_open = False
+
+        if ttype == tokenize.COMMENT and tstring:
+            comment_text = tstring.lstrip("#").strip()
+            if any(comment_text.startswith(tag) for tag in opts.comment_tags):
+                self.__comment_open = True
+                self.__comment_last_line = lineno
+                self.__comments.append(comment_text)
+                return
+            if self.__comment_open:
+                self.__comments.append(comment_text)
+
+        ll = self.__comment_last_line
+        if ll > 0 and ll + 2 < lineno:
+            self.__comments = []
+            self.__comment_open = False
+            self.__comment_last_line = -1
 
     def __addentry(self, msg, lineno=None, isdocstring=0):
         if lineno is None:
             lineno = self.__lineno
+            self.__lineno = -1
         if not msg in self.__options.toexclude:
             entry = (self.__curfile, lineno)
-            self.__messages.setdefault(msg, {})[entry] = isdocstring
+            self.__messages.setdefault(msg, {})[entry] = (isdocstring, self.__comments)
+            self.__comments = []
 
     def set_filename(self, filename):
         self.__curfile = filename
@@ -463,8 +513,11 @@ class TokenEater:
         options = self.__options
         timestamp = time.strftime('%Y-%m-%d %H:%M%z')
         encoding = fp.encoding if fp.encoding else 'UTF-8'
-        print(pot_header % {'time': timestamp, 'version': __version__,
+        print(pot_header % {'time': timestamp,'version': __version__,
                             'charset': encoding,
+                            'package_name': options.package_name,
+                            'package_version': options.package_version,
+                            'copyright-holder': options.copyright_holder,
                             'encoding': '8bit'}, file=fp)
         # Sort the entries.  First sort each particular entry's keys, then
         # sort all the entries by their first item.
@@ -480,7 +533,10 @@ class TokenEater:
                 # If the entry was gleaned out of a docstring, then add a
                 # comment stating so.  This is to aid translators who may wish
                 # to skip translating some unimportant docstrings.
-                isdocstring = any(v.values())
+                isdocstring = any(x[0] for x in v.values())
+                comments = []
+                for x in v.values():
+                    comments += x[1]
                 # k is the message string, v is a dictionary-set of (filename,
                 # lineno) tuples.  We want to sort the entries in v first by
                 # file name and then by line number.
@@ -494,6 +550,11 @@ class TokenEater:
                         print(_(
                             '# File: %(filename)s, line: %(lineno)d') % d, file=fp)
                 elif options.locationstyle == options.GNU:
+                    # insert comments if any.
+                    for c in comments:
+                        if c:
+                            print(f"#. {c}", file=fp)
+
                     # fit as many locations on one line, as long as the
                     # resulting line length doesn't exceed 'options.width'
                     locline = '#:'
@@ -507,8 +568,15 @@ class TokenEater:
                             locline = "#:" + s
                     if len(locline) > 2:
                         print(locline, file=fp)
+
+                flags = []
                 if isdocstring:
-                    print('#, docstring', file=fp)
+                    flags.append('python-docstring')
+                if self.pyformat.search(k) is not None and not isdocstring:
+                    flags.append('python-format')
+                
+                if flags:
+                    print(f"#, {','.join(flags)}", file=fp)
                 print('msgid', normalize(k, encoding), file=fp)
                 print('msgstr ""\n', file=fp)
 
@@ -524,6 +592,8 @@ def main():
              'add-location', 'no-location', 'output=', 'output-dir=',
              'style=', 'verbose', 'version', 'width=', 'exclude-file=',
              'docstrings', 'no-docstrings',
+             'package-name=', 'package-version=', 'copyright-holder=',
+             'add-comments=',
              ])
     except getopt.error as msg:
         usage(1, msg)
@@ -546,6 +616,10 @@ def main():
         excludefilename = ''
         docstrings = 0
         nodocstrings = {}
+        package_name = "PACKAGE NAME"
+        package_version = "PACKAGE VERSION"
+        copyright_holder = "THE PACKAGE'S COPYRIGHT HOLDER"
+        comment_tags = []
 
     options = Options()
     locations = {'gnu' : options.GNU,
@@ -602,6 +676,15 @@ def main():
                     options.nodocstrings[line[:-1]] = 1
             finally:
                 fp.close()
+        elif opt in ('--package-name'):
+            options.package_name = arg
+        elif opt in ('--package-version'):
+            options.package_version = arg
+        elif opt in ('--copyright-holder'):
+            options.copyright_holder = arg
+        elif opt in ('--add-comments'):
+            options.comment_tags.append(arg)
+            print(f"comment: '{arg}'")
 
     # calculate escapes
     make_escapes(not options.escape)
