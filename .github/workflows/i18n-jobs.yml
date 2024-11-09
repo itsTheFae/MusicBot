@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: '3.10'
       - name: Load cached pip dependencies
         uses: actions/cache/restore@v4
         id: cache
@@ -37,10 +37,14 @@ jobs:
       - name: Run lang.py tool
         run: |
           python ./i18n/lang.py -c
+          ls -lah ./i18n/*/LC_MESSAGES/*.mo
       - name: Commit MO files.
         run: |
-          ls -lah
-          git status
           git config --global user.name 'MusicBot Automation'
           git config --global user.email 'no-mail@musicbot.auto.bot'
-          
+          git add ./i18n/*/LC_MESSAGES/*.mo
+          if ! git diff --cached --exit-code ; then
+            git commit -am "Compile all MO files."
+            git push
+          fi
+

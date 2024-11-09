@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-08 07:52-0800\n"
-"PO-Revision-Date: 2024-11-08 18:12\n"
+"PO-Revision-Date: 2024-11-08 19:27\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
 "Language: en_US\n"
@@ -135,7 +135,7 @@ msgstr "Failed Discord API Login!\n\n"
 #: musicbot/bot.py:2695
 #, python-format
 msgid "The requested song `%(subject)s` is blocked by the song block list."
-msgstr ""
+msgstr "The requested song `%(subject)s` is blocked by the song block list."
 
 #: musicbot/bot.py:2831
 msgid "Reset the auto playlist queue by copying it back into player memory.\n"
