@@ -2,11 +2,10 @@ name: Translation Updates
 
 on:
   push:
-    branches:
-      - l10n_fae
+    branches: [ "l10n_fae" ]
   pull_request:
-    branches:
-      - l10n_fae
+    branches: [ "l10n_fae" ]
+  workflow_dispatch:
 
 jobs:
   compile:
