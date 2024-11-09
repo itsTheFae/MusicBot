@@ -42,6 +42,6 @@ jobs:
         run: |
           git config --global user.name 'MusicBot Automation'
           git config --global user.email 'no-mail@musicbot.auto.bot'
-          git add ./i18n/*/LC_MESSAGES/*.mo
+          echo -e "a\n*\nq\n" | git add -i
           git status
           git commit -am "Compile all MO files."
