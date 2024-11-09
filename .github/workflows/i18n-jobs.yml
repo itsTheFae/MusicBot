@@ -45,3 +45,4 @@ jobs:
           git add ./i18n/*/LC_MESSAGES/*.mo
           git commit -am "Compile all MO files."
           git push
+

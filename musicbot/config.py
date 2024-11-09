@@ -1983,7 +1983,9 @@ class ConfigOptionRegistry:
             return ", ".join(str(x) for x in conf_value)
 
         if getter == "getdatasize" and isinstance(conf_value, int):
-            return format_size_from_bytes(conf_value)
+            if conf_value:
+                return format_size_from_bytes(conf_value)
+            return str(conf_value)
 
         if getter == "getduration" and isinstance(conf_value, (int, float)):
             td = datetime.timedelta(seconds=round(conf_value))
@@ -2023,7 +2025,11 @@ class ConfigOptionRegistry:
 
             # TODO: default values need to be consistent i18n will probably change this.
             # fmt: off
-            comment = opt.comment.replace("\n", "<br>\n")
+            if opt.comment_args:
+                comment = opt.comment % opt.comment_args
+            else:
+                comment = opt.comment
+            comment = comment.replace("\n", "<br>\n")
             md_option = (
                 f"<details>\n  <summary>{opt.option}</summary>\n\n"
                 f"{comment}<br>  \n"

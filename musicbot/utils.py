@@ -444,7 +444,7 @@ def format_size_to_bytes(size_str: str, strict_si: bool = False) -> int:
     elif size_str.endswith("byte"):
         size_str = size_str[0:-4]
 
-    return int(size_str)
+    return int(float(size_str))
 
 
 def format_time_to_seconds(time_str: Union[str, int]) -> int:

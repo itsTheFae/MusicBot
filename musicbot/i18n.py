@@ -313,7 +313,7 @@ class I18n:
             return self._discord_langs[guild_id]
 
         # add selected lang as first option.
-        msg_langs = self.msg_langs
+        msg_langs = list(self.msg_langs)
         if ssd and ssd.lang_code:
             msg_langs.insert(0, ssd.lang_code)
 
@@ -328,10 +328,11 @@ class I18n:
         self._discord_langs[guild_id] = tl
 
         # warn for missing translations.
-        if isinstance(tl, gettext.NullTranslations):
+        if not isinstance(tl, gettext.GNUTranslations):
             log.warning(
-                "Failed to load discord translations for any of:  [%s]  in:  %s",
-                ", ".join(self.msg_langs),
+                "Failed to load discord translations for any of:  [%s]  guild:  %s  in:  %s",
+                ", ".join(msg_langs),
+                guild_id,
                 self._locale_dir,
             )
 
