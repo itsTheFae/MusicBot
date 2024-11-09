@@ -37,6 +37,7 @@ jobs:
       - name: Run lang.py tool
         run: |
           python ./i18n/lang.py -c
+          ls -lah ./i18n/*/LC_MESSAGES/*.mo
       - name: Commit MO files.
         run: |
           git config --global user.name 'MusicBot Automation'
