@@ -44,5 +44,7 @@ jobs:
           git config --global user.email 'no-mail@musicbot.auto.bot'
           git add ./i18n/*/LC_MESSAGES/*.mo
           git commit -am "Compile all MO files."
-          git push || { exit 0; }
+          if ! git diff --cached --exit-code ; then
+            git push
+          fi
 
