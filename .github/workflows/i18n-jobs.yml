@@ -7,6 +7,10 @@ on:
     branches: [ "l10n_fae" ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   compile:
     name: Compile MO Files
