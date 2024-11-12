@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 16:33-0800\n"
-"PO-Revision-Date: 2024-11-12 00:36\n"
+"POT-Creation-Date: 2024-11-11 16:38-0800\n"
+"PO-Revision-Date: 2024-11-12 00:39\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -1822,8 +1822,8 @@ msgstr "指定された無効なサブコマンドです。詳細については
 
 #: musicbot/bot.py:6934
 #, python-format
-msgid "Cannot set language to `%(locale)s` it s not available."
-msgstr "言語を`%(locale)s`に設定できません。"
+msgid "Cannot set language to `%(locale)s` it is not available."
+msgstr "言語を`%(locale)s`に設定できません。利用できません。"
 
 #: musicbot/bot.py:6979
 msgid "You must provide a URL or attach a file."
