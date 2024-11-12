@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 16:33-0800\n"
-"PO-Revision-Date: 2024-11-12 00:36\n"
+"POT-Creation-Date: 2024-11-11 16:38-0800\n"
+"PO-Revision-Date: 2024-11-12 00:39\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1855,8 +1855,8 @@ msgstr "Sub-comando inválido. Utilice el comando de ayuda para más informació
 
 #: musicbot/bot.py:6934
 #, python-format
-msgid "Cannot set language to `%(locale)s` it s not available."
-msgstr "No se puede establecer el idioma a `%(locale)s` no está disponible."
+msgid "Cannot set language to `%(locale)s` it is not available."
+msgstr ""
 
 #: musicbot/bot.py:6979
 msgid "You must provide a URL or attach a file."
