@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-11 16:33-0800\n"
-"PO-Revision-Date: 2024-11-12 00:36\n"
+"POT-Creation-Date: 2024-11-11 16:38-0800\n"
+"PO-Revision-Date: 2024-11-12 00:39\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -1877,7 +1877,7 @@ msgstr "**Nuvarande språk:** `%(locale)s`\n"
 
 #: musicbot/bot.py:6934
 #, python-format
-msgid "Cannot set language to `%(locale)s` it s not available."
+msgid "Cannot set language to `%(locale)s` it is not available."
 msgstr "Kan inte ställa in språk till `%(locale)s` det är inte tillgängligt."
 
 #: musicbot/bot.py:6939
