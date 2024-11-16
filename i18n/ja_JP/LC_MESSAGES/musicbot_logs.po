@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-15 07:12-0800\n"
-"PO-Revision-Date: 2024-11-15 16:39\n"
+"PO-Revision-Date: 2024-11-16 02:53\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Crowdin-Project-ID: 734017\n"
 "X-Crowdin-Language: ja\n"
 "X-Crowdin-File: /fae/i18n/musicbot_logs.pot\n"
-"X-Crowdin-File-ID: 26\n"
+"X-Crowdin-File-ID: 36\n"
 
 #: musicbot/aliases.py:52
 msgid "Aliases file not found, copying example_aliases.json"
@@ -3822,8 +3822,7 @@ msgstr "`pip`コマンドを使用してアップデートを確認できませ�
 #, python-format
 msgid "You can run a guided update by using the command:\n"
 "    %s ./update.py"
-msgstr "\n"
-"    %s ./update.py コマンドを使用してガイド付き更新を実行できます。"
+msgstr ""
 
 #: run.py:657
 msgid "Value is above the maximum limit."
