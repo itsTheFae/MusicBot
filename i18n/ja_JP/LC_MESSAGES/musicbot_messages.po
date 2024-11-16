@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-15 07:12-0800\n"
-"PO-Revision-Date: 2024-11-15 16:39\n"
+"PO-Revision-Date: 2024-11-16 02:53\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Crowdin-Project-ID: 734017\n"
 "X-Crowdin-Language: ja\n"
 "X-Crowdin-File: /fae/i18n/musicbot_messages.pot\n"
-"X-Crowdin-File-ID: 28\n"
+"X-Crowdin-File-ID: 38\n"
 
 #: musicbot/aliases.py:56
 msgid "Error while loading aliases.\n\n"
@@ -492,8 +492,7 @@ msgstr "曲を最後に再生するのではなく、次に追加する再生コ
 #: musicbot/bot.py:3759
 msgid "A play command which skips any current song and plays immediately.\n"
 "Read help for the play command for information on supported inputs.\n"
-msgstr "\n"
-"サポートされている入力に関する情報については、playコマンドのヘルプを参照してください。\n"
+msgstr ""
 
 #: musicbot/bot.py:3796
 msgid "Restarts the current song at the given time.\n"
@@ -2984,8 +2983,7 @@ msgstr "曲の最大長を秒単位で指定します。0 の値は無制限を�
 #: musicbot/permissions.py:456
 msgid "Maximum number of songs a playlist is allowed to have when queued.\n"
 "A value of 0 means unlimited."
-msgstr "\n"
-"Aformat@@1 0の値は無制限を意味します。"
+msgstr ""
 
 #: musicbot/permissions.py:468
 msgid "The maximum number of items that can be returned in a search."
