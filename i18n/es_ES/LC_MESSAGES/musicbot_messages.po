@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-15 07:12-0800\n"
-"PO-Revision-Date: 2024-11-15 16:39\n"
+"PO-Revision-Date: 2024-11-16 02:53\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Crowdin-Project-ID: 734017\n"
 "X-Crowdin-Language: es-ES\n"
 "X-Crowdin-File: /fae/i18n/musicbot_messages.pot\n"
-"X-Crowdin-File-ID: 28\n"
+"X-Crowdin-File-ID: 38\n"
 
 #: musicbot/aliases.py:56
 msgid "Error while loading aliases.\n\n"
@@ -831,7 +831,7 @@ msgstr "Mostrar información sobre lo que se está reproduciendo actualmente."
 
 #: musicbot/bot.py:4829 musicbot/bot.py:6077 musicbot/bot.py:6109
 msgid "[autoplaylist]"
-msgstr "[autoplaylist]"
+msgstr ""
 
 #: musicbot/bot.py:4833
 msgid "Now playing"
