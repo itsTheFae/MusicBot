@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: notmusicbot\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-15 07:12-0800\n"
-"PO-Revision-Date: 2024-11-15 16:39\n"
+"PO-Revision-Date: 2024-11-16 02:53\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -16,7 +16,7 @@ msgstr ""
 "X-Crowdin-Project-ID: 734017\n"
 "X-Crowdin-Language: zh-CN\n"
 "X-Crowdin-File: /fae/i18n/musicbot_logs.pot\n"
-"X-Crowdin-File-ID: 26\n"
+"X-Crowdin-File-ID: 36\n"
 
 #: musicbot/aliases.py:52
 msgid "Aliases file not found, copying example_aliases.json"
@@ -29,7 +29,12 @@ msgid "Error while loading aliases.\n\n"
 "Solution:\n"
 "  Replace the alias config file(s) or copy them from:\n"
 "    https://github.com/Just-Some-Bots/MusicBot/"
-msgstr ""
+msgstr "加载别名时出错。\n\n"
+"问题：\n"
+"  您的别名文件 (aliases.json & example_aliases.json) 丢失。\n\n"
+"解决方案：\n"
+"  替换别名配置文件或复制它们：\n"
+"    https://github.com/Just-Some-Bots/MusicBot/"
 
 #: musicbot/aliases.py:80
 #, python-format
@@ -105,7 +110,7 @@ msgstr "正在初始化 MusicBot %s"
 #: musicbot/bot.py:250
 #, python-format
 msgid "Loop is closed, cannot create task for: %r"
-msgstr ""
+msgstr "循环已关闭，不能为 %r 创建任务"
 
 #: musicbot/bot.py:266
 #, python-format
@@ -128,7 +133,7 @@ msgstr "通过Spotify验证成功使用客户端 ID 和秘密。"
 #: musicbot/bot.py:323
 #, python-format
 msgid "Could not start Spotify client. Is your client ID and secret correct? Details: %s. Continuing anyway in 5 seconds..."
-msgstr ""
+msgstr "无法启动 Spotify 客户端。您的客户端 ID 和密度是否正确？详细信息: %s。仍然在5秒内继续..."
 
 #: musicbot/bot.py:331
 msgid "The config did not have Spotify app credentials, attempting to use guest mode."
@@ -141,7 +146,7 @@ msgstr "使用 Spotify 验证成功使用访客模式。"
 #: musicbot/bot.py:346
 #, python-format
 msgid "Could not start Spotify client using guest mode. Details: %s."
-msgstr ""
+msgstr "无法使用访客模式启动 Spotify 客户端。详细信息: %s。"
 
 #: musicbot/bot.py:354
 msgid "Experimental Yt-dlp OAuth2 plugin is enabled. This might break at any point!"
@@ -181,7 +186,10 @@ msgid "MusicBot could not locate a `ping` command path.  Will attempt to use HTT
 "MusicBot tried the following command:   %s\n"
 "You should enable ping in your system or container environment for best results.\n"
 "Alternatively disable network checking via config."
-msgstr ""
+msgstr "MusicBot 无法定位一个 `ping` 命令路径。将尝试使用 HTTP 代替。\n"
+"MusicBot尝试了以下命令：   %s\n"
+"您应该在您的系统或容器环境中启用ping以获得最佳结果。\n"
+"也可通过配置禁用网络检查。"
 
 #: musicbot/bot.py:492
 #, python-format
@@ -189,7 +197,10 @@ msgid "MusicBot was denied permission to execute the `ping` command.  Will attem
 "MusicBot tried the following command:   %s\n"
 "You should enable ping in your system or container environment for best results.\n"
 "Alternatively disable network checking via config."
-msgstr ""
+msgstr "MusicBot被拒绝执行`ping`命令。将尝试使用 HTTP ping。\n"
+"MusicBot尝试了以下命令：   %s\n"
+"您应该在您的系统或容器环境中启用ping以获得最佳结果。\n"
+"也可通过配置禁用网络检查。"
 
 #: musicbot/bot.py:502
 #, python-format
@@ -197,7 +208,10 @@ msgid "Your environment may not allow the `ping` system command.  Will attempt t
 "MusicBot tried the following command:   %s\n"
 "You should enable ping in your system or container environment for best results.\n"
 "Alternatively disable network checking via config."
-msgstr ""
+msgstr "您的环境可能不允许 `ping` 系统命令。将尝试使用 HTTP ping。\n"
+"MusicBot尝试了以下命令：   %s\n"
+"您应该在您的系统或容器环境中启用ping以获得最佳结果。\n"
+"也可通过配置禁用网络检查。"
 
 #: musicbot/bot.py:517
 msgid "MusicBot detected network is available again."
@@ -243,22 +257,22 @@ msgstr ""
 #: musicbot/bot.py:609
 #, python-format
 msgid "Will try resuming voice session instead of Auto-Joining channel:  %s"
-msgstr ""
+msgstr "将尝试恢复语音会话而不是自动加入通道：  %s"
 
 #: musicbot/bot.py:626
 #, python-format
 msgid "Found owner in voice channel:  %s"
-msgstr ""
+msgstr "在语音频道找到所有者:  %s"
 
 #: musicbot/bot.py:631
 #, python-format
 msgid "Ignoring resumable channel, AutoSummon to owner in channel:  %s"
-msgstr ""
+msgstr "忽略恢复通道，AutoSummon 到所有者在通道:  %s"
 
 #: musicbot/bot.py:636
 #, python-format
 msgid "Ignoring Auto-Join channel, AutoSummon to owner in channel:  %s"
-msgstr ""
+msgstr "忽略自动加入通道, 自动召唤到频道所有者:  %s"
 
 #: musicbot/bot.py:648
 #, python-format
@@ -302,7 +316,7 @@ msgstr "正在获取机器人应用程序信息。"
 #: musicbot/bot.py:767
 #, python-format
 msgid "MusicBot does not have permission to Connect in channel:  %s"
-msgstr ""
+msgstr "MusicBot 没有权限连接到频道:  %s"
 
 #: musicbot/bot.py:771
 #, python-format
@@ -312,7 +326,7 @@ msgstr ""
 #: musicbot/bot.py:776
 #, python-format
 msgid "MusicBot does not have permission to Speak in channel:  %s"
-msgstr ""
+msgstr "MusicBot 没有权限在频道中说话:  %s"
 
 #: musicbot/bot.py:780
 #, python-format
@@ -322,12 +336,12 @@ msgstr ""
 #: musicbot/bot.py:790
 #, python-format
 msgid "Reusing bots VoiceClient from guild:  %s"
-msgstr ""
+msgstr "从公会重新使用机器人语音客户端:  %s"
 
 #: musicbot/bot.py:795
 #, python-format
 msgid "Forcing disconnect on stale VoiceClient in guild:  %s"
-msgstr ""
+msgstr "强制断开旧的公会语音客户端:  %s"
 
 #: musicbot/bot.py:801
 msgid "Disconnect failed or was cancelled?"
@@ -341,7 +355,8 @@ msgstr ""
 #: musicbot/bot.py:813
 msgid "MusicBot could not connect to the channel.\n"
 "Try again later, or restart the bot if this continues."
-msgstr ""
+msgstr "MusicBot 无法连接到频道。\n"
+"请稍后再尝试，如果继续，请重启机器人。"
 
 #: musicbot/bot.py:824
 msgid "MusicBot has a VoiceClient now..."
@@ -376,7 +391,7 @@ msgstr "MusicBot 无法请求发言。"
 #: musicbot/bot.py:865
 #, python-format
 msgid "Disconnecting a MusicPlayer in guild:  %s"
-msgstr ""
+msgstr "正在断开公会中的 MusicPlayer 连接:  %s"
 
 #: musicbot/bot.py:877
 msgid "Disconnecting VoiceClient before we kill the MusicPlayer."
@@ -394,7 +409,7 @@ msgstr "MusicBot 有一个不是语音客户端的语音协议，仍然断开连
 #: musicbot/bot.py:908
 #, python-format
 msgid "Disconnecting a rogue VoiceClient in guild:  %s"
-msgstr ""
+msgstr "正在断开一个公会中的无赖语音客户端:  %s"
 
 #: musicbot/bot.py:932
 msgid "Disconnecting a non-guild VoiceClient..."
@@ -404,7 +419,8 @@ msgstr "断开非公会语音客户端的连接..."
 #, python-format
 msgid "MusicBot.voice_clients list contains a non-VoiceClient object?\n"
 "The object is actually of type:  %s"
-msgstr ""
+msgstr "MusicBot.voice_client list包含一个非语音客户端对象吗？\n"
+"对象实际上是类型：  %s"
 
 #: musicbot/bot.py:952
 #, python-format
@@ -418,7 +434,7 @@ msgstr ""
 
 #: musicbot/bot.py:972
 msgid "[BUG] MusicPlayer is missing a VoiceClient somehow.  You should probably restart the bot."
-msgstr ""
+msgstr "[BUG] MusicPlayer 在某种程度上缺少一个语音客户端。您可能应该重启机器人。"
 
 #: musicbot/bot.py:977
 msgid "MusicPlayer has a VoiceClient that is not connected."
@@ -427,12 +443,12 @@ msgstr "MusicPlayer 有一个未连接的语音客户端。"
 #: musicbot/bot.py:978
 #, python-format
 msgid "MusicPlayer obj:  %r"
-msgstr ""
+msgstr "MusicPlayer obj:  %r"
 
 #: musicbot/bot.py:979
 #, python-format
 msgid "VoiceClient obj:  %r"
-msgstr ""
+msgstr "VoiceClient obj:  %r"
 
 #: musicbot/bot.py:999
 #, python-format
@@ -447,7 +463,8 @@ msgstr ""
 #: musicbot/bot.py:1024
 msgid "The bot is not in a voice channel.\n"
 "Use the summon command to bring the bot to your voice channel."
-msgstr ""
+msgstr "机器人不在语音频道。\n"
+"使用召唤命令将机器人带到您的语音频道。"
 
 #: musicbot/bot.py:1036
 msgid "Something is wrong, we didn't get the VoiceClient."
@@ -549,12 +566,12 @@ msgstr "在玩家完成的活动中，MusicBot 有一个未处理的异常。"
 #: musicbot/bot.py:1460
 #, python-format
 msgid "Expanding auto playlist with entries extracted from:  %s"
-msgstr ""
+msgstr "扩展自动播放列表中从:  %s 提取的条目"
 
 #: musicbot/bot.py:1484
 #, python-format
 msgid "Error adding song from autoplaylist: %s"
-msgstr ""
+msgstr "从自动播放列表添加歌曲时出错： %s"
 
 #: musicbot/bot.py:1487
 msgid "Exception data for above error:"
@@ -575,7 +592,7 @@ msgstr "自动跳过队列条目的自动播放列表条目。"
 #: musicbot/bot.py:1543
 #, python-format
 msgid "MusicPlayer exception for entry: %r"
-msgstr ""
+msgstr "文章的 MusicPlayer 异常： %r"
 
 #: musicbot/bot.py:1549
 msgid "MusicPlayer exception."
@@ -584,7 +601,7 @@ msgstr "MusicPlayer 异常。"
 #: musicbot/bot.py:1573
 #, python-format
 msgid "Auto playlist track could not be played:  %r"
-msgstr ""
+msgstr "无法播放自动播放列表曲目：  %r"
 
 #: musicbot/bot.py:1612
 msgid "Logout under way, ignoring status update event."
@@ -598,17 +615,17 @@ msgstr ""
 #: musicbot/bot.py:1741
 #, python-format
 msgid "Serializing queue for %s"
-msgstr ""
+msgstr "序列化 %s队列"
 
 #: musicbot/bot.py:1767
 #, python-format
 msgid "Deserializing queue for %s"
-msgstr ""
+msgstr "反序列化 %s"
 
 #: musicbot/bot.py:1785
 #, python-format
 msgid "Writing current song for %s"
-msgstr ""
+msgstr "正在为 %s 写当前歌曲"
 
 #: musicbot/bot.py:1810
 #, python-format
@@ -622,27 +639,27 @@ msgstr "[Dev Bug ] 试图发送无效的响应对象。"
 #: musicbot/bot.py:1843
 #, python-format
 msgid "sending embed to: %s"
-msgstr ""
+msgstr "发送嵌入到: %s"
 
 #: musicbot/bot.py:1846
 #, python-format
 msgid "sending text to: %s"
-msgstr ""
+msgstr "正在发送文本到: %s"
 
 #: musicbot/bot.py:1851
 #, python-format
 msgid "Cannot send message to \"%s\", no permission"
-msgstr ""
+msgstr "无法向\"%s\"发送消息，没有权限"
 
 #: musicbot/bot.py:1858
 #, python-format
 msgid "Cannot send message to \"%s\", invalid or deleted channel"
-msgstr ""
+msgstr "无法向\"%s\"发送消息，无效或删除的频道"
 
 #: musicbot/bot.py:1866
 #, python-format
 msgid "Message is over the message size limit (%s)"
-msgstr ""
+msgstr "消息超过了消息大小限制(%s)"
 
 #: musicbot/bot.py:1874
 msgid "Could not send private message, sending in fallback channel instead."
@@ -651,12 +668,12 @@ msgstr "无法发送私信，发送到后退频道中。"
 #: musicbot/bot.py:1892
 #, python-format
 msgid "Rate limited send message, retrying in %s seconds."
-msgstr ""
+msgstr "评分有限的发送信息，在 %s 秒后重试"
 
 #: musicbot/bot.py:1898
 #, python-format
 msgid "Cancelled message retry for:  %s"
-msgstr ""
+msgstr "已取消重试消息:  %s"
 
 #: musicbot/bot.py:1903
 msgid "Rate limited send message, but cannot retry!"
@@ -673,17 +690,17 @@ msgstr "由于HTTP错误发送失败。"
 #: musicbot/bot.py:1940
 #, python-format
 msgid "Cannot delete message \"%s\", no permission"
-msgstr ""
+msgstr "无法删除消息“%s”，没有权限"
 
 #: musicbot/bot.py:1945
 #, python-format
 msgid "Cannot delete message \"%s\", message not found"
-msgstr ""
+msgstr "无法删除消息\"%s\", 消息未找到"
 
 #: musicbot/bot.py:1963
 #, python-format
 msgid "Rate limited message delete, retrying in %s seconds."
-msgstr ""
+msgstr "评分限制信息删除，请在 %s 秒后重试"
 
 #: musicbot/bot.py:1968
 msgid "Rate limited message delete, but cannot retry!"
@@ -696,12 +713,12 @@ msgstr "删除消息失败"
 #: musicbot/bot.py:1973
 #, python-format
 msgid "Got HTTPException trying to delete message: %s"
-msgstr ""
+msgstr "获取 HTTPException 试图删除消息： %s"
 
 #: musicbot/bot.py:2008
 #, python-format
 msgid "Cannot edit message \"%s\", message not found"
-msgstr ""
+msgstr "无法编辑消息“%s”，未找到消息"
 
 #: musicbot/bot.py:2012
 msgid "Sending message instead"
@@ -710,12 +727,12 @@ msgstr "发送消息"
 #: musicbot/bot.py:2029
 #, python-format
 msgid "Rate limited edit message, retrying in %s seconds."
-msgstr ""
+msgstr "评分有限的编辑信息，在 %s 秒后重试"
 
 #: musicbot/bot.py:2035
 #, python-format
 msgid "Cancelled message edit for:  %s"
-msgstr ""
+msgstr "已取消对  %s的消息编辑"
 
 #: musicbot/bot.py:2041
 msgid "Failed to edit message"
@@ -724,7 +741,7 @@ msgstr "编辑消息失败"
 #: musicbot/bot.py:2043
 #, python-format
 msgid "Got HTTPException trying to edit message %s to: %s"
-msgstr ""
+msgstr "获取 HTTPException 尝试编辑消息 %s 到: %s"
 
 #: musicbot/bot.py:2065
 #, python-format
@@ -734,7 +751,7 @@ msgstr ""
 #: musicbot/bot.py:2127
 #, python-format
 msgid "Caught a signal from the OS: %s"
-msgstr ""
+msgstr "捕捉来自OS的信号： %s"
 
 #: musicbot/bot.py:2131
 msgid "Disconnecting and closing down MusicBot..."
@@ -805,7 +822,7 @@ msgstr ""
 #: musicbot/bot.py:2264
 #, python-format
 msgid "Exception in %s"
-msgstr ""
+msgstr "%s 中的异常"
 
 #: musicbot/bot.py:2271
 msgid "MusicBot resumed a session with discord."
@@ -840,22 +857,22 @@ msgstr "公会列表："
 #: musicbot/bot.py:2330 musicbot/bot.py:2356 musicbot/bot.py:8708
 #, python-format
 msgid " - %s"
-msgstr ""
+msgstr " - %s"
 
 #: musicbot/bot.py:2339
 #, python-format
 msgid "Left %s due to bot owner not found"
-msgstr ""
+msgstr "由于机器人所有者未找到左 %s"
 
 #: musicbot/bot.py:2344
 #, python-format
 msgid "Not proceeding with checks in %s servers due to unavailability"
-msgstr ""
+msgstr "由于无法使用 %s 服务器进行检查"
 
 #: musicbot/bot.py:2350
 #, python-format
 msgid "Owner could not be found on any guild (id: %s)\n"
-msgstr ""
+msgstr "在任何公会上找不到所有者 (id: %s)\n"
 
 #: musicbot/bot.py:2359
 msgid "Owner unknown, bot is not on any guilds."
@@ -867,12 +884,15 @@ msgid "To make the bot join a guild, paste this link in your browser. \n"
 "Note: You should be logged into your main account and have \n"
 "manage server permissions on the guild you want the bot to join.\n"
 "  %s"
-msgstr ""
+msgstr "要使机器人加入公会，请将此链接粘贴到您的浏览器。 \n"
+"注意：您应该登录到您的主帐户，并且在您想要机器人加入的公会上有 \n"
+"管理服务器权限。\n"
+"  %s"
 
 #: musicbot/bot.py:2380
 #, python-format
 msgid "Got None for bound channel with ID:  %d"
-msgstr ""
+msgstr "没有找到带有ID的绑定频道:  %d"
 
 #: musicbot/bot.py:2386
 #, python-format
@@ -931,7 +951,7 @@ msgstr ""
 #: musicbot/bot.py:2514
 #, python-format
 msgid "Event on_ready has fired %s times"
-msgstr ""
+msgstr "事件已准备就绪，发射了 %s 次"
 
 #: musicbot/bot.py:2530
 msgid "Getting application info."
@@ -964,12 +984,12 @@ msgstr "选项："
 #: musicbot/bot.py:2581
 #, python-format
 msgid "  Command prefix: %s"
-msgstr ""
+msgstr "  命令前缀： %s"
 
 #: musicbot/bot.py:2582
 #, python-format
 msgid "  Default volume: %d%%"
-msgstr ""
+msgstr "  默认音量: %d%%"
 
 #: musicbot/bot.py:2584
 #, python-format
@@ -979,12 +999,12 @@ msgstr ""
 #: musicbot/bot.py:2591
 #, python-format
 msgid "  Now Playing @mentions: %s"
-msgstr ""
+msgstr "  正在播放 @mentions: %s"
 
 #: musicbot/bot.py:2594
 #, python-format
 msgid "  Auto-Summon: %s"
-msgstr ""
+msgstr "  自动召唤: %s"
 
 #: musicbot/bot.py:2596
 #, python-format
@@ -1002,17 +1022,17 @@ msgstr "序列"
 #: musicbot/bot.py:2604
 #, python-format
 msgid "  Auto-Pause: %s"
-msgstr ""
+msgstr "  自动暂停: %s"
 
 #: musicbot/bot.py:2606
 #, python-format
 msgid "  Delete Messages: %s"
-msgstr ""
+msgstr "  删除消息： %s"
 
 #: musicbot/bot.py:2611
 #, python-format
 msgid "    Delete Invoking: %s"
-msgstr ""
+msgstr "    删除调用: %s"
 
 #: musicbot/bot.py:2615
 #, python-format
@@ -1022,102 +1042,102 @@ msgstr "    删除正在播放中: %s"
 #: musicbot/bot.py:2618
 #, python-format
 msgid "  Debug Mode: %s"
-msgstr ""
+msgstr "  调试模式： %s"
 
 #: musicbot/bot.py:2620
 #, python-format
 msgid "  Downloaded songs will be %s"
-msgstr ""
+msgstr "  下载的歌曲将是 %s"
 
 #: musicbot/bot.py:2624
 #, python-format
 msgid "    Delete if unused for %d days"
-msgstr ""
+msgstr "    如果 %d 天未使用则删除"
 
 #: musicbot/bot.py:2627
 #, python-format
 msgid "    Delete if size exceeds %s"
-msgstr ""
+msgstr "    如果大小超过 %s 则删除"
 
 #: musicbot/bot.py:2630
 #, python-format
 msgid "  Status message: %s"
-msgstr ""
+msgstr "  状态消息: %s"
 
 #: musicbot/bot.py:2632
 #, python-format
 msgid "  Write current songs to file: %s"
-msgstr ""
+msgstr "  将当前歌曲写入文件： %s"
 
 #: musicbot/bot.py:2636
 #, python-format
 msgid "  Author insta-skip: %s"
-msgstr ""
+msgstr "  作者的 insta-skip: %s"
 
 #: musicbot/bot.py:2639
 #, python-format
 msgid "  Embeds: %s"
-msgstr ""
+msgstr "  Embeds: %s"
 
 #: musicbot/bot.py:2641
 #, python-format
 msgid "  Spotify integration: %s"
-msgstr ""
+msgstr "  Spotify 集成: %s"
 
 #: musicbot/bot.py:2644
 #, python-format
 msgid "  Legacy skip: %s"
-msgstr ""
+msgstr "  传统跳过: %s"
 
 #: musicbot/bot.py:2646
 #, python-format
 msgid "  Leave non owners: %s"
-msgstr ""
+msgstr "  留下非所有者: %s"
 
 #: musicbot/bot.py:2650
 #, python-format
 msgid "  Leave inactive VC: %s"
-msgstr ""
+msgstr "  保持非活动虚拟机： %s"
 
 #: musicbot/bot.py:2655
 #, python-format
 msgid "    Timeout: %s seconds"
-msgstr ""
+msgstr "    超时: %s 秒"
 
 #: musicbot/bot.py:2659
 #, python-format
 msgid "  Leave at song end/empty queue: %s"
-msgstr ""
+msgstr "  离开歌曲结尾/空队列： %s"
 
 #: musicbot/bot.py:2663
 #, python-format
 msgid "  Leave when player idles: %s"
-msgstr ""
+msgstr "  当玩家空闲时离开： %s"
 
 #: musicbot/bot.py:2667
 #, python-format
 msgid "    Timeout: %d seconds"
-msgstr ""
+msgstr "    超时: %d 秒"
 
 #: musicbot/bot.py:2668
 #, python-format
 msgid "  Self Deafen: %s"
-msgstr ""
+msgstr "  自聋： %s"
 
 #: musicbot/bot.py:2670
 #, python-format
 msgid "  Per-server command prefix: %s"
-msgstr ""
+msgstr "  服务器命令前缀： %s"
 
 #: musicbot/bot.py:2673
 #, python-format
 msgid "  Search List: %s"
-msgstr ""
+msgstr "  搜索列表： %s"
 
 #: musicbot/bot.py:2675
 #, python-format
 msgid "  Round Robin Queue: %s"
-msgstr ""
+msgstr "  Round Robin 队列: %s"
 
 #: musicbot/bot.py:2705
 #, python-format
@@ -1131,7 +1151,7 @@ msgstr "试图处理 Voice Channot 处于无活动状态，但Bot 没有语音..
 #: musicbot/bot.py:2723
 #, python-format
 msgid "Channel activity already waiting in guild: %s"
-msgstr ""
+msgstr "频道活动已经在公会等待: %s"
 
 #: musicbot/bot.py:2733
 #, python-format
@@ -1141,7 +1161,7 @@ msgstr ""
 #: musicbot/bot.py:2748
 #, python-format
 msgid "Channel activity timer for %s has expired. Disconnecting."
-msgstr ""
+msgstr "%s 频道活动计时器已过期。断开连接。"
 
 #: musicbot/bot.py:2754
 #, python-format
@@ -1151,12 +1171,12 @@ msgstr ""
 #: musicbot/bot.py:2782
 #, python-format
 msgid "Ignoring player inactivity in auto-joined channel:  %s"
-msgstr ""
+msgstr "忽略自动加入频道中的玩家不活动:  %s"
 
 #: musicbot/bot.py:2789
 #, python-format
 msgid "Player activity timer already waiting in guild: %s"
-msgstr ""
+msgstr "玩家活动计时器已经在公会等待: %s"
 
 #: musicbot/bot.py:2797
 #, python-format
@@ -1166,7 +1186,7 @@ msgstr ""
 #: musicbot/bot.py:2809
 #, python-format
 msgid "Player activity timer for %s has expired. Disconnecting."
-msgstr ""
+msgstr "%s 的玩家活动计时器已过期。断开连接。"
 
 #: musicbot/bot.py:2815 musicbot/bot.py:2820
 #, python-format
@@ -1288,7 +1308,7 @@ msgstr "已经在处理自动暂停，忽略此事件。"
 #: musicbot/bot.py:3547
 #, python-format
 msgid "%sVoiceClient not connected, waiting %s seconds to handle auto-pause in guild:  %s"
-msgstr ""
+msgstr "%s语音客户端未连接，等待 %s 秒来处理公会的自动暂停：  %s"
 
 #: musicbot/bot.py:3555
 msgid "Auto-pause waiting was cancelled."
@@ -1301,12 +1321,12 @@ msgstr "一个新的 MusicPlayer 正在连接，忽略旧的自动暂停事件�
 #: musicbot/bot.py:3578
 #, python-format
 msgid "Playing in an empty voice channel, running auto pause for guild: %s"
-msgstr ""
+msgstr "在一个空的语音频道中播放，正在为公会自动暂停游戏： %s"
 
 #: musicbot/bot.py:3585
 #, python-format
 msgid "Previously auto paused player is unpausing for guild: %s"
-msgstr ""
+msgstr "曾经暂停的玩家正在取消对公会的暂停： %s"
 
 #: musicbot/bot.py:3816
 msgid "Cannot use seek if there is nothing playing."
@@ -1416,17 +1436,17 @@ msgstr ""
 #: musicbot/bot.py:4347
 #, python-format
 msgid "Added song(s) at position %s"
-msgstr ""
+msgstr "添加歌曲到位置 %s"
 
 #: musicbot/bot.py:4384
 #, python-format
 msgid "Cannot estimate time until playing for position: %d"
-msgstr ""
+msgstr "无法估计待播放位置前的时间: %d"
 
 #: musicbot/bot.py:4445
 #, python-format
 msgid "Failed to get info from the stream request: %s"
-msgstr ""
+msgstr "无法从流请求获取信息: %s"
 
 #: musicbot/bot.py:4454
 msgid "Streaming playlists is not yet supported."
@@ -1449,12 +1469,12 @@ msgstr ""
 #: musicbot/bot.py:4886
 #, python-format
 msgid "Waiting for summon lock: %s"
-msgstr ""
+msgstr "正在等待召唤锁： %s"
 
 #: musicbot/bot.py:4889
 #, python-format
 msgid "Summon lock acquired for: %s"
-msgstr ""
+msgstr "获得的召唤锁: %s"
 
 #: musicbot/bot.py:4893
 msgid "You are not connected to voice. Try joining a voice channel!"
@@ -1485,7 +1505,8 @@ msgstr ""
 #: musicbot/bot.py:5131 musicbot/bot.py:5166
 msgid "You do not have the permission to remove that entry from the queue.\n"
 "You must be the one who queued it or have instant skip permissions."
-msgstr ""
+msgstr "您没有从队列中删除该项的权限。\n"
+"您必须是排队它或拥有即时跳过权限的人。"
 
 #: musicbot/bot.py:5142 musicbot/bot.py:5147
 msgid "Invalid entry number. Use the queue command to find queue positions."
@@ -1526,7 +1547,8 @@ msgstr ""
 #: musicbot/bot.py:5443
 msgid "No track is playing, cannot set speed.\n"
 "Use the config command to set a default playback speed."
-msgstr ""
+msgstr "没有音轨在播放，无法设置速度。\n"
+"使用配置命令设置默认播放速度。"
 
 #: musicbot/bot.py:5451
 msgid "Speed cannot be applied to streamed media."
