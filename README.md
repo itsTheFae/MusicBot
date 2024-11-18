@@ -3,7 +3,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/Just-Some-Bots/MusicBot.svg)](https://github.com/Just-Some-Bots/MusicBot/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Just-Some-Bots/MusicBot.svg)](https://github.com/Just-Some-Bots/MusicBot/network)
 [![Python version](https://img.shields.io/badge/python-3.8%20to%203.13-blue.svg)](https://python.org)
-[![Crowdin](https://badges.crowdin.net/notmusicbot/localized.svg)](https://crowdin.com/project/notmusicbot)
+[![Translations: 66.2%](https://img.shields.io/badge/Translations-66.2%25-yellow)](./i18n/readme.md)
 [![Discord](https://discordapp.com/api/guilds/129489631539494912/widget.png?style=shield)](https://discord.gg/bots)  
 
 
