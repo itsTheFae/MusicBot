@@ -37,7 +37,9 @@ Checking for updates to MusicBot or dependencies...[0m
 [37mAttempting to join channel:  常规  in guild:  dodozean的服务器[0m
 [37mFinished joining configured channels.[0m
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=PBIlxmug8PU', title='Talking Heads   Life during wartime LIVE   Stop making sense 1984 HQ' file='/home/dodozean/EECS481/MusicBot/audio_cache/youtube-PBIlxmug8PU-Talking_Heads_Life_during_wartime_LIVE_Stop_making_sense_1984_HQ-NA.webm')>[0m
-[K[download] 100% of    5.73MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=PBIlxmug8PU', title='Talking Heads   Life during wartime LIVE   Stop making sense 1984 HQ' file='/home/dodozean/EECS481/MusicBot/audio_cache/youtube-PBIlxmug8PU-Talking_Heads_Life_during_wartime_LIVE_Stop_making_sense_1984_HQ-NA.webm')>[0m
+
+[K[download] 100% of    5.73MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=PBIlxmug8PU', title='Talking Heads   Life during wartime LIVE   Stop making sense 1984 HQ' file='/home/dodozean/EECS481/MusicBot/audio_cache/youtube-PBIlxmug8PU-Talking_Heads_Life_during_wartime_LIVE_Stop_making_sense_1984_HQ-NA.webm')>[0m
 [37mMessage from 1145148517795512340/dodozean: !testready[0m
 [37mStarting Command Tests...[0m
 [37m- Sending CMD 1 of 334:  !help [0m
@@ -1308,7 +1310,9 @@ musicbot.exceptions.ExtractionError: ('Error in yt-dlp while downloading data: %
 [37m- Sending CMD 113 of 334:  !playnow https://open.spotify.com/album/1y8Yw0NDcP2qxbZufIXt7u[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow https://open.spotify.com/album/1y8Yw0NDcP2qxbZufIXt7u[0m
 [37mProcessed 1 of 1 songs in 0.000 seconds at 0.00 s/song[0m
-[K[download] 100% of    3.70MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=2P8RU_dHyi4', title='Meghan Trainor - I'll Be Home (Audio)' file='')>[0m
+
+[K[download] 100% of    3.70MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=2P8RU_dHyi4', title='Meghan Trainor - I'll Be Home (Audio)' file='')>[0m
 [37m- Sending CMD 114 of 334:  !playnow https://open.spotify.com/album/5LbHbwejgZXRZAgzVAjkhj[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow https://open.spotify.com/album/5LbHbwejgZXRZAgzVAjkhj[0m
 [37mProcessed 12 of 12 songs in 0.000 seconds at 0.00 s/song[0m
@@ -1316,7 +1320,9 @@ musicbot.exceptions.ExtractionError: ('Error in yt-dlp while downloading data: %
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=6JA25BIxgtk', title='Alice In Chains - We Die Young (Official HD Video)' file='')>[0m
 [37m- Sending CMD 115 of 334:  !playnow https://soundcloud.com/neilcic/cabinet-man[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow https://soundcloud.com/neilcic/cabinet-man[0m
-[K[download] 100% of    2.25MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=6JA25BIxgtk', title='Alice In Chains - We Die Young (Official HD Video)' file='')>[0m
+
+[K[download] 100% of    2.25MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=6JA25BIxgtk', title='Alice In Chains - We Die Young (Official HD Video)' file='')>[0m
 [37m- Sending CMD 116 of 334:  !playnow https://soundcloud.com/grweston/sets/mashups[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow https://soundcloud.com/grweston/sets/mashups[0m
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=TAqZb52sgpU', title='Alice In Chains - Man in the Box (Official Video)' file='')>[0m
@@ -1452,10 +1458,14 @@ Entry name:  Mashups - #43[0m
 [37mProcessed 43 of 43 songs in 0.009 seconds at 0.00 s/song[0m
 [33mWARNING: Cannot delete message "", message not found[0m
 [37mDownload started:  <URLPlaylistEntry(url='https://soundcloud.com/arcadejump/gettin-lucky-wit-it-arcade', title='Gettin Lucky Wit It (Arcade Jump Mashup)' file='')>[0m
-[K[download] 100% of    2.06MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://soundcloud.com/arcadejump/gettin-lucky-wit-it-arcade', title='Gettin Lucky Wit It (Arcade Jump Mashup)' file='')>[0m
+
+[K[download] 100% of    2.06MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://soundcloud.com/arcadejump/gettin-lucky-wit-it-arcade', title='Gettin Lucky Wit It (Arcade Jump Mashup)' file='')>[0m
 [37m- Sending CMD 117 of 334:  !playnow https://lemondemon.bandcamp.com/album/spirit-phone[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow https://lemondemon.bandcamp.com/album/spirit-phone[0m
-[K[download] 100% of    4.12MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=TAqZb52sgpU', title='Alice In Chains - Man in the Box (Official Video)' file='')>[0m
+
+[K[download] 100% of    4.12MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=TAqZb52sgpU', title='Alice In Chains - Man in the Box (Official Video)' file='')>[0m
 [37mExtraction did not provide a duration for this entry.
 MusicBot cannot estimate queue times until it is downloaded.
 Entry name:  Spiral of Ants[0m
@@ -1502,12 +1512,16 @@ Entry name:  Lifetime Achievement Award[0m
 [37mDownload started:  <URLPlaylistEntry(url='https://soundcloud.com/boybeatsworld/little-wrecking-ball-isosine', title='Little Wrecking Ball (Isosine Mashup X Boy Beats World Edit)' file='')>[0m
 [37m- Sending CMD 118 of 334:  !playnow slippery people talking heads live 84[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow slippery people talking heads live 84[0m
-[K[download] 100% of    1.35MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://soundcloud.com/boybeatsworld/little-wrecking-ball-isosine', title='Little Wrecking Ball (Isosine Mashup X Boy Beats World Edit)' file='')>[0m
+
+[K[download] 100% of    1.35MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://soundcloud.com/boybeatsworld/little-wrecking-ball-isosine', title='Little Wrecking Ball (Isosine Mashup X Boy Beats World Edit)' file='')>[0m
 [33mWARNING: Cannot delete message "", message not found[0m
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=paSczHpWC3I', title='Talking Heads – Slippery People  - Stop Making Sense 1984 Hollywood Pantages Theatre' file='')>[0m
 [37m- Sending CMD 119 of 334:  !playnow ytsearch4:talking heads stop making sense[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow ytsearch4:talking heads stop making sense[0m
-[K[download] 100% of    4.33MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=paSczHpWC3I', title='Talking Heads – Slippery People  - Stop Making Sense 1984 Hollywood Pantages Theatre' file='')>[0m
+
+[K[download] 100% of    4.33MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=paSczHpWC3I', title='Talking Heads – Slippery People  - Stop Making Sense 1984 Hollywood Pantages Theatre' file='')>[0m
 [37mProcessed 4 of 4 songs in 0.000 seconds at 0.00 s/song[0m
 [37m- Sending CMD 120 of 334:  !playnow https://cdn.discordapp.com/attachments/741945274901200897/875075008723046410/cheesed.mp4[0m
 [37mMessage from 1145148517795512340/dodozean: !playnow https://cdn.discordapp.com/attachments/741945274901200897/875075008723046410/cheesed.mp4[0m
@@ -2464,7 +2478,105 @@ musicbot.exceptions.CommandError: Invalid entry number. Use the queue command to
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=ldwpwrW6tno', title='Talking Heads live at Montreux Jazz Festival (1982) [FIXED]' file='')>[0m
 [37m- Sending CMD 187 of 334:  !queue [0m
 [37mMessage from 1145148517795512340/dodozean: !queue[0m
-[K[download]   0.0% of   60.78MiB at  140.70KiB/s ETA 07:22[K[download]   0.0% of   60.78MiB at  387.97KiB/s ETA 02:40[K[download]   0.0% of   60.78MiB at  836.97KiB/s ETA 01:14[K[download]   0.0% of   60.78MiB at    1.64MiB/s ETA 00:37[K[download]   0.0% of   60.78MiB at    3.10MiB/s ETA 00:19[K[download]   0.1% of   60.78MiB at    2.58MiB/s ETA 00:23[K[download]   0.2% of   60.78MiB at    3.10MiB/s ETA 00:19[K[download]   0.4% of   60.78MiB at    4.12MiB/s ETA 00:14[K[download]   0.8% of   60.78MiB at    6.33MiB/s ETA 00:09[K[download]   1.6% of   60.78MiB at    9.46MiB/s ETA 00:06[K[download]   3.3% of   60.78MiB at   13.68MiB/s ETA 00:04[K[download]   6.6% of   60.78MiB at   16.28MiB/s ETA 00:03[K[download]  13.2% of   60.78MiB at   17.68MiB/s ETA 00:02[K[download]  15.8% of   60.78MiB at   19.37MiB/s ETA 00:02[K[download]  15.8% of   60.78MiB at  Unknown B/s ETA Unknown[K[download]  15.8% of   60.78MiB at    2.42MiB/s ETA 00:21[K[download]  15.8% of   60.78MiB at    4.22MiB/s ETA 00:12[K[download]  15.8% of   60.78MiB at    7.21MiB/s ETA 00:07[K[download]  15.8% of   60.78MiB at   10.65MiB/s ETA 00:04[K[download]  15.9% of   60.78MiB at    3.03MiB/s ETA 00:16[K[download]  16.0% of   60.78MiB at    3.50MiB/s ETA 00:14[K[download]  16.2% of   60.78MiB at    4.78MiB/s ETA 00:10[K[download]  16.6% of   60.78MiB at    7.13MiB/s ETA 00:07[K[download]  17.4% of   60.78MiB at    9.06MiB/s ETA 00:05[K[download]  19.1% of   60.78MiB at   12.61MiB/s ETA 00:03[K[download]  22.4% of   60.78MiB at   15.95MiB/s ETA 00:02[K[download]  28.9% of   60.78MiB at   17.32MiB/s ETA 00:02[K[download]  31.6% of   60.78MiB at   14.63MiB/s ETA 00:02[K[download]  31.6% of   60.78MiB at  346.61KiB/s ETA 02:03[K[download]  31.6% of   60.78MiB at  893.23KiB/s ETA 00:47[K[download]  31.6% of   60.78MiB at    1.82MiB/s ETA 00:22[K[download]  31.6% of   60.78MiB at    3.51MiB/s ETA 00:11[K[download]  31.6% of   60.78MiB at    6.26MiB/s ETA 00:06[K[download]  31.7% of   60.78MiB at    4.22MiB/s ETA 00:09[K[download]  31.8% of   60.78MiB at    3.88MiB/s ETA 00:10[K[download]  32.0% of   60.78MiB at    5.80MiB/s ETA 00:07[K[download]  32.4% of   60.78MiB at    7.89MiB/s ETA 00:05[K[download]  33.2% of   60.78MiB at    9.41MiB/s ETA 00:04[K[download]  34.8% of   60.78MiB at   11.35MiB/s ETA 00:03[K[download]  38.1% of   60.78MiB at   15.20MiB/s ETA 00:02[K[download]  44.7% of   60.78MiB at   17.10MiB/s ETA 00:01[K[download]  47.8% of   60.78MiB at   15.69MiB/s ETA 00:02[K[download]  47.8% of   60.78MiB at  110.05KiB/s ETA 04:55[K[download]  47.8% of   60.78MiB at  302.97KiB/s ETA 01:47[K[download]  47.8% of   60.78MiB at  658.89KiB/s ETA 00:49[K[download]  47.8% of   60.78MiB at    1.30MiB/s ETA 00:24[K[download]  47.9% of   60.78MiB at    2.52MiB/s ETA 00:12[K[download]  47.9% of   60.78MiB at    2.29MiB/s ETA 00:13[K[download]  48.0% of   60.78MiB at    2.36MiB/s ETA 00:13[K[download]  48.2% of   60.78MiB at    3.62MiB/s ETA 00:08[K[download]  48.6% of   60.78MiB at    5.73MiB/s ETA 00:05[K[download]  49.4% of   60.78MiB at    8.68MiB/s ETA 00:03[K[download]  51.1% of   60.78MiB at   13.61MiB/s ETA 00:02[K[download]  54.4% of   60.78MiB at   15.69MiB/s ETA 00:01[K[download]  61.0% of   60.78MiB at   16.25MiB/s ETA 00:01[K[download]  64.2% of   60.78MiB at   15.98MiB/s ETA 00:01[K[download]  64.2% of   60.78MiB at  386.22KiB/s ETA 00:57[K[download]  64.3% of   60.78MiB at  976.63KiB/s ETA 00:22[K[download]  64.3% of   60.78MiB at    2.01MiB/s ETA 00:10[K[download]  64.3% of   60.78MiB at    3.81MiB/s ETA 00:05[K[download]  64.3% of   60.78MiB at    7.06MiB/s ETA 00:03[K[download]  64.3% of   60.78MiB at    3.27MiB/s ETA 00:06[K[download]  64.5% of   60.78MiB at    3.80MiB/s ETA 00:05[K[download]  64.7% of   60.78MiB at    5.22MiB/s ETA 00:04[K[download]  65.1% of   60.78MiB at    7.24MiB/s ETA 00:02[K[download]  65.9% of   60.78MiB at   10.20MiB/s ETA 00:02[K[download]  67.5% of   60.78MiB at   15.12MiB/s ETA 00:01[K[download]  70.8% of   60.78MiB at   21.35MiB/s ETA 00:00[K[download]  77.4% of   60.78MiB at   21.91MiB/s ETA 00:00[K[download]  80.6% of   60.78MiB at   18.70MiB/s ETA 00:00[K[download]  80.6% of   60.78MiB at  257.07KiB/s ETA 00:47[K[download]  80.6% of   60.78MiB at  677.67KiB/s ETA 00:17[K[download]  80.6% of   60.78MiB at    1.35MiB/s ETA 00:08[K[download]  80.6% of   60.78MiB at    2.63MiB/s ETA 00:04[K[download]  80.6% of   60.78MiB at    1.81MiB/s ETA 00:06[K[download]  80.7% of   60.78MiB at    2.82MiB/s ETA 00:04[K[download]  80.8% of   60.78MiB at    3.30MiB/s ETA 00:03[K[download]  81.0% of   60.78MiB at    4.81MiB/s ETA 00:02[K[download]  81.4% of   60.78MiB at    6.91MiB/s ETA 00:01[K[download]  82.2% of   60.78MiB at    9.29MiB/s ETA 00:01[K[download]  83.9% of   60.78MiB at   14.31MiB/s ETA 00:00[K[download]  87.2% of   60.78MiB at   19.47MiB/s ETA 00:00[K[download]  93.7% of   60.78MiB at   19.23MiB/s ETA 00:00[K[download]  96.3% of   60.78MiB at   16.33MiB/s ETA 00:00[K[download]  96.3% of   60.78MiB at  132.30KiB/s ETA 00:17[K[download]  96.3% of   60.78MiB at  371.41KiB/s ETA 00:06[K[download]  96.3% of   60.78MiB at  816.08KiB/s ETA 00:02[K[download]  96.3% of   60.78MiB at    1.62MiB/s ETA 00:01[K[download]  96.3% of   60.78MiB at    1.77MiB/s ETA 00:01[K[download]  96.4% of   60.78MiB at    2.45MiB/s ETA 00:00[K[download]  96.5% of   60.78MiB at    3.09MiB/s ETA 00:00[K[download]  96.7% of   60.78MiB at    4.49MiB/s ETA 00:00[K[download]  97.1% of   60.78MiB at    6.13MiB/s ETA 00:00[K[download]  97.9% of   60.78MiB at    9.14MiB/s ETA 00:00[K[download]  99.6% of   60.78MiB at   12.96MiB/s ETA 00:00[K[download] 100.0% of   60.78MiB at   14.13MiB/s ETA 00:00[K[download] 100% of   60.78MiB in 00:00:04 at 14.52MiB/s[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=ldwpwrW6tno', title='Talking Heads live at Montreux Jazz Festival (1982) [FIXED]' file='')>[0m
+
+[K[download]   0.0% of   60.78MiB at  140.70KiB/s ETA 07:22
+[K[download]   0.0% of   60.78MiB at  387.97KiB/s ETA 02:40
+[K[download]   0.0% of   60.78MiB at  836.97KiB/s ETA 01:14
+[K[download]   0.0% of   60.78MiB at    1.64MiB/s ETA 00:37
+[K[download]   0.0% of   60.78MiB at    3.10MiB/s ETA 00:19
+[K[download]   0.1% of   60.78MiB at    2.58MiB/s ETA 00:23
+[K[download]   0.2% of   60.78MiB at    3.10MiB/s ETA 00:19
+[K[download]   0.4% of   60.78MiB at    4.12MiB/s ETA 00:14
+[K[download]   0.8% of   60.78MiB at    6.33MiB/s ETA 00:09
+[K[download]   1.6% of   60.78MiB at    9.46MiB/s ETA 00:06
+[K[download]   3.3% of   60.78MiB at   13.68MiB/s ETA 00:04
+[K[download]   6.6% of   60.78MiB at   16.28MiB/s ETA 00:03
+[K[download]  13.2% of   60.78MiB at   17.68MiB/s ETA 00:02
+[K[download]  15.8% of   60.78MiB at   19.37MiB/s ETA 00:02
+[K[download]  15.8% of   60.78MiB at  Unknown B/s ETA Unknown
+[K[download]  15.8% of   60.78MiB at    2.42MiB/s ETA 00:21
+[K[download]  15.8% of   60.78MiB at    4.22MiB/s ETA 00:12
+[K[download]  15.8% of   60.78MiB at    7.21MiB/s ETA 00:07
+[K[download]  15.8% of   60.78MiB at   10.65MiB/s ETA 00:04
+[K[download]  15.9% of   60.78MiB at    3.03MiB/s ETA 00:16
+[K[download]  16.0% of   60.78MiB at    3.50MiB/s ETA 00:14
+[K[download]  16.2% of   60.78MiB at    4.78MiB/s ETA 00:10
+[K[download]  16.6% of   60.78MiB at    7.13MiB/s ETA 00:07
+[K[download]  17.4% of   60.78MiB at    9.06MiB/s ETA 00:05
+[K[download]  19.1% of   60.78MiB at   12.61MiB/s ETA 00:03
+[K[download]  22.4% of   60.78MiB at   15.95MiB/s ETA 00:02
+[K[download]  28.9% of   60.78MiB at   17.32MiB/s ETA 00:02
+[K[download]  31.6% of   60.78MiB at   14.63MiB/s ETA 00:02
+[K[download]  31.6% of   60.78MiB at  346.61KiB/s ETA 02:03
+[K[download]  31.6% of   60.78MiB at  893.23KiB/s ETA 00:47
+[K[download]  31.6% of   60.78MiB at    1.82MiB/s ETA 00:22
+[K[download]  31.6% of   60.78MiB at    3.51MiB/s ETA 00:11
+[K[download]  31.6% of   60.78MiB at    6.26MiB/s ETA 00:06
+[K[download]  31.7% of   60.78MiB at    4.22MiB/s ETA 00:09
+[K[download]  31.8% of   60.78MiB at    3.88MiB/s ETA 00:10
+[K[download]  32.0% of   60.78MiB at    5.80MiB/s ETA 00:07
+[K[download]  32.4% of   60.78MiB at    7.89MiB/s ETA 00:05
+[K[download]  33.2% of   60.78MiB at    9.41MiB/s ETA 00:04
+[K[download]  34.8% of   60.78MiB at   11.35MiB/s ETA 00:03
+[K[download]  38.1% of   60.78MiB at   15.20MiB/s ETA 00:02
+[K[download]  44.7% of   60.78MiB at   17.10MiB/s ETA 00:01
+[K[download]  47.8% of   60.78MiB at   15.69MiB/s ETA 00:02
+[K[download]  47.8% of   60.78MiB at  110.05KiB/s ETA 04:55
+[K[download]  47.8% of   60.78MiB at  302.97KiB/s ETA 01:47
+[K[download]  47.8% of   60.78MiB at  658.89KiB/s ETA 00:49
+[K[download]  47.8% of   60.78MiB at    1.30MiB/s ETA 00:24
+[K[download]  47.9% of   60.78MiB at    2.52MiB/s ETA 00:12
+[K[download]  47.9% of   60.78MiB at    2.29MiB/s ETA 00:13
+[K[download]  48.0% of   60.78MiB at    2.36MiB/s ETA 00:13
+[K[download]  48.2% of   60.78MiB at    3.62MiB/s ETA 00:08
+[K[download]  48.6% of   60.78MiB at    5.73MiB/s ETA 00:05
+[K[download]  49.4% of   60.78MiB at    8.68MiB/s ETA 00:03
+[K[download]  51.1% of   60.78MiB at   13.61MiB/s ETA 00:02
+[K[download]  54.4% of   60.78MiB at   15.69MiB/s ETA 00:01
+[K[download]  61.0% of   60.78MiB at   16.25MiB/s ETA 00:01
+[K[download]  64.2% of   60.78MiB at   15.98MiB/s ETA 00:01
+[K[download]  64.2% of   60.78MiB at  386.22KiB/s ETA 00:57
+[K[download]  64.3% of   60.78MiB at  976.63KiB/s ETA 00:22
+[K[download]  64.3% of   60.78MiB at    2.01MiB/s ETA 00:10
+[K[download]  64.3% of   60.78MiB at    3.81MiB/s ETA 00:05
+[K[download]  64.3% of   60.78MiB at    7.06MiB/s ETA 00:03
+[K[download]  64.3% of   60.78MiB at    3.27MiB/s ETA 00:06
+[K[download]  64.5% of   60.78MiB at    3.80MiB/s ETA 00:05
+[K[download]  64.7% of   60.78MiB at    5.22MiB/s ETA 00:04
+[K[download]  65.1% of   60.78MiB at    7.24MiB/s ETA 00:02
+[K[download]  65.9% of   60.78MiB at   10.20MiB/s ETA 00:02
+[K[download]  67.5% of   60.78MiB at   15.12MiB/s ETA 00:01
+[K[download]  70.8% of   60.78MiB at   21.35MiB/s ETA 00:00
+[K[download]  77.4% of   60.78MiB at   21.91MiB/s ETA 00:00
+[K[download]  80.6% of   60.78MiB at   18.70MiB/s ETA 00:00
+[K[download]  80.6% of   60.78MiB at  257.07KiB/s ETA 00:47
+[K[download]  80.6% of   60.78MiB at  677.67KiB/s ETA 00:17
+[K[download]  80.6% of   60.78MiB at    1.35MiB/s ETA 00:08
+[K[download]  80.6% of   60.78MiB at    2.63MiB/s ETA 00:04
+[K[download]  80.6% of   60.78MiB at    1.81MiB/s ETA 00:06
+[K[download]  80.7% of   60.78MiB at    2.82MiB/s ETA 00:04
+[K[download]  80.8% of   60.78MiB at    3.30MiB/s ETA 00:03
+[K[download]  81.0% of   60.78MiB at    4.81MiB/s ETA 00:02
+[K[download]  81.4% of   60.78MiB at    6.91MiB/s ETA 00:01
+[K[download]  82.2% of   60.78MiB at    9.29MiB/s ETA 00:01
+[K[download]  83.9% of   60.78MiB at   14.31MiB/s ETA 00:00
+[K[download]  87.2% of   60.78MiB at   19.47MiB/s ETA 00:00
+[K[download]  93.7% of   60.78MiB at   19.23MiB/s ETA 00:00
+[K[download]  96.3% of   60.78MiB at   16.33MiB/s ETA 00:00
+[K[download]  96.3% of   60.78MiB at  132.30KiB/s ETA 00:17
+[K[download]  96.3% of   60.78MiB at  371.41KiB/s ETA 00:06
+[K[download]  96.3% of   60.78MiB at  816.08KiB/s ETA 00:02
+[K[download]  96.3% of   60.78MiB at    1.62MiB/s ETA 00:01
+[K[download]  96.3% of   60.78MiB at    1.77MiB/s ETA 00:01
+[K[download]  96.4% of   60.78MiB at    2.45MiB/s ETA 00:00
+[K[download]  96.5% of   60.78MiB at    3.09MiB/s ETA 00:00
+[K[download]  96.7% of   60.78MiB at    4.49MiB/s ETA 00:00
+[K[download]  97.1% of   60.78MiB at    6.13MiB/s ETA 00:00
+[K[download]  97.9% of   60.78MiB at    9.14MiB/s ETA 00:00
+[K[download]  99.6% of   60.78MiB at   12.96MiB/s ETA 00:00
+[K[download] 100.0% of   60.78MiB at   14.13MiB/s ETA 00:00
+[K[download] 100% of   60.78MiB in 00:00:04 at 14.52MiB/s
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=ldwpwrW6tno', title='Talking Heads live at Montreux Jazz Festival (1982) [FIXED]' file='')>[0m
 [37m- Sending CMD 188 of 334:  !np [0m
 [37mMessage from 1145148517795512340/dodozean: !np[0m
 [33mWARNING: Cannot delete message "", message not found[0m
@@ -2591,7 +2703,9 @@ musicbot.exceptions.CommandError: ('`%(new_volume)s` is not a valid number', {'n
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=PBIlxmug8PU', title='Talking Heads   Life during wartime LIVE   Stop making sense 1984 HQ' file='')>[0m
 [37m- Sending CMD 225 of 334:  !karaoke [0m
 [37mMessage from 1145148517795512340/dodozean: !karaoke[0m
-[K[download] 100% of    5.73MiB[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=PBIlxmug8PU', title='Talking Heads   Life during wartime LIVE   Stop making sense 1984 HQ' file='')>[0m
+
+[K[download] 100% of    5.73MiB
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=PBIlxmug8PU', title='Talking Heads   Life during wartime LIVE   Stop making sense 1984 HQ' file='')>[0m
 [37m- Sending CMD 226 of 334:  !autoplaylist [0m
 [37mMessage from 1145148517795512340/dodozean: !autoplaylist[0m
 [37m- Sending CMD 227 of 334:  !autoplaylist +[0m
@@ -3118,7 +3232,21 @@ Done. Finally....
 Took 1206.852 seconds.
 [33mWARNING: Cannot delete message "", message not found[0m
 [37mDownload started:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=dZEnQogAd8U', title='Centuries - Fall Out Boy Lyrics' file='')>[0m
-[K[download]   0.0% of    3.47MiB at  372.46KiB/s ETA 00:09[K[download]   0.1% of    3.47MiB at  955.49KiB/s ETA 00:03[K[download]   0.2% of    3.47MiB at    1.94MiB/s ETA 00:01[K[download]   0.4% of    3.47MiB at    3.71MiB/s ETA 00:00[K[download]   0.9% of    3.47MiB at    2.02MiB/s ETA 00:01[K[download]   1.8% of    3.47MiB at    2.99MiB/s ETA 00:01[K[download]   3.6% of    3.47MiB at    3.64MiB/s ETA 00:00[K[download]   7.2% of    3.47MiB at    4.47MiB/s ETA 00:00[K[download]  14.4% of    3.47MiB at    6.72MiB/s ETA 00:00[K[download]  28.8% of    3.47MiB at   10.27MiB/s ETA 00:00[K[download]  57.5% of    3.47MiB at   15.73MiB/s ETA 00:00[K[download] 100.0% of    3.47MiB at   19.97MiB/s ETA 00:00[K[download] 100% of    3.47MiB in 00:00:00 at 12.97MiB/s[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=dZEnQogAd8U', title='Centuries - Fall Out Boy Lyrics' file='')>[0m
+
+[K[download]   0.0% of    3.47MiB at  372.46KiB/s ETA 00:09
+[K[download]   0.1% of    3.47MiB at  955.49KiB/s ETA 00:03
+[K[download]   0.2% of    3.47MiB at    1.94MiB/s ETA 00:01
+[K[download]   0.4% of    3.47MiB at    3.71MiB/s ETA 00:00
+[K[download]   0.9% of    3.47MiB at    2.02MiB/s ETA 00:01
+[K[download]   1.8% of    3.47MiB at    2.99MiB/s ETA 00:01
+[K[download]   3.6% of    3.47MiB at    3.64MiB/s ETA 00:00
+[K[download]   7.2% of    3.47MiB at    4.47MiB/s ETA 00:00
+[K[download]  14.4% of    3.47MiB at    6.72MiB/s ETA 00:00
+[K[download]  28.8% of    3.47MiB at   10.27MiB/s ETA 00:00
+[K[download]  57.5% of    3.47MiB at   15.73MiB/s ETA 00:00
+[K[download] 100.0% of    3.47MiB at   19.97MiB/s ETA 00:00
+[K[download] 100% of    3.47MiB in 00:00:00 at 12.97MiB/s
+[K[37mDownload complete:  <URLPlaylistEntry(url='https://www.youtube.com/watch?v=dZEnQogAd8U', title='Centuries - Fall Out Boy Lyrics' file='')>[0m
 [37mPlaying in an empty voice channel, running auto pause for guild: dodozean的服务器[0m
 
 [33mWARNING: Caught a signal from the OS: SIGINT[0m
