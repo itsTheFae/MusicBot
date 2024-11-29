@@ -24,3 +24,5 @@ config/playlists/
 media/
 
 docker-compose.yml
+
+/env*/
