@@ -1,11 +1,13 @@
 import curses
 import json
+import textwrap
+from collections import defaultdict
 from curses import textpad
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from musicbot import parse_write_base_arg, write_path
 from musicbot.aliases import Aliases
-from musicbot.config import Config
+from musicbot.config import Config, ConfigOption
 from musicbot.constants import (
     DATA_FILE_SERVERS,
     DATA_GUILD_FILE_OPTIONS,
@@ -92,11 +94,242 @@ def get_text_input(lines: int, cols: int, y: int, x: int) -> str:
 
 
 def config_options(win: curses.window, stdscr: curses.window) -> bool:
+    M_PICK_SECTION = 0
+    M_PICK_OPTION = 1
+    M_EDIT_OPTION = 2
+
     mgr = Config(write_path(DEFAULT_OPTIONS_FILE))
+    sections = mgr.parser.sections()
 
-    edits_made = False
+    edited_options: Set[ConfigOption] = set()
+    edit_error_msg = ""
+    edit_buffer = ""
+    edit_mode = M_PICK_SECTION
+    sct_selno = 0
+    opt_selno = 0
+    opt_viewno = 0
 
-    return edits_made
+    missing_options: Dict[str, List[str]] = defaultdict(list)
+    for mopt in mgr.register.ini_missing_options:
+        missing_options[mopt.section].append(mopt.option)
+
+    while True:
+        # setup the window for this frame.
+        max_y, max_x = win.getmaxyx()
+        win.clear()
+
+        # update selected section
+        selected_sct: str = sections[sct_selno]
+
+        # Layout window.
+        win.hline(2, 0, curses.ACS_HLINE, max_x)
+        win.vline(2, 30, curses.ACS_VLINE, max_y)
+        win.addch(2, 30, curses.ACS_TTEE)
+        if edit_error_msg:
+            win.addstr(0, 1, edit_error_msg, curses.color_pair(12))
+        else:
+            win.addstr(0, 1, "Select a section and option to edit.")
+        win.addstr(1, 1, "Section:", curses.A_BOLD)
+        win.addstr(1, 10, "[", curses.A_DIM)
+        if edit_mode == M_PICK_SECTION:
+            win.addstr(1, 11, selected_sct, curses.color_pair(1))
+        else:
+            win.addstr(1, 11, selected_sct)
+        win.addstr(1, 11 + len(selected_sct), "]", curses.A_DIM)
+
+        # Show HUD
+        hud = " [F2] Save  [F5] Reload  [ESC] Go Back"
+        pad = max_x - len(hud) - 31
+        hud += " " * pad
+        win.addstr(
+            max_y - 1, 31, hud[: max_x - 32], curses.color_pair(1) | curses.A_BOLD
+        )
+
+        # build options from the above selected section
+        options = mgr.parser.options(selected_sct) + missing_options[selected_sct]
+        selected_opt = mgr.register.get_config_option(selected_sct, options[opt_selno])
+        opt_viewno = max(0, (opt_selno - (max_y - 3)) + 1)
+        visopts = options[opt_viewno : opt_viewno + (max_y - 3)]
+        cnf_opt: Optional[ConfigOption] = None
+        for i, opt in enumerate(visopts):
+            cnf_opt = mgr.register.get_config_option(selected_sct, opt)
+            if i + opt_viewno == opt_selno and edit_mode == M_PICK_OPTION:
+                flags = curses.color_pair(1)
+                # If register returns None, the option does not exist.
+                if cnf_opt is None:
+                    flags = curses.color_pair(11)
+                if cnf_opt in edited_options:
+                    flags = curses.color_pair(15)
+                # If opt is listed in missing_options, mark it so.
+                elif opt in missing_options[selected_sct]:
+                    flags = curses.color_pair(13)
+                win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
+            else:
+                flags = 0
+                if cnf_opt is None:
+                    flags = curses.color_pair(10)
+                if cnf_opt in edited_options:
+                    flags = curses.color_pair(14)
+                elif opt in missing_options[selected_sct]:
+                    flags = curses.color_pair(12)
+                win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
+
+        # build info for selected option.
+        if selected_opt:
+            max_desc_x = max_x - 34
+            # vals = mgr.register.get_values(selected_opt)
+            comment = selected_opt.comment
+            if selected_opt.comment_args:
+                comment %= selected_opt.comment_args
+            comment_lines = []
+            for line in comment.split("\n"):
+                if len(line) > max_desc_x:
+                    ls = textwrap.wrap(line, width=max_desc_x)
+                    comment_lines += ls
+                else:
+                    comment_lines.append(line)
+
+            lbl_option = "Option:"
+            lbl_default = "Default Setting:"
+            lbl_current = "Current Setting:"
+            lbl_desc = "Description:"
+
+            # option name
+            win.addstr(3, 31, lbl_option, curses.A_BOLD)
+            win.addstr(3, 32 + len(lbl_option), selected_opt.option)
+
+            # default value
+            dval = mgr.register.to_ini(selected_opt, use_default=True)
+            win.addstr(4, 31, lbl_default, curses.A_BOLD)
+            win.addstr(4, 32 + len(lbl_default), dval)
+
+            # current setting
+            cval = mgr.register.to_ini(selected_opt)
+            win.addstr(5, 31, lbl_current, curses.A_BOLD)
+            # win.addstr(5, 32 + len(lbl_current), str(vals))
+            if selected_opt.option in missing_options[selected_sct]:
+                win.addstr(
+                    5,
+                    33 + len(lbl_current),
+                    "This option is missing from your INI file.",
+                    curses.color_pair(12),
+                )
+            win.addstr(6, 33, cval)
+
+            # description
+            win.addstr(8, 31, lbl_desc, curses.A_BOLD)
+            for i, line in enumerate(comment_lines):
+                win.addstr(9 + i, 33, line)
+
+        # display a message for non-existing options.
+        else:
+            win.addstr(4, 33, "This option is invalid.", curses.A_BOLD)
+            win.addstr(5, 33, "It can be removed from your INI file.")
+
+        win.refresh()
+
+        # handle getting the edited string.
+        edit_buffer = ""
+        if edit_mode == M_EDIT_OPTION:
+            if selected_opt is None:
+                win.addstr(6, 33, "You cannot edit this option.", curses.color_pair(10))
+                edit_mode = M_PICK_OPTION
+            else:
+                # TODO: Maybe add ConfigOption var for input length.
+                edit_buffer = get_text_input(1, 200, 9, 33)
+                last_ini_val = mgr.register.to_ini(selected_opt)
+                edit_mode = M_PICK_OPTION
+                edit_error_msg = ""
+                no_error = mgr.update_option(selected_opt, edit_buffer)
+                cur_ini_val = mgr.register.to_ini(selected_opt)
+                if not no_error or cur_ini_val == last_ini_val:
+                    edit_error_msg = (
+                        f"The option was not updated: {selected_opt.option}"
+                    )
+                else:
+                    edited_options.add(selected_opt)
+
+        win.refresh()
+
+        # get this frame's key code input, if we didn't just leave edit mode.
+        if edit_buffer:
+            key = 0
+        else:
+            key = stdscr.getch()
+
+        # select previous
+        if key in KEYS_NAV_PREV:
+            edit_error_msg = ""
+            if edit_mode == M_PICK_OPTION:
+                if opt_selno > 0:
+                    opt_selno -= 1
+                else:
+                    opt_selno = len(options) - 1
+            elif edit_mode == M_PICK_SECTION:
+                if sct_selno > 0:
+                    sct_selno -= 1
+                else:
+                    sct_selno = len(sections) - 1
+
+        # select next
+        elif key in KEYS_NAV_NEXT:
+            edit_error_msg = ""
+            if edit_mode == M_PICK_OPTION:
+                if opt_selno < (len(options) - 1):
+                    opt_selno += 1
+                else:
+                    opt_selno = 0
+            elif edit_mode == M_PICK_SECTION:
+                if sct_selno < (len(sections) - 1):
+                    sct_selno += 1
+                else:
+                    sct_selno = 0
+
+        # confirm selection
+        elif key in KEYS_ENTER:
+            edit_error_msg = ""
+            # picking aliases
+            if edit_mode == M_PICK_SECTION:
+                edit_mode = M_PICK_OPTION
+                opt_selno = 0
+            # picking alias component fields
+            elif edit_mode == M_PICK_OPTION:
+                edit_mode = M_EDIT_OPTION
+
+        # Reload data
+        elif key == curses.KEY_F5:
+            mgr = Config(write_path(DEFAULT_OPTIONS_FILE))
+            sections = mgr.parser.sections()
+            edited_options.clear()
+            missing_options.clear()
+            for mopt in mgr.register.ini_missing_options:
+                missing_options[mopt.section].append(mopt.option)
+
+        # Save data
+        elif key == curses.KEY_F2:
+            eopts = list(edited_options)
+            for eopt in eopts:
+                if mgr.save_option(eopt):
+                    edited_options.discard(eopt)
+
+        # Go back
+        elif key == KEY_ESCAPE:
+            if edit_mode == M_PICK_SECTION:
+                break
+            if edit_mode == M_PICK_OPTION:
+                edit_mode = M_PICK_SECTION
+                opt_selno = 0
+
+        # handle resize
+        elif key == curses.KEY_RESIZE:
+            ny, nx = stdscr.getmaxyx()
+            curses.resize_term(ny, nx)
+            curses.update_lines_cols()
+            win.resize(ny - 3, nx)
+            stdscr.refresh()
+            win.refresh()
+
+    return bool(edited_options)
 
 
 def config_permissions(win: curses.window, stdscr: curses.window) -> bool:
@@ -544,6 +777,12 @@ def main(stdscr: curses.window) -> None:
     curses.start_color()
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.init_pair(2, curses.COLOR_BLACK, curses.COLOR_YELLOW)
+    curses.init_pair(10, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(11, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(12, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    curses.init_pair(13, curses.COLOR_YELLOW, curses.COLOR_WHITE)
+    curses.init_pair(14, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(15, curses.COLOR_BLUE, curses.COLOR_WHITE)
 
     # Create a list of config types to manage.
     config_files = {
