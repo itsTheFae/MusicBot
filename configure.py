@@ -460,12 +460,23 @@ class ConfigAssistantTextSystem:
                         "This option is missing from your INI file.",
                         curses.color_pair(12),
                     )
-                self.win.addstr(6, 33, cval)
+                cflags = 0
+                if len(cval) >= 199:
+                    cflags = curses.color_pair(12)
+                if len(cval) <= max_desc_x:
+                    self.win.addstr(6, 33, cval, cflags)
+                    last_y = 7
+                else:
+                    cval_lines = textwrap.wrap(cval, width=max_desc_x)
+                    for i, line in enumerate(cval_lines):
+                        y = 6 + i
+                        self.win.addstr(y, 33, line, cflags)
+                        last_y = y + 1
 
                 # description
-                self.win.addstr(8, 31, lbl_desc, curses.A_BOLD)
+                self.win.addstr(last_y + 1, 31, lbl_desc, curses.A_BOLD)
                 for i, line in enumerate(comment_lines):
-                    self.win.addstr(9 + i, 33, line)
+                    self.win.addstr(last_y + 2 + i, 33, line)
 
             # display a message for non-existing options.
             else:
