@@ -39,7 +39,14 @@ MODE_EDIT_FIELD = 3
 
 
 class ServerData:
+    """
+    Represents a single discord server's options.json data.
+    """
+
     def __init__(self, guild_id: str, guild_name: Optional[str]) -> None:
+        """
+        Create a server data object and load in the options data.
+        """
         self.id = guild_id
         if isinstance(guild_name, str):
             self.name = guild_name
@@ -55,19 +62,23 @@ class ServerData:
 
     @property
     def has_options(self) -> bool:
+        """Test if the server has a data file."""
         return self.path.is_file()
 
     def __hash__(self) -> int:
         return int(self.id)
 
     def set(self, option: str, value: Any) -> None:
+        """Set the server option value to the given value."""
         self._options[option] = value
         self.edited = True
 
     def get(self, option: str, default: str) -> Any:
+        """Get a server option value or return the given default."""
         return self._options.get(option, default)
 
     def load(self) -> None:
+        """Read the options.json file."""
         parsed: Dict[str, Any] = {}
         if not self.path.is_file():
             self._options = parsed
@@ -80,18 +91,10 @@ class ServerData:
         self._options = parsed
 
     def save(self) -> None:
+        """Save the options.json file"""
         with open(self.path, "w", encoding="utf8") as fh:
             json.dump(self._options, fh)
         self.edited = False
-
-
-def get_curses_key_const(key: int) -> List[str]:
-    c = []
-    for a in dir(curses):
-        v = getattr(curses, a)
-        if isinstance(v, int) and v == key:
-            c.append(a)
-    return c
 
 
 class ConfigAssistantTextSystem:
@@ -101,6 +104,10 @@ class ConfigAssistantTextSystem:
     """
 
     def __init__(self, stdscr: curses.window) -> None:
+        """
+        The CATS initializer which starts CATS.
+        Should be called form curses.wrapper()
+        """
         self.scr = stdscr
         self.win = curses.newwin(
             curses.LINES - 3,  # pylint: disable=no-member
@@ -139,6 +146,7 @@ class ConfigAssistantTextSystem:
         self.main_screen()
 
     def main_screen(self) -> None:
+        """Process the CATS main menu screen."""
         # Create a list of config types to manage.
         config_files = {
             "Options": "Manage settings saved in options.ini file.",
@@ -216,6 +224,10 @@ class ConfigAssistantTextSystem:
     def get_text_input(
         self, lines: int, cols: int, y: int, x: int, value: str = ""
     ) -> str:
+        """
+        Create a single-line text input with optional value for editing.
+        Value is returned with leading and trailing space removed.
+        """
         curses.curs_set(1)
         twin = curses.newwin(lines, cols, y, x)
         twin.addstr(0, 0, value)
@@ -323,6 +335,7 @@ class ConfigAssistantTextSystem:
         return False
 
     def config_options(self) -> bool:
+        """Run CATS in options editing mode."""
         if not self.mgr_opts:
             self.mgr_opts = Config(write_path(DEFAULT_OPTIONS_FILE))
         sections = self.mgr_opts.parser.sections()
@@ -524,6 +537,7 @@ class ConfigAssistantTextSystem:
         return bool(edited_options)
 
     def config_permissions(self) -> bool:
+        """Run CATS in Permissions editing mode."""
         if not self.mgr_perms:
             self.mgr_perms = Permissions(write_path(DEFAULT_PERMS_FILE))
 
@@ -745,6 +759,7 @@ class ConfigAssistantTextSystem:
         return bool(edited_options)
 
     def config_aliases(self) -> bool:
+        """Run CATS in Alias editing mode."""
         if not self.mgr_alias:
             self.mgr_alias = Aliases(write_path(DEFAULT_COMMAND_ALIAS_FILE), [])
 
@@ -920,6 +935,7 @@ class ConfigAssistantTextSystem:
         return edits_made
 
     def config_servers(self) -> bool:
+        """Run CATS in Server Data editing mode."""
         data_path = write_path(DEFAULT_DATA_DIR)
         servers_path = data_path.joinpath(DATA_FILE_SERVERS)
         opt_pattern = "*/"
