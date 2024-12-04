@@ -1,12 +1,14 @@
 import curses
 import json
+import re
 import textwrap
 from collections import defaultdict
 from curses import textpad
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable, DefaultDict, Dict, List, Optional, Set
 
 from musicbot import parse_write_base_arg, write_path
 from musicbot.aliases import Aliases
+from musicbot.bot import MusicBot
 from musicbot.config import Config, ConfigOption
 from musicbot.constants import (
     DATA_FILE_SERVERS,
@@ -142,6 +144,9 @@ class ConfigAssistantTextSystem:
         self.mgr_perms: Optional[Permissions] = None
         self.mgr_opts: Optional[Config] = None
         self.mgr_srvs: List[ServerData] = []
+        self.edited_opts: Set[ConfigOption] = set()
+        self.edited_perms: Set[ConfigOption] = set()
+        self.edited_aliases: Set[str] = set()
 
         self.main_screen()
 
@@ -168,11 +173,19 @@ class ConfigAssistantTextSystem:
             c = 2
             for i, option in enumerate(config_types):
                 opt_str = f" {option} "
+                flags = 0
                 if i == config_sel:
-                    self.scr.addstr(1, c, opt_str, curses.color_pair(1))
+                    flags = curses.color_pair(1)
+                    if config_edited[i]:
+                        flags = curses.color_pair(15)
+                    self.scr.addstr(1, c, opt_str, flags)
                 else:
-                    self.scr.addstr(1, c, opt_str)
+                    if config_edited[i]:
+                        flags = curses.color_pair(14)
+                    self.scr.addstr(1, c, opt_str, flags)
                 c += len(opt_str)
+                if config_edited[i]:
+                    self.scr.addstr(4, 2, "You have unsaved edits!", curses.color_pair(14))
             self.scr.hline(2, 0, curses.ACS_HLINE, max_x)
             self.scr.addstr(3, 2, config_files[config_types[config_sel]])
 
@@ -192,7 +205,16 @@ class ConfigAssistantTextSystem:
                 selected = True
             elif key == KEY_ESCAPE:
                 selected = False
-                break
+                if any(x for x in config_edited):
+                    self.scr.addstr(4, 2, "You have unsaved edits!", curses.color_pair(10))
+                    self.scr.addstr(5, 2, "Press [ESC] again to exit anyway.", curses.color_pair(10) | curses.A_BOLD)
+                    key = self.scr.getch()
+                    if key == KEY_ESCAPE:
+                        break
+                    else:
+                        continue
+                else:
+                    break
 
             if selected:
                 # enter Options editor
@@ -318,6 +340,8 @@ class ConfigAssistantTextSystem:
         # Go back
         elif key == KEY_ESCAPE:
             if self.edit_mode == MODE_PICK_SECTION:
+                self.opt_selno = 0
+                self.sct_selno = 0
                 return True
             if self.edit_mode == MODE_PICK_OPTION:
                 self.edit_mode = MODE_PICK_SECTION
@@ -340,7 +364,6 @@ class ConfigAssistantTextSystem:
             self.mgr_opts = Config(write_path(DEFAULT_OPTIONS_FILE))
         sections = self.mgr_opts.parser.sections()
 
-        edited_options: Set[ConfigOption] = set()
         edit_buffer = ""
 
         missing_options: Dict[str, List[str]] = defaultdict(list)
@@ -348,18 +371,18 @@ class ConfigAssistantTextSystem:
             missing_options[mopt.section].append(mopt.option)
 
         def save_callback() -> None:
-            eopts = list(edited_options)
+            eopts = list(self.edited_opts)
             if not self.mgr_opts:
                 return
             for eopt in eopts:
                 if self.mgr_opts.save_option(eopt):
-                    edited_options.discard(eopt)
+                    self.edited_opts.discard(eopt)
 
         def reload_callback() -> None:
             nonlocal sections
             self.mgr_opts = Config(write_path(DEFAULT_OPTIONS_FILE))
             sections = self.mgr_opts.parser.sections()
-            edited_options.clear()
+            self.edited_opts.clear()
             missing_options.clear()
             for mopt in self.mgr_opts.register.ini_missing_options:
                 missing_options[mopt.section].append(mopt.option)
@@ -417,7 +440,7 @@ class ConfigAssistantTextSystem:
                     # If register returns None, the option does not exist.
                     if cnf_opt is None:
                         flags = curses.color_pair(11)
-                    if cnf_opt in edited_options:
+                    if cnf_opt in self.edited_opts:
                         flags = curses.color_pair(15)
                     # If opt is listed in missing_options, mark it so.
                     elif opt in missing_options[selected_sct]:
@@ -427,7 +450,7 @@ class ConfigAssistantTextSystem:
                     flags = 0
                     if cnf_opt is None:
                         flags = curses.color_pair(10)
-                    if cnf_opt in edited_options:
+                    if cnf_opt in self.edited_opts:
                         flags = curses.color_pair(14)
                     elif opt in missing_options[selected_sct]:
                         flags = curses.color_pair(12)
@@ -519,7 +542,7 @@ class ConfigAssistantTextSystem:
                             f"The option was not updated: {selected_opt.option}"
                         )
                     else:
-                        edited_options.add(selected_opt)
+                        self.edited_opts.add(selected_opt)
 
             self.win.refresh()
 
@@ -534,7 +557,7 @@ class ConfigAssistantTextSystem:
                 if goback:
                     break
 
-        return bool(edited_options)
+        return bool(self.edited_opts)
 
     def config_permissions(self) -> bool:
         """Run CATS in Permissions editing mode."""
@@ -545,7 +568,6 @@ class ConfigAssistantTextSystem:
 
         selected_group: str = ""
         selected_opt: Optional[ConfigOption] = None
-        edited_options: Set[ConfigOption] = set()
         edit_buffer: str = ""
 
         missing_options: Dict[str, List[str]] = defaultdict(list)
@@ -556,18 +578,18 @@ class ConfigAssistantTextSystem:
             if self.mgr_perms is None:
                 return
             saved_groups: Set[str] = set()
-            opts = list(edited_options)
+            opts = list(self.edited_perms)
             for eopt in opts:
                 if eopt.section not in saved_groups:
                     self.mgr_perms.save_group(eopt.section)
-                edited_options.discard(eopt)
+                self.edited_perms.discard(eopt)
             reload_callback()
 
         def reload_callback() -> None:
             nonlocal groups
             self.mgr_perms = Permissions(write_path(DEFAULT_PERMS_FILE))
             groups = self.mgr_perms.config.sections()
-            edited_options.clear()
+            self.edited_perms.clear()
             missing_options.clear()
             for mopt in self.mgr_perms.register.ini_missing_options:
                 missing_options[mopt.section].append(mopt.option)
@@ -579,7 +601,7 @@ class ConfigAssistantTextSystem:
             if self.mgr_perms is None or selected_opt is None:
                 return
             self.mgr_perms.remove_group(selected_opt.section)
-            edited_options.add(selected_opt)
+            self.edited_perms.add(selected_opt)
 
         def add_callback() -> None:
             nonlocal groups
@@ -648,14 +670,14 @@ class ConfigAssistantTextSystem:
                     # If register returns None, the option does not exist.
                     if cnf_opt is None:
                         flags = curses.color_pair(11)
-                    if cnf_opt in edited_options:
+                    if cnf_opt in self.edited_perms:
                         flags = curses.color_pair(15)
                     self.win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
                 else:
                     flags = 0
                     if cnf_opt is None:
                         flags = curses.color_pair(10)
-                    if cnf_opt in edited_options:
+                    if cnf_opt in self.edited_perms:
                         flags = curses.color_pair(14)
                     self.win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
 
@@ -739,7 +761,7 @@ class ConfigAssistantTextSystem:
                             f"The option was not updated: {selected_opt.option}"
                         )
                     else:
-                        edited_options.add(selected_opt)
+                        self.edited_perms.add(selected_opt)
 
             self.win.refresh()
 
@@ -756,7 +778,7 @@ class ConfigAssistantTextSystem:
                 if goback:
                     break
 
-        return bool(edited_options)
+        return bool(self.edited_perms)
 
     def config_aliases(self) -> bool:
         """Run CATS in Alias editing mode."""
@@ -765,7 +787,6 @@ class ConfigAssistantTextSystem:
 
         # Set up vars and selection list.
         aliases = []
-        edits_made = False
         edit_buffer = ""
         new_alias_name = ""
 
@@ -773,16 +794,14 @@ class ConfigAssistantTextSystem:
             return ["[New]"] + sorted(mgr.aliases.keys())
 
         def save_callback() -> None:
-            nonlocal edits_made
             if self.mgr_alias:
                 self.mgr_alias.save()
-                edits_made = False
+                self.edited_aliases.clear()
 
         def reload_callback() -> None:
-            nonlocal edits_made
             if self.mgr_alias:
                 self.mgr_alias.load()
-                edits_made = False
+                self.edited_aliases.clear()
 
         # run output/update loop.
         while True:
@@ -817,9 +836,13 @@ class ConfigAssistantTextSystem:
                 if self.sct_selno == i + alias_viewno:
                     selected_alias = alias
                     selected_cmd = cmd
-                    flags |= curses.color_pair(1)
+                    flags = curses.color_pair(1)
+                    if alias in self.edited_aliases:
+                        flags = curses.color_pair(15)
                     self.win.addstr(i, 0, f" {alias[:11]} ", flags)
                 else:
+                    if alias in self.edited_aliases:
+                        flags = curses.color_pair(14)
                     self.win.addstr(i, 0, f" {alias[:11]} ", flags)
 
             # build info display for selected alias.
@@ -876,7 +899,7 @@ class ConfigAssistantTextSystem:
                 if self.opt_selno == 0:
                     edit_buffer = self.get_text_input(1, 20, 4, 17)
                     if edit_buffer:
-                        edits_made = True
+                        self.edited_aliases.add(edit_buffer)
                         # save new alias name to buffer and move to command field.
                         if self.sct_selno == 0:
                             new_alias_name = edit_buffer
@@ -899,7 +922,6 @@ class ConfigAssistantTextSystem:
                 elif self.opt_selno == 1:
                     edit_buffer = self.get_text_input(1, 20, 6, 17)
                     if edit_buffer:
-                        edits_made = True
                         if new_alias_name:
                             self.mgr_alias.make_alias(new_alias_name, edit_buffer, "")
                             # get the new index value.
@@ -910,12 +932,13 @@ class ConfigAssistantTextSystem:
                             self.mgr_alias.make_alias(
                                 selected_alias, edit_buffer, edit_cmd[1]
                             )
+                            self.edited_aliases.add(selected_alias)
                     self.edit_mode = MODE_PICK_FIELD
 
                 # edited arguments field
                 elif self.opt_selno == 2:
                     edit_buffer = self.get_text_input(1, 60, 8, 17)
-                    edits_made = True
+                    self.edited_aliases.add(selected_alias)
                     self.mgr_alias.make_alias(selected_alias, edit_cmd[0], edit_buffer)
                     self.edit_mode = MODE_PICK_FIELD
 
@@ -932,7 +955,7 @@ class ConfigAssistantTextSystem:
                 if goback:
                     break
 
-        return edits_made
+        return bool(self.edited_aliases)
 
     def config_servers(self) -> bool:
         """Run CATS in Server Data editing mode."""
@@ -966,7 +989,9 @@ class ConfigAssistantTextSystem:
 
             return list(srvs.values())
 
-        self.mgr_srvs = get_servers()
+        if not self.mgr_srvs:
+            self.mgr_srvs = get_servers()
+
         edit_buffer = ""
         selected_srv = self.mgr_srvs[0]
         while True:
@@ -992,12 +1017,16 @@ class ConfigAssistantTextSystem:
             for i, srv in enumerate(visible):
                 flags = 0
                 if not srv.has_options:
-                    flags |= curses.A_DIM
+                    flags = curses.A_DIM
                 if i + srv_viewno == self.sct_selno:
                     selected_srv = srv
-                    flags |= curses.color_pair(1)
+                    flags = curses.color_pair(1)
+                    if srv.edited:
+                        flags = curses.color_pair(15)
                     self.win.addstr(i + 2, 0, f" {srv.name[:12]} ", flags)
                 else:
+                    if srv.edited:
+                        flags = curses.color_pair(14)
                     self.win.addstr(i + 2, 0, f" {srv.name[:12]} ", flags)
 
             self.win.addstr(0, 1, f"Select a server to edit. [ID: {selected_srv.id}]")
