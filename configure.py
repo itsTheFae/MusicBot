@@ -31,6 +31,7 @@ except Exception as e1:
                 "Try to install it with pip and any python verion supported by MusicBot.\n\n"
             )
             raise e2 from e1
+        sys.exit(1)
     raise e1
 
 from musicbot import parse_write_base_arg, write_path
