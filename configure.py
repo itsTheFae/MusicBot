@@ -26,6 +26,10 @@ except Exception as e1:
                 creationflags=subprocess.CREATE_NEW_CONSOLE,  # type: ignore[attr-defined]
             )
         except Exception as e2:
+            print(
+                "\n\nSomething failed.\nYou need the pip package named: windows-curses\n"
+                "Try to install it with pip and any python verion supported by MusicBot.\n\n"
+            )
             raise e2 from e1
     raise e1
 
@@ -143,8 +147,10 @@ class ConfigAssistantTextSystem:
 
         # turn off the cursor
         curses.curs_set(0)
-        # set escape delay to 100 ms
-        curses.set_escdelay(100)  # type: ignore[attr-defined]
+        # set escape delay to 100 ms, if possible.
+        # on some versions of windows-curses this seems to be missing.
+        if hasattr(curses, "set_escdelay"):
+            curses.set_escdelay(100)
         # Initialize colors
         curses.start_color()
         curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
