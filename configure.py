@@ -196,6 +196,8 @@ class ConfigAssistantTextSystem:
                 cmd_name = attr.replace("cmd_", "")
                 # attempt to get sub-commands from usage strings.
                 cmd = getattr(MusicBot, attr, None)
+                if hasattr(cmd, "admin_only") or hasattr(cmd, "dev_cmd"):
+                    continue
                 if cmd:
                     self._get_sub_commands(cmd)
                     self.top_commands.add(cmd_name)
@@ -342,7 +344,7 @@ class ConfigAssistantTextSystem:
 
         perms = sorted(perms)
         selno = 0
-        selected: Set[str] = cur_val
+        selected: Set[str] = set(cur_val)
 
         maxy, maxx = self.scr.getmaxyx()
         padx = 6
@@ -381,7 +383,7 @@ class ConfigAssistantTextSystem:
 
             key = self.scr.getch()
             if key == KEY_ESCAPE:
-                break
+                return " ".join(cur_val)
             if key in KEYS_ENTER:
                 return " ".join(sorted(list(selected)))
             if key in KEYS_NAV_NEXT:
