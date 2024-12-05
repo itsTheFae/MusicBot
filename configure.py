@@ -148,100 +148,46 @@ class ConfigAssistantTextSystem:
         self.edited_perms: Set[ConfigOption] = set()
         self.edited_aliases: Set[str] = set()
 
+        # store valid commands from musicbot.
+        self.top_commands: Set[str] = set()
+        self.sub_commands: DefaultDict[str, Set[str]] = defaultdict(set)
+        self.sub_cmd_pattern = re.compile(r"^{prefix}[a-z]+\s{1}([a-z0-9]+)", re.I)
+        self._get_natural_commands()
+
+        t = self.select_cmd_perms(set())
+        self.scr.addstr(8, 8, f"X:  {t}")
+        key = self.scr.getch()
+
         self.main_screen()
 
-    def main_screen(self) -> None:
-        """Process the CATS main menu screen."""
-        # Create a list of config types to manage.
-        config_files = {
-            "Options": "Manage settings saved in options.ini file.",
-            "Permissions": "Manage groups saved in permissions.ini file.",
-            "Aliases": "Manage aliases saved in aliases.json file.",
-            "Servers": "Manage per-server settings saved in data files.",
-        }
-        config_types = list(config_files.keys())
-        config_edited = [False for _ in config_types]
-        config_sel = 0
-        selected = False
+    def _get_natural_commands(self) -> None:
+        """
+        Loops over MusicBot's attributes and extracts a set of commands
+        which are avaialble in `self.top_commands`.
+        """
+        for attr in dir(MusicBot):
+            if attr.startswith("cmd_"):
+                cmd_name = attr.replace("cmd_", "")
+                # attempt to get sub-commands from usage strings.
+                cmd = getattr(MusicBot, attr, None)
+                if cmd:
+                    self._get_sub_commands(cmd)
+                    self.top_commands.add(cmd_name)
 
-        while True:
-            _max_y, max_x = self.scr.getmaxyx()
-            self.scr.clear()
-            self.scr.addstr(0, 0, "Select configuration to edit:", curses.A_BOLD)
-
-            # build config selection at top.
-            c = 2
-            for i, option in enumerate(config_types):
-                opt_str = f" {option} "
-                flags = 0
-                if i == config_sel:
-                    flags = curses.color_pair(1)
-                    if config_edited[i]:
-                        flags = curses.color_pair(15)
-                    self.scr.addstr(1, c, opt_str, flags)
-                else:
-                    if config_edited[i]:
-                        flags = curses.color_pair(14)
-                    self.scr.addstr(1, c, opt_str, flags)
-                c += len(opt_str)
-                if config_edited[i]:
-                    self.scr.addstr(4, 2, "You have unsaved edits!", curses.color_pair(14))
-            self.scr.hline(2, 0, curses.ACS_HLINE, max_x)
-            self.scr.addstr(3, 2, config_files[config_types[config_sel]])
-
-            # Get user input
-            key = self.scr.getch()
-            if key in KEYS_NAV_PREV:
-                if config_sel > 0:
-                    config_sel -= 1
-                else:
-                    config_sel = len(config_types) - 1
-            elif key in KEYS_NAV_NEXT:
-                if config_sel < len(config_types) - 1:
-                    config_sel += 1
-                else:
-                    config_sel = 0
-            elif key in KEYS_ENTER and not selected:
-                selected = True
-            elif key == KEY_ESCAPE:
-                selected = False
-                if any(x for x in config_edited):
-                    self.scr.addstr(4, 2, "You have unsaved edits!", curses.color_pair(10))
-                    self.scr.addstr(5, 2, "Press [ESC] again to exit anyway.", curses.color_pair(10) | curses.A_BOLD)
-                    key = self.scr.getch()
-                    if key == KEY_ESCAPE:
-                        break
-                    else:
-                        continue
-                else:
-                    break
-
-            if selected:
-                # enter Options editor
-                if config_sel == 0:
-                    self.edit_mode = MODE_PICK_SECTION
-                    config_edited[0] = self.config_options()
-                    selected = False
-
-                # enter Permissions editor
-                elif config_sel == 1:
-                    self.edit_mode = MODE_PICK_GROUP
-                    config_edited[1] = self.config_permissions()
-                    selected = False
-
-                # enter Aliases editor
-                elif config_sel == 2:
-                    self.edit_mode = MODE_PICK_ALIAS
-                    config_edited[2] = self.config_aliases()
-                    selected = False
-
-                # enter Server options editor.
-                elif config_sel == 3:
-                    self.edit_mode = MODE_PICK_SERVER
-                    config_edited[3] = self.config_servers()
-                    selected = False
-
-            self.scr.refresh()
+    def _get_sub_commands(self, cmd: Callable[..., Any]) -> None:
+        """
+        Takes a valid command attribute from musicbot then extracts possible
+        sub-commands from the usage stirngs.
+        The results are available in self.sub_commands as a dictionary of sets.
+        """
+        usage = getattr(cmd, "help_usage", [])
+        cmd_name = cmd.__name__.replace("cmd_", "")
+        for ustr in usage:
+            ulines = ustr.split("\n")
+            for uline in ulines:
+                m = self.sub_cmd_pattern.match(uline)
+                if m:
+                    self.sub_commands[cmd_name].add(m.group(1))
 
     def get_text_input(
         self, lines: int, cols: int, y: int, x: int, value: str = ""
@@ -357,6 +303,178 @@ class ConfigAssistantTextSystem:
             self.win.refresh()
 
         return False
+
+    def select_cmd_perms(self, cur_val: set) -> str:
+        """Special input method use for Permissions command list options."""
+        perms = list(self.top_commands)
+        max_px = 0
+        for cmd, subs in self.sub_commands.items():
+            for sub in subs:
+                perm = f"{cmd}_{sub}"
+                perms.append(perm)
+                max_px = max(max_px, len(perm))
+
+        perms = sorted(perms)
+        selno = 0
+        selected: Set[str] = cur_val
+
+        maxy, maxx = self.scr.getmaxyx()
+        padx = 6
+        midx = (maxx - 1) // 2
+        midwx = midx - ((max_px + padx) // 2)
+        win = curses.newwin(maxy - 4, max_px + padx, 3, midwx)
+        win.clear()
+        win.refresh()
+        self.scr.refresh()
+        while True:
+            maxy, maxx = self.scr.getmaxyx()
+            win.clear()
+            win.box()
+            win.addstr(1, 1, "Select Commands:", curses.A_BOLD)
+            hud = "[SPACE] Select  [ENTER] Confirm Selected  [ESC] Go Back"
+            self.scr.addstr(
+                maxy - 1,
+                0,
+                hud.center(maxx - 1),
+                curses.color_pair(1) | curses.A_BOLD,
+            )
+
+            viewno = max(0, (selno - (maxy - 7)) + 1)
+            view = list(perms)[viewno : viewno + (maxy - 7)]
+            for i, perm in enumerate(view):
+                flags = 0
+                if i + viewno == selno:
+                    flags = curses.color_pair(1)
+                if perm in selected:
+                    win.addstr(i + 2, 1, f"[x] {perm}", flags)
+                else:
+                    win.addstr(i + 2, 1, f"[ ] {perm}", flags)
+
+            win.refresh()
+            self.scr.refresh()
+
+            key = self.scr.getch()
+            if key == KEY_ESCAPE:
+                break
+            if key in KEYS_ENTER:
+                return " ".join(sorted(list(selected)))
+            if key in KEYS_NAV_NEXT:
+                if selno < len(perms) - 1:
+                    selno += 1
+                else:
+                    selno = 0
+            elif key in KEYS_NAV_PREV:
+                if selno > 0:
+                    selno -= 1
+                else:
+                    selno = len(perms) - 1
+            elif key == ord(" "):
+                perm = list(perms)[selno]
+                if perm in selected:
+                    selected.discard(perm)
+                else:
+                    selected.add(perm)
+        return ""
+
+    def main_screen(self) -> None:
+        """Process the CATS main menu screen."""
+        # Create a list of config types to manage.
+        config_files = {
+            "Options": "Manage settings saved in options.ini file.",
+            "Permissions": "Manage groups saved in permissions.ini file.",
+            "Aliases": "Manage aliases saved in aliases.json file.",
+            "Servers": "Manage per-server settings saved in data files.",
+        }
+        config_types = list(config_files.keys())
+        config_edited = [False for _ in config_types]
+        config_sel = 0
+        selected = False
+
+        while True:
+            _max_y, max_x = self.scr.getmaxyx()
+            self.scr.clear()
+            self.scr.addstr(0, 0, "Select configuration to edit:", curses.A_BOLD)
+
+            # build config selection at top.
+            c = 2
+            for i, option in enumerate(config_types):
+                opt_str = f" {option} "
+                flags = 0
+                if i == config_sel:
+                    flags = curses.color_pair(1)
+                    if config_edited[i]:
+                        flags = curses.color_pair(15)
+                    self.scr.addstr(1, c, opt_str, flags)
+                else:
+                    if config_edited[i]:
+                        flags = curses.color_pair(14)
+                    self.scr.addstr(1, c, opt_str, flags)
+                c += len(opt_str)
+                if config_edited[i]:
+                    self.scr.addstr(
+                        4, 2, "You have unsaved edits!", curses.color_pair(14)
+                    )
+            self.scr.hline(2, 0, curses.ACS_HLINE, max_x)
+            self.scr.addstr(3, 2, config_files[config_types[config_sel]])
+
+            # Get user input
+            key = self.scr.getch()
+            if key in KEYS_NAV_PREV:
+                if config_sel > 0:
+                    config_sel -= 1
+                else:
+                    config_sel = len(config_types) - 1
+            elif key in KEYS_NAV_NEXT:
+                if config_sel < len(config_types) - 1:
+                    config_sel += 1
+                else:
+                    config_sel = 0
+            elif key in KEYS_ENTER and not selected:
+                selected = True
+            elif key == KEY_ESCAPE:
+                selected = False
+                if any(x for x in config_edited):
+                    self.scr.addstr(
+                        4, 2, "You have unsaved edits!", curses.color_pair(10)
+                    )
+                    self.scr.addstr(
+                        5,
+                        2,
+                        "Press [ESC] again to exit anyway.",
+                        curses.color_pair(10) | curses.A_BOLD,
+                    )
+                    key = self.scr.getch()
+                    if key == KEY_ESCAPE:
+                        break
+                else:
+                    break
+
+            if selected:
+                # enter Options editor
+                if config_sel == 0:
+                    self.edit_mode = MODE_PICK_SECTION
+                    config_edited[0] = self.config_options()
+                    selected = False
+
+                # enter Permissions editor
+                elif config_sel == 1:
+                    self.edit_mode = MODE_PICK_GROUP
+                    config_edited[1] = self.config_permissions()
+                    selected = False
+
+                # enter Aliases editor
+                elif config_sel == 2:
+                    self.edit_mode = MODE_PICK_ALIAS
+                    config_edited[2] = self.config_aliases()
+                    selected = False
+
+                # enter Server options editor.
+                elif config_sel == 3:
+                    self.edit_mode = MODE_PICK_SERVER
+                    config_edited[3] = self.config_servers()
+                    selected = False
+
+            self.scr.refresh()
 
     def config_options(self) -> bool:
         """Run CATS in options editing mode."""
@@ -749,8 +867,13 @@ class ConfigAssistantTextSystem:
                     )
                     self.edit_mode = MODE_PICK_OPTION
                 else:
-                    # TODO: Maybe add ConfigOption var for input length.
-                    edit_buffer = self.get_text_input(1, 200, 9, 33, cval)
+                    if selected_opt.option in ["CommandWhitelist", "CommandBlacklist"]:
+                        edit_buffer = self.select_cmd_perms(
+                            self.mgr_perms.register.get_values(selected_opt)[0]
+                        )
+                    else:
+                        # TODO: Maybe add ConfigOption var for input length.
+                        edit_buffer = self.get_text_input(1, 200, 9, 33, cval)
                     last_ini_val = self.mgr_perms.register.to_ini(selected_opt)
                     self.edit_mode = MODE_PICK_OPTION
                     self.edit_error_msg = ""
@@ -864,7 +987,15 @@ class ConfigAssistantTextSystem:
                     self.win.addstr(1, 17, p_alias)
 
                 # Command field
-                self.win.addstr(2, 15, "Command:", curses.A_BOLD)
+                lbl_cmd = "Command:"
+                self.win.addstr(2, 15, lbl_cmd, curses.A_BOLD)
+                if p_cmd not in self.top_commands:
+                    self.win.addstr(
+                        2,
+                        16 + len(lbl_cmd),
+                        "Invalid command name",
+                        curses.color_pair(10),
+                    )
                 if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 1:
                     self.win.addstr(3, 17, p_cmd, curses.color_pair(1))
                 else:
