@@ -10,12 +10,24 @@ from typing import Any, Callable, DefaultDict, Dict, List, Optional, Set
 try:
     import curses
     from curses import textpad
-except Exception as e:
-    if not sys.platform.startswith("win"):
-        raise RuntimeError(
-            f"You need to install wincurses. Use:  {sys.executable} -m pip install windows-curses"
-        ) from e
-    raise
+except Exception as e1:
+    if sys.platform.startswith("win"):
+        import subprocess
+
+        try:
+            print("You need to install the window-curses pip package.")
+            print("Please wait while we try automatically...\n")
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", "-U", "windows-curses"],
+            )
+            print("Trying to restart python / this tool...")
+            subprocess.Popen(  # pylint: disable=consider-using-with
+                [sys.executable] + sys.argv,
+                creationflags=subprocess.CREATE_NEW_CONSOLE,  # type: ignore[attr-defined]
+            )
+        except Exception as e2:
+            raise e2 from e1
+    raise e1
 
 from musicbot import parse_write_base_arg, write_path
 from musicbot.aliases import Aliases
