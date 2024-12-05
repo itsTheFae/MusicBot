@@ -154,10 +154,6 @@ class ConfigAssistantTextSystem:
         self.sub_cmd_pattern = re.compile(r"^{prefix}[a-z]+\s{1}([a-z0-9]+)", re.I)
         self._get_natural_commands()
 
-        t = self.select_cmd_perms(set())
-        self.scr.addstr(8, 8, f"X:  {t}")
-        key = self.scr.getch()
-
         self.main_screen()
 
     def _get_natural_commands(self) -> None:
@@ -304,7 +300,7 @@ class ConfigAssistantTextSystem:
 
         return False
 
-    def select_cmd_perms(self, cur_val: set) -> str:
+    def select_cmd_perms(self, cur_val: Set[str]) -> str:
         """Special input method use for Permissions command list options."""
         perms = list(self.top_commands)
         max_px = 0
@@ -867,10 +863,12 @@ class ConfigAssistantTextSystem:
                     )
                     self.edit_mode = MODE_PICK_OPTION
                 else:
-                    if selected_opt.option in ["CommandWhitelist", "CommandBlacklist"]:
-                        edit_buffer = self.select_cmd_perms(
-                            self.mgr_perms.register.get_values(selected_opt)[0]
-                        )
+                    rawval = self.mgr_perms.register.get_values(selected_opt)[0]
+                    if selected_opt.option in [
+                        "CommandWhitelist",
+                        "CommandBlacklist",
+                    ]:
+                        edit_buffer = self.select_cmd_perms(rawval)  # type: ignore[arg-type]
                     else:
                         # TODO: Maybe add ConfigOption var for input length.
                         edit_buffer = self.get_text_input(1, 200, 9, 33, cval)
