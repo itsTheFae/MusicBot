@@ -1,10 +1,21 @@
-import curses
+#!/usr/bin/env python3
+
 import json
 import re
+import sys
 import textwrap
 from collections import defaultdict
-from curses import textpad
 from typing import Any, Callable, DefaultDict, Dict, List, Optional, Set
+
+try:
+    import curses
+    from curses import textpad
+except Exception as e:
+    if not sys.platform.startswith("win"):
+        raise RuntimeError(
+            f"You need to install wincurses. Use:  {sys.executable} -m pip install windows-curses"
+        ) from e
+    raise
 
 from musicbot import parse_write_base_arg, write_path
 from musicbot.aliases import Aliases
