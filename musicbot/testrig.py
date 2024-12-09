@@ -215,18 +215,28 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
             "playlist",
             "song",
             "on",
+            "on",
             "off",
             "off",
-            "off",
+        ],
+    ),
+    # Set the limitation before testing clearing cache
+    CmdTest(
+        "config",
+        [
+            "show StorageLimitBytes",
+            "help StorageLimitBytes",
+            "set StorageLimitBytes 1",
+            "save MusicBot StorageLimitBytes",
         ],
     ),
     CmdTest(
         "cache",
         [
             "",
+            "update",
             "info",
             "clear",
-            "update",
         ],
     ),
     CmdTest(
@@ -309,7 +319,10 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
         ],
     ),
     CmdTest("resetplaylist", [""]),
-    CmdTest("option", ["", "autoplaylist on"]),
+
+    # Deprecated command
+    # CmdTest("option", [""]), 
+
     CmdTest("follow", ["", ""]),
     CmdTest("uptime", [""]),
     CmdTest("latency", [""]),
@@ -318,6 +331,16 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
     # Commands that need owner / perms
     CmdTest("botlatency", [""]),
     CmdTest("checkupdates", [""]),
+    # Ensure prefix ccan be change before testing setprefix
+    CmdTest(
+        "config",
+        [
+            "show EnablePrefixPerGuild",
+            "help EnablePrefixPerGuild",
+            "set EnablePrefixPerGuild yes",
+            "save MusicBot EnablePrefixPerGuild",
+        ],
+    ),
     CmdTest("setprefix", ["", "**", "**", "?"]),
     CmdTest("setavatar", ["", "https://cdn.imgchest.com/files/6yxkcjrkqg7.png"]),
     CmdTest("setname", ["", f"TB-name-{uuid.uuid4().hex[0:7]}"]),
