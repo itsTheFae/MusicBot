@@ -166,11 +166,13 @@ def classify_links(links):
     return dict(classified_dict)
 
 # Example usage
-CLASSIFIED_PLAYABLE_STRING_ARRAY = classify_links(PLAYABLE_STRING_ARRAY)
-PLAYABLE_STRING_ARRAY
+# CLASSIFIED_PLAYABLE_STRING_ARRAY = classify_links(PLAYABLE_STRING_ARRAY)
 
-def class_filter_func(cls: str):
+def exclude_class_filter_func(cls: str):
     return lambda x: cls not in classify_link_multi(x)
+
+def contain_class_filter_func(cls: str):
+    return lambda x: cls in classify_link_multi(x)
 
 TESTRIG_TEST_CASES: List[CmdTest] = [
     # Help command is added to this list at test-start.
@@ -179,8 +181,8 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
     CmdTest("playnext", PLAYABLE_STRING_ARRAY),
     CmdTest("shuffleplay", PLAYABLE_STRING_ARRAY),
     CmdTest("playnow", PLAYABLE_STRING_ARRAY),
-    CmdTest("stream", filter(not class_filter_func("playlist"), PLAYABLE_STRING_ARRAY)),
-    CmdTest("pldump", filter(class_filter_func("playlist"), PLAYABLE_STRING_ARRAY)),
+    CmdTest("stream", list(filter(exclude_class_filter_func("playlist"), PLAYABLE_STRING_ARRAY))),
+    CmdTest("pldump", list(filter(contain_class_filter_func("playlist"), PLAYABLE_STRING_ARRAY))),
     CmdTest(
         "search",
         [
