@@ -76,9 +76,101 @@ PLAYABLE_STRING_ARRAY = [
     "https://cdn.discordapp.com/attachments/741945274901200897/875075008723046410/cheesed.mp4",
     # live stream public radio station.
     "https://playerservices.streamtheworld.com/api/livestream-redirect/KUPDFM.mp3?dist=hubbard&source=hubbard-web&ttag=web&gdpr=0",
+    # Youtube live streams
+    "https://www.youtube.com/watch?v=jfKfPfyJRdk",
     # TODO: insert some live streams from youtube and twitch here.
 ]
 
+from urllib.parse import urlparse, parse_qs
+from collections import defaultdict
+
+def classify_link_multi(link):
+        classifications = []
+
+        if not link.strip():
+            return ["empty"]
+        
+        # Parse the URL
+        parsed = urlparse(link)
+        query_params = parse_qs(parsed.query)
+        path = parsed.path.lower()
+        domain = parsed.netloc.lower()
+
+        # Check for playlist
+        if "list" in query_params or "playlist" in link or "playlist" in path:
+            classifications.append("playlist")
+        
+        # Check for video links
+        if "youtu.be" in domain or "youtube.com" in domain:
+            classifications.append("video")
+        
+        # Check for Spotify track or album
+        if "spotify.com" in domain:
+            if "track" in path:
+                classifications.append("track")
+            if "album" in path:
+                classifications.append("album")
+            if "playlist" in path:
+                classifications.append("playlist")
+
+        # Check for SoundCloud
+        if "soundcloud.com" in domain:
+            if "sets" in path:
+                classifications.append("playlist")
+            classifications.append("track")
+        
+        # Check for Bandcamp
+        if "bandcamp.com" in domain:
+            if "album" in path:
+                classifications.append("album")
+        
+        # Check for static files
+        if any(path.endswith(ext) for ext in [".mp4", ".mp3", ".wav"]):
+            classifications.append("static_file")
+        
+        # Check for live streams
+        if "stream" in link or "livestream" in link:
+            classifications.append("live_stream")
+
+        # Search queries
+        if link.startswith("ytsearch") or link.isalpha():
+            classifications.append("search_query")
+
+        # Default to unknown if no other classifications
+        if not classifications:
+            classifications.append("unknown")
+
+        return classifications
+
+def classify_links(links):
+    """
+    Classifies a list of links or strings into multiple categories.
+
+    Args:
+        links (List[str]): A list of links or strings to classify.
+
+    Returns:
+        Dict[str, List[str]]: A dictionary where keys are classes and values are lists of URLs/strings.
+    """
+    
+
+    # Initialize a defaultdict for grouping
+    classified_dict = defaultdict(list)
+
+    # Classify each link and group into the dict
+    for link in links:
+        classes = classify_link_multi(link)
+        for cls in classes:
+            classified_dict[cls].append(link)
+
+    return dict(classified_dict)
+
+# Example usage
+CLASSIFIED_PLAYABLE_STRING_ARRAY = classify_links(PLAYABLE_STRING_ARRAY)
+PLAYABLE_STRING_ARRAY
+
+def class_filter_func(cls: str):
+    return lambda x: cls not in classify_link_multi(x)
 
 TESTRIG_TEST_CASES: List[CmdTest] = [
     # Help command is added to this list at test-start.
@@ -87,8 +179,8 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
     CmdTest("playnext", PLAYABLE_STRING_ARRAY),
     CmdTest("shuffleplay", PLAYABLE_STRING_ARRAY),
     CmdTest("playnow", PLAYABLE_STRING_ARRAY),
-    CmdTest("stream", PLAYABLE_STRING_ARRAY),
-    CmdTest("pldump", PLAYABLE_STRING_ARRAY),
+    CmdTest("stream", filter(not class_filter_func("playlist"), PLAYABLE_STRING_ARRAY)),
+    CmdTest("pldump", filter(class_filter_func("playlist"), PLAYABLE_STRING_ARRAY)),
     CmdTest(
         "search",
         [
