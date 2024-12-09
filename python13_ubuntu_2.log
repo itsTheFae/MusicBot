@@ -4138,3 +4138,15 @@ The following packages can be updated:
 [37mMessage from 1145148517795512340/dodozean: ?seek 1:01[0m
 [37mMessage from 1145148517795512340/dodozean: ?seek 61[0m
 [37mMessage from 1145148517795512340/dodozean: ?seek nein[0m
+
+[33mWARNING: Caught a signal from the OS: SIGINT[0m
+[37mDisconnecting and closing down MusicBot...[0m
+[37mDisconnecting a MusicPlayer in guild:  dodozean的服务器[0m
+[37mMusicBot is now doing shutdown steps...[0m
+[37mWaiting for download threads to finish up...[0m
+
+[37mAll done.[0m
+[37mMusicBot loggers have been called to shut down.[0m
+No logs rotated.
+
+Leaving MusicBot Venv...
