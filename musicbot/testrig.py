@@ -57,8 +57,8 @@ PLAYABLE_STRING_ARRAY = [
     # Shorthand with playlist ID
     "https://youtu.be/E3xbLcTj_bs?list=PLTxsp5i8fQO51pAymuKRfkmL4GnPRa6iC",
     # Spotify links
-    # TODO: find smaller playlist on spotify
-    # "https://open.spotify.com/playlist/37i9dQZF1DXaImRpG7HXqp",
+    # short playlist (38 minutes)
+    "https://open.spotify.com/playlist/4MtB6u1iXkFSnFELB8OPGU",
     "https://open.spotify.com/track/0YupMLYOYz6lZDbN3kRt7A?si=5b0eeb51b04c4af9",
     # one item and multi-item albums
     "https://open.spotify.com/album/1y8Yw0NDcP2qxbZufIXt7u",
@@ -104,6 +104,8 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
         ],
     ),
     CmdTest("seek", ["", "+30", "-20", "1:01", "61", "nein"]),
+    # Play adjustable media before testing speed
+    CmdTest("playnow", ["https://www.youtube.com/watch?v=bm48ncbhU10"]),
     CmdTest("speed", ["", "1", "1.", "1.1", "six", "-0.3", "40"]),
     CmdTest("move", ["", "2 4", "-1 -2", "x y"]),
     CmdTest("remove", ["", "5", "a"]),
@@ -371,27 +373,41 @@ async def run_cmd_tests(
 
         if dry:
             return None
+        
+        # Initialize queue for buffering commands
+        cmd_queue = asyncio.Queue()
 
-        counter = 0
-        for test in test_cases:
-            for cmd in test.command_cases(""):
+        async def enqueue_commands():
+            """Load commands into the queue."""
+            for test in test_cases:
+                for cmd in test.command_cases(""):
+                    await cmd_queue.put(cmd)
+                    loginfo(f"Buffered command: {cmd}")
 
+        async def process_commands():
+            """Process commands from the queue."""
+            counter = 0
+            while not cmd_queue.empty():
+                cmd = await cmd_queue.get()
                 counter += 1
+
                 if message.channel.guild:
                     prefix = bot.server_data[message.channel.guild.id].command_prefix
                 else:
                     prefix = bot.config.command_prefix
 
-                cmd = f"{prefix}{cmd}"
-
+                full_cmd = f"{prefix}{cmd}"
+                message.content = full_cmd
                 loginfo(
-                    "- Sending CMD %(n)s of %(t)s:  %(cmd)s",
-                    {"n": counter, "t": cmd_total, "cmd": cmd},
+                    "- Processing CMD %(n)s of %(t)s: %(cmd)s",
+                    {"n": counter, "t": cmd_total, "cmd": full_cmd},
                 )
 
-                message.content = cmd
                 await bot.on_message(message)
                 await asyncio.sleep(sleep_time)
+
+        # Run both enqueueing and processing concurrently
+        await asyncio.gather(enqueue_commands(), process_commands())
 
         print("Done. Finally....")
         t = time.time() - start_time
