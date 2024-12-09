@@ -103,6 +103,8 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
             "ytsearch4: something about this feels wrong.",
         ],
     ),
+    # Play adjustable media before testing seek
+    CmdTest("playnow", ["https://www.youtube.com/watch?v=dQw4w9WgXcQ"]),
     CmdTest("seek", ["", "+30", "-20", "1:01", "61", "nein"]),
     # Play adjustable media before testing speed
     CmdTest("playnow", ["https://www.youtube.com/watch?v=bm48ncbhU10"]),
