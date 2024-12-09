@@ -239,3 +239,5 @@ Traceback (most recent call last):
         "No attached uploads were found, try again while uploading a cookie file."
     )
 musicbot.exceptions.CommandError: No attached uploads were found, try again while uploading a cookie file.
+
+- seek issue
