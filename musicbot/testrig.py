@@ -490,8 +490,6 @@ async def run_cmd_tests(
                 ),
             )
 
-        # a better idea would be buffering messages into a queue to inspect them.
-        # but i'm just gonna do this manually for now.
         sleep_time = 2
         cmd_total = 0
         for tc in test_cases:
