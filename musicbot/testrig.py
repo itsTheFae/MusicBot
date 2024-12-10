@@ -82,63 +82,65 @@ PLAYABLE_STRING_ARRAY = [
 from urllib.parse import urlparse, parse_qs
 from collections import defaultdict
 
+
 def classify_link_multi(link):
-        classifications = []
+    classifications = []
 
-        if not link.strip():
-            return ["empty"]
-        
-        # Parse the URL
-        parsed = urlparse(link)
-        query_params = parse_qs(parsed.query)
-        path = parsed.path.lower()
-        domain = parsed.netloc.lower()
+    if not link.strip():
+        return ["empty"]
 
-        # Check for playlist
-        if "playlist" in query_params or "playlist" in link or "playlist" in path:
-            classifications.append("playlist")
-        
-        # Check for video links
-        if "youtu.be" in domain or "youtube.com" in domain:
-            classifications.append("video")
-        
-        # Check for Spotify track or album
-        if "spotify.com" in domain:
-            if "track" in path:
-                classifications.append("track")
-            if "album" in path:
-                classifications.append("playlist")
-            if "playlist" in path:
-                classifications.append("playlist")
+    # Parse the URL
+    parsed = urlparse(link)
+    query_params = parse_qs(parsed.query)
+    path = parsed.path.lower()
+    domain = parsed.netloc.lower()
 
-        # Check for SoundCloud
-        if "soundcloud.com" in domain:
-            if "sets" in path:
-                classifications.append("playlist")
+    # Check for playlist
+    if "playlist" in query_params or "playlist" in link or "playlist" in path:
+        classifications.append("playlist")
+
+    # Check for video links
+    if "youtu.be" in domain or "youtube.com" in domain:
+        classifications.append("video")
+
+    # Check for Spotify track or album
+    if "spotify.com" in domain:
+        if "track" in path:
             classifications.append("track")
-        
-        # Check for Bandcamp
-        if "bandcamp.com" in domain:
-            if "album" in path:
-                classifications.append("album")
-        
-        # Check for static files
-        if any(path.endswith(ext) for ext in [".mp4", ".mp3", ".wav"]):
-            classifications.append("static_file")
-        
-        # Check for live streams
-        if "stream" in link or "livestream" in link:
-            classifications.append("live_stream")
+        if "album" in path:
+            classifications.append("playlist")
+        if "playlist" in path:
+            classifications.append("playlist")
 
-        # Search queries
-        if link.startswith("ytsearch") or link.isalpha():
-            classifications.append("search_query")
+    # Check for SoundCloud
+    if "soundcloud.com" in domain:
+        if "sets" in path:
+            classifications.append("playlist")
+        classifications.append("track")
 
-        # Default to unknown if no other classifications
-        if not classifications:
-            classifications.append("unknown")
+    # Check for Bandcamp
+    if "bandcamp.com" in domain:
+        if "album" in path:
+            classifications.append("album")
 
-        return classifications
+    # Check for static files
+    if any(path.endswith(ext) for ext in [".mp4", ".mp3", ".wav"]):
+        classifications.append("static_file")
+
+    # Check for live streams
+    if "stream" in link or "livestream" in link:
+        classifications.append("live_stream")
+
+    # Search queries
+    if link.startswith("ytsearch") or link.isalpha():
+        classifications.append("search_query")
+
+    # Default to unknown if no other classifications
+    if not classifications:
+        classifications.append("unknown")
+
+    return classifications
+
 
 def classify_links(links):
     """
@@ -150,7 +152,6 @@ def classify_links(links):
     Returns:
         Dict[str, List[str]]: A dictionary where keys are classes and values are lists of URLs/strings.
     """
-    
 
     # Initialize a defaultdict for grouping
     classified_dict = defaultdict(list)
@@ -163,14 +164,18 @@ def classify_links(links):
 
     return dict(classified_dict)
 
+
 # Example usage
 # CLASSIFIED_PLAYABLE_STRING_ARRAY = classify_links(PLAYABLE_STRING_ARRAY)
+
 
 def exclude_class_filter_func(cls: str):
     return lambda x: cls not in classify_link_multi(x)
 
+
 def contain_class_filter_func(cls: str):
     return lambda x: cls in classify_link_multi(x)
+
 
 TESTRIG_TEST_CASES: List[CmdTest] = [
     # Help command is added to this list at test-start.
@@ -179,8 +184,22 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
     CmdTest("playnext", PLAYABLE_STRING_ARRAY),
     CmdTest("shuffleplay", PLAYABLE_STRING_ARRAY),
     CmdTest("playnow", PLAYABLE_STRING_ARRAY),
-    CmdTest("stream", list(filter(exclude_class_filter_func("playlist"), PLAYABLE_STRING_ARRAY))),
-    CmdTest("pldump", list(filter(contain_class_filter_func("playlist"), PLAYABLE_STRING_ARRAY))),
+    CmdTest(
+        "stream",
+        list(
+            filter(
+                exclude_class_filter_func("playlist"), PLAYABLE_STRING_ARRAY
+            )
+        ),
+    ),
+    CmdTest(
+        "pldump",
+        list(
+            filter(
+                contain_class_filter_func("playlist"), PLAYABLE_STRING_ARRAY
+            )
+        ),
+    ),
     CmdTest(
         "search",
         [
@@ -321,10 +340,8 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
         ],
     ),
     CmdTest("resetplaylist", [""]),
-
     # Deprecated command
-    # CmdTest("option", [""]), 
-
+    # CmdTest("option", [""]),
     CmdTest("follow", ["", ""]),
     CmdTest("uptime", [""]),
     CmdTest("latency", [""]),
@@ -344,7 +361,9 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
         ],
     ),
     CmdTest("setprefix", ["", "**", "**", "?"]),
-    CmdTest("setavatar", ["", "https://cdn.imgchest.com/files/6yxkcjrkqg7.png"]),
+    CmdTest(
+        "setavatar", ["", "https://cdn.imgchest.com/files/6yxkcjrkqg7.png"]
+    ),
     CmdTest("setname", ["", f"TB-name-{uuid.uuid4().hex[0:7]}"]),
     CmdTest("setnick", ["", f"TB-nick-{uuid.uuid4().hex[0:7]}"]),
     CmdTest("language", ["", "show", "set", "set xx", "reset"]),
@@ -490,7 +509,7 @@ async def run_cmd_tests(
 
         if dry:
             return None
-        
+
         # Initialize queue for buffering commands
         cmd_queue = asyncio.Queue()
 
@@ -509,7 +528,9 @@ async def run_cmd_tests(
                 counter += 1
 
                 if message.channel.guild:
-                    prefix = bot.server_data[message.channel.guild.id].command_prefix
+                    prefix = bot.server_data[
+                        message.channel.guild.id
+                    ].command_prefix
                 else:
                     prefix = bot.config.command_prefix
 
