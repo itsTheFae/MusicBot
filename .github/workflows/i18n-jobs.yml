@@ -1,0 +1,54 @@
+name: Translation Updates
+
+on:
+  push:
+    branches: [ "l10n_fae" ]
+  pull_request:
+    branches: [ "l10n_fae" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    name: Compile MO Files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Load cached pip dependencies
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-py3.10-translate
+          restore-keys: |
+            pip-${{ runner.os }}-py3.10-translate
+      - name: Install dependencies
+        run: |
+          python -m pip install -U polib
+      - name: Save pip dependencies cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-py3.10-translate
+      - name: Run lang.py tool
+        run: |
+          python ./i18n/lang.py -c
+          ls -lah ./i18n/*/LC_MESSAGES/*.mo
+      - name: Commit MO files.
+        run: |
+          git config --global user.name 'MusicBot Automation'
+          git config --global user.email 'no-mail@musicbot.auto.bot'
+          git add ./i18n/*/LC_MESSAGES/*.mo
+          if ! git diff --cached --exit-code ; then
+            git commit -am "Compile all MO files."
+            git push
+          fi
+
