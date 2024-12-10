@@ -97,7 +97,7 @@ def classify_link_multi(link):
         domain = parsed.netloc.lower()
 
         # Check for playlist
-        if "list" in query_params or "playlist" in link or "playlist" in path:
+        if "playlist" in query_params or "playlist" in link or "playlist" in path:
             classifications.append("playlist")
         
         # Check for video links
@@ -109,7 +109,7 @@ def classify_link_multi(link):
             if "track" in path:
                 classifications.append("track")
             if "album" in path:
-                classifications.append("album")
+                classifications.append("playlist")
             if "playlist" in path:
                 classifications.append("playlist")
 
