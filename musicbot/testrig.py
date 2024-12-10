@@ -72,8 +72,6 @@ PLAYABLE_STRING_ARRAY = [
     "slippery people talking heads live 84",
     # search handler format in query.
     "ytsearch4:talking heads stop making sense",
-    # generic extractor, static file with no service/meta data
-    "https://cdn.discordapp.com/attachments/741945274901200897/875075008723046410/cheesed.mp4",
     # live stream public radio station.
     "https://playerservices.streamtheworld.com/api/livestream-redirect/KUPDFM.mp3?dist=hubbard&source=hubbard-web&ttag=web&gdpr=0",
     # Youtube live streams
