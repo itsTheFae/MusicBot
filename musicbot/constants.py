@@ -152,6 +152,18 @@ DISCORD_MSG_CHAR_LIMIT: int = 2000
 # Limit bitrate to this value if per-channel bitrate is higher than this.
 MUSICBOT_VOICE_MAX_KBITRATE: int = 512
 
+# Config sections for Options.ini file, in order.
+MUSICBOT_CONFIG_SECTIONS_ORDERED: List[str] = [
+    "Credentials",
+    "Permissions",
+    "Chat Commands",
+    "Chat Responses",
+    "Playback",
+    "Auto Playlist",
+    "MusicBot",
+    "Files",
+]
+
 # Embed specifics
 MUSICBOT_EMBED_COLOR_NORMAL: str = "#7289DA"
 MUSICBOT_EMBED_COLOR_ERROR: str = "#CC0000"
