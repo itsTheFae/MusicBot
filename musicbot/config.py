@@ -2611,8 +2611,10 @@ class ConfigRenameManager:
             cu.optionxform = str  # type: ignore
             cu.read(self._cfg_file, encoding="utf8")
 
-            # enforce our favored order.
             sections = MUSICBOT_CONFIG_SECTIONS_ORDERED
+            updates = 0
+
+            # Make sure config has the required sections, in order.
             for i, sect in enumerate(sections):
                 prv = ""
                 nxt = ""
@@ -2628,8 +2630,9 @@ class ConfigRenameManager:
                         cu[nxt].add_before.section(sect)
                     else:
                         cu.add_section(sect)
+                    updates += 1
 
-            updates = 0
+            # check if we need to update any options.
             for item in self._remap:
                 if cu.has_option(item[0], item[1]):
                     updates += 1
@@ -2647,6 +2650,16 @@ class ConfigRenameManager:
                     for opt in s.iter_options():
                         if not isinstance(opt.next_block, Space):
                             opt.add_after.space(1)
+
+                # backup original file.
+                dt = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+                bkp_file = self._cfg_file.with_suffix(f".ini.old_{dt}")
+                try:
+                    shutil.copy(self._cfg_file, bkp_file)
+                except OSError as e:
+                    raise RuntimeError(
+                        "Could not create a backup copy of options.ini file."
+                    ) from e
 
                 # write the changes to file.
                 # cu.first_block.add_before.comment("NOTICE:  Options have been renamed.")
