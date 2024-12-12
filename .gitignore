@@ -2,9 +2,8 @@
 *.pyc
 ~*/
 .vscode/
-.coverage
-out/
 *.service
+.coverage*
 
 audio_cache/
 dectalk/
@@ -27,4 +26,4 @@ media/
 
 docker-compose.yml
 
-test_cmds.py
+/env*/
