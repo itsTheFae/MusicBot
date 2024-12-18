@@ -1505,7 +1505,7 @@ class ConfigDefaults:
     command_prefix: str = "!"
     commands_via_mention: bool = True
     bound_channels: Set[int] = set()
-    unbound_servers: bool = False
+    unbound_servers: bool = True
     autojoin_channels: Set[int] = set()
     dm_nowplaying: bool = False
     no_nowplaying_auto: bool = False
