@@ -17,3 +17,10 @@ isort[colors]
 mypy
 pylint
 polib
+
+# type stubs for untyped packages.
+# ytdlp and pymediainfo do not seem to have these.
+types-certifi
+types-objgraph
+types-colorama
+
