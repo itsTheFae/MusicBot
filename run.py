@@ -921,7 +921,7 @@ def set_console_title() -> None:
     if os.name == "nt":
         try:
             # if colorama fails to import we can assume setup_logs didn't load it.
-            import colorama  # type: ignore[import-untyped]
+            import colorama
 
             # this is only available in colorama version 0.4.6+
             # which as it happens isn't required by colorlog.

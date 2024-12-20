@@ -20,7 +20,7 @@ from io import BytesIO, StringIO
 from typing import TYPE_CHECKING, Any, DefaultDict, Dict, List, Optional, Set, Union
 
 import aiohttp
-import certifi  # type: ignore[import-untyped, unused-ignore]
+import certifi
 import discord
 import yt_dlp as youtube_dl  # type: ignore[import-untyped]
 
@@ -89,9 +89,9 @@ from .utils import (
 
 # optional imports
 try:
-    import objgraph  # type: ignore[import-untyped]
+    import objgraph
 except ImportError:
-    objgraph = None
+    objgraph = None  # type: ignore[assignment]
 
 
 if TYPE_CHECKING:
@@ -7465,6 +7465,7 @@ class MusicBot(discord.Client):
 
         await channel.typing()
 
+        data: Any = None
         if func == "growth":
             f = StringIO()
             objgraph.show_growth(limit=10, file=f)
