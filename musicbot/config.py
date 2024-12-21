@@ -231,7 +231,7 @@ class Config:
         # Chat Commands
         ########################################################################
         self.command_prefix: str = self.register.init_option(
-            section="Chat Commands",
+            section="ChatCommands",
             option="CommandPrefix",
             dest="command_prefix",
             default=ConfigDefaults.command_prefix,
@@ -241,7 +241,7 @@ class Config:
             ),
         )
         self.commands_via_mention: bool = self.register.init_option(
-            section="Chat Commands",
+            section="ChatCommands",
             option="CommandsByMention",
             dest="commands_via_mention",
             default=ConfigDefaults.commands_via_mention,
@@ -253,7 +253,7 @@ class Config:
             ),
         )
         self.bound_channels: Set[int] = self.register.init_option(
-            section="Chat Commands",
+            section="ChatCommands",
             option="BindToChannels",
             dest="bound_channels",
             default=ConfigDefaults.bound_channels,
@@ -266,7 +266,7 @@ class Config:
             ),
         )
         self.unbound_servers: bool = self.register.init_option(
-            section="Chat Commands",
+            section="ChatCommands",
             option="AllowUnboundServers",
             dest="unbound_servers",
             default=ConfigDefaults.unbound_servers,
@@ -278,7 +278,7 @@ class Config:
             ),
         )
         self.usealias: bool = self.register.init_option(
-            section="Chat Commands",
+            section="ChatCommands",
             option="UseAlias",
             dest="usealias",
             default=ConfigDefaults.usealias,
@@ -289,7 +289,7 @@ class Config:
             comment_args={"filepath": DEFAULT_COMMAND_ALIAS_FILE},
         )
         self.enable_options_per_guild: bool = self.register.init_option(
-            section="Chat Commands",
+            section="ChatCommands",
             option="EnablePrefixPerGuild",
             dest="enable_options_per_guild",
             default=ConfigDefaults.enable_options_per_guild,
@@ -304,7 +304,7 @@ class Config:
         # Chat Responses
         ########################################################################
         self.dm_nowplaying: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DMNowPlaying",
             dest="dm_nowplaying",
             default=ConfigDefaults.dm_nowplaying,
@@ -314,7 +314,7 @@ class Config:
             ),
         )
         self.no_nowplaying_auto: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DisableNowPlayingAutomatic",
             dest="no_nowplaying_auto",
             default=ConfigDefaults.no_nowplaying_auto,
@@ -324,7 +324,7 @@ class Config:
             ),
         )
         self.nowplaying_channels: Set[int] = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="NowPlayingChannels",
             dest="nowplaying_channels",
             default=ConfigDefaults.nowplaying_channels,
@@ -335,7 +335,7 @@ class Config:
             ),
         )
         self.delete_nowplaying: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DeleteNowPlaying",
             dest="delete_nowplaying",
             default=ConfigDefaults.delete_nowplaying,
@@ -344,7 +344,7 @@ class Config:
         )
 
         self.now_playing_mentions: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="NowPlayingMentions",
             dest="now_playing_mentions",
             default=ConfigDefaults.now_playing_mentions,
@@ -353,7 +353,7 @@ class Config:
         )
 
         self.delete_messages: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DeleteMessages",
             dest="delete_messages",
             default=ConfigDefaults.delete_messages,
@@ -365,7 +365,7 @@ class Config:
             ),
         )
         self.delete_invoking: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DeleteInvoking",
             dest="delete_invoking",
             default=ConfigDefaults.delete_invoking,
@@ -373,7 +373,7 @@ class Config:
             comment=_Dd("Auto delete valid commands after a delay."),
         )
         self.delete_delay_short: float = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DeleteDelayShort",
             dest="delete_delay_short",
             default=ConfigDefaults.delete_delay_short,
@@ -384,7 +384,7 @@ class Config:
             ),
         )
         self.delete_delay_long: float = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DeleteDelayLong",
             dest="delete_delay_long",
             default=ConfigDefaults.delete_delay_long,
@@ -395,7 +395,7 @@ class Config:
             ),
         )
         self.embeds: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="UseEmbeds",
             dest="embeds",
             default=ConfigDefaults.embeds,
@@ -403,7 +403,7 @@ class Config:
             comment=_Dd("Allow MusicBot to format its messages as embeds."),
         )
         self.footer_text: str = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="CustomEmbedFooter",
             dest="footer_text",
             default=ConfigDefaults.footer_text,
@@ -415,7 +415,7 @@ class Config:
             default_is_empty=True,
         )
         self.remove_embed_footer: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="RemoveEmbedFooter",
             dest="remove_embed_footer",
             default=ConfigDefaults.remove_embed_footer,
@@ -423,7 +423,7 @@ class Config:
             comment=_Dd("Completely remove the footer from embeds."),
         )
         self.searchlist: bool = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="SearchList",
             dest="searchlist",
             default=ConfigDefaults.searchlist,
@@ -433,7 +433,7 @@ class Config:
             ),
         )
         self.defaultsearchresults: int = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="DefaultSearchResults",
             dest="defaultsearchresults",
             default=ConfigDefaults.defaultsearchresults,
@@ -443,7 +443,7 @@ class Config:
             ),
         )
         self.queue_length: int = self.register.init_option(
-            section="Chat Responses",
+            section="ChatResponses",
             option="QueueLength",
             dest="queue_length",
             default=ConfigDefaults.queue_length,
@@ -630,7 +630,7 @@ class Config:
         # Auto Playlist
         ########################################################################
         self.auto_playlist: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="UseAutoPlaylist",
             dest="auto_playlist",
             default=ConfigDefaults.auto_playlist,
@@ -640,7 +640,7 @@ class Config:
             ),
         )
         self.auto_playlist_random: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="AutoPlaylistRandom",
             dest="auto_playlist_random",
             default=ConfigDefaults.auto_playlist_random,
@@ -648,7 +648,7 @@ class Config:
             comment=_Dd("Shuffles the auto playlist tracks before playing them."),
         )
         self.auto_playlist_autoskip: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="AutoPlaylistAutoSkip",
             dest="auto_playlist_autoskip",
             default=ConfigDefaults.auto_playlist_autoskip,
@@ -659,7 +659,7 @@ class Config:
             ),
         )
         self.auto_playlist_remove_on_block: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="AutoPlaylistRemoveBlocked",
             dest="auto_playlist_remove_on_block",
             default=ConfigDefaults.auto_playlist_remove_on_block,
@@ -671,7 +671,7 @@ class Config:
         # write_path not needed, used for display only.
         hist_file = pathlib.Path(DEFAULT_PLAYLIST_DIR).joinpath(APL_FILE_HISTORY)
         self.enable_queue_history_global: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="SavePlayedHistoryGlobal",
             dest="enable_queue_history_global",
             default=ConfigDefaults.enable_queue_history_global,
@@ -683,7 +683,7 @@ class Config:
             comment_args={"filename": hist_file},
         )
         self.enable_queue_history_guilds: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="SavePlayedHistoryGuilds",
             dest="enable_queue_history_guilds",
             default=ConfigDefaults.enable_queue_history_guilds,
@@ -698,7 +698,7 @@ class Config:
             },
         )
         self.remove_ap: bool = self.register.init_option(
-            section="Auto Playlist",
+            section="AutoPlaylist",
             option="RemoveFromAPOnError",
             dest="remove_ap",
             default=ConfigDefaults.remove_ap,
@@ -2504,29 +2504,29 @@ class ConfigRenameManager:
             # fmt: off
             # Update #1: Organize old config options into new sections.
             # Chat Commands
-            ("Chat", "CommandPrefix",            "Chat Commands", "CommandPrefix"),  # noqa: E241
-            ("Chat", "CommandsByMention",        "Chat Commands", "CommandsByMention"),  # noqa: E241
-            ("Chat", "BindToChannels",           "Chat Commands", "BindToChannels"),  # noqa: E241
-            ("Chat", "AllowUnboundServers",      "Chat Commands", "AllowUnboundServers"),  # noqa: E241
-            ("MusicBot", "EnablePrefixPerGuild", "Chat Commands", "EnablePrefixPerGuild"),  # noqa: E241
-            ("MusicBot", "UseAlias",             "Chat Commands", "UseAlias"),  # noqa: E241
+            ("Chat", "CommandPrefix",            "ChatCommands", "CommandPrefix"),  # noqa: E241
+            ("Chat", "CommandsByMention",        "ChatCommands", "CommandsByMention"),  # noqa: E241
+            ("Chat", "BindToChannels",           "ChatCommands", "BindToChannels"),  # noqa: E241
+            ("Chat", "AllowUnboundServers",      "ChatCommands", "AllowUnboundServers"),  # noqa: E241
+            ("MusicBot", "EnablePrefixPerGuild", "ChatCommands", "EnablePrefixPerGuild"),  # noqa: E241
+            ("MusicBot", "UseAlias",             "ChatCommands", "UseAlias"),  # noqa: E241
 
             # Chat Responses
-            ("Chat", "DMNowPlaying",                "Chat Responses", "DMNowPlaying"),  # noqa: E241
-            ("Chat", "DisableNowPlayingAutomatic",  "Chat Responses", "DisableNowPlayingAutomatic"),  # noqa: E241
-            ("Chat", "NowPlayingChannels",          "Chat Responses", "NowPlayingChannels"),  # noqa: E241
-            ("Chat", "DeleteNowPlaying",            "Chat Responses", "DeleteNowPlaying"),  # noqa: E241
-            ("MusicBot", "NowPlayingMentions",      "Chat Responses", "NowPlayingMentions"),  # noqa: E241
-            ("MusicBot", "DeleteMessages",          "Chat Responses", "DeleteMessages"),  # noqa: E241
-            ("MusicBot", "DeleteInvoking",          "Chat Responses", "DeleteInvoking"),  # noqa: E241
-            ("MusicBot", "DeleteDelayShort",        "Chat Responses", "DeleteDelayShort"),  # noqa: E241
-            ("MusicBot", "DeleteDelayLong",         "Chat Responses", "DeleteDelayLong"),  # noqa: E241
-            ("MusicBot", "UseEmbeds",               "Chat Responses", "UseEmbeds"),  # noqa: E241
-            ("MusicBot", "QueueLength",             "Chat Responses", "QueueLength"),  # noqa: E241
-            ("MusicBot", "CustomEmbedFooter",       "Chat Responses", "CustomEmbedFooter"),  # noqa: E241
-            ("MusicBot", "RemoveEmbedFooter",       "Chat Responses", "RemoveEmbedFooter"),  # noqa: E241
-            ("MusicBot", "SearchList",              "Chat Responses", "SearchList"),  # noqa: E241
-            ("MusicBot", "DefaultSearchResults",    "Chat Responses", "DefaultSearchResults"),  # noqa: E241
+            ("Chat", "DMNowPlaying",                "ChatResponses", "DMNowPlaying"),  # noqa: E241
+            ("Chat", "DisableNowPlayingAutomatic",  "ChatResponses", "DisableNowPlayingAutomatic"),  # noqa: E241
+            ("Chat", "NowPlayingChannels",          "ChatResponses", "NowPlayingChannels"),  # noqa: E241
+            ("Chat", "DeleteNowPlaying",            "ChatResponses", "DeleteNowPlaying"),  # noqa: E241
+            ("MusicBot", "NowPlayingMentions",      "ChatResponses", "NowPlayingMentions"),  # noqa: E241
+            ("MusicBot", "DeleteMessages",          "ChatResponses", "DeleteMessages"),  # noqa: E241
+            ("MusicBot", "DeleteInvoking",          "ChatResponses", "DeleteInvoking"),  # noqa: E241
+            ("MusicBot", "DeleteDelayShort",        "ChatResponses", "DeleteDelayShort"),  # noqa: E241
+            ("MusicBot", "DeleteDelayLong",         "ChatResponses", "DeleteDelayLong"),  # noqa: E241
+            ("MusicBot", "UseEmbeds",               "ChatResponses", "UseEmbeds"),  # noqa: E241
+            ("MusicBot", "QueueLength",             "ChatResponses", "QueueLength"),  # noqa: E241
+            ("MusicBot", "CustomEmbedFooter",       "ChatResponses", "CustomEmbedFooter"),  # noqa: E241
+            ("MusicBot", "RemoveEmbedFooter",       "ChatResponses", "RemoveEmbedFooter"),  # noqa: E241
+            ("MusicBot", "SearchList",              "ChatResponses", "SearchList"),  # noqa: E241
+            ("MusicBot", "DefaultSearchResults",    "ChatResponses", "DefaultSearchResults"),  # noqa: E241
 
             # Playback
             ("MusicBot", "AutoPause",                   "Playback", "AutoPause"),  # noqa: E241
@@ -2546,13 +2546,13 @@ class ConfigRenameManager:
             ("MusicBot", "UseOpusProbe",                "Playback", "UseOpusProbe"),  # noqa: E241
 
             # Auto Playlist
-            ("MusicBot", "UseAutoPlaylist",             "Auto Playlist", "UseAutoPlaylist"),  # noqa: E241
-            ("MusicBot", "AutoPlaylistRandom",          "Auto Playlist", "AutoPlaylistRandom"),  # noqa: E241
-            ("MusicBot", "AutoPlaylistAutoSkip",        "Auto Playlist", "AutoPlaylistAutoSkip"),  # noqa: E241
-            ("MusicBot", "AutoPlaylistRemoveBlocked",   "Auto Playlist", "AutoPlaylistRemoveBlocked"),  # noqa: E241
-            ("MusicBot", "RemoveFromAPOnError",         "Auto Playlist", "RemoveFromAPOnError"),  # noqa: E241
-            ("MusicBot", "SavePlayedHistoryGlobal",     "Auto Playlist", "SavePlayedHistoryGlobal"),  # noqa: E241
-            ("MusicBot", "SavePlayedHistoryGuilds",     "Auto Playlist", "SavePlayedHistoryGuilds"),  # noqa: E241
+            ("MusicBot", "UseAutoPlaylist",             "AutoPlaylist", "UseAutoPlaylist"),  # noqa: E241
+            ("MusicBot", "AutoPlaylistRandom",          "AutoPlaylist", "AutoPlaylistRandom"),  # noqa: E241
+            ("MusicBot", "AutoPlaylistAutoSkip",        "AutoPlaylist", "AutoPlaylistAutoSkip"),  # noqa: E241
+            ("MusicBot", "AutoPlaylistRemoveBlocked",   "AutoPlaylist", "AutoPlaylistRemoveBlocked"),  # noqa: E241
+            ("MusicBot", "RemoveFromAPOnError",         "AutoPlaylist", "RemoveFromAPOnError"),  # noqa: E241
+            ("MusicBot", "SavePlayedHistoryGlobal",     "AutoPlaylist", "SavePlayedHistoryGlobal"),  # noqa: E241
+            ("MusicBot", "SavePlayedHistoryGuilds",     "AutoPlaylist", "SavePlayedHistoryGuilds"),  # noqa: E241
 
             # MusicBot
             ("Chat", "AutojoinChannels", "MusicBot", "AutojoinChannels"),
