@@ -156,10 +156,10 @@ MUSICBOT_VOICE_MAX_KBITRATE: int = 512
 MUSICBOT_CONFIG_SECTIONS_ORDERED: List[str] = [
     "Credentials",
     "Permissions",
-    "Chat Commands",
-    "Chat Responses",
+    "ChatCommands",
+    "ChatResponses",
     "Playback",
-    "Auto Playlist",
+    "AutoPlaylist",
     "MusicBot",
     "Files",
 ]
