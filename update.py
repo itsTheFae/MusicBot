@@ -61,7 +61,9 @@ def get_bot_version(git_bin: str) -> str:
         )
         # Check status of file modifications.
         ver_p2 = (
-            subprocess.check_output([git_bin, "status", "-suno", "--porcelain"])
+            subprocess.check_output(
+                [git_bin, "-c", "core.fileMode=false", "status", "-suno", "--porcelain"]
+            )
             .decode("ascii")
             .strip()
         )
@@ -432,7 +434,8 @@ def main() -> None:
     # Check that the current working directory is clean.
     # -suno is --short with --untracked-files=no
     status_unclean = subprocess.check_output(
-        [git_bin, "status", "-suno", "--porcelain"], universal_newlines=True
+        [git_bin, "-c", "core.fileMode=false", "status", "-suno", "--porcelain"],
+        universal_newlines=True,
     )
     if status_unclean.strip():
         # TODO: Maybe offering a stash option here would not be so bad...
