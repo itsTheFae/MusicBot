@@ -16,7 +16,7 @@ except Exception as e1:
         import subprocess
 
         try:
-            print("You need to install the window-curses pip package.")
+            print("You need to install the windows-curses pip package.")
             print("Please wait while we try automatically...\n")
             subprocess.check_call(
                 [sys.executable, "-m", "pip", "install", "-U", "windows-curses"],
