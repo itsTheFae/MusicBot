@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import os
 import re
 import sys
 import textwrap
@@ -136,8 +137,9 @@ class ConfigAssistantTextSystem:
     def __init__(self, stdscr: curses.window) -> None:
         """
         The CATS initializer which starts CATS.
-        Should be called form curses.wrapper()
+        Should be called from curses.wrapper()
         """
+
         self.scr = stdscr
         self.win = curses.newwin(
             curses.LINES - 3,  # pylint: disable=no-member
@@ -173,7 +175,7 @@ class ConfigAssistantTextSystem:
         self.mgr_alias: Optional[Aliases] = None
         self.mgr_perms: Optional[Permissions] = None
         self.mgr_opts: Optional[Config] = None
-        self.mgr_srvs: List[ServerData] = []
+        self.mgr_srvs: List[ServerData] = self._get_servers()
         self.edited_opts: Set[ConfigOption] = set()
         self.edited_perms: Set[ConfigOption] = set()
         self.edited_aliases: Set[str] = set()
@@ -216,6 +218,37 @@ class ConfigAssistantTextSystem:
                 m = self.sub_cmd_pattern.match(uline)
                 if m:
                     self.sub_commands[cmd_name].add(m.group(1))
+
+    def _get_servers(self) -> List[ServerData]:
+        """Build a list of possible servers from servers.txt and data files."""
+        data_path = write_path(DEFAULT_DATA_DIR)
+        servers_path = data_path.joinpath(DATA_FILE_SERVERS)
+        opt_pattern = "*/"
+
+        # known servers have entries in data/server txt
+        srvs: Dict[str, ServerData] = {}
+        names: Dict[str, str] = {}
+        if servers_path.is_file():
+            slines = servers_path.read_text(encoding="utf8").split("\n")
+            for line in slines:
+                line = line.strip()
+                if not line:
+                    continue
+
+                bits = line.split(": ", maxsplit=1)
+                gid = bits[0]
+                sname = bits[1]
+                names[gid] = sname
+                srvs[gid] = ServerData(gid, sname)
+
+        for path in data_path.glob(opt_pattern):
+            if not path.is_dir():
+                continue
+            gid = path.name
+            name: Optional[str] = names.get(gid, None)
+            srvs[gid] = ServerData(gid, name)
+
+        return list(srvs.values())
 
     def get_text_input(
         self, lines: int, cols: int, y: int, x: int, value: str = ""
@@ -442,6 +475,13 @@ class ConfigAssistantTextSystem:
                     self.scr.addstr(
                         4, 2, "You have unsaved edits!", curses.color_pair(14)
                     )
+
+                # disable server options if no servers are found.
+                elif config_sel == 3 and not self.mgr_srvs:
+                    self.scr.addstr(
+                        4, 2, "No servers available to edit!", curses.color_pair(12)
+                    )
+
             self.scr.hline(2, 0, curses.ACS_HLINE, max_x)
             self.scr.addstr(3, 2, config_files[config_types[config_sel]])
 
@@ -497,9 +537,11 @@ class ConfigAssistantTextSystem:
                     selected = False
 
                 # enter Server options editor.
-                elif config_sel == 3:
+                elif config_sel == 3 and self.mgr_srvs:
                     self.edit_mode = MODE_PICK_SERVER
                     config_edited[3] = self.config_servers()
+                    selected = False
+                else:
                     selected = False
 
             self.scr.refresh()
@@ -1120,38 +1162,8 @@ class ConfigAssistantTextSystem:
 
     def config_servers(self) -> bool:
         """Run CATS in Server Data editing mode."""
-        data_path = write_path(DEFAULT_DATA_DIR)
-        servers_path = data_path.joinpath(DATA_FILE_SERVERS)
-        opt_pattern = "*/"
-
-        def get_servers() -> List[ServerData]:
-            # known servers have entries in data/server txt
-            srvs: Dict[str, ServerData] = {}
-            names: Dict[str, str] = {}
-            if servers_path.is_file():
-                slines = servers_path.read_text(encoding="utf8").split("\n")
-                for line in slines:
-                    line = line.strip()
-                    if not line:
-                        continue
-
-                    bits = line.split(": ", maxsplit=1)
-                    gid = bits[0]
-                    sname = bits[1]
-                    names[gid] = sname
-                    srvs[gid] = ServerData(gid, sname)
-
-            for path in data_path.glob(opt_pattern):
-                if not path.is_dir():
-                    continue
-                gid = path.name
-                name: Optional[str] = names.get(gid, None)
-                srvs[gid] = ServerData(gid, name)
-
-            return list(srvs.values())
-
         if not self.mgr_srvs:
-            self.mgr_srvs = get_servers()
+            self.mgr_srvs = self._get_servers()
 
         edit_buffer = ""
         selected_srv = self.mgr_srvs[0]
@@ -1261,4 +1273,6 @@ class ConfigAssistantTextSystem:
 
 if __name__ == "__main__":
     parse_write_base_arg()
+    if "MUSICBOT_TOKEN" not in os.environ:
+        os.environ["MUSICBOT_TOKEN"] = "Your Token Here"
     curses.wrapper(ConfigAssistantTextSystem)
