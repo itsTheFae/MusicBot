@@ -452,7 +452,7 @@ class ConfigAssistantTextSystem:
         selected = False
 
         while True:
-            _max_y, max_x = self.scr.getmaxyx()
+            max_y, max_x = self.scr.getmaxyx()
             self.scr.clear()
             self.scr.addstr(0, 0, "Select configuration to edit:", curses.A_BOLD)
 
@@ -484,6 +484,14 @@ class ConfigAssistantTextSystem:
 
             self.scr.hline(2, 0, curses.ACS_HLINE, max_x)
             self.scr.addstr(3, 2, config_files[config_types[config_sel]])
+
+            # Show HUD
+            hud = " [ESC] Quit  [ENTER] Confirm  [ARROW KEYS] Navigate"
+            pad = max_x - len(hud) - 1
+            hud += " " * pad
+            self.scr.addstr(
+                max_y - 1, 0, hud[: max_x - 1], curses.color_pair(1) | curses.A_BOLD
+            )
 
             # Get user input
             key = self.scr.getch()
