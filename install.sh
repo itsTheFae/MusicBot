@@ -25,7 +25,7 @@ DEBUG=0
 
 #----------------------------------------------Constants----------------------------------------------#
 # Suported versions of python using only major.minor format
-PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
+PySupported=("3.13" "3.12" "3.11" "3.10" "3.9" "3.8")
 PyBin="python3"
 # Path updated by find_python
 PyBinPath="$(command -v "$PyBin")"
@@ -198,7 +198,7 @@ function find_python() {
             if [[ $PY_VER_MINOR -eq 8 ]]; then
                 # if 3.8, patch version minimum is 3.8.7
                 if [[ $PY_VER_PATCH -ge 7 ]]; then
-                    PyBinPath="$(command -v "$PyBinTest")"
+                    PyBinPath="$(which "$PyBinTest")"
                     PyBin="$PyBinTest"
                     debug "Selected: $PyBinTest  @  $PyBinPath"
                     return 0
@@ -206,7 +206,7 @@ function find_python() {
             fi
             # if 3.9+ it should work.
             if [[ $PY_VER_MINOR -ge 9 ]]; then
-                PyBinPath="$(command -v "$PyBinTest")"
+                PyBinPath="$(which "$PyBinTest")"
                 PyBin="$PyBinTest"
                 debug "Selected: $PyBinTest  @  $PyBinPath"
                 return 0
@@ -214,7 +214,7 @@ function find_python() {
         fi
     done
 
-    PyBinPath="$(command -v "python3")"
+    PyBinPath="$(which "python3")"
     PyBin="python3"
     debug "Default: python3  @  $PyBinPath"
     return 1
@@ -589,13 +589,14 @@ function debug() {
 function configure_bot() {
     echo "You can now configure MusicBot!"
     read -rp "Would like to launch the 'configure.py' tool? [N/y]" YesConfig
-    if [ "${YesConfig,,}" != "y" ] && [ "${YesConfig,,}" != "yes" ] ; then
+    if [[ "${YesConfig,,}" != "y" && "${YesConfig,,}" != "yes" ]] ; then
+        echo ""
         echo "Open the 'config' directory, then copy and rename the example files to get started."
         echo "Make sure to add your Bot token to the options.ini 'Token' option before starting."
         return
     fi
 
-    $PyBin "${InstallDir}/configure.py"
+    $PyBin "configure.py"
 }
 
 #------------------------------------------CLI Arguments----------------------------------------------#
