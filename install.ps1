@@ -267,73 +267,10 @@ if($iagree -ne "Y" -and $iagree -ne "y")
 
 Copy-Item ".\config\example_options.ini" -Destination ".\config\options.ini"
 
-# GET AND VERIFY TOKEN
-""
-"Please enter your bot token. This can be found in your discordapp developer page." 
-$token = Read-Host "Enter Token" -AsSecureString
-$token_plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($token))
-$header = @{
-    "Authorization" = "Bot $token_plain"
-    "Content-Type" = "application/json"
-}
-$result = Invoke-WebRequest -Headers $header -Method "GET" -Uri "$DEFAULT_URL_BASE/users/@me"
-$result_code = $result.StatusCode
-$result_content = $result.Content
-if (!($result_code -eq 200))
-{
-    "Error getting user profile, is the token correct? ($result_code $result_content)"
-    ""
-    "You can finish the configuration manually by editing the options.ini file in the config folder."
-    Return
-}
-$result_object = ConvertFrom-Json -InputObject $result_content
-# Cause whoever wrote ConvertFrom-Json cmdlet was insane and use some strange data type instead
-$result_table = @{}
-$result_object.PsObject.Properties | ForEach-Object{
-    $result_table[$_.Name] = $_.Value
-}
-$result_table += @{"token" = $token_plain}
-$config = (Get-Content -Path ".\config\options.ini") -creplace "bot_token", $token_plain
+"Copied example_options.ini to options.ini"
+"Starting configure.py configuration tool..."
 
-# GET PREFIX
-$cprefix = Read-Host "Would you like to change the command prefix? [N/y]: "
-if($cprefix -eq "Y" -or $cprefix -eq "y")
-{
-    "Please enter the prefix you'd like for your bot."
-    $prefix = Read-Host "This is what comes before all commands. The default is [!] "
-    $config = $config -creplace "CommandPrefix = !", "CommandPrefix = $prefix"
-}
-else
-{
-    "Using default prefix [!]"
-}
-
-# GET OWNER
-$cowner = Read-Host "Would you like to automatically get the owner ID from the OAuth application? [Y/n]: "
-if($cowner -eq "N" -or $cowner -eq "n")
-{
-    $owner = Read-Host "Please enter the owner ID. "
-    $config = $config -creplace "OwnerID = auto", "OwnerID = $owner"
-}
-else
-{
-    "Getting owner ID from OAuth application..."
-}
-
-# GET AP
-$cap = Read-Host "Would you like to enable the autoplaylist? [Y/n] "
-if($cap -eq "N" -or $cap -eq "n")
-{
-    $config = $config -creplace "UseAutoPlaylist = yes", "UseAutoPlaylist = no"
-    "Autoplaylist disabled"
-}
-else
-{
-    "Autoplaylist enabled"
-}
-
-"Saving your config..."
-Set-Content -Path ".\config\options.ini" -Value $config
+Invoke-Expression "$PYTHON configure.py"
 
 "You can use run.bat to run the bot."
 "Restart your command prompt first!"
