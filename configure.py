@@ -68,6 +68,12 @@ MODE_PICK_FIELD = 2
 MODE_EDIT_OPTION = 3
 MODE_EDIT_FIELD = 3
 
+# Status codes for token verification.
+VERIFY_SUCCESS = 0
+VERIFY_FAILED_LIBRARY = 1
+VERIFY_FAILED_API = 2
+VERIFY_FAILED_MGR = 3
+
 
 class ServerData:
     """
@@ -179,6 +185,7 @@ class ConfigAssistantTextSystem:
         self.edited_opts: Set[ConfigOption] = set()
         self.edited_perms: Set[ConfigOption] = set()
         self.edited_aliases: Set[str] = set()
+        self.token_status: int = 0
 
         # store valid commands from musicbot.
         self.top_commands: Set[str] = set()
@@ -249,6 +256,35 @@ class ConfigAssistantTextSystem:
             srvs[gid] = ServerData(gid, name)
 
         return list(srvs.values())
+
+    def _verify_bot_token(self) -> int:
+        """Create a discord client which immediately closes, to test tokens."""
+        try:
+            import discord
+        except Exception:  # pylint: disable=broad-exception-caught
+            return VERIFY_FAILED_LIBRARY
+
+        if self.mgr_opts is None:
+            return VERIFY_FAILED_MGR
+
+        try:
+            client = discord.Client(intents=discord.Intents.default())
+
+            @client.event
+            async def on_ready() -> None:
+                await client.close()
+
+            @client.event
+            async def on_error() -> None:
+                await client.close()
+
+            client.run(
+                self.mgr_opts._login_token,  # pylint: disable=protected-access
+                log_handler=None,
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            return VERIFY_FAILED_API
+        return VERIFY_SUCCESS
 
     def get_text_input(
         self, lines: int, cols: int, y: int, x: int, value: str = ""
@@ -692,6 +728,21 @@ class ConfigAssistantTextSystem:
                         "This option is missing from your INI file.",
                         curses.color_pair(12),
                     )
+                if selected_opt.option == "Token" and self.token_status:
+                    if self.token_status == VERIFY_FAILED_API:
+                        self.win.addstr(
+                            5,
+                            33 + len(lbl_current),
+                            "ERROR: Token failed to log in!",
+                            curses.color_pair(12),
+                        )
+                    elif self.token_status == VERIFY_FAILED_LIBRARY:
+                        self.win.addstr(
+                            5,
+                            33 + len(lbl_current),
+                            f"WARNING: Cannot verify, internal error {self.token_status}",
+                            curses.color_pair(12),
+                        )
                 cflags = 0
                 if len(cval) >= 199:
                     cflags = curses.color_pair(12)
@@ -739,6 +790,8 @@ class ConfigAssistantTextSystem:
                         )
                     else:
                         self.edited_opts.add(selected_opt)
+                        if selected_opt.option == "Token":
+                            self.token_status = self._verify_bot_token()
 
             self.win.refresh()
 

@@ -21,19 +21,14 @@ DEBUG=0
 
 
 #----------------------------------------------Constants----------------------------------------------#
-DEFAULT_URL_BASE="https://discordapp.com/api"
 # Suported versions of python using only major.minor format
 PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
 PyBin="python3"
 # Path updated by find_python
 PyBinPath="$(command -v "$PyBin")"
 
-USER_OBJ_KEYS="id username discriminator verified bot email avatar"
-
 # Status indicator for post-install notice about python venv based install.
 InstalledViaVenv=0
-
-declare -A BOT
 
 # Get some notion of the current OS / distro name.
 # This will not exhaust options, or ensure a correct name is returned. 
@@ -588,121 +583,16 @@ function debug() {
     fi
 }
 
-function strip_dquote() {
-    result="${1%\"}"
-    result="${result#\"}"
-    echo "$result"
-}
-
-function r_data() {
-    local data=$1
-    echo "$data" | sed -rn 's/(\{.+)\} ([0-9]+)$/\1}/p'
-}
-
-function r_code() {
-    local data=$1
-    echo "$data" | sed -rn 's/(\{.+)\} ([0-9]+)$/\2/p'
-}
-
-function key() {
-    local data=$1
-    local key=$2
-    echo "$data" | jq ".$key"
-}
-
-function r() {
-    local token=$1
-    local method=$2
-    local route=$3
-
-    local url="$DEFAULT_URL_BASE/$route"
-    debug "Attempting to load url $url with token $token"
-
-    res=$(curl -k -s \
-        -w " %{http_code}" \
-        -H "Authorization: Bot $token" \
-        -H "Content-Type: application/json" \
-        -X "$method" \
-        "$url" | tr -d '\n')
-    echo "$res"
-}
-
-function get_token_and_create_bot() {
-    # Set bot token
-    echo ""
-    echo "Please enter your bot token. This can be found in your discordapp developer page."
-    read -rp "Enter Token:" -s token
-    create_bot "$token"
-}
-
-function create_bot() {
-    local bot_token=$1
-
-    local me
-    local me_code
-    local me_data
-    me=$(r "$bot_token" "GET" "users/@me")
-    me_code=$(r_code "$me")
-    me_data=$(r_data "$me")
-
-    if ! [[ $me_code == "200" ]]; then
-        echo ""
-        echo "Error getting user profile, is the token correct? ($me_code $me_data)"
-        exit 1
-    else
-        debug "Got user profile: $me_data"
-    fi
-
-    for k in $USER_OBJ_KEYS; do
-        BOT[$k]=strip_dquote "$(key "$me_data" "$k")"
-    done
-    BOT["token"]=$bot_token
-
-    # We're logged on!
-    echo "Logged on with ${BOT["username"]}#${BOT["discriminator"]}"
-    sed -i "s/bot_token/$bot_token/g" ./config/options.ini
-}
-
 function configure_bot() {
-    read -rp "Would like to configure the bot for basic use? [N/y]" YesConfig
+    echo "You can now configure MusicBot!"
+    read -rp "Would like to launch the 'configure.py' tool? [N/y]" YesConfig
     if [ "${YesConfig,,}" != "y" ] && [ "${YesConfig,,}" != "yes" ] ; then
+        echo "Open the 'config' directory, then copy and rename the example files to get started."
+        echo "Make sure to add your Bot token to the options.ini 'Token' option before starting."
         return
     fi
 
-    get_token_and_create_bot
-
-    # Set prefix, if user wants
-    read -rp "Would you like to change the command prefix? [N/y] " chngprefix
-    case $chngprefix in
-    [Yy]*)
-        echo "Please enter the prefix you'd like for your bot."
-        read -rp "This is what comes before all commands. The default is [!] " prefix
-        sed -i "s/CommandPrefix = !/CommandPrefix = $prefix/g" ./config/options.ini
-        ;;
-    [Nn]*) echo "Using default prefix [!]" ;;
-    *) echo "Using default prefix [!]" ;;
-    esac
-
-    # Set owner ID, if user wants
-    read -rp "Would you like to automatically get the owner ID from the OAuth application? [Y/n] " accountcheck
-    case $accountcheck in
-    [Yy]*) echo "Getting owner ID from OAuth application..." ;;
-    [Nn]*)
-        read -rp "Please enter the owner ID. " ownerid
-        sed -i "s/OwnerID = auto/OwnerID = $ownerid/g" ./config/options.ini
-        ;;
-    *) echo "Getting owner ID from OAuth application..." ;;
-    esac
-    # Enable/Disable AutoPlaylist
-    read -rp "Would you like to enable the autoplaylist? [Y/n] " autoplaylist
-    case $autoplaylist in
-    [Yy]*) echo "Autoplaylist enabled." ;;
-    [Nn]*)
-        echo "Autoplaylist disabled"
-        sed -i "s/UseAutoPlaylist = yes/UseAutoPlaylist = no/g" ./config/options.ini
-        ;;
-    *) echo "Autoplaylist enabled." ;;
-    esac
+    $PyBin "${InstallDir}/configure.py"
 }
 
 #------------------------------------------CLI Arguments----------------------------------------------#
