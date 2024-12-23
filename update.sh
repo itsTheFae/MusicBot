@@ -20,7 +20,7 @@ if [ -f "../bin/activate" ] ; then
 fi
 
 # Suported versions of python using only major.minor format
-PySupported=("3.8" "3.9" "3.10" "3.11" "3.12")
+PySupported=("3.13" "3.12" "3.11" "3.10" "3.9""3.8")
 
 # compile a list of bin names to try for.
 PyBins=("python3")  # We hope that python3 maps to a good version.
