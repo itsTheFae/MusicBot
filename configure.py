@@ -294,8 +294,8 @@ class ConfigAssistantTextSystem:
         Value is returned with leading and trailing space removed.
         """
         curses.curs_set(1)
-        lines = min(lines, curses.LINES - 1 - y)
-        cols = min(cols, curses.COLS - 1 - x)
+        lines = min(lines, curses.LINES - 1 - y)  # pylint: disable=no-member
+        cols = min(cols, curses.COLS - 1 - x)  # pylint: disable=no-member
         twin = curses.newwin(lines, cols, y, x)
         twin.addstr(0, 0, value)
         tpad = textpad.Textbox(twin, insert_mode=True)
