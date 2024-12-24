@@ -158,6 +158,8 @@ function build_python() {
             echo "Error:  Could not find python on the PATH after installing it."
             exit 1
         fi
+    else
+        find_python
     fi
 }
 
