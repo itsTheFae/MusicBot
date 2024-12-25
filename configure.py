@@ -446,7 +446,7 @@ class ConfigAssistantTextSystem:
             midx = (maxx) // 2
             midwx = midx - ((max_px + padx) // 2)
             win = curses.newwin(max(1, maxy - 3), max_px + padx, min(3, maxy), midwx)
-            wmaxy, wmaxx = win.getmaxyx()
+            wmaxy, _wmaxx = win.getmaxyx()
             win.clear()
             win.refresh()
             self.scr.refresh()
