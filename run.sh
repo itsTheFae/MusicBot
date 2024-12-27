@@ -50,7 +50,7 @@ for PyBin in "${PyBins[@]}" ; do
     fi
     PY_VER_MAJOR=$((PY_VER[0]))
     PY_VER_MINOR=$((PY_VER[1]))
-    PY_VER_PATCH=$((PY_VER[2]))
+    # PY_VER_PATCH=$((PY_VER[2]))
     # echo "run.sh detected $PY_BIN version: $PY_VER_MAJOR.$PY_VER_MINOR.$PY_VER_PATCH"
 
     # Major version must be 3+
