@@ -254,7 +254,7 @@ class MusicBot(discord.Client):
         # context was not added until python 3.11
         if sys.version_info >= (3, 11):
             t = self.loop.create_task(coro, name=name, context=ctx)
-        else:  # assume 3.8 +
+        else:  # assume 3.9+
             t = self.loop.create_task(coro, name=name)
         self.task_pool.add(t)
 

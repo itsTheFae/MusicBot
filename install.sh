@@ -22,7 +22,7 @@ DEBUG=0
 
 #----------------------------------------------Constants----------------------------------------------#
 # Suported versions of python using only major.minor format
-PySupported=("3.13" "3.12" "3.11" "3.10" "3.9" "3.8")
+PySupported=("3.13" "3.12" "3.11" "3.10" "3.9")
 PyBin="python3"
 # Path updated by find_python
 PyBinPath="$(command -v "$PyBin")"
@@ -193,16 +193,6 @@ function find_python() {
 
         # Major version must be 3+
         if [[ $PY_VER_MAJOR -ge 3 ]]; then
-            # If 3, minor version minimum is 3.8
-            if [[ $PY_VER_MINOR -eq 8 ]]; then
-                # if 3.8, patch version minimum is 3.8.7
-                if [[ $PY_VER_PATCH -ge 7 ]]; then
-                    PyBinPath="$(which "$PyBinTest")"
-                    PyBin="$PyBinTest"
-                    debug "Selected: $PyBinTest  @  $PyBinPath"
-                    return 0
-                fi
-            fi
             # if 3.9+ it should work.
             if [[ $PY_VER_MINOR -ge 9 ]]; then
                 PyBinPath="$(which "$PyBinTest")"
