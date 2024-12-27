@@ -51,11 +51,11 @@ if [ "$HELP_ME" == "1" ]; then
 fi
 
 
-echo "Black on py38:"
+echo "Black on py39:"
 if [ "$DO_FORMAT" == "0" ]; then
-    python -m black . --diff --color --check -t py38
+    python -m black . --diff --color --check -t py39
 else
-    python -m black . -t py38
+    python -m black . -t py39
 fi
 echo "----"
 echo ""
@@ -80,7 +80,7 @@ echo "----"
 echo ""
 
 echo "MyPy:"
-mypy --python-version 3.8 --warn-unused-ignores ./*.py
+mypy --python-version 3.9 --warn-unused-ignores ./*.py
 echo "----"
 echo ""
 
