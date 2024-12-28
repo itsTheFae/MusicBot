@@ -122,10 +122,14 @@ class LangTool:
 
         print("Compiling existing PO files to MO...")
         for po_file in self.basedir.glob(self._po_file_pattern):
+            locale = po_file.parent.parent.name
+            if self.args.lang and self.args.lang != locale:
+                continue
+
             mo_file = po_file.with_suffix(".mo")
             po = polib.pofile(po_file)
             po.save_as_mofile(mo_file)
-            locale = po_file.parent.parent.name
+
             fname = po_file.name
             ptl = self._colorize_percent(po.percent_translated())
             print(f"Compiled:  {C_BWHITE}{locale}{C_END} - {fname} - {ptl} translated")
@@ -280,6 +284,9 @@ class LangTool:
         pot_msgs = polib.pofile(self._msgs_diff_path)
         for po_file in self.basedir.glob(self._po_file_pattern):
             locale = po_file.parent.parent.name
+            if self.args.lang and self.args.lang != locale:
+                continue
+
             locale_set.add(locale)
 
             if locale != last_locale:
@@ -323,7 +330,7 @@ class LangTool:
         pct = completed / total * 100
         print(f"\nOverall Completion:  {pct:.1f}%\n")
 
-        if save_json:
+        if save_json and not self.args.lang:
             data["MUSICBOT"] = {
                 "completion": f"{pct:.1f}",
                 "languages": ", ".join(locale_set),
@@ -331,7 +338,7 @@ class LangTool:
             with open(self._json_stats_path, "w", encoding="utf-8") as fh:
                 json.dump(data, fh)
 
-        if save_badges:
+        if save_badges and not self.args.lang:
             b_color = "red"
             if pct > 60:
                 b_color = "yellow"
@@ -428,6 +435,142 @@ class LangTool:
             )
         print("Done.")
 
+    def argostranslate(self):
+        """
+        Use argostranslate to fetch languages and apply machine translations to 
+        all untranslated strings in each supported language.
+        """
+        self._check_polib()
+        import polib
+        import uuid
+
+        print("Starting Argos machine translation process...")
+
+        try:
+            from argostranslate import package as argospkg
+            from argostranslate import translate as argostl
+        except Exception:
+            print("Failed to import argostranslate.  Please install it with pip.")
+            sys.exit(1)
+
+        try:
+            import marko
+            from marko.md_renderer import MarkdownRenderer
+        except Exception:
+            print("Failed to import marko.  Please install it with pip.")
+            sys.exit(1)
+
+        # update argos package index.
+        print("Fetching available packages.")
+        argospkg.update_package_index()
+        available_packages = argospkg.get_available_packages()
+        installed_packages = argospkg.get_installed_packages()
+        stringsubs = re.compile(r"%(?:\([a-z0-9_]+\))?[a-z0-9\.]+")
+
+        # extract locales from existing language directories.
+        # then determine if we should install or update language packs for them.
+        excluded_tocodes = ["en", "xx"]
+        from_code = "en"
+        pofile_paths = []
+        for po_file in self.basedir.glob(self._po_file_pattern):
+            locale = po_file.parent.parent.name
+            if self.args.lang and self.args.lang != locale:
+                continue
+
+            pofile_paths.append(po_file)
+            to_code = locale.split("_", maxsplit=1)[0]
+
+            if to_code in excluded_tocodes:
+                print(f"Excluded target language: {to_code}")
+                continue
+
+            def fltr(pkg):
+                return pkg.from_code == from_code and pkg.to_code == to_code
+
+            installed_package = next(filter(fltr, installed_packages), None)
+
+            if installed_package is not None:
+                print(f"Updating language pack for:  {to_code}")
+                installed_package.update()
+            else:
+                package_to_install = next(filter(fltr, available_packages), None)
+                if package_to_install is not None:
+                    print(f"Installing language pack for:  {to_code}")
+                    argospkg.install_from_path(package_to_install.download())
+                else:
+                    print(f"Language pack may not be available for:  {to_code}")
+
+            # update installed packages list.
+            installed_packages = argospkg.get_installed_packages()
+
+        # Helper for Markdown AST traversal.
+        def marko_tl(elm, from_code, to_code):
+            # process text elements which can be translated.
+            if isinstance(elm, marko.inline.InlineElement) and isinstance(elm.children, str):
+                #print(f"MD_ELM: {type(elm)} :: {elm}")
+                elm_text = elm.children
+                subs_map = {}
+                # map percent-style placeholders to a machine-translation-friendly format.
+                for sub in stringsubs.finditer(elm_text):
+                    subin = sub.group(0)
+                    subout = str(uuid.uuid4().int >> 64)
+                    subout = f"_{subout}_"
+                    elm_text = elm_text.replace(subin, subout)
+                    subs_map[subout] = subin
+                    tsubout = argostl.translate(subout, from_code, to_code)
+                    subs_map[tsubout] = subin
+                # translate the raw text for this node.
+                elm_ttext = argostl.translate(elm_text, from_code, to_code)
+                # fix placeholder substitutions.
+                for subin, subout in subs_map.items():
+                    elm_ttext = elm_ttext.replace(subin, subout)
+                    #print(f"REPLACE  {subin}  >>>  {subout}")
+                # update the element node with translated text.
+                elm.children = elm_ttext
+
+            # process element children to search for translatable elements.
+            elif hasattr(elm, 'children'):
+                for child in elm.children:
+                    marko_tl(child, from_code, to_code)
+            return elm
+
+        # Assuming the above loop got all the language packs we need.
+        # We loop over the PO files again and translate only the missing strings.
+        for po_file in pofile_paths:
+            locale = po_file.parent.parent.name
+            if self.args.lang and self.args.lang != locale:
+                continue
+
+            to_code = locale.split("_", maxsplit=1)[0]
+            if to_code in excluded_tocodes:
+                print(f"Excluded target language: {to_code}")
+                continue
+            
+            po = polib.pofile(po_file)
+            ut_entries = po.untranslated_entries()
+            num = len(ut_entries)
+            print(f"Translating {num} strings from {from_code} to {to_code} in {po_file.name}")
+            for entry in ut_entries:
+                otext = entry.msgid
+
+                #print(f"Translated from {from_code} to {to_code}")
+                #print(f">>>Source:\n{entry.msgid}")
+                #print("--------")
+
+                # parse out the markdown formatting to make strings less complex.
+                mp = marko.Markdown(renderer=MarkdownRenderer)
+                md = mp.parse(otext)
+                md = marko_tl(md, from_code, to_code)
+                ttext = mp.render(md)
+
+                #print(f">>>Translation:\n{ttext}")
+                #print("=========================================================\n\n")
+                entry.msgstr = ttext
+                entry.flags.append("machine-translated")
+            po.save()
+
+
+
 
 def main():
     """MusicBot i18n tool entry point."""
@@ -441,6 +584,14 @@ def main():
             "\n"
             "See the `LICENSE` text file for complete details."
         ),
+    )
+
+    ap.add_argument(
+        "-L",
+        dest="lang",
+        type=str,
+        help="Select a single language code to run tasks on, instead of all installed languages.",
+        default="",
     )
 
     ap.add_argument(
@@ -506,6 +657,13 @@ def main():
         help="Update existing POT files and then update existing PO files.",
     )
 
+    ap.add_argument(
+        "-A",
+        dest="do_argostranslate",
+        action="store_true",
+        help="Update all missing translations with Argos-translate machine translations.",
+    )
+
     _args = ap.parse_args()
     _basedir = pathlib.Path(__file__).parent.resolve()
 
@@ -538,6 +696,9 @@ def main():
 
     if _args.do_update:
         langtool.update()
+
+    if _args.do_argostranslate:
+        langtool.argostranslate()
 
     if _args.do_compile:
         langtool.compile()
