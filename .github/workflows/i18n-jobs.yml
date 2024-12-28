@@ -43,7 +43,7 @@ jobs:
           python ./i18n/lang.py -c
           ls -lah ./i18n/*/LC_MESSAGES/*.mo
           python ./i18n/lang.py -sJ
-      - name: Commit MO files.
+      - name: Commit changed i18n data
         run: |
           git config --global user.name 'MusicBot Automation'
           git config --global user.email 'no-mail@musicbot.autobot'
