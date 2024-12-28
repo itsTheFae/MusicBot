@@ -48,6 +48,7 @@ jobs:
           git config --global user.name 'MusicBot Automation'
           git config --global user.email 'no-mail@musicbot.autobot'
           git add ./i18n/*/LC_MESSAGES/*.mo
+          git add ./.github/i18n_stats.json
           if ! git diff --cached --exit-code ; then
             git commit -am "Auto-update i18n data."
             git push
