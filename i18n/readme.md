@@ -136,7 +136,10 @@ Some options require the `polib` python package in order to be used.
 The script provides these command line flags:
 
 - `-h` or `--help`  
-  Shows the help message and exits.
+  Shows the help message and exits.  
+
+- `-L`  
+  Select a single language code to operate on, instead of all installed.
 
 - `-c`  
   Compile existing PO files into MO files.  
@@ -158,9 +161,12 @@ The script provides these command line flags:
   This requires the `polib` python package.
 
 - `-s`  
-  Show translation stats for existing PO files, such as completion and number of missing translations.
+  Show translation stats for existing PO files, such as completion and number of missing translations.  
 
 - `-u`  
   Extracts strings to POT files, then updates existing PO files with new strings.  
   This requires the `polib` python package.
 
+- `-A`  
+  Attempt to automatically translate all untranslated strings using machine translations.  
+  This requires the `polib` and `argostranslate` python packages.  
