@@ -4788,260 +4788,287 @@ msgstr ""
 "MusicBot debe tener permiso para crear este directorio.\n"
 
 #: musicbot/bot.py:2423
+#, machine-translated
 msgid "Private Channel"
-msgstr ""
+msgstr "Canal privado\n"
 
 #: musicbot/bot.py:2425
+#, machine-translated
 msgid "Unknown User DM"
-msgstr ""
+msgstr "Unknown User DM\n"
 
 #: musicbot/bot.py:2427
-#, python-format
+#, python-format, machine-translated
 msgid "User DM: %(name)s"
-msgstr ""
+msgstr "Usuario DM: %(name)s\n"
 
 #: musicbot/bot.py:2431
+#, machine-translated
 msgid "Unknown Channel (Partial)"
-msgstr ""
+msgstr "Canal desconocido (en parte)\n"
 
 #: musicbot/bot.py:2433
-#, python-format
+#, python-format, machine-translated
 msgid "Unnamed Channel: %(id)s"
-msgstr ""
+msgstr "Canal sin nombre: _1831704289459891_\n"
 
 #: musicbot/bot.py:2812
+#, machine-translated
 msgid "Unknown Channel"
-msgstr ""
+msgstr "Canal desconocido\n"
 
 #. TRANSLATORS: Placeholder for empty track title.
 #: musicbot/entry.py:299 musicbot/entry.py:821 musicbot/entry.py:1020
+#, machine-translated
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido\n"
 
 #: musicbot/bot.py:718
-#, python-format
+#, python-format, machine-translated
 msgid "MusicBot may use up to %(rate).2f %(suffix)s of bandwidth."
 msgstr ""
+"MusicBot puede utilizar hasta %(rate).2f %(suffix)s de ancho de banda.\n"
 
 #: musicbot/player.py:446
-#, python-format
+#, python-format, machine-translated
 msgid "Probed codec and bitrate: %(name)s at %(rate)s kbps"
-msgstr ""
+msgstr "Probed codec and bitrate: %(name)s at %(rate)s kbps\n"
 
 #: musicbot/bot.py:2608
-#, python-format
+#, python-format, machine-translated
 msgid "  Command by @mention: %s"
-msgstr ""
+msgstr "Comando por @mention: %s\n"
 
 #: musicbot/bot.py:2610
-#, python-format
+#, python-format, machine-translated
 msgid "  Command aliases: %s"
-msgstr ""
+msgstr "Mando alias: %s\n"
 
 #: musicbot/bot.py:2619
-#, python-format
+#, python-format, machine-translated
 msgid "    Legacy skip: %s"
-msgstr ""
+msgstr "    Patrón de Legado: %s\n"
 
 #: musicbot/bot.py:2621
-#, python-format
+#, python-format, machine-translated
 msgid "    Author insta-skip: %s"
-msgstr ""
+msgstr "    Autor insta-skip: %s\n"
 
 #: musicbot/bot.py:2629
-#, python-format
+#, python-format, machine-translated
 msgid "  Auto-join Owner's voice channel: %s"
-msgstr ""
+msgstr "Canal de voz del propietario automático: %s\n"
 
 #: musicbot/bot.py:2641
-#, python-format
+#, python-format, machine-translated
 msgid "    Save per-server queue history: %s"
-msgstr ""
+msgstr "    Guardar historia de la cola por servidor: %s\n"
 
 #: musicbot/bot.py:2645
-#, python-format
+#, python-format, machine-translated
 msgid "    Save global queue history: %s"
-msgstr ""
+msgstr "    Guardar historia de la cola global: %s\n"
 
 #: musicbot/bot.py:2649
-#, python-format
+#, python-format, machine-translated
 msgid "    Remove URLs on extraction error: %s"
-msgstr ""
+msgstr "    Eliminar URLs en el error de extracción: %s\n"
 
 #: musicbot/bot.py:2652
-#, python-format
+#, python-format, machine-translated
 msgid "    Skip playlist for user requests: %s"
-msgstr ""
+msgstr "    Saltar lista de reproducción para solicitudes de usuarios: %s\n"
 
 #: musicbot/bot.py:2670
-#, python-format
+#, python-format, machine-translated
 msgid "  Songs blocklist: %s"
-msgstr ""
+msgstr "Canciones blocklist: %s\n"
 
 #: musicbot/bot.py:2671
-#, python-format
+#, python-format, machine-translated
 msgid "  Users blocklist: %s"
-msgstr ""
+msgstr "Lista de usuarios: %s\n"
 
 #: musicbot/bot.py:2680
-#, python-format
+#, python-format, machine-translated
 msgid "    Delete if cache exceeds %s"
-msgstr ""
+msgstr "    Eliminar si el caché supera %s\n"
 
 #: musicbot/bot.py:2683
-#, python-format
+#, python-format, machine-translated
 msgid "  Pre-download next track: %s"
-msgstr ""
+msgstr "Descargar la siguiente pista: %s\n"
 
 #: musicbot/bot.py:2690
-#, python-format
+#, python-format, machine-translated
 msgid "  Write current song title to file: %s"
 msgstr ""
+"Escriba el título de la canción actual para el archivo: "
+"_38315306494442335_\n"
 
 #: musicbot/bot.py:2693
-#, python-format
+#, python-format, machine-translated
 msgid "  Respond with Embeds: %s"
-msgstr ""
+msgstr "Responder a Embeds: %s\n"
 
 #: musicbot/bot.py:2696
+#, machine-translated
 msgid "    Footer Text Disabled"
-msgstr ""
+msgstr "    Footer Text Disabled\n"
 
 #: musicbot/bot.py:2698
-#, python-format
+#, python-format, machine-translated
 msgid "    Footer Text:  %s"
-msgstr ""
+msgstr "    Texto del pie: %s\n"
 
 #: musicbot/bot.py:2704
-#, python-format
+#, python-format, machine-translated
 msgid "  Leave servers where Owner is not a member: %s"
-msgstr ""
+msgstr "Dejar servidores donde el propietario no es miembro: %s\n"
 
 #: musicbot/bot.py:2708
-#, python-format
+#, python-format, machine-translated
 msgid "  Disconnect from inactive channel: %s"
-msgstr ""
+msgstr "Desconexión del canal inactivo %s\n"
 
 #: musicbot/bot.py:2717
-#, python-format
+#, python-format, machine-translated
 msgid "  Disconnect at end of queue: %s"
-msgstr ""
+msgstr "Desconexión al final de la cola: %s\n"
 
 #: musicbot/bot.py:2721
-#, python-format
+#, python-format, machine-translated
 msgid "  Disconnect when player idles: %s"
-msgstr ""
+msgstr "Desconectar cuando el jugador idles: %s\n"
 
 #: musicbot/bot.py:2731
-#, python-format
+#, python-format, machine-translated
 msgid "  Search using reactions: %s"
-msgstr ""
+msgstr "Búsqueda utilizando reacciones: %s\n"
 
 #: musicbot/bot.py:2732
-#, python-format
+#, python-format, machine-translated
 msgid "    Results per search: %d"
-msgstr ""
+msgstr "    Resultados por búsqueda: %d\n"
 
 #: musicbot/bot.py:2737
-#, python-format
+#, python-format, machine-translated
 msgid "  Local media files: %s"
-msgstr ""
+msgstr "Archivos de medios locales: %s\n"
 
 #: musicbot/bot.py:2740
-#, python-format
+#, python-format, machine-translated
 msgid "  Network checking ping tests: %s"
-msgstr ""
+msgstr "Pruebas de detección de redes: %s\n"
 
 #: musicbot/bot.py:2750
-#, python-format
+#, python-format, machine-translated
 msgid "  Audio processed with: %s"
-msgstr ""
+msgstr "Audio procesado con: %s\n"
 
 #: musicbot/bot.py:2753
-#, python-format
+#, python-format, machine-translated
 msgid "  Equalize audio level per-track: %s"
-msgstr ""
+msgstr "Igualdad de audio nivel por pista: %s\n"
 
 #: musicbot/bot.py:2758
-#, python-format
+#, python-format, machine-translated
 msgid "  HTTP Proxy set to:  %s"
-msgstr ""
+msgstr "HTTP Proxy se establece en: _15217758131462538_\n"
 
 #: musicbot/bot.py:2760
-#, python-format
+#, python-format, machine-translated
 msgid "  User Agent set to:  %s"
-msgstr ""
+msgstr "Agente de usuario establecido en: _53534739667241667_\n"
 
 #: musicbot/bot.py:8144
+#, machine-translated
 msgid ""
 "MusicBot has bound channel config and caller channel is not in bound "
 "channels."
 msgstr ""
+"MusicBot tiene config de canal atado y canal de llamada no está en canales "
+"atados.\n"
 
 #: musicbot/bot.py:8151
+#, machine-translated
 msgid "Caller server has a bound channel, caller channel ignored."
 msgstr ""
+"El servidor de llamada tiene un canal atado, canal de llamada ignorado.\n"
 
 #: musicbot/bot.py:8154
+#, machine-translated
 msgid "Caller server has no bound channel, caller allowed."
 msgstr ""
+"El servidor de llamada no tiene un canal atado, se permite la llamada.\n"
 
 #: musicbot/bot.py:8157
-#, python-format
+#, python-format, machine-translated
 msgid "Unbound channel (%s) in server:  %s"
-msgstr ""
+msgstr "Canal sin límite (%s) en servidor: %s\n"
 
 #: musicbot/testrig.py:462
+#, machine-translated
 msgid "Starting Command Tests..."
-msgstr ""
+msgstr "Comando de inicio Tests...\n"
 
 #: musicbot/testrig.py:510
-#, python-format
+#, python-format, machine-translated
 msgid "Buffered command: %(cmd)s"
-msgstr ""
+msgstr "Buffered command: %(cmd)s\n"
 
 #: musicbot/testrig.py:527
-#, python-format
+#, python-format, machine-translated
 msgid "- Processing CMD %(n)s of %(t)s: %(cmd)s"
-msgstr ""
+msgstr "- CMD %(n)s de %(t)s: %(cmd)s\n"
 
 #: run.py:387
+#, machine-translated
 msgid "Checking for Python 3.9+"
-msgstr ""
+msgstr "Comprobación para Python 3.9+\n"
 
 #: run.py:391
-#, python-format
+#, python-format, machine-translated
 msgid "Python 3.9+ is required. This version is %s"
-msgstr ""
+msgstr "Python 3.9+ es necesario. Esta versión es %s\n"
 
 #: run.py:393
+#, machine-translated
 msgid "Attempting to locate Python 3.9..."
-msgstr ""
+msgstr "Intento localizar a Python 3.9...\n"
 
 #: run.py:412
+#, machine-translated
 msgid "Could not execute `py.exe -3.9` "
-msgstr ""
+msgstr "No se puede ejecutar`py.exe -3.9`\n"
 
 #: run.py:421
+#, machine-translated
 msgid "Trying \"python3.9\""
-msgstr ""
+msgstr "Intentando \"python3.9\"\n"
 
 #: run.py:424
+#, machine-translated
 msgid "Could not locate python3.9 on path."
-msgstr ""
+msgstr "No podía localizar pitón3.9 en el camino.\n"
 
 #: run.py:438
-#, python-format
+#, python-format, machine-translated
 msgid ""
 "\n"
 "Python 3.9 found.  Re-launching bot using: %s run.py\n"
 msgstr ""
+"\n"
+"Python 3.9 encontrado. Re-launching bot using: %s run.py\n"
 
 #: run.py:443
+#, machine-translated
 msgid ""
 "Could not find Python 3.9 or higher.  Please run the bot using Python "
 "version 3.9 to 3.13"
 msgstr ""
+"No podía encontrar Python 3.9 o superior. Por favor, ejecute el bot usando "
+"Python versión 3.9 a 3.13\n"
 
 #, python-format
 #~ msgid "  Auto-Summon: %s"

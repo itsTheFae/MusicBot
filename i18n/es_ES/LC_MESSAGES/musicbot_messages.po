@@ -4034,87 +4034,104 @@ msgstr ""
 "  Asegúrese de que MusicBot pueda leer y escribir en sus archivos de configuración.\n"
 
 #: musicbot/bot.py:7374
+#, machine-translated
 msgid "Unknown Owner"
-msgstr ""
+msgstr "Unknown Owner\n"
 
 #. TRANSLATORS: text-only format for embed title.
 #: musicbot/constructs.py:420
-#, python-format
+#, python-format, machine-translated
 msgid "## %(title)s\n"
-msgstr ""
+msgstr "## %(title)s\n"
 
 #. TRANSLATORS: text-only format for embed description.
 #: musicbot/constructs.py:423
-#, python-format
+#, python-format, machine-translated
 msgid "%(content)s\n"
-msgstr ""
+msgstr "%(content)s\n"
 
 #. TRANSLATORS: text-only format for embed url.
 #: musicbot/constructs.py:426
-#, python-format
+#, python-format, machine-translated
 msgid "%(url)s\n"
-msgstr ""
+msgstr "%(url)s\n"
 
 #. TRANSLATORS: text-only format for embed field name an value.
 #: musicbot/constructs.py:432
-#, python-format
+#, python-format, machine-translated
 msgid "**%(name)s** %(value)s\n"
-msgstr ""
+msgstr "**%(name)s**%(value)s\n"
 
 #. TRANSLATORS: text-only format for embed field without a name.
 #: musicbot/constructs.py:438
-#, python-format
+#, python-format, machine-translated
 msgid "%(value)s\n"
-msgstr ""
+msgstr "%(value)s\n"
 
 #. TRANSLATORS: text-only format for embed image or thumbnail.
 #: musicbot/constructs.py:443 musicbot/constructs.py:445
-#, python-format
+#, python-format, machine-translated
 msgid "%(url)s"
-msgstr ""
+msgstr "%(url)s\n"
 
 #. TRANSLATORS: text-only format template for embeds converted to markdown.
 #: musicbot/constructs.py:449
-#, python-format
+#, python-format, machine-translated
 msgid "%(title)s%(content)s%(url)s%(fields)s%(image)s"
-msgstr ""
+msgstr "%(title)s%(content)s%(url)s%(fields)s_%(image)s\n"
 
 #: musicbot/bot.py:7847
-#, python-format
+#, python-format, machine-translated
 msgid ""
 "- `%(delay).0f ms` (`%(avg).0f ms` Avg.) in region: `%(region)s` using "
 "%(bitrate)s kbps.\n"
 msgstr ""
+"- `%(delay).0f ms`()`%(avg).0f ms`Avg.) en la región:`%(region)s`use "
+"%(bitrate)s kbps.\n"
 
 #: musicbot/bot.py:7861
-#, python-format
+#, python-format, machine-translated
 msgid ""
 "**API Latency:** `%(delay).0f ms`\n"
 "**VoiceClient Latency:**\n"
 "%(voices)s\n"
 "Using approximately %(rate).2f %(suffix)s of bandwidth total."
 msgstr ""
+"**API Latency:**`%(delay).0f ms`\n"
+"**VoiceClient Latency:**\n"
+"%(voices)s\n"
+"Usando aproximadamente %(rate).2f %(suffix)s de ancho de banda total.\n"
 
 #: musicbot/bot.py:7889
-#, python-format
+#, python-format, machine-translated
 msgid ""
 "\n"
 "**Voice Latency:** `%(delay).0f ms` (`%(average).0f ms` Avg.) in region `%(region)s` using %(bitrate)s kbps"
 msgstr ""
+"\n"
+"**Latencia de voz:**`%(delay).0f ms`()`%(average).0f ms`Avg.) en la región`%(region)s`use %(bitrate)s kbps\n"
 
 #: musicbot/config.py:1061
+#, machine-translated
 msgid ""
 "May reduce CPU usage by avoiding PCM-to-Opus encoding in python.\n"
 "When enabled, volume is controlled via FFmpeg filter instead of python.\n"
 "May cause a short delay when tracks first start for bitrate discovery."
 msgstr ""
+"Puede reducir el uso de CPU evitando la codificación PCM-a-Opus en pitón.\n"
+"Cuando está habilitado, el volumen se controla a través del filtro FFmpeg en lugar de pitón.\n"
+"Puede causar un breve retraso cuando las pistas comienzan por el descubrimiento de bitrate.\n"
 
 #: musicbot/config.py:1073
+#, machine-translated
 msgid ""
 "Similar to UseOpusAudio, but reduces CPU usage even more where possible.\n"
 "If the media is already Opus encoded (like YouTube) no re-encoding is done.\n"
 "This option will disable speed, volume, and UseExperimentalEqualization options."
 msgstr ""
+"Similar a UseOpusAudio, pero reduce el uso de CPU aún más cuando sea posible.\n"
+"Si los medios de comunicación ya están codificados por Opus (como YouTube) no se hace recodificación.\n"
+"Esta opción desactivará la velocidad, el volumen y las opciones UseExperimentalEqualization.\n"
 
 #, python-format
 #~ msgid "- `%(delay).0f ms` (`%(avg).0f ms` Avg.) in region: `%(region)s`\n"
