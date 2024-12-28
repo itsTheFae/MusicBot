@@ -1,6 +1,6 @@
 # MusicBot Translation Guide  
 
-![Translations: 66.2%](https://img.shields.io/badge/Translations-66.2%25-orange?style=flat-square)  
+![Translation Stats](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FitsTheFae%2FMusicBot%2Ffae%2F.github%2Fi18n_stats.json&query=%24.MUSICBOT.completion&suffix=%25&label=Translations)  
 
 MusicBot makes use of GNU Gettext for translation of display text.  
 We use the typical `.po`/`.mo` file format to enable translations and bundle a few 
