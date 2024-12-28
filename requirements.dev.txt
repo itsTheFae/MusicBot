@@ -17,7 +17,7 @@ isort[colors]
 mypy
 pylint
 polib
-argostranslate
+argostranslate; python_version < '3.13'
 marko
 
 # type stubs for untyped packages.

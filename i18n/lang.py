@@ -448,8 +448,12 @@ class LangTool:
         print("Starting Argos machine translation process...")
 
         try:
-            from argostranslate import package as argospkg
-            from argostranslate import translate as argostl
+            from argostranslate import (
+                package as argospkg,  # pylint: disable=import-error,useless-suppression
+            )
+            from argostranslate import (
+                translate as argostl,  # pylint: disable=import-error,useless-suppression
+            )
         except Exception:  # pylint: disable=broad-exception-caught
             print("Failed to import argostranslate.  Please install it with pip.")
             sys.exit(1)
