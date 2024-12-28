@@ -68,6 +68,12 @@ MODE_PICK_FIELD = 2
 MODE_EDIT_OPTION = 3
 MODE_EDIT_FIELD = 3
 
+# Status codes for token verification.
+VERIFY_SUCCESS = 0
+VERIFY_FAILED_LIBRARY = 1
+VERIFY_FAILED_API = 2
+VERIFY_FAILED_MGR = 3
+
 
 class ServerData:
     """
@@ -141,12 +147,7 @@ class ConfigAssistantTextSystem:
         """
 
         self.scr = stdscr
-        self.win = curses.newwin(
-            curses.LINES - 3,  # pylint: disable=no-member
-            curses.COLS,  # pylint: disable=no-member
-            3,
-            0,
-        )
+        self.win = curses.newwin(1, 1, 0, 0)
 
         # turn off the cursor
         curses.curs_set(0)
@@ -179,6 +180,7 @@ class ConfigAssistantTextSystem:
         self.edited_opts: Set[ConfigOption] = set()
         self.edited_perms: Set[ConfigOption] = set()
         self.edited_aliases: Set[str] = set()
+        self.token_status: int = 0
 
         # store valid commands from musicbot.
         self.top_commands: Set[str] = set()
@@ -250,6 +252,66 @@ class ConfigAssistantTextSystem:
 
         return list(srvs.values())
 
+    def _verify_bot_token(self) -> int:
+        """Create a discord client which immediately closes, to test tokens."""
+        try:
+            import discord
+        except Exception:  # pylint: disable=broad-exception-caught
+            return VERIFY_FAILED_LIBRARY
+
+        if self.mgr_opts is None:
+            return VERIFY_FAILED_MGR
+
+        try:
+            client = discord.Client(intents=discord.Intents.default())
+
+            @client.event
+            async def on_ready() -> None:
+                await client.close()
+
+            @client.event
+            async def on_error() -> None:
+                await client.close()
+
+            client.run(
+                self.mgr_opts._login_token,  # pylint: disable=protected-access
+                log_handler=None,
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            return VERIFY_FAILED_API
+        return VERIFY_SUCCESS
+
+    def _remake_subwindow(self) -> None:
+        """(re) create the main sub-window using current screen size."""
+        self.win = curses.newwin(
+            max(1, curses.LINES - 3),  # pylint: disable=no-member
+            curses.COLS,  # pylint: disable=no-member
+            min(3, curses.LINES),  # pylint: disable=no-member
+            0,
+        )
+
+    def _process_resize(self) -> None:
+        """Calls common resize functions to update curses screen and window sizes."""
+        ny, nx = self.scr.getmaxyx()
+        curses.resize_term(ny, nx)
+        curses.update_lines_cols()
+        self.win.resize(max(1, ny - 3), nx)
+        self.scr.refresh()
+        self.win.refresh()
+
+    def winaddstr(self, y: int, x: int, data: str, flags: Optional[Any] = None) -> None:
+        """Wrapper for self.win.adddstr() which enforces bounds to prevent crashes."""
+        max_y, max_x = self.win.getmaxyx()
+        max_y -= 1
+        max_x -= 1
+        by = min(y, max_y)
+        bx = min(x, max_x)
+        data = data[: max(0, max_x - x)]
+        if flags is not None:
+            self.win.addstr(by, bx, data, flags)
+        else:
+            self.win.addstr(by, bx, data)
+
     def get_text_input(
         self, lines: int, cols: int, y: int, x: int, value: str = ""
     ) -> str:
@@ -258,6 +320,8 @@ class ConfigAssistantTextSystem:
         Value is returned with leading and trailing space removed.
         """
         curses.curs_set(1)
+        lines = min(lines, curses.LINES - 1 - y)  # pylint: disable=no-member
+        cols = min(cols, curses.COLS - 1 - x)  # pylint: disable=no-member
         twin = curses.newwin(lines, cols, y, x)
         twin.addstr(0, 0, value)
         tpad = textpad.Textbox(twin, insert_mode=True)
@@ -356,12 +420,7 @@ class ConfigAssistantTextSystem:
 
         # handle resize
         elif key == curses.KEY_RESIZE:
-            ny, nx = self.scr.getmaxyx()
-            curses.resize_term(ny, nx)
-            curses.update_lines_cols()
-            self.win.resize(ny - 3, nx)
-            self.scr.refresh()
-            self.win.refresh()
+            self._process_resize()
 
         return False
 
@@ -379,37 +438,43 @@ class ConfigAssistantTextSystem:
         selno = 0
         selected: Set[str] = set(cur_val)
 
-        maxy, maxx = self.scr.getmaxyx()
-        padx = 6
-        midx = (maxx - 1) // 2
-        midwx = midx - ((max_px + padx) // 2)
-        win = curses.newwin(maxy - 4, max_px + padx, 3, midwx)
-        win.clear()
-        win.refresh()
-        self.scr.refresh()
         while True:
             maxy, maxx = self.scr.getmaxyx()
+            maxy -= 1
+            maxx -= 1
+            padx = 6
+            midx = (maxx) // 2
+            midwx = midx - ((max_px + padx) // 2)
+            win = curses.newwin(max(1, maxy - 3), max_px + padx, min(3, maxy), midwx)
+            wmaxy, _wmaxx = win.getmaxyx()
             win.clear()
+            win.refresh()
+            self.scr.refresh()
             win.box()
-            win.addstr(1, 1, "Select Commands:", curses.A_BOLD)
+
+            if wmaxy > 1:
+                win.addstr(
+                    min(1, maxy), min(1, maxx), "Select Commands:", curses.A_BOLD
+                )
+
             hud = "[SPACE] Select  [ENTER] Confirm Selected  [ESC] Go Back"
             self.scr.addstr(
-                maxy - 1,
+                max(0, maxy),
                 0,
-                hud.center(maxx - 1),
+                hud.center(maxx)[:maxx],
                 curses.color_pair(1) | curses.A_BOLD,
             )
 
-            viewno = max(0, (selno - (maxy - 7)) + 1)
-            view = list(perms)[viewno : viewno + (maxy - 7)]
+            viewno = max(0, (selno - (maxy - 6)) + 1)
+            view = list(perms)[viewno : viewno + (maxy - 6)]
             for i, perm in enumerate(view):
                 flags = 0
                 if i + viewno == selno:
                     flags = curses.color_pair(1)
                 if perm in selected:
-                    win.addstr(i + 2, 1, f"[x] {perm}", flags)
+                    win.addstr(min(i + 2, maxy), 1, f"[x] {perm}", flags)
                 else:
-                    win.addstr(i + 2, 1, f"[ ] {perm}", flags)
+                    win.addstr(min(i + 2, maxy), 1, f"[ ] {perm}", flags)
 
             win.refresh()
             self.scr.refresh()
@@ -429,6 +494,8 @@ class ConfigAssistantTextSystem:
                     selno -= 1
                 else:
                     selno = len(perms) - 1
+            elif key == curses.KEY_RESIZE:
+                self._process_resize()
             elif key == ord(" "):
                 perm = list(perms)[selno]
                 if perm in selected:
@@ -451,39 +518,73 @@ class ConfigAssistantTextSystem:
         config_sel = 0
         selected = False
 
+        # update/input loop for the main screen.
         while True:
-            _max_y, max_x = self.scr.getmaxyx()
+            # get screen size and adjust them for use in layout logic.
+            max_y, max_x = self.scr.getmaxyx()
+            max_y -= 1
+            max_x -= 1
+
+            # reset everything on the screen in prep for output.
             self.scr.clear()
             self.scr.addstr(0, 0, "Select configuration to edit:", curses.A_BOLD)
 
             # build config selection at top.
             c = 2
+            line_offset = 0
+            xlimit = max_x - c
             for i, option in enumerate(config_types):
                 opt_str = f" {option} "
+                opt_desc = config_files[config_types[config_sel]]
+
+                # prevent printing the option if the screen is too narrow.
+                if c >= xlimit or c + len(opt_str) >= xlimit:
+                    break
+
+                # if the screen is too narrow for the description, add a line so it can fold.
+                if len(opt_desc) > max_x:
+                    line_offset = 1
+
+                # determine how to highlight the option
                 flags = 0
                 if i == config_sel:
                     flags = curses.color_pair(1)
                     if config_edited[i]:
                         flags = curses.color_pair(15)
-                    self.scr.addstr(1, c, opt_str, flags)
+                    self.scr.addstr(1, c, opt_str[:xlimit], flags)
                 else:
                     if config_edited[i]:
                         flags = curses.color_pair(14)
-                    self.scr.addstr(1, c, opt_str, flags)
+                    self.scr.addstr(1, c, opt_str[:xlimit], flags)
                 c += len(opt_str)
+
+                # tell the user about unsaved edits for the selected option.
                 if config_edited[i]:
                     self.scr.addstr(
-                        4, 2, "You have unsaved edits!", curses.color_pair(14)
+                        min(4 + line_offset, max_y),
+                        2,
+                        "You have unsaved edits!"[: max_x - 2],
+                        curses.color_pair(14),
                     )
 
                 # disable server options if no servers are found.
                 elif config_sel == 3 and not self.mgr_srvs:
                     self.scr.addstr(
-                        4, 2, "No servers available to edit!", curses.color_pair(12)
+                        min(4 + line_offset, max_y),
+                        2,
+                        "No servers available to edit!"[: max_x - 2],
+                        curses.color_pair(12),
                     )
 
-            self.scr.hline(2, 0, curses.ACS_HLINE, max_x)
-            self.scr.addstr(3, 2, config_files[config_types[config_sel]])
+            # draw the horizontal line and selected sections description.
+            self.scr.hline(min(2, max_y), 0, curses.ACS_HLINE, max_x)
+            self.scr.addstr(min(3, max_y), 2, opt_desc[: max_x - 2])
+
+            # Draw the HUD
+            hud = " [ESC] Quit  [ENTER] Confirm  [ARROW KEYS] Navigate"
+            pad = max(0, max_x - len(hud))
+            hud += " " * pad
+            self.scr.addstr(max_y, 0, hud[:max_x], curses.color_pair(1) | curses.A_BOLD)
 
             # Get user input
             key = self.scr.getch()
@@ -503,11 +604,14 @@ class ConfigAssistantTextSystem:
                 selected = False
                 if any(x for x in config_edited):
                     self.scr.addstr(
-                        4, 2, "You have unsaved edits!", curses.color_pair(10)
+                        min(4, max_y),
+                        min(2, max_x),
+                        "You have unsaved edits!",
+                        curses.color_pair(10),
                     )
                     self.scr.addstr(
-                        5,
-                        2,
+                        min(5, max_y),
+                        min(2, max_x),
                         "Press [ESC] again to exit anyway.",
                         curses.color_pair(10) | curses.A_BOLD,
                     )
@@ -516,6 +620,8 @@ class ConfigAssistantTextSystem:
                         break
                 else:
                     break
+            elif key == curses.KEY_RESIZE:
+                self._process_resize()
 
             if selected:
                 # enter Options editor
@@ -577,35 +683,31 @@ class ConfigAssistantTextSystem:
 
         while True:
             # setup the window for this frame.
+            self._remake_subwindow()
             max_y, max_x = self.win.getmaxyx()
+            max_y -= 1
+            max_x -= 1
             self.win.clear()
 
             # update selected section
             selected_sct: str = sections[self.sct_selno]
 
             # Layout window.
-            self.win.hline(2, 0, curses.ACS_HLINE, max_x)
-            self.win.vline(2, 30, curses.ACS_VLINE, max_y)
-            self.win.addch(2, 30, curses.ACS_TTEE)
+            self.win.hline(min(2, max_y), 0, curses.ACS_HLINE, max_x)
+            if max_x > 30:
+                self.win.vline(min(2, max_y), min(30, max_x), curses.ACS_VLINE, max_y)
+                self.win.addch(min(2, max_y), min(30, max_x), curses.ACS_TTEE)
             if self.edit_error_msg:
-                self.win.addstr(0, 1, self.edit_error_msg, curses.color_pair(12))
+                self.winaddstr(0, 1, self.edit_error_msg, curses.color_pair(12))
             else:
-                self.win.addstr(0, 1, "Select a section and option to edit.")
-            self.win.addstr(1, 1, "Section:", curses.A_BOLD)
-            self.win.addstr(1, 10, "[", curses.A_DIM)
+                self.winaddstr(0, 1, "Select a section and option to edit.")
+            self.winaddstr(1, 1, "Section:", curses.A_BOLD)
+            self.winaddstr(1, 10, "[", curses.A_DIM)
             if self.edit_mode == MODE_PICK_SECTION:
-                self.win.addstr(1, 11, selected_sct, curses.color_pair(1))
+                self.winaddstr(1, 11, selected_sct, curses.color_pair(1))
             else:
-                self.win.addstr(1, 11, selected_sct)
-            self.win.addstr(1, 11 + len(selected_sct), "]", curses.A_DIM)
-
-            # Show HUD
-            hud = " [F2] Save  [F5] Reload  [ESC] Go Back"
-            pad = max_x - len(hud) - 31
-            hud += " " * pad
-            self.win.addstr(
-                max_y - 1, 31, hud[: max_x - 32], curses.color_pair(1) | curses.A_BOLD
-            )
+                self.winaddstr(1, 11, selected_sct)
+            self.winaddstr(1, 11 + len(selected_sct), "]", curses.A_DIM)
 
             # build options from the above selected section
             options = (
@@ -615,8 +717,8 @@ class ConfigAssistantTextSystem:
             selected_opt = self.mgr_opts.register.get_config_option(
                 selected_sct, options[self.opt_selno]
             )
-            opt_viewno = max(0, (self.opt_selno - (max_y - 3)) + 1)
-            visopts = options[opt_viewno : opt_viewno + (max_y - 3)]
+            opt_viewno = max(0, (self.opt_selno - (max_y - 2)) + 1)
+            visopts = options[opt_viewno : opt_viewno + (max_y - 2)]
             cnf_opt: Optional[ConfigOption] = None
             for i, opt in enumerate(visopts):
                 cnf_opt = self.mgr_opts.register.get_config_option(selected_sct, opt)
@@ -633,7 +735,7 @@ class ConfigAssistantTextSystem:
                     # If opt is listed in missing_options, mark it so.
                     elif opt in missing_options[selected_sct]:
                         flags = curses.color_pair(13)
-                    self.win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
+                    self.winaddstr(i + 3, 0, f" {opt[:28]} ", flags)
                 else:
                     flags = 0
                     if cnf_opt is None:
@@ -642,7 +744,7 @@ class ConfigAssistantTextSystem:
                         flags = curses.color_pair(14)
                     elif opt in missing_options[selected_sct]:
                         flags = curses.color_pair(12)
-                    self.win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
+                    self.winaddstr(i + 3, 0, f" {opt[:28]} ", flags)
 
             # build info for selected option.
             if selected_opt:
@@ -654,7 +756,7 @@ class ConfigAssistantTextSystem:
                 comment_lines = []
                 for line in comment.split("\n"):
                     if len(line) > max_desc_x:
-                        ls = textwrap.wrap(line, width=max_desc_x)
+                        ls = textwrap.wrap(line, width=max(1, max_desc_x))
                         comment_lines += ls
                     else:
                         comment_lines.append(line)
@@ -665,47 +767,70 @@ class ConfigAssistantTextSystem:
                 lbl_desc = "Description:"
 
                 # option name
-                self.win.addstr(3, 31, lbl_option, curses.A_BOLD)
-                self.win.addstr(3, 32 + len(lbl_option), selected_opt.option)
+                self.winaddstr(3, 31, lbl_option, curses.A_BOLD)
+                self.winaddstr(3, 32 + len(lbl_option), selected_opt.option)
 
                 # default value
                 dval = self.mgr_opts.register.to_ini(selected_opt, use_default=True)
-                self.win.addstr(4, 31, lbl_default, curses.A_BOLD)
-                self.win.addstr(4, 32 + len(lbl_default), dval)
+                self.winaddstr(4, 31, lbl_default, curses.A_BOLD)
+                self.winaddstr(4, 32 + len(lbl_default), dval)
 
                 # current setting
                 cval = self.mgr_opts.register.to_ini(selected_opt)
-                self.win.addstr(5, 31, lbl_current, curses.A_BOLD)
-                # win.addstr(5, 32 + len(lbl_current), str(vals))
+                self.winaddstr(5, 31, lbl_current, curses.A_BOLD)
                 if selected_opt.option in missing_options[selected_sct]:
-                    self.win.addstr(
+                    self.winaddstr(
                         5,
                         33 + len(lbl_current),
                         "This option is missing from your INI file.",
                         curses.color_pair(12),
                     )
+                if selected_opt.option == "Token" and self.token_status:
+                    if self.token_status == VERIFY_FAILED_API:
+                        self.winaddstr(
+                            5,
+                            33 + len(lbl_current),
+                            "ERROR: Token failed to log in!",
+                            curses.color_pair(12),
+                        )
+                    elif self.token_status == VERIFY_FAILED_LIBRARY:
+                        self.winaddstr(
+                            5,
+                            33 + len(lbl_current),
+                            f"WARNING: Cannot verify, internal error {self.token_status}",
+                            curses.color_pair(12),
+                        )
                 cflags = 0
                 if len(cval) >= 199:
                     cflags = curses.color_pair(12)
                 if len(cval) <= max_desc_x:
-                    self.win.addstr(6, 33, cval, cflags)
+                    self.winaddstr(6, 33, cval, cflags)
                     last_y = 7
                 else:
-                    cval_lines = textwrap.wrap(cval, width=max_desc_x)
+                    cval_lines = textwrap.wrap(cval, width=max(1, max_desc_x))
                     for i, line in enumerate(cval_lines):
                         y = 6 + i
-                        self.win.addstr(y, 33, line, cflags)
+                        self.winaddstr(y, 33, line, cflags)
                         last_y = y + 1
 
                 # description
-                self.win.addstr(last_y + 1, 31, lbl_desc, curses.A_BOLD)
+                self.winaddstr(last_y + 1, 31, lbl_desc, curses.A_BOLD)
                 for i, line in enumerate(comment_lines):
-                    self.win.addstr(last_y + 2 + i, 33, line)
+                    yline = last_y + 2 + i
+                    if yline >= max_y:
+                        continue
+                    self.winaddstr(yline, 33, line)
 
             # display a message for non-existing options.
             else:
-                self.win.addstr(4, 33, "This option is invalid.", curses.A_BOLD)
-                self.win.addstr(5, 33, "It can be removed from your INI file.")
+                self.winaddstr(4, 33, "This option is invalid.", curses.A_BOLD)
+                self.winaddstr(5, 33, "It can be removed from your INI file.")
+
+            # Draw HUD
+            hud = " [F2] Save  [F5] Reload  [ESC] Go Back"
+            pad = max_x - len(hud) - 31
+            hud += " " * pad
+            self.winaddstr(max_y, 31, hud, curses.color_pair(1) | curses.A_BOLD)
 
             self.win.refresh()
 
@@ -713,7 +838,7 @@ class ConfigAssistantTextSystem:
             edit_buffer = ""
             if self.edit_mode == MODE_EDIT_OPTION:
                 if selected_opt is None:
-                    self.win.addstr(
+                    self.winaddstr(
                         6, 33, "You cannot edit this option.", curses.color_pair(10)
                     )
                     self.edit_mode = MODE_PICK_OPTION
@@ -731,6 +856,8 @@ class ConfigAssistantTextSystem:
                         )
                     else:
                         self.edited_opts.add(selected_opt)
+                        if selected_opt.option == "Token":
+                            self.token_status = self._verify_bot_token()
 
             self.win.refresh()
 
@@ -796,8 +923,8 @@ class ConfigAssistantTextSystem:
             if not self.mgr_perms:
                 return
             self.win.clear()
-            self.win.addstr(0, 1, "Enter a name for the new group:", curses.A_BOLD)
-            self.win.addstr(1, 1, " " * (max_x - 2))
+            self.winaddstr(0, 1, "Enter a name for the new group:", curses.A_BOLD)
+            self.winaddstr(1, 1, " " * (max_x - 2))
             self.win.refresh()
             new_name = self.get_text_input(1, 40, 4, 1)
             self.mgr_perms.add_group(new_name)
@@ -807,35 +934,31 @@ class ConfigAssistantTextSystem:
 
         while True:
             # setup the window for this frame.
+            self._remake_subwindow()
             max_y, max_x = self.win.getmaxyx()
+            max_y -= 1
+            max_x -= 1
             self.win.clear()
 
             # update selected section
             selected_group = groups[self.sct_selno]
 
             # Layout window.
-            self.win.hline(2, 0, curses.ACS_HLINE, max_x)
-            self.win.vline(2, 30, curses.ACS_VLINE, max_y)
-            self.win.addch(2, 30, curses.ACS_TTEE)
+            self.win.hline(min(2, max_y), 0, curses.ACS_HLINE, max_x)
+            if max_x > 30:
+                self.win.vline(min(2, max_y), min(30, max_x), curses.ACS_VLINE, max_y)
+                self.win.addch(min(2, max_y), min(30, max_x), curses.ACS_TTEE)
             if self.edit_error_msg:
-                self.win.addstr(0, 1, self.edit_error_msg, curses.color_pair(12))
+                self.winaddstr(0, 1, self.edit_error_msg, curses.color_pair(12))
             else:
-                self.win.addstr(0, 1, "Select a group and option to edit.")
-            self.win.addstr(1, 1, "Group:", curses.A_BOLD)
-            self.win.addstr(1, 10, "[", curses.A_DIM)
+                self.winaddstr(0, 1, "Select a group and option to edit.")
+            self.winaddstr(1, 1, "Group:", curses.A_BOLD)
+            self.winaddstr(1, 10, "[", curses.A_DIM)
             if self.edit_mode == MODE_PICK_SECTION:
-                self.win.addstr(1, 11, selected_group, curses.color_pair(1))
+                self.winaddstr(1, 11, selected_group, curses.color_pair(1))
             else:
-                self.win.addstr(1, 11, selected_group)
-            self.win.addstr(1, 11 + len(selected_group), "]", curses.A_DIM)
-
-            # Show HUD
-            hud = " [F2] Save  [F5] Reload  [F7] Remove Group  [F8] Add Group  [ESC] Go Back"
-            pad = max_x - len(hud) - 31
-            hud += " " * pad
-            self.win.addstr(
-                max_y - 1, 31, hud[: max_x - 32], curses.color_pair(1) | curses.A_BOLD
-            )
+                self.winaddstr(1, 11, selected_group)
+            self.winaddstr(1, 11 + len(selected_group), "]", curses.A_DIM)
 
             # build options from the above selected section
             options = (
@@ -845,8 +968,8 @@ class ConfigAssistantTextSystem:
             selected_opt = self.mgr_perms.register.get_config_option(
                 selected_group, options[self.opt_selno]
             )
-            opt_viewno = max(0, (self.opt_selno - (max_y - 3)) + 1)
-            visopts = options[opt_viewno : opt_viewno + (max_y - 3)]
+            opt_viewno = max(0, (self.opt_selno - (max_y - 2)) + 1)
+            visopts = options[opt_viewno : opt_viewno + (max_y - 2)]
             cnf_opt: Optional[ConfigOption] = None
             for i, opt in enumerate(visopts):
                 cnf_opt = self.mgr_perms.register.get_config_option(selected_group, opt)
@@ -860,14 +983,14 @@ class ConfigAssistantTextSystem:
                         flags = curses.color_pair(11)
                     if cnf_opt in self.edited_perms:
                         flags = curses.color_pair(15)
-                    self.win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
+                    self.winaddstr(i + 3, 0, f" {opt[:28]} ", flags)
                 else:
                     flags = 0
                     if cnf_opt is None:
                         flags = curses.color_pair(10)
                     if cnf_opt in self.edited_perms:
                         flags = curses.color_pair(14)
-                    self.win.addstr(i + 3, 0, f" {opt[:28]} ", flags)
+                    self.winaddstr(i + 3, 0, f" {opt[:28]} ", flags)
 
             # build info for selected option.
             if selected_opt:
@@ -880,7 +1003,7 @@ class ConfigAssistantTextSystem:
                 comment_lines = []
                 for line in comment.split("\n"):
                     if len(line) > max_desc_x:
-                        ls = textwrap.wrap(line, width=max_desc_x)
+                        ls = textwrap.wrap(line, width=max(1, max_desc_x))
                         comment_lines += ls
                     else:
                         comment_lines.append(line)
@@ -891,40 +1014,45 @@ class ConfigAssistantTextSystem:
                 lbl_desc = "Description:"
 
                 # option name
-                self.win.addstr(3, 31, lbl_option, curses.A_BOLD)
-                self.win.addstr(3, 32 + len(lbl_option), selected_opt.option)
+                self.winaddstr(3, 31, lbl_option, curses.A_BOLD)
+                self.winaddstr(3, 32 + len(lbl_option), selected_opt.option)
 
                 # default value
                 dval = self.mgr_perms.register.to_ini(selected_opt, use_default=True)
-                self.win.addstr(4, 31, lbl_default, curses.A_BOLD)
-                self.win.addstr(4, 32 + len(lbl_default), dval)
+                self.winaddstr(4, 31, lbl_default, curses.A_BOLD)
+                self.winaddstr(4, 32 + len(lbl_default), dval)
 
                 # current setting
                 cval = self.mgr_perms.register.to_ini(selected_opt)
-                self.win.addstr(5, 31, lbl_current, curses.A_BOLD)
-                # win.addstr(5, 32 + len(lbl_current), str(vals))
+                self.winaddstr(5, 31, lbl_current, curses.A_BOLD)
                 cflags = 0
                 if len(cval) >= 199:
                     cflags = curses.color_pair(12)
                 if len(cval) <= max_opt_x:
-                    self.win.addstr(6, 33, cval, cflags)
+                    self.winaddstr(6, 33, cval, cflags)
                     last_y = 7
                 else:
-                    cval_lines = textwrap.wrap(cval, width=max_opt_x)
+                    cval_lines = textwrap.wrap(cval, width=max(1, max_opt_x))
                     for i, line in enumerate(cval_lines):
                         y = 6 + i
-                        self.win.addstr(y, 33, line, cflags)
+                        self.winaddstr(y, 33, line, cflags)
                         last_y = y + 1
 
                 # description
-                self.win.addstr(last_y + 1, 31, lbl_desc, curses.A_BOLD)
+                self.winaddstr(last_y + 1, 31, lbl_desc, curses.A_BOLD)
                 for i, line in enumerate(comment_lines):
-                    self.win.addstr(last_y + 2 + i, 33, line)
+                    self.winaddstr(last_y + 2 + i, 33, line)
 
             # display a message for non-existing options.
             else:
-                self.win.addstr(4, 33, "This option is invalid.", curses.A_BOLD)
-                self.win.addstr(5, 33, "It can be removed from your INI file.")
+                self.winaddstr(4, 33, "This option is invalid.", curses.A_BOLD)
+                self.winaddstr(5, 33, "It can be removed from your INI file.")
+
+            # Show HUD
+            hud = " [F2] Save  [F5] Reload  [F7] Remove Group  [F8] Add Group  [ESC] Go Back"
+            pad = max_x - len(hud) - 31
+            hud += " " * pad
+            self.winaddstr(max_y, 31, hud, curses.color_pair(1) | curses.A_BOLD)
 
             self.win.refresh()
 
@@ -932,7 +1060,7 @@ class ConfigAssistantTextSystem:
             edit_buffer = ""
             if self.edit_mode == MODE_EDIT_OPTION:
                 if selected_opt is None:
-                    self.win.addstr(
+                    self.winaddstr(
                         6, 33, "You cannot edit this option.", curses.color_pair(10)
                     )
                     self.edit_mode = MODE_PICK_OPTION
@@ -943,9 +1071,13 @@ class ConfigAssistantTextSystem:
                         "CommandBlacklist",
                     ]:
                         edit_buffer = self.select_cmd_perms(rawval)  # type: ignore[arg-type]
+                        # Transform empty selection into a "truthy" value.
+                        if edit_buffer == "":
+                            edit_buffer = " "
                     else:
                         # TODO: Maybe add ConfigOption var for input length.
                         edit_buffer = self.get_text_input(1, 200, 9, 33, cval)
+
                     last_ini_val = self.mgr_perms.register.to_ini(selected_opt)
                     self.edit_mode = MODE_PICK_OPTION
                     self.edit_error_msg = ""
@@ -1001,18 +1133,19 @@ class ConfigAssistantTextSystem:
         # run output/update loop.
         while True:
             # setup the window for this frame.
+            self._remake_subwindow()
             max_y, max_x = self.win.getmaxyx()
+            max_y -= 1
+            max_x -= 1
             self.win.clear()
             self.win.vline(0, 14, curses.ACS_VLINE, max_y)
-            self.scr.addch(2, 14, curses.ACS_TTEE)
+            self.scr.addch(min(2, max_y), 14, curses.ACS_TTEE)
 
             # Show HUD
             hud = " [F2] Save  [F5] Reload  [ESC] Go Back"
-            pad = max_x - len(hud) - 16
+            pad = max_x - len(hud) - 15
             hud += " " * pad
-            self.win.addstr(
-                max_y - 1, 15, hud[: max_x - 16], curses.color_pair(1) | curses.A_BOLD
-            )
+            self.winaddstr(max_y, 15, hud, curses.color_pair(1) | curses.A_BOLD)
 
             # build the selection for this "frame"
             aliases = get_alias_list(self.mgr_alias)
@@ -1034,11 +1167,11 @@ class ConfigAssistantTextSystem:
                     flags = curses.color_pair(1)
                     if alias in self.edited_aliases:
                         flags = curses.color_pair(15)
-                    self.win.addstr(i, 0, f" {alias[:11]} ", flags)
+                    self.winaddstr(i, 0, f" {alias[:11]} ", flags)
                 else:
                     if alias in self.edited_aliases:
                         flags = curses.color_pair(14)
-                    self.win.addstr(i, 0, f" {alias[:11]} ", flags)
+                    self.winaddstr(i, 0, f" {alias[:11]} ", flags)
 
             # build info display for selected alias.
             if selected_cmd or self.edit_mode in [MODE_PICK_FIELD, MODE_EDIT_FIELD]:
@@ -1052,42 +1185,42 @@ class ConfigAssistantTextSystem:
                     p_args = selected_cmd[1]
 
                 # Alias field
-                self.win.addstr(0, 15, "Alias:", curses.A_BOLD)
+                self.winaddstr(0, 15, "Alias:", curses.A_BOLD)
                 if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 0:
-                    self.win.addstr(1, 17, p_alias, curses.color_pair(1))
+                    self.winaddstr(1, 17, p_alias, curses.color_pair(1))
                 else:
-                    self.win.addstr(1, 17, p_alias)
+                    self.winaddstr(1, 17, p_alias)
 
                 # Command field
                 lbl_cmd = "Command:"
-                self.win.addstr(2, 15, lbl_cmd, curses.A_BOLD)
+                self.winaddstr(2, 15, lbl_cmd, curses.A_BOLD)
                 if p_cmd not in self.top_commands:
-                    self.win.addstr(
+                    self.winaddstr(
                         2,
                         16 + len(lbl_cmd),
                         "Invalid command name",
                         curses.color_pair(10),
                     )
                 if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 1:
-                    self.win.addstr(3, 17, p_cmd, curses.color_pair(1))
+                    self.winaddstr(3, 17, p_cmd, curses.color_pair(1))
                 else:
-                    self.win.addstr(3, 17, p_cmd)
+                    self.winaddstr(3, 17, p_cmd)
 
                 # Arguments field.
                 if (selected_cmd and selected_cmd[1]) or self.edit_mode in [
                     MODE_PICK_FIELD,
                     MODE_EDIT_FIELD,
                 ]:
-                    self.win.addstr(4, 15, "Arguments:", curses.A_BOLD)
+                    self.winaddstr(4, 15, "Arguments:", curses.A_BOLD)
                     if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 2:
-                        self.win.addstr(5, 17, p_args, curses.color_pair(1))
+                        self.winaddstr(5, 17, p_args, curses.color_pair(1))
                     else:
-                        self.win.addstr(5, 17, p_args)
+                        self.winaddstr(5, 17, p_args)
 
             # display a simple message before "New" is edited.
             else:
                 self.opt_selno = 0
-                self.win.addstr(0, 15, "Add a new command alias.")
+                self.winaddstr(0, 15, "Add a new command alias.")
 
             self.win.refresh()
 
@@ -1169,20 +1302,21 @@ class ConfigAssistantTextSystem:
         selected_srv = self.mgr_srvs[0]
         while True:
             # setup the window for this frame.
+            self._remake_subwindow()
             max_y, max_x = self.win.getmaxyx()
+            max_y -= 1
+            max_x -= 1
             self.win.clear()
             # Layout window.
-            self.win.hline(1, 0, curses.ACS_HLINE, max_x)
-            self.win.vline(1, 15, curses.ACS_VLINE, max_y)
-            self.win.addch(1, 15, curses.ACS_TTEE)
+            self.win.hline(min(1, max_y), 0, curses.ACS_HLINE, max_x)
+            self.win.vline(min(1, max_y), 15, curses.ACS_VLINE, max_y)
+            self.win.addch(min(1, max_y), 15, curses.ACS_TTEE)
 
             # Show HUD
             hud = " [F2] Save  [F5] Reload  [ESC] Go Back"
             pad = max_x - len(hud) - 16
             hud += " " * pad
-            self.win.addstr(
-                max_y - 1, 16, hud[: max_x - 17], curses.color_pair(1) | curses.A_BOLD
-            )
+            self.winaddstr(max_y, 16, hud, curses.color_pair(1) | curses.A_BOLD)
 
             # build the selection for this "frame"
             srv_viewno = max(0, (self.sct_selno - max_y) + 1)
@@ -1196,40 +1330,40 @@ class ConfigAssistantTextSystem:
                     flags = curses.color_pair(1)
                     if srv.edited:
                         flags = curses.color_pair(15)
-                    self.win.addstr(i + 2, 0, f" {srv.name[:12]} ", flags)
+                    self.winaddstr(i + 2, 0, f" {srv.name[:12]} ", flags)
                 else:
                     if srv.edited:
                         flags = curses.color_pair(14)
-                    self.win.addstr(i + 2, 0, f" {srv.name[:12]} ", flags)
+                    self.winaddstr(i + 2, 0, f" {srv.name[:12]} ", flags)
 
-            self.win.addstr(0, 1, f"Select a server to edit. [ID: {selected_srv.id}]")
+            self.winaddstr(0, 1, f"Select a server to edit. [ID: {selected_srv.id}]")
             self.win.refresh()
 
             # build info display for selected alias.
             # Command Prefix field
             prefix = selected_srv.get("command_prefix", " ")
-            self.win.addstr(2, 16, "Command Prefix:", curses.A_BOLD)
+            self.winaddstr(2, 16, "Command Prefix:", curses.A_BOLD)
             if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 0:
-                self.win.addstr(3, 18, prefix, curses.color_pair(1))
+                self.winaddstr(3, 18, prefix, curses.color_pair(1))
             else:
-                self.win.addstr(3, 18, prefix)
+                self.winaddstr(3, 18, prefix)
 
             # Playlist field
             playlist = selected_srv.get("auto_playlist", " ")
-            self.win.addstr(4, 16, "Playlist File:", curses.A_BOLD)
+            self.winaddstr(4, 16, "Playlist File:", curses.A_BOLD)
             if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 1:
-                self.win.addstr(5, 18, playlist, curses.color_pair(1))
+                self.winaddstr(5, 18, playlist, curses.color_pair(1))
             else:
-                self.win.addstr(5, 18, playlist)
+                self.winaddstr(5, 18, playlist)
 
             # Language field.
             lang = selected_srv.get("language", " ")
             lang = lang or " "
-            self.win.addstr(6, 16, "Language:", curses.A_BOLD)
+            self.winaddstr(6, 16, "Language:", curses.A_BOLD)
             if self.edit_mode == MODE_PICK_FIELD and self.opt_selno == 2:
-                self.win.addstr(7, 18, lang, curses.color_pair(1))
+                self.winaddstr(7, 18, lang, curses.color_pair(1))
             else:
-                self.win.addstr(7, 18, lang)
+                self.winaddstr(7, 18, lang)
 
             self.win.refresh()
 
@@ -1272,7 +1406,10 @@ class ConfigAssistantTextSystem:
 
 
 if __name__ == "__main__":
+    # this allows using --write-dir to select a config directory.
     parse_write_base_arg()
+    # this makes sure a token exists, so Config doesn't wig out.
     if "MUSICBOT_TOKEN" not in os.environ:
         os.environ["MUSICBOT_TOKEN"] = "Your Token Here"
+    # start the CATS tool.
     curses.wrapper(ConfigAssistantTextSystem)

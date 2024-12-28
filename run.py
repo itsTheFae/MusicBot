@@ -352,7 +352,7 @@ def sanity_checks(args: argparse.Namespace) -> None:
     """
     log.info("Starting sanity checks")
     """Required Checks"""
-    # Make sure we're on Python 3.8+
+    # Make sure we're on Python 3.9+
     req_ensure_py3()
 
     # Make sure we're in a writable env
@@ -384,13 +384,13 @@ def req_ensure_py3() -> None:
     Verify the current running version of Python and attempt to find a
     suitable minimum version in the system if the running version is too old.
     """
-    log.info("Checking for Python 3.8+")
+    log.info("Checking for Python 3.9+")
 
-    if sys.version_info < (3, 8):
+    if sys.version_info < (3, 9):
         log.warning(
-            "Python 3.8+ is required. This version is %s", sys.version.split()[0]
+            "Python 3.9+ is required. This version is %s", sys.version.split()[0]
         )
-        log.warning("Attempting to locate Python 3.8...")
+        log.warning("Attempting to locate Python 3.9...")
         # Should we look for other versions than min-ver?
 
         pycom = None
@@ -401,15 +401,15 @@ def req_ensure_py3() -> None:
                 log.warning("Could not locate py.exe")
 
             try:
-                subprocess.check_output([pycom, "-3.8", '-c "exit()"'])
-                pycom = f"{pycom} -3.8"
+                subprocess.check_output([pycom, "-3.9", '-c "exit()"'])
+                pycom = f"{pycom} -3.9"
             except (
                 OSError,
                 PermissionError,
                 FileNotFoundError,
                 subprocess.CalledProcessError,
             ):
-                log.warning("Could not execute `py.exe -3.8` ")
+                log.warning("Could not execute `py.exe -3.9` ")
                 pycom = None
 
             if pycom:
@@ -418,10 +418,10 @@ def req_ensure_py3() -> None:
                 sys.exit(0)
 
         else:
-            log.info('Trying "python3.8"')
-            pycom = shutil.which("python3.8")
+            log.info('Trying "python3.9"')
+            pycom = shutil.which("python3.9")
             if not pycom:
-                log.warning("Could not locate python3.8 on path.")
+                log.warning("Could not locate python3.9 on path.")
 
             try:
                 subprocess.check_output([pycom, '-c "exit()"'])
@@ -435,12 +435,12 @@ def req_ensure_py3() -> None:
 
             if pycom:
                 log.info(
-                    "\nPython 3.8 found.  Re-launching bot using: %s run.py\n", pycom
+                    "\nPython 3.9 found.  Re-launching bot using: %s run.py\n", pycom
                 )
                 os.execlp(pycom, pycom, "run.py")
 
         log.critical(
-            "Could not find Python 3.8 or higher.  Please run the bot using Python 3.8"
+            "Could not find Python 3.9 or higher.  Please run the bot using Python version 3.9 to 3.13"
         )
         bugger_off()
 
