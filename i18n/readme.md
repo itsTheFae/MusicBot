@@ -169,4 +169,4 @@ The script provides these command line flags:
 
 - `-A`  
   Attempt to automatically translate all untranslated strings using machine translations.  
-  This requires the `polib` and `argostranslate` python packages.  
+  This requires the `polib` as well as `argostranslate` and `marko` python packages.  
