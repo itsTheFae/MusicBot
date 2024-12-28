@@ -437,26 +437,27 @@ class LangTool:
 
     def argostranslate(self):
         """
-        Use argostranslate to fetch languages and apply machine translations to 
+        Use argostranslate to fetch languages and apply machine translations to
         all untranslated strings in each supported language.
         """
         self._check_polib()
-        import polib
         import uuid
+
+        import polib
 
         print("Starting Argos machine translation process...")
 
         try:
             from argostranslate import package as argospkg
             from argostranslate import translate as argostl
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             print("Failed to import argostranslate.  Please install it with pip.")
             sys.exit(1)
 
         try:
             import marko
             from marko.md_renderer import MarkdownRenderer
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             print("Failed to import marko.  Please install it with pip.")
             sys.exit(1)
 
@@ -485,7 +486,10 @@ class LangTool:
                 continue
 
             def fltr(pkg):
-                return pkg.from_code == from_code and pkg.to_code == to_code
+                return (
+                    pkg.from_code == from_code
+                    and pkg.to_code == to_code  # pylint: disable=cell-var-from-loop
+                )
 
             installed_package = next(filter(fltr, installed_packages), None)
 
@@ -506,8 +510,10 @@ class LangTool:
         # Helper for Markdown AST traversal.
         def marko_tl(elm, from_code, to_code):
             # process text elements which can be translated.
-            if isinstance(elm, marko.inline.InlineElement) and isinstance(elm.children, str):
-                #print(f"MD_ELM: {type(elm)} :: {elm}")
+            if isinstance(elm, marko.inline.InlineElement) and isinstance(
+                elm.children, str
+            ):
+                # print(f"MD_ELM: {type(elm)} :: {elm}")
                 elm_text = elm.children
                 subs_map = {}
                 # map percent-style placeholders to a machine-translation-friendly format.
@@ -524,12 +530,12 @@ class LangTool:
                 # fix placeholder substitutions.
                 for subin, subout in subs_map.items():
                     elm_ttext = elm_ttext.replace(subin, subout)
-                    #print(f"REPLACE  {subin}  >>>  {subout}")
+                    # print(f"REPLACE  {subin}  >>>  {subout}")
                 # update the element node with translated text.
                 elm.children = elm_ttext
 
             # process element children to search for translatable elements.
-            elif hasattr(elm, 'children'):
+            elif hasattr(elm, "children"):
                 for child in elm.children:
                     marko_tl(child, from_code, to_code)
             return elm
@@ -545,17 +551,19 @@ class LangTool:
             if to_code in excluded_tocodes:
                 print(f"Excluded target language: {to_code}")
                 continue
-            
+
             po = polib.pofile(po_file)
             ut_entries = po.untranslated_entries()
             num = len(ut_entries)
-            print(f"Translating {num} strings from {from_code} to {to_code} in {po_file.name}")
+            print(
+                f"Translating {num} strings from {from_code} to {to_code} in {po_file.name}"
+            )
             for entry in ut_entries:
                 otext = entry.msgid
 
-                #print(f"Translated from {from_code} to {to_code}")
-                #print(f">>>Source:\n{entry.msgid}")
-                #print("--------")
+                # print(f"Translated from {from_code} to {to_code}")
+                # print(f">>>Source:\n{entry.msgid}")
+                # print("--------")
 
                 # parse out the markdown formatting to make strings less complex.
                 mp = marko.Markdown(renderer=MarkdownRenderer)
@@ -563,13 +571,11 @@ class LangTool:
                 md = marko_tl(md, from_code, to_code)
                 ttext = mp.render(md)
 
-                #print(f">>>Translation:\n{ttext}")
-                #print("=========================================================\n\n")
+                # print(f">>>Translation:\n{ttext}")
+                # print("=========================================================\n\n")
                 entry.msgstr = ttext
                 entry.flags.append("machine-translated")
             po.save()
-
-
 
 
 def main():
