@@ -1,10 +1,8 @@
 name: Translation Updates
 
 on:
-  push:
-    branches: [ "l10n_fae" ]
   pull_request:
-    branches: [ "l10n_fae" ]
+    types: [opened, synchronize]
   workflow_dispatch:
 
 concurrency:
@@ -12,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  compile:
-    name: Compile MO Files
+  langtool:
+    name: Update translation data
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,15 +38,18 @@ jobs:
           key: pip-${{ runner.os }}-py3.10-translate
       - name: Run lang.py tool
         run: |
+          python ./i18n/lang.py -u
+          python ./i18n/lang.py -t
           python ./i18n/lang.py -c
           ls -lah ./i18n/*/LC_MESSAGES/*.mo
+          python ./i18n/lang.py -sJ
       - name: Commit MO files.
         run: |
           git config --global user.name 'MusicBot Automation'
-          git config --global user.email 'no-mail@musicbot.auto.bot'
+          git config --global user.email 'no-mail@musicbot.autobot'
           git add ./i18n/*/LC_MESSAGES/*.mo
           if ! git diff --cached --exit-code ; then
-            git commit -am "Compile all MO files."
+            git commit -am "Auto-update i18n data."
             git push
           fi
 
