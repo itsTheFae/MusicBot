@@ -325,8 +325,8 @@ class LangTool:
 
         if save_json:
             data["MUSICBOT"] = {
-                "completion": pct,
-                "languages": ",".join(locale_set),
+                "completion": f"{pct:.1f}",
+                "languages": ", ".join(locale_set),
             }
             with open(self._json_stats_path, "w", encoding="utf-8") as fh:
                 json.dump(data, fh)
