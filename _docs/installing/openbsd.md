@@ -3,6 +3,8 @@ title: OpenBSD
 category: Installing the bot
 order: 11
 ---
+
+<img class="os-icon" style="width: 5.8em;" src="{{ site.baseurl }}/images/openbsd.svg"/>
 MusicBot can run on OpenBSD systems as well. Note that the X11 sets must be installed, due to the `ffmpeg` dependency.
 
 ## OpenBSD 6.6

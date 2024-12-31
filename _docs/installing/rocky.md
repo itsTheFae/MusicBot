@@ -4,7 +4,7 @@ category: Installing the bot
 order: 12
 ---
 
-<img class="os-icon" src="{{ site.baseurl }}/images/rocky.png" alt="Rocky Linux Logo"/>
+<img class="os-icon" style="mix-blend-mode: color;" src="{{ site.baseurl }}/images/rocky.png" alt="Rocky Linux Logo"/>
 
 Installing the bot on Rocky is similar to [Ubuntu]({{ site.baseurl }}/installing/ubuntu), but requires a different package manager.
 
