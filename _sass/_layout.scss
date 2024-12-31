@@ -441,25 +441,25 @@ blockquote {
 img {
 	max-width: 100%;
 	height: auto;
-
-	.os-icon {
-		width: 75px;
-		float: right;
-	}
-
-	.doc-img {
-		width: 70%;
-	}
-
-	.doc-img-right {
-		width: 33%;
-		float: right;
-		margin-bottom: 1em;
-	}
-
-	@media (prefers-color-scheme: dark) {
+}
+@media (prefers-color-scheme: dark) {
+	img {
 		filter: invert(100%) hue-rotate(180deg);
 	}
+}
+.os-icon {
+	width: 75px;
+	float: right;
+}
+
+.doc-img {
+	width: 70%;
+}
+
+.doc-img-right {
+	width: 33%;
+	float: right;
+	margin-bottom: 1em;
 }
 
 .editor-link {
