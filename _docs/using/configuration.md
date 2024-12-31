@@ -150,7 +150,7 @@ All channels are used if this is not set.<br>
 
 Allow responses in all channels while no specific channel is set for a server.<br>
 Only used when BindToChannels is missing an ID for a server.<br>  
-<strong>Default Value:</strong> <code>no</code>  
+<strong>Default Value:</strong> <code>yes</code>  
 </details>  
 <details>
   <summary>AutojoinChannels</summary>
@@ -423,7 +423,7 @@ If enabled, MusicBot will allow commands to have multiple names using data in:  
 
 Replace MusicBot name/version in embed footer with custom text.<br>
 Only applied when UseEmbeds is enabled and it is not blank.<br>  
-<strong>Default Value:</strong> <code>Just-Some-Bots/MusicBot (release-250723-190-g7719f30f)</code>  
+<strong>Default Value:</strong> <code>Just-Some-Bots/MusicBot (release-250723-1110-g6ded856)</code>  
 </details>  
 <details>
   <summary>RemoveEmbedFooter</summary>
@@ -580,8 +580,17 @@ Enable the song block list feature, without emptying the block list.<br>
 <details>
   <summary>UseOpusAudio</summary>
 
-Potentially reduces CPU usage, but disables volume and speed controls.<br>
-This option will disable UseExperimentalEqualization option as well.<br>  
+May reduce CPU usage by avoiding PCM-to-Opus encoding in python.<br>
+When enabled, volume is controlled via FFmpeg filter instead of python.<br>
+May cause a short delay when tracks first start for bitrate discovery.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>UseOpusProbe</summary>
+
+Similar to UseOpusAudio, but reduces CPU usage even more where possible.<br>
+If the media is already Opus encoded (like YouTube) no re-encoding is done.<br>
+This option will disable speed, volume, and UseExperimentalEqualization options.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 
@@ -629,7 +638,7 @@ An optional directory path where MusicBot will store long and short-term cache f
 Configure automatic log file rotation at restart, and limit the number of files kept.<br>
 When disabled, only one log is kept and its contents are replaced each run.<br>
 Set to 0 to disable.  Maximum allowed number is 100.<br>  
-<strong>Default Value:</strong> <code>0</code>  
+<strong>Default Value:</strong> <code>3</code>  
 </details>  
 <details>
   <summary>LogsDateFormat</summary>

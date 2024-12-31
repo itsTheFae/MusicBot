@@ -4,7 +4,7 @@ category: Installing the bot
 order: 7
 ---
 
-<img class="doc-img" src="{{ site.baseurl }}/images/arch.png" alt="centos" style="width: 75px; float: right;"/>
+<img class="os-icon" src="{{ site.baseurl }}/images/arch.png" alt="Arch logo" />
 Installation on Arch Linux is like many other Linux distributions, however these steps may be out-of-date at any moment due to Arch being a rolling distribution, which tends to provide very new versions of packages.  
 Please keep this in mind when seeking support.  
 

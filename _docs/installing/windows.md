@@ -3,7 +3,7 @@ title: Windows
 category: Installing the bot
 order: 2
 ---
-<img class="doc-img" src="{{ site.baseurl }}/images/windows.png" alt="Windows" style="width: 75px; float: right;"/>
+<img class="os-icon" src="{{ site.baseurl }}/images/windows.png" alt="Windows Logo"/>
 
 > If you do not clone the bot using Git, and instead download the ZIP file from GitHub and attempt to run it, you will receive an error.
 

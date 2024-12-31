@@ -4,8 +4,7 @@ category: Installing the bot
 order: 12
 ---
 
-<img class="doc-img" src="{{ site.baseurl }}/images/rocky.png" alt="rocky" style="width: 75px; float: right;"/>
-
+<img class="os-icon" src="{{ site.baseurl }}/images/rocky.png" alt="Rocky Linux Logo"/>
 
 Installing the bot on Rocky is similar to [Ubuntu]({{ site.baseurl }}/installing/ubuntu), but requires a different package manager.
 
@@ -24,7 +23,7 @@ sudo dnf  config-manager --set-enabled crb
 sudo dnf -y install ffmpeg
 
 
-# Install Python (skip this if `python3 --version` shows python 3.8.x or newer is installed)
+# Install Python (skip this if `python3 --version` shows python 3.9.x or newer is installed)
 sudo dnf install -y python3 
 
 # Install pip

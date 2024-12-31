@@ -4,7 +4,7 @@ category: Installing the bot
 order: 6
 ---
 
-<img class="doc-img" src="{{ site.baseurl }}/images/raspbian.png" alt="Raspbian" style="width: 75px; float: right;"/>
+<img class="os-icon" src="{{ site.baseurl }}/images/raspbian.png" alt="Raspbian or Pi OS logo"/>
 
 MusicBot can be installed on Raspbian and Raspberry Pi OS. Older versions of Pi OS (known as Raspbian) may require some manual steps.  
 This guide is broken into three sections depending on your version of Raspberry Pi OS or Raspbian.  

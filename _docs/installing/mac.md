@@ -3,34 +3,43 @@ title: MacOS
 category: Installing the bot
 order: 4
 ---
-<img class="doc-img" src="{{ site.baseurl }}/images/mac.png" alt="Mac" style="width: 75px; float: right;"/>
+<img class="os-icon" src="{{ site.baseurl }}/images/mac.png" alt="mac OS Logo"/>
+
+Installing MusicBot on Mac is simple using homebrew and xcode.  
+
+> Note: On ARM-based mac (M1, M4, etc.) you may encounter an issue with Opus not loading. 
+You can bypass this by enabling `UseOpusAudio` in your options.ini file.  
 
 
-Installing MusicBot on Mac is quite simple.
+### Catalina & above
+These steps were made for macOS Catalina and above.
 
-> **The steps below are for macOS Catalina and above. They may not work on older versions of macOS.**
-
-You will need to open Terminal and run the following commands:
+To install, you will need to open Terminal and use the following commands (adjust them as needed for your system):  
 
 ```bash
-# Install Homebrew and Xcode command line tools
+# Install Homebrew and Xcode command line tools.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo; echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$(id -un)/.zprofile \
 eval "$(/opt/homebrew/bin/brew shellenv)" # To fix "zsh: command not found: brew"
-brew update
+
+# set up xcode.
 xcode-select --install
 
-# Install dependencies
-brew install python libsodium libffi opus ffmpeg git
+# update brew package index.
+brew update
 
+# Install system dependencies
+brew install libsodium libffi ffmpeg git opus-tools
 
-# Clone the MusicBot
+# Install python using version 3.10, or any version from 3.9 to 3.13
+brew install python@3.10
+
+# Clone the MusicBot using master branch, you may also use review or dev.
 cd desktop
-git clone https://github.com/Just-Some-Bots/MusicBot.git MusicBot -b master 
+git clone https://github.com/Just-Some-Bots/MusicBot.git MusicBot -b master
 
 # Install Python dependencies
 cd MusicBot
-python3 -m pip install -U pip
 python3 -m pip install -U -r requirements.txt
 ```
 

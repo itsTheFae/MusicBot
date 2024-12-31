@@ -2,7 +2,7 @@
 title: Introduction
 ---
 
-<img class="doc-img" src="https://i.imgur.com/FWcHtcS.png" alt="Main" style="width: 750px;"/>
+<img class="doc-img-full" src="https://i.imgur.com/FWcHtcS.png" alt="User interface example image"/>
 
 MusicBot is the original Discord music bot written for Python 3 using [discord.py](https://github.com/Rapptz/discord.py).  
 For an overview of what MusicBot is, and for the code history, see the [repository](https://github.com/Just-Some-Bots/MusicBot).  

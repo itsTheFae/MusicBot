@@ -3,7 +3,7 @@ title: Debian
 category: Installing the bot
 order: 5
 ---
-<img class="doc-img" src="{{ site.baseurl }}/images/debian.png" alt="debian" style="width: 75px; float: right;"/>
+<img class="os-icon" src="{{ site.baseurl }}/images/debian.png" alt="Debian logo"/>
 
 Installing the bot on Debian is similar to [Ubuntu]({{ site.baseurl }}/installing/ubuntu), but requires some additional system dependencies obtained through `apt`.
 

@@ -4,7 +4,7 @@ category: Installing the bot
 order: 3
 ---
 
-<img class="doc-img" src="{{ site.baseurl }}/images/ubuntu.png" alt="Ubuntu" style="width: 75px; float: right;"/>
+<img class="os-icon" src="{{ site.baseurl }}/images/ubuntu.png" alt="Ubuntu Logo"/>
 
 Installing MusicBot on Ubuntu is simple, and we have steps for several LTS versions.  
 While this guide leaves out non-LTS versions of Ubuntu, the steps here are a good place to start for interim versions.  

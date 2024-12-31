@@ -6,10 +6,10 @@ order: 5
 
 [![GitHub stars](https://img.shields.io/github/stars/Just-Some-Bots/MusicBot.svg)](https://github.com/Just-Some-Bots/MusicBot/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/Just-Some-Bots/MusicBot.svg)](https://github.com/Just-Some-Bots/MusicBot/network)
-[![Python version](https://img.shields.io/badge/python-3.8%20to%203.13-blue.svg)](https://python.org)
+[![Python version](https://img.shields.io/badge/python-3.9%20to%203.13-blue.svg)](https://python.org)
 
 
-> MucicBot requires Python 3.8 or higher.   
+> MucicBot requires Python 3.9 or higher.   
 
 Before updating, make sure to read the [latest changes](/MusicBot/changelog), as some behaviour may have changed significantly.
 
