@@ -39,6 +39,33 @@ else:
 
 log = logging.getLogger(__name__)
 
+
+class YtdlpLogHook:
+    def debug(self, msg: Any) -> None:
+        """Debug or info level log from yt_dlp"""
+        if msg.startswith("[debug] "):
+            ld = log.debug
+            ld(f"[YTDLP] {msg}")  # pylint: disable=logging-fstring-interpolation
+        else:
+            li = log.info
+            li(f"[YTDLP] {msg}")  # pylint: disable=logging-fstring-interpolation
+
+    def info(self, msg: Any) -> None:
+        """Info level log from yt_dlp"""
+        li = log.info
+        li(f"[YTDLP] {msg}")  # pylint: disable=logging-fstring-interpolation
+
+    def warning(self, msg: Any) -> None:
+        """Warning level log from yt_dlp"""
+        lw = log.warning
+        lw(f"[YTDLP] {msg}")  # pylint: disable=logging-fstring-interpolation
+
+    def error(self, msg: Any) -> None:
+        """Error level log from yt_dlp"""
+        le = log.error
+        le(f"[YTDLP] {msg}")  # pylint: disable=logging-fstring-interpolation
+
+
 # Immutable dict is needed, because something is modifying the 'outtmpl' value. I suspect it being ytdl, but I'm not sure.
 ytdl_format_options_immutable = MappingProxyType(
     {
@@ -57,6 +84,7 @@ ytdl_format_options_immutable = MappingProxyType(
         "source_address": "0.0.0.0",
         "usenetrc": True,
         "no_color": True,
+        "retries": 1,
     }
 )
 
@@ -98,6 +126,14 @@ class Downloader:
         # Copy immutable dict and use the mutable copy for everything else.
         ytdl_format_options = ytdl_format_options_immutable.copy()
         ytdl_format_options["http_headers"] = self.http_req_headers
+
+        # enable verbose ytdlp logs if debug mode is enabled.
+        if bot.config.debug_mode:
+            ytdl_format_options["no_warnings"] = False
+            ytdl_format_options["logger"] = YtdlpLogHook()
+            # "progress_hooks": [YtdlpLogHook.progress]
+            if bot.config.debug_level <= logging.NOISY:  # type: ignore[attr-defined]
+                ytdl_format_options["verbose"] = True
 
         # check if we should apply a cookies file to ytdlp.
         if bot.config.cookies_path.is_file():
@@ -486,7 +522,7 @@ class Downloader:
         except DownloadError as e:
             if not as_stream_url:
                 raise ExtractionError(
-                    "Error in yt-dlp while downloading data: %(raw_error)s",
+                    "Error in yt-dlp while downloading media data: %(raw_error)s",
                     fmt_args={"raw_error": e},
                 ) from e
 
@@ -507,7 +543,7 @@ class Downloader:
 
             else:
                 raise ExtractionError(
-                    "Error in yt-dlp while downloading data: %(raw_error)s",
+                    "Error in yt-dlp while downloading stream data: %(raw_error)s",
                     fmt_args={"raw_error": e},
                 ) from e
         except NoSupportingHandlers:
