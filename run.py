@@ -705,6 +705,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--lang",
         dest="lang_both",
         default=DEFAULT_I18N_LANG,
+        metavar="LOCALE",
         type=str,
         help=_L(
             "Override the default / system detected language for all text in MusicBot."
@@ -715,6 +716,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--log_lang",
         dest="lang_logs",
         default=DEFAULT_I18N_LANG,
+        metavar="LOCALE",
         type=str,
         help=_L("Use this language for all server-side log messages from MusicBot."),
     )
@@ -723,6 +725,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--msg_lang",
         dest="lang_msgs",
         default=DEFAULT_I18N_LANG,
+        metavar="LOCALE",
         type=str,
         help=_L(
             "Use this language for all messages sent to discord from MusicBot.\n"
@@ -778,6 +781,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--logs-kept",
         dest="keep_n_logs",
         default=DEFAULT_LOGS_KEPT,
+        metavar="NUMBER",
         type=kept_logs_int,
         help=_L(
             "Specify how many log files to keep, between 0 and %s inclusive."
@@ -789,6 +793,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--log-level",
         dest="log_level",
         default="NOTSET",
+        metavar="LEVEL",
         type=log_levels_int,
         help=_L("Override the log level settings set in config. Must be one of: %s")
         % (
@@ -799,6 +804,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--log-rotate-fmt",
         dest="old_log_fmt",
         default=DEFAULT_LOGS_ROTATE_FORMAT,
+        metavar="FORMAT",
         type=str,
         help=_L(
             "Override the default date format used when rotating log files. "
@@ -812,6 +818,7 @@ def parse_cli_args() -> argparse.Namespace:
         "--write-dir",
         dest="global_writes_basedir",
         default="",
+        metavar="PATH",
         type=str,
         help=_L(
             "Supply a directory where MusicBot can store all mutable files.\n"
