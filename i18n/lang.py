@@ -590,8 +590,7 @@ def main():
         epilog=(
             "For more help and support with this bot, join our discord:"
             "\n  https://discord.gg/bots\n\n"
-            "This software is provided under the MIT License."
-            "\n"
+            "This software is provided under the MIT License.\n"
             "See the `LICENSE` text file for complete details."
         ),
     )
@@ -602,6 +601,7 @@ def main():
         type=str,
         help="Select a single language code to run tasks on, instead of all installed languages.",
         default="",
+        metavar="LOCALE",
     )
 
     ap.add_argument(

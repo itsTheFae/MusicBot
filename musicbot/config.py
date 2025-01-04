@@ -5,7 +5,6 @@ import os
 import pathlib
 import shutil
 import sys
-import time
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -1272,17 +1271,6 @@ class Config:
 
         if self.enable_local_media and not self.media_file_dir.is_dir():
             self.media_file_dir.mkdir(exist_ok=True)
-
-        if self.cookies_path.is_file():
-            log.warning(
-                "Cookies TXT file detected. MusicBot will pass them to yt-dlp.\n"
-                "Cookies are not recommended, may not be supported, and may totally break.\n"
-                "Copying cookies from your web-browser risks exposing personal data and \n"
-                "in the best case can result in your accounts being banned!\n\n"
-                "You have been warned!  Good Luck!  \U0001F596\n"
-            )
-            # make sure the user sees this.
-            time.sleep(3)
 
     async def async_validate(self, bot: "MusicBot") -> None:
         """
