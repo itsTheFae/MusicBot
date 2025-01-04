@@ -567,7 +567,7 @@ class TokenEater:
         """Check if an entry has the given comment."""
         if msg not in self.__messages:
             return False
-        for k, v in self.__messages[msg].items():
+        for _k, v in self.__messages[msg].items():
             if comment in v[1]:
                 return True
         return False
@@ -651,7 +651,6 @@ class TokenEater:
                     flags.append("python-docstring")
                 if self.pyformat.search(k) is not None and not isdocstring:
                     flags.append("python-format")
-                
 
                 if flags:
                     print(f"#, {','.join(flags)}", file=fp)

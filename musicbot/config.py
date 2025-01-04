@@ -5,7 +5,6 @@ import os
 import pathlib
 import shutil
 import sys
-import time
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -1255,7 +1254,6 @@ class Config:
 
         if self.enable_local_media and not self.media_file_dir.is_dir():
             self.media_file_dir.mkdir(exist_ok=True)
-
 
     async def async_validate(self, bot: "MusicBot") -> None:
         """
