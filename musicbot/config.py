@@ -27,7 +27,6 @@ from .constants import (
     APL_FILE_HISTORY,
     DATA_FILE_COOKIES,
     DATA_FILE_SERVERS,
-    DATA_FILE_YTDLP_OAUTH2,
     DEFAULT_AUDIO_CACHE_DIR,
     DEFAULT_COMMAND_ALIAS_FILE,
     DEFAULT_DATA_DIR,
@@ -937,40 +936,6 @@ class Config:
                 "Leave blank to use default, dynamically generated UA strings."
             ),
         )
-        self.ytdlp_use_oauth2: bool = self.register.init_option(
-            section="MusicBot",
-            option="YtdlpUseOAuth2",
-            dest="ytdlp_use_oauth2",
-            default=ConfigDefaults.ytdlp_use_oauth2,
-            getter="getboolean",
-            comment=_Dd(
-                "Experimental option to enable yt-dlp to use a YouTube account via OAuth2.\n"
-                "When enabled, you must use the generated URL and code to authorize an account.\n"
-                "The authorization token is then stored in the "
-                "`%(oauthfile)s` file.\n"
-                "This option should not be used when cookies are enabled.\n"
-                "Using a personal account may not be recommended.\n"
-                "Set yes to enable or no to disable."
-            ),
-            comment_args={"oauthfile": f"{DEFAULT_DATA_DIR}/{DATA_FILE_YTDLP_OAUTH2}"},
-        )
-        self.ytdlp_oauth2_url: str = self.register.init_option(
-            section="MusicBot",
-            option="YtdlpOAuth2URL",
-            dest="ytdlp_oauth2_url",
-            getter="getstr",
-            default=ConfigDefaults.ytdlp_oauth2_url,
-            comment=_Dd(
-                "Optional YouTube video URL used at start-up for triggering OAuth2 authorization.\n"
-                "This starts the OAuth2 prompt early, rather than waiting for a song request.\n"
-                "The URL set here should be an accessible YouTube video URL.\n"
-                "Authorization must be completed before start-up will continue when this is set."
-            ),
-        )
-        # Was: [Credentials] >> YtdlpOAuth2ClientID
-        self.ytdlp_oauth2_client_id: str = ConfigDefaults.ytdlp_oauth2_client_id
-        # Was: Credentials] >> YtdlpOAuth2ClientSecret
-        self.ytdlp_oauth2_client_secret: str = ConfigDefaults.ytdlp_oauth2_client_secret
 
         self.user_blocklist_enabled: bool = self.register.init_option(
             section="MusicBot",
@@ -1552,14 +1517,7 @@ class ConfigDefaults:
     auto_unpause_on_play: bool = False
     ytdlp_proxy: str = ""
     ytdlp_user_agent: str = ""
-    ytdlp_oauth2_url: str = ""
 
-    ytdlp_oauth2_client_id: str = (
-        "861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com"
-    )
-    ytdlp_oauth2_client_secret: str = "SboVhoG9s0rNafixCSGGKXAT"
-
-    ytdlp_use_oauth2: bool = False
     pre_download_next_song: bool = True
 
     song_blocklist: Set[str] = set()
