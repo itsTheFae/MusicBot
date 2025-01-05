@@ -450,6 +450,14 @@ class Config:
                 "The number of entries to show per-page when using q command to list the queue."
             ),
         )
+        self.reply_and_mention: bool = self.register.init_option(
+            section="ChatResponses",
+            option="ReplyAndMention",
+            dest="reply_and_mention",
+            default=ConfigDefaults.reply_and_mention,
+            getter="getboolean",
+            comment=_Dd("Command responses will also mention or notify the user."),
+        )
 
         ########################################################################
         # Playback
@@ -1464,6 +1472,7 @@ class ConfigDefaults:
     no_nowplaying_auto: bool = False
     nowplaying_channels: Set[int] = set()
     delete_nowplaying: bool = True
+    reply_and_mention: bool = True
 
     default_volume: float = 0.15
     default_speed: float = 1.0
