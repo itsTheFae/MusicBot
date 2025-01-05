@@ -8,25 +8,31 @@ from typing import List
 VERSION: str = ""
 try:
     # Get the last release tag, number of commits since, and g{commit_id} as string.
-    _VERSION_P1 = (
+    _VERSION_DESC = (
         subprocess.check_output(["git", "describe", "--tags", "--always"])
         .decode("ascii")
         .strip()
     )
+    # Get the branch name.
+    _VERSION_BRANCH = (
+        subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+        .decode("ascii")
+        .strip()
+    )
     # Check if any tracked files are modified for -modded version flag.
-    _VERSION_P2 = (
+    _VERSION_MOD = (
         subprocess.check_output(
             ["git", "-c", "core.fileMode=false", "status", "-suno", "--porcelain"]
         )
         .decode("ascii")
         .strip()
     )
-    if _VERSION_P2:
-        _VERSION_P2 = "-modded"
+    if _VERSION_MOD:
+        _VERSION_MOD = "-modded"
     else:
-        _VERSION_P2 = ""
+        _VERSION_MOD = ""
 
-    VERSION = f"{_VERSION_P1}{_VERSION_P2}"
+    VERSION = f"{_VERSION_DESC}-{_VERSION_BRANCH}{_VERSION_MOD}"
 
 except (subprocess.SubprocessError, OSError, ValueError) as e:
     print(f"Failed setting version constant, reason:  {str(e)}")
