@@ -62,13 +62,14 @@ Of course, the `.pot` and `.po` files are just plain text.  So you can edit them
 To compile the `.mo` files, you generally have two options.  
 If you used Poedit for translations, you can also use it to compile the `.po` into a `.mo` file.  
 
-If you edited on Crowdin and downloaded the changes or are using another editor, MusicBot provides the `lang.py` script to enable compiling on any system.  
+If you edited using another editor, MusicBot provides an option in the `lang.py` script to enable compiling on any system.  
 Follow these steps to compile manually:  
 
 1. First, make sure you've downloaded the PO files into their respective language directories.  
-2. Make sure you have `polib` python package installed.  
+2. Double check the Language code in the PO file matches the code used in the language directory.
+3. Make sure you have the `polib` python package installed.  
    You can use `pip install polib` or use your system's package manager to find and install the appropriate package.  
-3. Run the lang tool with `python3 lang.py -c` to compile all existing PO files.
+4. Run the lang tool with `python3 lang.py -c` to compile all existing PO files.
 
 MusicBot should now be able to use the new translations!
 
@@ -135,7 +136,10 @@ Some options require the `polib` python package in order to be used.
 The script provides these command line flags:
 
 - `-h` or `--help`  
-  Shows the help message and exits.
+  Shows the help message and exits.  
+
+- `-L`  
+  Select a single language code to operate on, instead of all installed.
 
 - `-c`  
   Compile existing PO files into MO files.  
@@ -157,8 +161,12 @@ The script provides these command line flags:
   This requires the `polib` python package.
 
 - `-s`  
-  Show translation stats for existing PO files, such as completion and number of missing translations.
+  Show translation stats for existing PO files, such as completion and number of missing translations.  
 
 - `-u`  
   Extracts strings to POT files, then updates existing PO files with new strings.  
+  This requires the `polib` python package.
 
+- `-A`  
+  Attempt to automatically translate all untranslated strings using machine translations.  
+  This requires the `polib` as well as `argostranslate` and `marko` python packages.  
