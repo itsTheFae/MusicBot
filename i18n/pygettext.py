@@ -363,6 +363,7 @@ class TokenEater:
         self.__freshmodule = 1
         self.__curfile = None
         self.__enclosurecount = 0
+        self.__last_keyword = ""
 
     def __call__(self, ttype, tstring, stup, etup, line):
         """Dispatch function for token processing."""
@@ -390,6 +391,7 @@ class TokenEater:
                 self.__state = self.__suiteseen
                 return
         if ttype == tokenize.NAME and tstring in opts.keywords:
+            self.__last_keyword = tstring
             self.__state = self.__keywordseen
             return
         if ttype == tokenize.STRING:
@@ -554,9 +556,21 @@ class TokenEater:
             lineno = self.__lineno
             self.__lineno = -1
         if msg not in self.__options.toexclude:
+            usedby = f"Used by: {self.__last_keyword}"
+            if not self.has_comment(msg, usedby):
+                self.__comments.append(usedby)
             entry = (self.__curfile, lineno)
             self.__messages.setdefault(msg, {})[entry] = (isdocstring, self.__comments)
             self.__comments = []
+
+    def has_comment(self, msg, comment):
+        """Check if an entry has the given comment."""
+        if msg not in self.__messages:
+            return False
+        for _k, v in self.__messages[msg].items():
+            if comment in v[1]:
+                return True
+        return False
 
     def set_filename(self, filename):
         """Update file name and signal fresh module."""
