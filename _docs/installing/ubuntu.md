@@ -80,7 +80,7 @@ After configuring you can use the command <code>./run.sh</code> to start the bot
 <details>
   <summary>Install steps.</summary>
 
-For Ubuntu 20.04 and 22.04, the Python 3 packages should be 3.8 or newer which makes install pretty simple.
+For Ubuntu 20.04 and 22.04, the Python 3 packages should be 3.9 or newer which makes install pretty simple.
 
 {% highlight bash %}
 # Update system packages first

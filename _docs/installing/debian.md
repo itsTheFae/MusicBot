@@ -70,7 +70,7 @@ If you need to manually update python libraries for MusicBot, you will need to a
 <details>
   <summary>Debian 11 (bullseye) install steps.</summary>  
 
-For Debian version 11 (bullseye), the Python 3.8+ is available as a system package, so installing is pretty simple.<br>  
+For Debian version 11 (bullseye), Python 3.9 or higher is available as a system package, so installing is pretty simple.<br>  
 Just follow these commands:  
 
 {% highlight bash %}
@@ -102,7 +102,7 @@ After configuring you can use the command <code>./run.sh</code> to start the bot
 <details>
   <summary>Debian 10 (buster) install steps.</summary>
 
-For Debian version 10 (buster) and earlier versions, you will need to compile a version of Python 3.8 or higher as well as installing pip.<br>  
+For Debian version 10 (buster) and earlier versions, you will need to compile a version of Python 3.9 or higher as well as installing pip.<br>  
 This can take a bit of time to complete and may require a little troubleshooting know-how if these steps are out-of-date or incomplete in some way.<br>  
 <br>
 If you're willing to carefully follow along, these steps <i>should</i> get MusicBot working:

@@ -62,6 +62,9 @@ All of these scripts support the same <a href="{{ site.baseurl }}/using/running/
 
 ## Documentation for options.ini  
 
+The options listed here may be older or newer than your installed version of MusicBot.  
+For a version-specific documentation, please read the `example_options.ini` file included with your version of MusicBot.    
+
 <p><a class="expand-all-details">Show/Hide All</a></p>
 
 #### [Credentials]

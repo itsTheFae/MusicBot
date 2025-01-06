@@ -18,12 +18,9 @@ Currently, the bot can't play music that is saved on your computer locally, thou
 
 #### How can I sign into youtube?
 
-By using the experimental OAuth2 integration, you can use a youtube/google account to sign in.  
-First enable `YtdlpUseOauth2` in your options file.  
-Next, update the `YtdlpOauth2URL` option with a youtube video URL.  
-While the URL is set, you should be prompted to verify at MusicBot startup.  Otherwise MusicBot will prompt when a youtube video is requested.  
-
-In most cases you should only need to verify once.  MusicBot will update the oauth token as needed while making requests to youtube.  
+You'll need to research what the maintainers of ytdlp recommend as the modern method of choice.  
+Typically, if a method works for stand-alone ytdlp, then it can usually work for MusicBot.  
+YouTube as a platform makes changes in order to force users to comply.  Best of luck to you in keeping up with the changes.  
 
 #### Can I modify the bot?
 
