@@ -123,7 +123,7 @@ All bots are ignored by default.<br>
 </details>  
 
 
-#### [Chat]
+#### [ChatCommands]
 
 <details>
   <summary>CommandPrefix</summary>
@@ -156,12 +156,21 @@ Only used when BindToChannels is missing an ID for a server.<br>
 <strong>Default Value:</strong> <code>yes</code>  
 </details>  
 <details>
-  <summary>AutojoinChannels</summary>
+  <summary>UseAlias</summary>
 
-A list of Voice Channel IDs that MusicBot should automatically join on start up.<br>
-Use spaces to separate multiple IDs.<br>  
-<strong>Default Value:</strong> <i>*empty*</i>  
+If enabled, MusicBot will allow commands to have multiple names using data in:  config/aliases.json<br>  
+<strong>Default Value:</strong> <code>yes</code>  
 </details>  
+<details>
+  <summary>EnablePrefixPerGuild</summary>
+
+Allow MusicBot to save a per-server command prefix, and enables the setprefix command.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+
+
+#### [ChatResponses]
+
 <details>
   <summary>DMNowPlaying</summary>
 
@@ -187,18 +196,86 @@ Only one text channel ID can be used per server.<br>
 MusicBot will automatically delete Now Playing messages.<br>  
 <strong>Default Value:</strong> <code>yes</code>  
 </details>  
-
-
-#### [MusicBot]
-
 <details>
-  <summary>DebugLevel</summary>
+  <summary>NowPlayingMentions</summary>
 
-Set the log verbosity of MusicBot. Normally this should be set to INFO.<br>
-It can be set to one of the following:<br>
- CRITICAL, ERROR, WARNING, INFO, DEBUG, VOICEDEBUG, FFMPEG, NOISY, or EVERYTHING<br>  
-<strong>Default Value:</strong> <code>INFO</code>  
+Mention the user who added the song when it is played.<br>  
+<strong>Default Value:</strong> <code>no</code>  
 </details>  
+<details>
+  <summary>DeleteMessages</summary>
+
+Allow MusicBot to automatically delete messages it sends, after a delay.<br>
+Delay period is controlled by DeleteDelayShort and DeleteDelayLong.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+<details>
+  <summary>DeleteInvoking</summary>
+
+Auto delete valid commands after a delay.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>DeleteDelayShort</summary>
+
+Sets the short period of seconds before deleting messages.<br>
+This period is used by messages that require no further interaction.<br>  
+<strong>Default Value:</strong> <code>0:00:30</code>  
+</details>  
+<details>
+  <summary>DeleteDelayLong</summary>
+
+Sets the long delay period before deleting messages.<br>
+This period is used by interactive or long-winded messages, like search and help.<br>  
+<strong>Default Value:</strong> <code>0:01:00</code>  
+</details>  
+<details>
+  <summary>UseEmbeds</summary>
+
+Allow MusicBot to format its messages as embeds.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+<details>
+  <summary>CustomEmbedFooter</summary>
+
+Replace MusicBot name/version in embed footer with custom text.<br>
+Only applied when UseEmbeds is enabled and it is not blank.<br>  
+<strong>Default Value:</strong> <code>Just-Some-Bots/MusicBot (alpha-050125-4-gb7f2c99a-config-cli-tool-modded)</code>  
+</details>  
+<details>
+  <summary>RemoveEmbedFooter</summary>
+
+Completely remove the footer from embeds.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>SearchList</summary>
+
+If enabled, users must indicate search result choices by sending a message instead of using reactions.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>DefaultSearchResults</summary>
+
+Sets the default number of search results to fetch when using the search command without a specific number.<br>  
+<strong>Default Value:</strong> <code>3</code>  
+</details>  
+<details>
+  <summary>QueueLength</summary>
+
+The number of entries to show per-page when using q command to list the queue.<br>  
+<strong>Default Value:</strong> <code>10</code>  
+</details>  
+<details>
+  <summary>ReplyAndMention</summary>
+
+Command responses will also mention or notify the user.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+
+
+#### [Playback]
+
 <details>
   <summary>DefaultVolume</summary>
 
@@ -231,41 +308,83 @@ You can set this from 0 to 1, or 0% to 100%.<br>
 <strong>Default Value:</strong> <code>0.5</code>  
 </details>  
 <details>
-  <summary>SaveVideos</summary>
+  <summary>AllowAuthorSkip</summary>
 
-Allow MusicBot to keep downloaded media, or delete it right away.<br>  
+Allow the member who requested the song to skip it, bypassing votes.<br>  
 <strong>Default Value:</strong> <code>yes</code>  
 </details>  
 <details>
-  <summary>StorageLimitBytes</summary>
+  <summary>LegacySkip</summary>
 
-If SaveVideos is enabled, set a limit on how much storage space should be used.<br>  
-<strong>Default Value:</strong> <code>0</code>  
-</details>  
-<details>
-  <summary>StorageLimitDays</summary>
-
-If SaveVideos is enabled, set a limit on how long files should be kept.<br>  
-<strong>Default Value:</strong> <code>0</code>  
-</details>  
-<details>
-  <summary>StorageRetainAutoPlay</summary>
-
-If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits.<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
-  <summary>NowPlayingMentions</summary>
-
-Mention the user who added the song when it is played.<br>  
+Enable users with the InstaSkip permission to bypass skip voting and force skips.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
-  <summary>AutoSummon</summary>
+  <summary>AutoPause</summary>
 
-Automatically join the owner if they are in an accessible voice channel when bot starts.<br>  
+MusicBot will automatically pause playback when no users are listening.<br>  
 <strong>Default Value:</strong> <code>yes</code>  
 </details>  
+<details>
+  <summary>PersistentQueue</summary>
+
+Allow MusicBot to save the song queue, so queued songs will survive restarts.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+<details>
+  <summary>PreDownloadNextSong</summary>
+
+Enable MusicBot to download the next song in the queue while a song is playing.<br>
+Currently this option does not apply to auto playlist or songs added to an empty queue.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+<details>
+  <summary>UseExperimentalEqualization</summary>
+
+Tries to use ffmpeg to get volume normalizing options for use in playback.<br>
+This option can cause delay between playing songs, as the whole track must be processed.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>RoundRobinQueue</summary>
+
+If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>EnableLocalMedia</summary>
+
+Enable playback of local media files using the play command.<br>
+When enabled, users can use:  `play file://path/to/file.ext`<br>
+to play files from the local MediaFileDirectory path.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>UnpausePlayerOnPlay</summary>
+
+Allow MusicBot to automatically unpause when play commands are used.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>UseOpusAudio</summary>
+
+May reduce CPU usage by avoiding PCM-to-Opus encoding in python.<br>
+When enabled, volume is controlled via FFmpeg filter instead of python.<br>
+May cause a short delay when tracks first start for bitrate discovery.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+<details>
+  <summary>UseOpusProbe</summary>
+
+Similar to UseOpusAudio, but reduces CPU usage even more where possible.<br>
+If the media is already Opus encoded (like YouTube) no re-encoding is done.<br>
+This option will disable speed, volume, and UseExperimentalEqualization options.<br>  
+<strong>Default Value:</strong> <code>no</code>  
+</details>  
+
+
+#### [AutoPlaylist]
+
 <details>
   <summary>UseAutoPlaylist</summary>
 
@@ -292,49 +411,71 @@ Remove songs from the auto playlist if they are found in the song block list.<br
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
-  <summary>AutoPause</summary>
+  <summary>SavePlayedHistoryGlobal</summary>
 
-MusicBot will automatically pause playback when no users are listening.<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
-  <summary>DeleteMessages</summary>
-
-Allow MusicBot to automatically delete messages it sends, after a delay.<br>
-Delay period is controlled by DeleteDelayShort and DeleteDelayLong.<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
-  <summary>DeleteInvoking</summary>
-
-Auto delete valid commands after a delay.<br>  
+Enable saving all songs played by MusicBot to a global playlist file:  config/playlists/history.txt<br>
+This will contain all songs from all servers.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
-  <summary>DeleteDelayShort</summary>
+  <summary>SavePlayedHistoryGuilds</summary>
 
-Sets the short period of seconds before deleting messages.<br>
-This period is used by messages that require no further interaction.<br>  
-<strong>Default Value:</strong> <code>0:00:30</code>  
+Enable saving songs played per-server to a playlist file:  config/playlists/history[Server ID].txt<br>  
+<strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
-  <summary>DeleteDelayLong</summary>
+  <summary>RemoveFromAPOnError</summary>
 
-Sets the long delay period before deleting messages.<br>
-This period is used by interactive or long-winded messages, like search and help.<br>  
-<strong>Default Value:</strong> <code>0:01:00</code>  
+Enable MusicBot to automatically remove unplayable entries from the auto playlist.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+
+
+#### [MusicBot]
+
+<details>
+  <summary>DebugLevel</summary>
+
+Set the log verbosity of MusicBot. Normally this should be set to INFO.<br>
+It can be set to one of the following:<br>
+ CRITICAL, ERROR, WARNING, INFO, DEBUG, VOICEDEBUG, FFMPEG, NOISY, or EVERYTHING<br>  
+<strong>Default Value:</strong> <code>INFO</code>  
 </details>  
 <details>
-  <summary>PersistentQueue</summary>
+  <summary>AutojoinChannels</summary>
 
-Allow MusicBot to save the song queue, so queued songs will survive restarts.<br>  
+A list of Voice Channel IDs that MusicBot should automatically join on start up.<br>
+Use spaces to separate multiple IDs.<br>  
+<strong>Default Value:</strong> <i>*empty*</i>  
+</details>  
+<details>
+  <summary>SaveVideos</summary>
+
+Allow MusicBot to keep downloaded media, or delete it right away.<br>  
 <strong>Default Value:</strong> <code>yes</code>  
 </details>  
 <details>
-  <summary>PreDownloadNextSong</summary>
+  <summary>StorageLimitBytes</summary>
 
-Enable MusicBot to download the next song in the queue while a song is playing.<br>
-Currently this option does not apply to auto playlist or songs added to an empty queue.<br>  
+If SaveVideos is enabled, set a limit on how much storage space should be used.<br>  
+<strong>Default Value:</strong> <code>0</code>  
+</details>  
+<details>
+  <summary>StorageLimitDays</summary>
+
+If SaveVideos is enabled, set a limit on how long files should be kept.<br>  
+<strong>Default Value:</strong> <code>0</code>  
+</details>  
+<details>
+  <summary>StorageRetainAutoPlay</summary>
+
+If SaveVideos is enabled, never purge auto playlist songs from the cache regardless of limits.<br>  
+<strong>Default Value:</strong> <code>yes</code>  
+</details>  
+<details>
+  <summary>AutoSummon</summary>
+
+Automatically join the owner if they are in an accessible voice channel when bot starts.<br>  
 <strong>Default Value:</strong> <code>yes</code>  
 </details>  
 <details>
@@ -367,71 +508,15 @@ If enabled, MusicBot will save the track title to:  data/[Server ID]/current.txt
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
-  <summary>AllowAuthorSkip</summary>
-
-Allow the member who requested the song to skip it, bypassing votes.<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
-  <summary>UseExperimentalEqualization</summary>
-
-Tries to use ffmpeg to get volume normalizing options for use in playback.<br>
-This option can cause delay between playing songs, as the whole track must be processed.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>UseEmbeds</summary>
-
-Allow MusicBot to format its messages as embeds.<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
-  <summary>QueueLength</summary>
-
-The number of entries to show per-page when using q command to list the queue.<br>  
-<strong>Default Value:</strong> <code>10</code>  
-</details>  
-<details>
-  <summary>RemoveFromAPOnError</summary>
-
-Enable MusicBot to automatically remove unplayable entries from the auto playlist.<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
   <summary>ShowConfigOnLaunch</summary>
 
 Display MusicBot config settings in the logs at startup.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
-  <summary>LegacySkip</summary>
-
-Enable users with the InstaSkip permission to bypass skip voting and force skips.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
   <summary>LeaveServersWithoutOwner</summary>
 
 If enabled, MusicBot will leave servers if the owner is not in their member list.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>UseAlias</summary>
-
-If enabled, MusicBot will allow commands to have multiple names using data in:  config/aliases.json<br>  
-<strong>Default Value:</strong> <code>yes</code>  
-</details>  
-<details>
-  <summary>CustomEmbedFooter</summary>
-
-Replace MusicBot name/version in embed footer with custom text.<br>
-Only applied when UseEmbeds is enabled and it is not blank.<br>  
-<strong>Default Value:</strong> <code>Just-Some-Bots/MusicBot (release-250723-1110-g6ded856)</code>  
-</details>  
-<details>
-  <summary>RemoveEmbedFooter</summary>
-
-Completely remove the footer from embeds.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
@@ -470,63 +555,12 @@ Set it to 0 to disable leaving in this way.<br>
 <strong>Default Value:</strong> <code>0:00:00</code>  
 </details>  
 <details>
-  <summary>SearchList</summary>
-
-If enabled, users must indicate search result choices by sending a message instead of using reactions.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>DefaultSearchResults</summary>
-
-Sets the default number of search results to fetch when using the search command without a specific number.<br>  
-<strong>Default Value:</strong> <code>3</code>  
-</details>  
-<details>
-  <summary>EnablePrefixPerGuild</summary>
-
-Allow MusicBot to save a per-server command prefix, and enables the setprefix command.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>RoundRobinQueue</summary>
-
-If enabled and multiple members are adding songs, MusicBot will organize playback for one song per member.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
   <summary>EnableNetworkChecker</summary>
 
 Allow MusicBot to use timed pings to detect network outage and availability.<br>
 This may be useful if you keep the bot joined to a channel or playing music 24/7.<br>
 MusicBot must be restarted to enable network testing.<br>
 By default this is disabled.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>SavePlayedHistoryGlobal</summary>
-
-Enable saving all songs played by MusicBot to a global playlist file:  config/playlists/history.txt<br>
-This will contain all songs from all servers.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>SavePlayedHistoryGuilds</summary>
-
-Enable saving songs played per-server to a playlist file:  config/playlists/history[Server ID].txt<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>EnableLocalMedia</summary>
-
-Enable playback of local media files using the play command.<br>
-When enabled, users can use:  `play file://path/to/file.ext`<br>
-to play files from the local MediaFileDirectory path.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>UnpausePlayerOnPlay</summary>
-
-Allow MusicBot to automatically unpause when play commands are used.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 <details>
@@ -549,26 +583,6 @@ Leave blank to use default, dynamically generated UA strings.<br>
 <strong>Default Value:</strong> <i>*empty*</i>  
 </details>  
 <details>
-  <summary>YtdlpUseOAuth2</summary>
-
-Experimental option to enable yt-dlp to use a YouTube account via OAuth2.<br>
-When enabled, you must use the generated URL and code to authorize an account.<br>
-The authorization token is then stored in the `data//oauth2.token` file.<br>
-This option should not be used when cookies are enabled.<br>
-Using a personal account may not be recommended.<br>
-Set yes to enable or no to disable.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>YtdlpOAuth2URL</summary>
-
-Optional YouTube video URL used at start-up for triggering OAuth2 authorization.<br>
-This starts the OAuth2 prompt early, rather than waiting for a song request.<br>
-The URL set here should be an accessible YouTube video URL.<br>
-Authorization must be completed before start-up will continue when this is set.<br>  
-<strong>Default Value:</strong> <i>*empty*</i>  
-</details>  
-<details>
   <summary>EnableUserBlocklist</summary>
 
 Toggle the user block list feature, without emptying the block list.<br>  
@@ -578,22 +592,6 @@ Toggle the user block list feature, without emptying the block list.<br>
   <summary>EnableSongBlocklist</summary>
 
 Enable the song block list feature, without emptying the block list.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>UseOpusAudio</summary>
-
-May reduce CPU usage by avoiding PCM-to-Opus encoding in python.<br>
-When enabled, volume is controlled via FFmpeg filter instead of python.<br>
-May cause a short delay when tracks first start for bitrate discovery.<br>  
-<strong>Default Value:</strong> <code>no</code>  
-</details>  
-<details>
-  <summary>UseOpusProbe</summary>
-
-Similar to UseOpusAudio, but reduces CPU usage even more where possible.<br>
-If the media is already Opus encoded (like YouTube) no re-encoding is done.<br>
-This option will disable speed, volume, and UseExperimentalEqualization options.<br>  
 <strong>Default Value:</strong> <code>no</code>  
 </details>  
 
