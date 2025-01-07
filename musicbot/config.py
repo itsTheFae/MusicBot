@@ -1498,7 +1498,7 @@ class ConfigDefaults:
     status_include_paused: bool = False
     write_current_song: bool = False
     allow_author_skip: bool = True
-    use_opus_audio: bool = False
+    use_opus_audio: bool = True
     use_opus_probe: bool = False
     use_experimental_equalization: bool = False
     embeds: bool = True
