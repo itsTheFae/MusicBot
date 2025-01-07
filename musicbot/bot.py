@@ -5762,25 +5762,20 @@ class MusicBot(discord.Client):
 
         # Show missing options with help text.
         if option == "missing":
-            missing = ""
-            for opt in self.config.register.ini_missing_options:
-                missing += _D(
-                    "**Missing Option:** `%(config)s`\n"
-                    "```\n"
-                    "%(comment)s\n"
-                    "Default is set to:  %(default)s"
-                    "```\n",
-                    ssd_,
-                ) % {
-                    "config": opt,
-                    "comment": opt.comment,
-                    "default": opt.default,
-                }
-            if not missing:
+            missed = ""
+            for opt in sorted(self.config.register.ini_missing_options, key=str):
+                missed += f"{opt}\n"
+
+            if not missed:
                 missing = _D(
                     "*All config options are present and accounted for!*",
                     ssd_,
                 )
+            else:
+                missing = _D(
+                    "**Missing Options:**\n```\n%(missing)s```",
+                    ssd_,
+                ) % {"missing": missed}
 
             return Response(
                 missing,
@@ -5951,6 +5946,13 @@ class MusicBot(discord.Client):
                 )
             # TODO: perhaps make use of currently unused display value for empty configs.
             cur_val, ini_val, disp_val = self.config.register.get_values(opt)
+            cur_val = str(cur_val)
+            ini_val = str(ini_val)
+            if not cur_val:
+                cur_val = " " if not disp_val else disp_val
+            if not ini_val:
+                ini_val = " " if not disp_val else disp_val
+
             return Response(
                 _D(
                     "**Option:** `%(config)s`\n"
@@ -5960,8 +5962,8 @@ class MusicBot(discord.Client):
                 )
                 % {
                     "config": opt,
-                    "loaded": cur_val if cur_val == "" else disp_val,
-                    "ini": ini_val if ini_val == "" else disp_val,
+                    "loaded": cur_val,
+                    "ini": ini_val,
                 }
             )
 
