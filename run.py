@@ -1015,6 +1015,10 @@ def main() -> None:
     # Handle startup checks, if they haven't been skipped.
     sanity_checks(cli_args)
 
+    # Make sure Config doesn't wig out when no config exists but we still want to generate examples.
+    if cli_args.make_examples and "MUSICBOT_TOKEN" not in os.environ:
+        os.environ["MUSICBOT_TOKEN"] = "Your Token Here"
+
     exit_signal: Union[RestartSignal, TerminateSignal, None] = None
     event_loop: Optional[asyncio.AbstractEventLoop] = None
     tried_requirementstxt: bool = False
