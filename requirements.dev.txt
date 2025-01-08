@@ -22,4 +22,5 @@ pylint
 types-certifi
 types-objgraph
 types-colorama
+types-polib
 
