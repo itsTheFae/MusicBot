@@ -802,6 +802,9 @@ class PermissionOptionRegistry(ConfigOptionRegistry):
                 )
 
             conf_value = getattr(group, option.dest)
+        # apply a sort to the extractors.
+        if option.option == "Extractors":
+            conf_value = sorted(list(conf_value))  # type: ignore[type-var,assignment]
         return self._value_to_ini(conf_value, option.getter)
 
     def write_default_ini(self, filename: pathlib.Path) -> bool:

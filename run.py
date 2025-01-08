@@ -26,6 +26,8 @@ from musicbot.constants import (
     DEFAULT_LOGS_ROTATE_FORMAT,
     DEFAULT_MEDIA_FILE_DIR,
     DEFAULT_OPTIONS_FILE,
+    EXAMPLE_OPTIONS_FILE,
+    EXAMPLE_PERMS_FILE,
     MAXIMUM_LOGS_LIMIT,
 )
 from musicbot.constants import VERSION as BOTVERSION
@@ -827,6 +829,13 @@ def parse_cli_args() -> argparse.Namespace:
         ),
     )
 
+    ap.add_argument(
+        "--mk-examples",
+        dest="make_examples",
+        action="store_true",
+        help="Update or create example config files and then exit. Useful if code is changed or examples are out-of-date for some reason.",
+    )
+
     args = ap.parse_args()
 
     # Show version and exit.
@@ -1034,6 +1043,13 @@ def main() -> None:
             m = MusicBot(  # pylint: disable=possibly-used-before-assignment
                 use_certifi=use_certifi
             )
+
+            # Update example options / permissions as needed.
+            if cli_args.make_examples:
+                log.info("Updating example config files...")
+                m.config.register.write_default_ini(write_path(EXAMPLE_OPTIONS_FILE))
+                m.permissions.register.write_default_ini(write_path(EXAMPLE_PERMS_FILE))
+                raise TerminateSignal()
 
             # register system signal handlers with the event loop.
             if not getattr(event_loop, "_sig_handler_set", False):
