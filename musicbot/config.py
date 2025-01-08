@@ -2008,7 +2008,7 @@ class ConfigOptionRegistry:
         if getter == "getboolean":
             return "yes" if conf_value else "no"
 
-        if getter in ["getstrset", "getidset"] and isinstance(conf_value, set):
+        if getter in ["getstrset", "getidset"] and isinstance(conf_value, (list, set)):
             return ", ".join(str(x) for x in conf_value)
 
         if getter == "getdatasize" and isinstance(conf_value, int):
