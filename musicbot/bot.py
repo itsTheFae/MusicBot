@@ -5764,7 +5764,7 @@ class MusicBot(discord.Client):
         if option == "missing":
             missed = ""
             for opt in sorted(self.config.register.ini_missing_options, key=str):
-                missed += f"{opt}\n"
+                missed += f"{opt}\n"  # pylint: disable=consider-using-join
 
             if not missed:
                 missing = _D(
