@@ -16,9 +16,6 @@ black
 isort[colors]
 mypy
 pylint
-polib
-argostranslate; python_version < '3.13'
-marko
 
 # type stubs for untyped packages.
 # ytdlp and pymediainfo do not seem to have these.

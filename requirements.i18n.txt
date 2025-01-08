@@ -1,0 +1,6 @@
+# This file contains packages required only for the i18n tools.
+polib
+marko
+
+# Not yet available in 3.13, you may want to double check this.
+argostranslate; python_version < '3.13'
