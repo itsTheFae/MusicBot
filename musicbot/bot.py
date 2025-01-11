@@ -76,6 +76,7 @@ from .playlist import Playlist
 from .spotify import Spotify
 from .utils import (
     _func_,
+    check_extractor,
     command_helper,
     count_members_in_voice,
     dev_only,
@@ -4267,6 +4268,8 @@ class MusicBot(discord.Client):
             song_url = " ".join([song_url, *leftover_args])
             leftover_args = []  # prevent issues later.
             self._do_song_blocklist_check(song_url)
+            if song_url:
+                song_url = f"{self.config.default_search_service}:{song_url}"
 
         # Validate spotify links are supported before we try them.
         if "open.spotify.com" in song_url.lower():
@@ -4323,7 +4326,7 @@ class MusicBot(discord.Client):
 
             # if the result has "entries" but it's empty, it might be a failed search.
             if "entries" in info and not info.entry_count:
-                if info.extractor.startswith("youtube:search"):
+                if check_extractor(info.extractor, "youtube:search"):
                     # TOOD: UI, i18n stuff
                     raise exceptions.CommandError(
                         "YouTube search returned no results for:  %(url)s",
@@ -4562,6 +4565,9 @@ class MusicBot(discord.Client):
             "- yt, youtube (default)\n"
             "- sc, soundcloud\n"
             "- yh, yahoo\n"
+            "- gv, google\n"
+            "- nv, nico\n"
+            "- bb, bili\n"
         ),
     )
     async def cmd_search(
@@ -4603,20 +4609,27 @@ class MusicBot(discord.Client):
 
         argcheck()
 
-        service = "youtube"
+        service = self.config.default_search_service
         items_requested = self.config.defaultsearchresults
         max_items = permissions.max_search_items
         services = {
+            "bili": "bilisearch",
+            "bb": "bilisearch",
+            "nico": "nicosearch",
+            "nv": "nicosearch",
             "youtube": "ytsearch",
+            "google": "gvsearch",
             "soundcloud": "scsearch",
             "yahoo": "yvsearch",
             "yt": "ytsearch",
             "sc": "scsearch",
             "yh": "yvsearch",
+            "gv": "gvsearch",
         }
+        service_keys = [*services.keys(), *list(set(services.values()))]
 
         # handle optional [SERVICE] arg
-        if leftover_args[0] in services:
+        if leftover_args[0] in service_keys:
             service = leftover_args.pop(0)
             argcheck()
 
@@ -4642,7 +4655,7 @@ class MusicBot(discord.Client):
             leftover_args[-1] = leftover_args[-1].rstrip(lchar)
 
         ssd = self.server_data[guild.id]
-        srvc = services[service]
+        srvc = services.get(service, service)
         args_str = " ".join(leftover_args)
         search_query = f"{srvc}{items_requested}:{args_str}"
 
@@ -8293,7 +8306,8 @@ class MusicBot(discord.Client):
                 handler_kwargs["leftover_args"] = args
 
             # special case to auto populate "song_url" with attachment url.
-            if params.pop("song_url", None) and message.attachments and not args:
+            if params.get("song_url", None) and message.attachments and not args:
+                params.pop("song_url")
                 handler_kwargs["song_url"] = message.attachments[0].url
 
             for key, param in list(params.items()):

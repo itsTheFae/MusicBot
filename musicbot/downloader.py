@@ -23,6 +23,7 @@ from yt_dlp.utils import UnsupportedError
 from .constants import DEFAULT_MAX_INFO_DL_THREADS, DEFAULT_MAX_INFO_REQUEST_TIMEOUT
 from .exceptions import ExtractionError, MusicbotException
 from .spotify import Spotify
+from .utils import check_extractor
 
 if TYPE_CHECKING:
     from multidict import CIMultiDictProxy
@@ -112,6 +113,14 @@ class Downloader:
             max_workers=DEFAULT_MAX_INFO_DL_THREADS,
             thread_name_prefix="MB_Downloader",
         )
+        self._supported_search = [
+            "ytsearch",  # YouTube search
+            "gvsearch",  # Google Video search
+            "yvsearch",  # Yahoo video search
+            "scsearch",  # soundcloud search
+            "bilisearch",  # bilibili search
+            "nicosearch",  # nico video search
+        ]
 
         # force ytdlp and HEAD requests to use the same UA string.
         # If the constant is set, use that, otherwise use dynamic selection.
@@ -474,7 +483,8 @@ class Downloader:
                     song_subject, process
                 )
                 if data["_type"] == "url":
-                    song_subject = data["search_terms"]
+                    song_subject = f"{self.bot.config.default_search_service}:"
+                    song_subject += data["search_terms"]
                 elif data["_type"] == "playlist":
                     return data
 
@@ -537,14 +547,15 @@ class Downloader:
         # This prevents single-entry searches being processed like a playlist later.
         # However we must preserve the list behavior when using cmd_search.
         if (
-            data.get("extractor", "").startswith("youtube:search")
+            check_extractor(data.get("extractor", ""), "search")
             and len(data.get("entries", [])) == 1
             and isinstance(data.get("entries", None), list)
             and data.get("playlist_count", 0) == 1
-            and not song_subject.startswith("ytsearch")
+            and not any(song_subject.startswith(e) for e in self._supported_search)
         ):
             log.noise(  # type: ignore[attr-defined]
-                "Extractor youtube:search returned single-entry result, replacing base info with entry info."
+                "Extractor %(extractor)s returned single-entry result, replacing base info with entry info.",
+                {"extractor": data.get("extractor", "__unknown__")},
             )
             entry_info = copy.deepcopy(data["entries"][0])
             for key in entry_info:
