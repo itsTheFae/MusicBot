@@ -512,3 +512,9 @@ def format_time_to_seconds(time_str: Union[str, int]) -> int:
             unit = unit[0].lower().strip()
         total_sec += int(float(value) * unit_seconds[unit])
     return total_sec
+
+
+def check_extractor(target: str, contains: str) -> bool:
+    """Tests extractor string for containing the given extractor parts."""
+    parts = contains.split(":")
+    return all(p in target for p in parts)

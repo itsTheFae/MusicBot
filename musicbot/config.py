@@ -631,6 +631,17 @@ class Config:
                 "This option will disable speed, volume, and UseExperimentalEqualization options."
             ),
         )
+        self.default_search_service: str = self.register.init_option(
+            section="Playback",
+            option="DefaultSearchService",
+            dest="default_search_service",
+            default=ConfigDefaults.default_search_service,
+            comment=_Dd(
+                "This option sets the default search service used by MusicBot through ytdlp.\n"
+                "Read ytdlp's list of supported sites to find supported prefixes you can use here.\n"
+                "Some prefix examples:   ytsearch, scsearch, gvsearch, yvsearch, bilisearch, nicosearch"
+            ),
+        )
 
         ########################################################################
         # Auto Playlist
@@ -1528,6 +1539,7 @@ class ConfigDefaults:
     ytdlp_user_agent: str = ""
 
     pre_download_next_song: bool = True
+    default_search_service: str = "ytsearch"
 
     song_blocklist: Set[str] = set()
     user_blocklist: Set[int] = set()
