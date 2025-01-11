@@ -8292,6 +8292,10 @@ class MusicBot(discord.Client):
             if params.pop("leftover_args", None):
                 handler_kwargs["leftover_args"] = args
 
+            # special case to auto populate "song_url" with attachment url.
+            if params.pop("song_url", None) and message.attachments and not args:
+                handler_kwargs["song_url"] = message.attachments[0].url
+
             for key, param in list(params.items()):
                 # parse (*args) as a list of args
                 if param.kind == param.VAR_POSITIONAL:
