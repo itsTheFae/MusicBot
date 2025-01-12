@@ -145,7 +145,7 @@ function build_python() {
         cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
 
         ./configure --enable-optimizations
-        sudo make altinstall
+        $SUDO_BIN make altinstall
 
         # Ensure python bin is updated with altinstall name.
         find_python
@@ -543,12 +543,11 @@ function setup_as_service() {
         
         if [ "$SKIP_ALL_SUDO" == "0" ] ; then
             # Copy the service file into place and enable it.
-            sudo cp "${SrvCpyFile}" "${SrvInstFile}"
-            sudo chown root:root "$SrvInstFile"
-            sudo chmod 644 "$SrvInstFile"
-            # TODO:  maybe we need to reload the daemon... 
-            # sudo systemctl daemon-reload
-            sudo systemctl enable "$ServiceName"
+            $SUDO_BIN cp "${SrvCpyFile}" "${SrvInstFile}"
+            $SUDO_BIN chown root:root "$SrvInstFile"
+            $SUDO_BIN chmod 644 "$SrvInstFile"
+            $SUDO_BIN systemctl daemon-reload
+            $SUDO_BIN systemctl enable "$ServiceName"
 
             echo "Installed File:  ${SrvInstFile}"
 
@@ -558,7 +557,7 @@ function setup_as_service() {
             case $StartService in
             [Yy]*)
                 echo "Running:  sudo systemctl start $ServiceName"
-                sudo systemctl start "$ServiceName"
+                $SUDO_BIN systemctl start "$ServiceName"
             ;;
             esac
         else
@@ -720,7 +719,8 @@ if [ "$(id -u)" -eq "0" ] && [ "$INSTALL_BOT_BITS" == "1" ] ;  then
 fi
 
 # check if we can sudo or not
-if [ "$SKIP_ALL_SUDO" == "0" ] ; then
+SUDO_BIN="$(command -v sudo)"
+if [ "$SKIP_ALL_SUDO" == "0" ] && [ "$(id -u)" -ne "0" ] ; then
     echo "Checking if user can sudo..."
     if ! sudo -v ; then
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
@@ -759,8 +759,8 @@ case $DISTRO_NAME in
 *"Arch Linux"*)  # Tested working 2024.03.01  @  2024/03/31
     if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
         # NOTE: Arch now uses system managed python packages, so venv is required.
-        sudo pacman -Syu
-        sudo pacman -S curl ffmpeg git jq python python-pip
+        $SUDO_BIN pacman -Syu
+        $SUDO_BIN pacman -S curl ffmpeg git jq python python-pip
     fi
 
     if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -774,9 +774,9 @@ case $DISTRO_NAME in
     # Tested working 22.04  @  2024/03/29
     *"Pop!_OS 22.04"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install build-essential software-properties-common \
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
+            $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-pip python3-dev jq -y
         fi
@@ -788,9 +788,9 @@ case $DISTRO_NAME in
 
     *"Pop!_OS 24.04"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install build-essential software-properties-common \
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
+            $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-full python3-pip python3-venv python3-dev jq -y
         fi
@@ -812,10 +812,10 @@ case $DISTRO_NAME in
     case $DISTRO_NAME in
     *"Ubuntu 18.04"*)  #  Tested working 18.04 @ 2024/03/29
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
             # 18.04 needs to build a newer version from source.
-            sudo apt-get install build-essential software-properties-common \
+            $SUDO_BIN apt-get install build-essential software-properties-common \
                 libopus-dev libffi-dev libsodium-dev libssl-dev \
                 zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \
                 libreadline-dev libsqlite3-dev libbz2-dev \
@@ -834,9 +834,9 @@ case $DISTRO_NAME in
     # 22.04  @  2024/03/30
     *"Ubuntu 20"*|*"Ubuntu 22"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install build-essential software-properties-common \
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
+            $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-pip python3-dev jq -y
         fi
@@ -850,9 +850,9 @@ case $DISTRO_NAME in
     # 24.04  @  2024/09/04
     *"Ubuntu 24"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install build-essential software-properties-common \
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
+            $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-full python3-pip python3-venv python3-dev jq -y
         fi
@@ -876,10 +876,10 @@ case $DISTRO_NAME in
     case $DISTRO_NAME in
     *"Debian GNU/Linux 10"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
 
-            sudo apt-get install -y build-essential \
+            $SUDO_BIN apt-get install -y build-essential \
                 libopus-dev libffi-dev libsodium-dev libssl-dev \
                 zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \
                 libreadline-dev libsqlite3-dev libbz2-dev \
@@ -898,9 +898,9 @@ case $DISTRO_NAME in
     # Debian 11.3  @  2024/03/29
     *"Debian GNU/Linux 11"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install -y jq git curl ffmpeg python3 python3-pip
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
+            $SUDO_BIN apt-get install -y jq git curl ffmpeg python3 python3-pip
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -914,9 +914,9 @@ case $DISTRO_NAME in
     *"Debian GNU/Linux 12"*|*"Debian GNU/Linux trixie"*|*"Debian GNU/Linux sid"*)
         # Debian 12 uses system controlled python packages.
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            sudo apt-get update -y
-            sudo apt-get upgrade -y
-            sudo apt-get install -y build-essential libopus-dev libffi-dev libsodium-dev \
+            $SUDO_BIN apt-get update -y
+            $SUDO_BIN apt-get upgrade -y
+            $SUDO_BIN apt-get install -y build-essential libopus-dev libffi-dev libsodium-dev \
                 python3-full python3-dev python3-venv python3-pip git ffmpeg curl
         fi
 
@@ -935,10 +935,10 @@ case $DISTRO_NAME in
 # Modern Raspberry Pi OS does not return "Raspbian"
 *"Raspbian"*)
     if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-        sudo apt-get update -y
-        sudo apt-get upgrade -y
+        $SUDO_BIN apt-get update -y
+        $SUDO_BIN apt-get upgrade -y
 
-        sudo apt-get install -y build-essential libopus-dev libffi-dev \
+        $SUDO_BIN apt-get install -y build-essential libopus-dev libffi-dev \
             libsodium-dev libssl-dev zlib1g-dev libncurses5-dev \
             libgdbm-dev libnss3-dev libreadline-dev libsqlite3-dev \
             libbz2-dev liblzma-dev lzma-dev uuid-dev \
@@ -949,7 +949,7 @@ case $DISTRO_NAME in
         curl -o jq.tar.gz https://github.com/stedolan/jq/releases/download/jq-1.5/jq-1.5.tar.gz
         tar -zxvf jq.tar.gz
         cd jq-1.5 || exit_err "Fatal:  Could not change directory to jq-1.5"
-        ./configure && make && sudo make install
+        ./configure && make && $SUDO_BIN make install
         cd .. && rm -rf ./jq-1.5
     fi
     if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -980,12 +980,12 @@ case $DISTRO_NAME in
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             # Enable extra repos, as required for ffmpeg
             # We DO NOT use the -y flag here.
-            sudo yum install epel-release
-            sudo yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+            $SUDO_BIN yum install epel-release
+            $SUDO_BIN yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
 
             # Install available packages and libraries for building python 3.8+
-            sudo yum -y groupinstall "Development Tools"
-            sudo yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
+            $SUDO_BIN yum -y groupinstall "Development Tools"
+            $SUDO_BIN yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
                 git curl jq ffmpeg
 
             # Ask if we should build python
@@ -1002,7 +1002,7 @@ case $DISTRO_NAME in
                 cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
 
                 ./configure --enable-optimizations
-                sudo make altinstall
+                $SUDO_BIN make altinstall
 
                 # Ensure python bin is updated with altinstall name.
                 find_python
@@ -1026,12 +1026,12 @@ case $DISTRO_NAME in
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             # Install extra repos, needed for ffmpeg.
             # Do not use -y flag here.
-            sudo dnf install epel-release
-            sudo dnf install --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm
-            sudo dnf config-manager --enable powertools
+            $SUDO_BIN dnf install epel-release
+            $SUDO_BIN dnf install --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm
+            $SUDO_BIN dnf config-manager --enable powertools
 
             # Install available packages.
-            sudo yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel
+            $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
