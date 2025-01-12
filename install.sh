@@ -154,6 +154,7 @@ function build_python() {
     # Ask if we should build python
     echo "We need to build python from source for your system."
     echo "It will be installed using the altinstall target to avoid conflicts."
+    echo "This process can take several minutes!"
     echo " Building Python ${PyBuildVer}  from: ${PySrcUrl}"
     read -rp "Would you like to continue ? [N/y]" BuildPython
     if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
@@ -184,6 +185,15 @@ function build_python() {
             exit 1
         fi
     else
+        echo ""
+        echo "To build Python ${PyBuildVer} manually, use these commands:"
+        echo "  curl -o '${PySrcFile}' '${PySrcUrl}'"
+        echo "  tar -xzf '${PySrcFile}'"
+        echo "  cd '${PWD}/${PySrcDir}'"
+        echo "  ./configure --enable-optimizations"
+        echo "  sudo make altinstall"
+        echo ""
+        echo ""
         find_python
     fi
 }
