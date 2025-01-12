@@ -578,6 +578,11 @@ function debug() {
 }
 
 function configure_bot() {
+    if in_venv ; then
+        find_python_venv
+    else
+        find_python
+    fi
     echo "You can now configure MusicBot!"
     read -rp "Would like to launch the 'configure.py' tool? [N/y]" YesConfig
     if [[ "${YesConfig,,}" != "y" && "${YesConfig,,}" != "yes" ]] ; then
