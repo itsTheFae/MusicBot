@@ -622,6 +622,9 @@ function debug() {
 }
 
 function configure_bot() {
+    if in_venv ; then
+        source "../bin/activate"
+    fi
     find_python
 
     echo "You can now configure MusicBot!"
@@ -634,6 +637,10 @@ function configure_bot() {
     fi
 
     $PyBin "configure.py"
+    
+    if in_venv ; then
+        deactivate
+    fi
 }
 
 #------------------------------------------CLI Arguments----------------------------------------------#
