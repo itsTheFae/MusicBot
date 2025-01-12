@@ -165,6 +165,10 @@ function build_python() {
         ./configure --enable-optimizations
         $SUDO_BIN make altinstall
 
+        # make sure to leave the build dir.
+        cd .. || exit_err "Fatal:  Could not change directory to parent of python source directory."
+        # TODO: maybe we should clean up the build/source/download but I cba.
+
         # Ensure python bin is updated with altinstall name.
         find_python
         RetVal=$?
