@@ -128,6 +128,24 @@ function exit_err() {
 }
 
 function build_python() {
+    # check if python already built
+    if in_venv ; then
+        if find_python_venv ; then
+            echo ""
+            echo "Python already built/installed @ ${PyBinPath}"
+            echo "Skipping build steps."
+            return 0
+        fi
+    else
+        if find_python ; then
+            echo ""
+            echo "Python already built/installed @ ${PyBinPath}"
+            echo "Skipping build steps."
+            return 0
+        fi
+    fi
+
+    # actually build python
     PyBuildVer="3.10.14"
     PySrcDir="Python-${PyBuildVer}"
     PySrcFile="${PySrcDir}.tgz"
@@ -217,7 +235,9 @@ function find_python_venv() {
     # shellcheck disable=SC1091
     source "../bin/activate"
     find_python
+    PyFound=$?
     deactivate
+    return $PyFound
 }
 
 function in_existing_repo() {
@@ -267,9 +287,11 @@ function pull_musicbot_git() {
                 fi
             fi
 
+            # install / upgrade pip packages
             $PyBin -m pip install --upgrade -r requirements.txt
             echo ""
 
+            # copy an empty options file if one does not exist.
             if [ ! -f "./config/options.ini" ] ; then
                 echo "Creating default options.ini file from example_options.ini file."
                 echo ""
