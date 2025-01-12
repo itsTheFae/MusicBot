@@ -302,6 +302,7 @@ function pull_musicbot_git() {
             find_python
 
             # install / upgrade pip packages
+            $PyBin -m pip install --upgrade pip
             $PyBin -m pip install --upgrade -r requirements.txt
             echo ""
 
@@ -367,6 +368,8 @@ function pull_musicbot_git() {
     # find python before using it
     find_python
 
+    # update pip first
+    $PyBin -m pip install --upgrade pip
     # install / upgrade pip packages
     $PyBin -m pip install --upgrade -r requirements.txt
     echo ""
