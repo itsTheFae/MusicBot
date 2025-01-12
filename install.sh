@@ -302,11 +302,7 @@ function pull_musicbot_git() {
             fi
             
             # find python before using it.
-            if in_venv ; then
-                find_python_venv
-            else
-                find_python
-            fi
+            find_python
 
             # install / upgrade pip packages
             $PyBin -m pip install --upgrade -r requirements.txt
@@ -371,15 +367,14 @@ function pull_musicbot_git() {
     esac
     cd "${CloneDir}" || exit_err "Fatal:  Could not change to MusicBot directory."
 
-    if in_venv ; then
-        find_python_venv
-    else
-        find_python
-    fi
+    # find python before using it
+    find_python
 
+    # install / upgrade pip packages
     $PyBin -m pip install --upgrade -r requirements.txt
     echo ""
 
+    # copy the options file if none exists.
     if ! [ -f ./config/options.ini ] ; then
         echo "Creating default options.ini file from example_options.ini file."
         echo ""
@@ -627,11 +622,8 @@ function debug() {
 }
 
 function configure_bot() {
-    if in_venv ; then
-        find_python_venv
-    else
-        find_python
-    fi
+    find_python
+
     echo "You can now configure MusicBot!"
     read -rp "Would like to launch the 'configure.py' tool? [N/y]" YesConfig
     if [[ "${YesConfig,,}" != "y" && "${YesConfig,,}" != "yes" ]] ; then
