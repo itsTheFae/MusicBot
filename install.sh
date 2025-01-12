@@ -300,6 +300,13 @@ function pull_musicbot_git() {
                     CloneDir="${PWD}"
                 fi
             fi
+            
+            # find python before using it.
+            if in_venv ; then
+                find_python_venv
+            else
+                find_python
+            fi
 
             # install / upgrade pip packages
             $PyBin -m pip install --upgrade -r requirements.txt
