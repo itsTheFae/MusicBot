@@ -439,6 +439,9 @@ Select from these services:<br>
 - yt, youtube (default)<br>
 - sc, soundcloud<br>
 - yh, yahoo<br>
+- gv, google<br>
+- nv, nico<br>
+- bb, bili<br>
 
 </details>
 
