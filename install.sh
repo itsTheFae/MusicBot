@@ -395,6 +395,7 @@ function install_as_venv() {
             fi
             $PyBin -m venv "${VenvDir}"
             cd "${VenvDir}" || exit_err "Failed to enter Venv directory."
+            # shellcheck disable=SC1091
             source "./bin/activate"
         fi
     else
