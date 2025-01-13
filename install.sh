@@ -282,21 +282,6 @@ function pull_musicbot_git() {
         if [ "${UsePwd,,}" == "y" ] || [ "${UsePwd,,}" == "yes" ] ; then
             echo ""
             CloneDir="${PWD}"
-            CloneDirName="$(basename "$PWD")"
-            # sort out the directory structure, we want musicbot inside its venv.
-            if [ "$InstalledViaVenv" == "1" ] ; then
-                # if the venv is inside our repo, move it out.
-                if [ -d "$VenvDir" ] ; then
-                    echo "Installer needs to move your clone inside the Venv."
-                    echo " - moving $VenvDir up one directory."
-                    mv "./${VenvDir}" "../${VenvDir}"
-                    echo " - moving $CloneDirName into $VenvDir"
-                    cd .. || exit_err "Failed to leave repo directory."
-                    mv "$CloneDir" "${VenvDir}/$CloneDirName"
-                    cd "${VenvDir}/$CloneDirName" || exit_err "Failed to enter clone directory."
-                    CloneDir="${PWD}"
-                fi
-            fi
             
             # find python before using it.
             find_python
@@ -318,7 +303,7 @@ function pull_musicbot_git() {
     fi
 
     # test if we install at home-directory or a specified path.
-    if [ "$InstallDir" == "" ] ; then
+    if [ "$InstallDir" == "" ] && [ "$InstalledViaVenv" == "0" ] ; then
         cd ~ || exit_err "Fatal:  Could not change into home directory."
         if [ -d "${CloneDir}" ] ; then
             echo "Error: A directory named ${CloneDir} already exists in your home directory."
@@ -385,11 +370,39 @@ function pull_musicbot_git() {
 function install_as_venv() {
     # Create and activate a venv using python that is installed.
     find_python
-    $PyBin -m venv "${VenvDir}"
+
+    # adjust the VenvDir and move our clone if needed.
+    if ! in_venv ; then
+        if in_existing_repo && [ "$InstallDir" == "" ] ; then
+            CloneDir="${PWD}"
+            CloneDirName="$(basename "$PWD")"
+            cd .. || exit_err "Failed to leave cloned directory."
+
+            $PyBin -m venv "${VenvDir}"
+
+            echo "Installer needs to move your clone inside the Venv."
+            echo " - moving $CloneDirName into $VenvDir"
+            mv "$CloneDir" "${VenvDir}/$CloneDirName"
+            cd "${VenvDir}/$CloneDirName" || exit_err "Failed to enter clone directory."
+        else
+            if [ "$InstallDir" != "" ] && [ -d "$InstallDir" ] ; then
+                cd "$InstallDir" || exit_err "Fatal:  could not change into install directory."
+            else
+                cd ~ || exit_err "Fatal:  Could not change into home directory."
+            fi
+            $PyBin -m venv "${VenvDir}"
+            cd "${VenvDir}" || exit_err "Failed to enter Venv directory."
+            source "./bin/activate"
+        fi
+    else
+        echo "Python Venv already exits."
+    fi
+
     InstalledViaVenv=1
-    CloneDir="${VenvDir}/${CloneDir}"
-    # shellcheck disable=SC1091
-    source "${VenvDir}/bin/activate"
+    if [ -f ../bin/activate ] ; then
+        # shellcheck disable=SC1091
+        source "../bin/activate"
+    fi
     find_python
 
     pull_musicbot_git
@@ -623,12 +636,19 @@ function debug() {
 
 function configure_bot() {
     if in_venv ; then
-        source "../bin/activate"
+        if [ -f "../bin/activate" ] ; then
+            # shellcheck disable=SC1091
+            source "../bin/activate"
+        fi
+        if [ -f "./bin/activate" ] ; then
+            # shellcheck disable=SC1091
+            source "./bin/activate"
+        fi
     fi
     find_python
 
     echo "You can now configure MusicBot!"
-    read -rp "Would like to launch the 'configure.py' tool? [N/y]" YesConfig
+    read -rp "Would you like to launch the 'configure.py' tool? [N/y]" YesConfig
     if [[ "${YesConfig,,}" != "y" && "${YesConfig,,}" != "yes" ]] ; then
         echo ""
         echo "Open the 'config' directory, then copy and rename the example files to get started."
