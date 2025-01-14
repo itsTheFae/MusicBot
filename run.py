@@ -13,7 +13,6 @@ import ssl
 import subprocess
 import sys
 import time
-from base64 import b64decode
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Tuple, Union
 
 import musicbot.logs
@@ -477,26 +476,28 @@ def req_ensure_env() -> None:
     """
     log.info("Ensuring we're in the right environment")
 
-    if os.environ.get("APP_ENV") != "docker" and not os.path.isdir(
-        b64decode("LmdpdA==").decode("utf-8")
-    ):
+    if os.environ.get("APP_ENV") != "docker" and not os.path.isdir(".git"):
+        # NOTICE:
+        # if you feel like removing this check to "make it work"
+        # be aware this project depends on git for version information
+        # as well as ease of updating the bot.
         log.critical(
-            b64decode(
-                "Qm90IHdhc24ndCBpbnN0YWxsZWQgdXNpbmcgR2l0LiBSZWluc3RhbGwgdXNpbmcgaHR0cDovL2JpdC5seS9tdXNpY2JvdGRvY3Mu"
-            ).decode("utf-8")
+            "MusicBot was not installed using Git.\n"
+            "Check the documentation for install guides:\n"
+            "  https://just-some-bots.github.io/MusicBot/"
         )
         bugger_off()
 
     # Make sure musicbot exists and test if it can be imported.
     try:
         if not os.path.isdir("musicbot"):
-            raise RuntimeError('folder "musicbot" not found')
+            raise RuntimeError(_L('folder "musicbot" not found'))
 
         if not os.path.isfile("musicbot/__init__.py"):
-            raise RuntimeError("musicbot folder is not a Python module")
+            raise RuntimeError(_L("musicbot folder is not a Python module"))
 
         if not importlib.util.find_spec("musicbot"):
-            raise RuntimeError("musicbot module is not importable")
+            raise RuntimeError(_L("musicbot module is not importable"))
     except RuntimeError as e:
         log.critical("Failed environment check, %s", e)
         bugger_off()
