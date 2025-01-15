@@ -75,7 +75,7 @@ class LangTool:
     def _check_polib(self):
         """Test-load polib and fail softly."""
         try:
-            import polib
+            import polib  # pylint: disable=import-error,useless-suppression
 
             print(f"Loaded polib version {polib.__version__}")
         except Exception:  # pylint: disable=broad-exception-caught
@@ -118,7 +118,7 @@ class LangTool:
         Compiles all existing .po files into .mo files.
         """
         self._check_polib()
-        import polib
+        import polib  # pylint: disable=import-error,useless-suppression
 
         print("Compiling existing PO files to MO...")
         for po_file in self.basedir.glob(self._po_file_pattern):
@@ -269,7 +269,7 @@ class LangTool:
         Get statistics on each language completion level and coherence to source.
         """
         self._check_polib()
-        import polib
+        import polib  # pylint: disable=import-error,useless-suppression
 
         print("Gathering language statistics...")
         self._do_diff = True
@@ -367,7 +367,7 @@ class LangTool:
         Directories and the .po / .mo files are updated by this method.
         """
         self._check_polib()
-        import polib
+        import polib  # pylint: disable=import-error,useless-suppression
 
         self._xx_lang_path.mkdir(parents=True, exist_ok=True)
 
@@ -410,7 +410,7 @@ class LangTool:
     def update(self):
         """Update the POT file then run merge on existing PO files."""
         self._check_polib()
-        import polib
+        import polib  # pylint: disable=import-error,useless-suppression
 
         print("Updating POT and PO files from sources...")
         self.extract()
@@ -443,24 +443,22 @@ class LangTool:
         self._check_polib()
         import uuid
 
-        import polib
+        import polib  # pylint: disable=import-error,useless-suppression
 
         print("Starting Argos machine translation process...")
 
         try:
-            from argostranslate import (
-                package as argospkg,  # pylint: disable=import-error,useless-suppression
-            )
-            from argostranslate import (
-                translate as argostl,  # pylint: disable=import-error,useless-suppression
-            )
+            import argostranslate.package as argospkg  # pylint: disable=import-error,useless-suppression
+            import argostranslate.translate as argostl  # pylint: disable=import-error,useless-suppression
+
         except Exception:  # pylint: disable=broad-exception-caught
             print("Failed to import argostranslate.  Please install it with pip.")
             sys.exit(1)
 
         try:
-            import marko
-            from marko.md_renderer import MarkdownRenderer
+            import marko  # pylint: disable=import-error,useless-suppression
+            import marko.md_renderer.MarkdownRenderer as MarkdownRenderer  # pylint: disable=import-error,useless-suppression,consider-using-from-import
+
         except Exception:  # pylint: disable=broad-exception-caught
             print("Failed to import marko.  Please install it with pip.")
             sys.exit(1)
