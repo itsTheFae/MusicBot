@@ -41,10 +41,10 @@ log = logging.getLogger(__name__)
 
 # optionally using pymediainfo instead of ffprobe if presents
 try:
-    import pymediainfo  # type: ignore[import-untyped]
+    import pymediainfo  # type: ignore[import-untyped,unused-ignore]
 except ImportError:
     log.debug("module 'pymediainfo' not found, will fall back to ffprobe.")
-    pymediainfo = None
+    pymediainfo = None  # type: ignore[unused-ignore,no-redef,assignment]
 
 
 class BasePlaylistEntry(Serializable):

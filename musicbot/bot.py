@@ -376,7 +376,7 @@ class MusicBot(discord.Client):
         if not self._ping_peer_addr:
             try:
                 ai = socket.getaddrinfo(DEFAULT_PING_TARGET, 80)
-                self._ping_peer_addr = ai[0][4][0]
+                self._ping_peer_addr = str(ai[0][4][0])
                 ping_target = self._ping_peer_addr
             except OSError:
                 log.warning("Could not resolve ping target.")
