@@ -1174,9 +1174,21 @@ class MusicBot(discord.Client):
                     if potential_channel and potential_channel.guild == guild:
                         np_channel = potential_channel
                         break
+            elif self.config.bound_channels:
+                for potential_channel_id in self.config.bound_channels:
+                    potential_channel = self.get_channel(potential_channel_id)
+                    if isinstance(potential_channel, discord.abc.PrivateChannel):
+                        continue
 
-            if not np_channel and last_np_msg:
-                np_channel = last_np_msg.channel
+                    if not isinstance(potential_channel, discord.abc.Messageable):
+                        continue
+
+                    if potential_channel and potential_channel.guild == guild:
+                        np_channel = potential_channel
+                        break
+
+            if not np_channel and ssd_.last_np_channel:
+                np_channel = ssd_.last_np_channel  # type: ignore[assignment]
 
         content = Response("")
         if entry.thumbnail_url:
@@ -6340,6 +6352,7 @@ class MusicBot(discord.Client):
 
         # add the tracks to the embed fields
         tracks_list = ""
+        tracks_per_page = 0
         queue_segment = list(player.playlist.entries)[start_index:end_index]
         for idx, item in enumerate(queue_segment, starting_at):
             if item == player.current_entry:
@@ -6351,12 +6364,31 @@ class MusicBot(discord.Client):
             if item.channel and item.author:
                 added_by = item.author.name
 
-            tracks_list += _D(
+            # shorten the titles to get more tracks in the list.
+            title = item.title
+            if len(item.title) > 40:
+                title = item.title[:40] + " ..."
+
+            next_track_list = _D(
                 "**Entry #%(index)s:**"
                 "Title: `%(title)s`\n"
                 "Added by: `%(user)s`\n\n",
                 ssd_,
-            ) % {"index": idx, "title": _D(item.title, ssd_), "user": added_by}
+            ) % {"index": idx, "title": _D(title, ssd_), "user": added_by}
+            # We limit the track list, and leave extra space for the rest of the description text.
+            if (len(tracks_list) + len(next_track_list)) < 3840:
+                tracks_per_page += 1
+                tracks_list += next_track_list
+
+        if (
+            self.config.queue_length > tracks_per_page
+            and total_entry_count > self.config.queue_length
+        ):
+            log.warning(
+                "You may have QueueLength set too high! "
+                "The setting is %(option)d but we could only list %(count)d tracks.",
+                {"option": self.config.queue_length, "count": tracks_per_page},
+            )
 
         embed = Response(
             _D(
