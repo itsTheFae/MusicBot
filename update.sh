@@ -3,6 +3,13 @@
 # make sure we're in MusicBot directory...
 cd "$(dirname "${BASH_SOURCE[0]}")" || { echo "Could not change directory to MusicBot."; exit 1; }
 
+# Check if this script is being run on windows and redirect the user.  
+if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]] ; then
+    echo "update.sh is not for Windows.  Use the update.bat file instead."
+    read -rp "Press any key to exit."
+    exit 2
+fi
+
 # provides an exit that also deactivates venv.
 function do_exit() {
     if [ "${VIRTUAL_ENV}" != "" ] ; then
