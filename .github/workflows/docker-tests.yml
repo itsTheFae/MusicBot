@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  docker:
+  docker_linux:
     name: Docker Linux
     runs-on: ubuntu-latest
     steps:
@@ -22,3 +22,15 @@ jobs:
           compose-file: "./docker-compose.example.yml"
           up-flags: "--build"
           down-flags: "--volumes"
+  docker_windows:
+    name: Docker Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Run Docker Compose Action
+      - uses: adambirds/docker-compose-action@v1.5.0
+        with:
+          compose-file: "./docker-compose.example.yml"
+          up-flags: "--build"
+          down-flags: "--volumes"    
+
