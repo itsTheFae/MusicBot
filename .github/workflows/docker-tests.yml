@@ -24,7 +24,7 @@ jobs:
           down-flags: "--volumes"
   docker_windows:
     name: Docker Windows
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       # Run Docker Compose Action
