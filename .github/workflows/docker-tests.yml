@@ -1,6 +1,7 @@
 name: Docker Tests
 
 on:
+  push:
   pull_request:
     types: [opened, synchronize]
   workflow_dispatch:
