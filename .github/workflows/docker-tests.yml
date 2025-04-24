@@ -19,6 +19,6 @@ jobs:
       # Run Docker Compose Action
       - uses: adambirds/docker-compose-action@v1.5.0
         with:
-          compose-file: "./docker/docker-compose.example.yml"
+          compose-file: "./docker-compose.example.yml"
           up-flags: "--build"
           down-flags: "--volumes"
