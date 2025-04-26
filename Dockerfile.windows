@@ -6,10 +6,19 @@ WORKDIR /musicbot
 COPY . ./
 COPY ./config sample_config
 
-# Install PowerShell modules for WinGet
+
+# Step 1: Download the required dependencies for WinGet installation
 RUN powershell -Command " \
-    Install-PackageProvider -Name NuGet -Force; \
-    Install-Module -Name Microsoft.WinGet.Client -Force -Scope AllUsers;"
+    Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx -OutFile C:\\VCLibs.appx; \
+    Invoke-WebRequest -Uri https://aka.ms/Microsoft.UI.Xaml.2.7.appx -OutFile C:\\XAML.appx; \
+    Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile C:\\WinGet.msixbundle"
+
+# Step 2: Use DISM to install the dependencies system-wide
+RUN powershell -Command " \
+    dism.exe /Online /Add-Package /PackagePath:C:\\VCLibs.appx; \
+    dism.exe /Online /Add-Package /PackagePath:C:\\XAML.appx; \
+    dism.exe /Online /Add-Package /PackagePath:C:\\WinGet.msixbundle; \
+    Remove-Item C:\\VCLibs.appx, C:\\XAML.appx, C:\\WinGet.msixbundle"
 
 # Use WinGet to install FFmpeg
 RUN powershell -Command "winget install -e --id Gyan.FFmpeg -h"
