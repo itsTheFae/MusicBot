@@ -1,0 +1,49 @@
+# Use a Windows-compatible Python base image
+FROM python:3.12-windowsservercore-ltsc2022
+
+# Add project source
+WORKDIR /musicbot
+COPY . ./
+COPY ./config sample_config
+
+# Set environment variables for non-interactive installations
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
+# Install PowerShell
+RUN powershell -Command " \
+    Invoke-WebRequest -Uri https://aka.ms/install-powershell.ps1 -OutFile install-powershell.ps1; \
+    .\install-powershell.ps1 -UseMSI -Destination C:\PowerShell; \
+    Remove-Item install-powershell.ps1 -Force;"
+
+# Download and install WinGet CLI
+RUN powershell -Command " \
+    Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile WinGet.msixbundle; \
+    Add-AppxPackage -Path WinGet.msixbundle; \
+    Remove-Item WinGet.msixbundle -Force;"
+
+# Install Git for Windows
+RUN powershell -Command " \
+    Invoke-WebRequest -Uri https://github.com/git-for-windows/git/releases/latest/download/MinGit-2.38.0-64-bit.zip -OutFile MinGit.zip; \
+    Expand-Archive MinGit.zip -DestinationPath C:\MinGit; \
+    Remove-Item MinGit.zip -Force; \
+    $env:PATH = $env:PATH + ';C:\\MinGit\\cmd'; \
+    Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment' -Name Path -Value $env:PATH"
+
+# Set PATH for Python, PowerShell, WinGet, and Git
+ENV PATH="C:\PowerShell;C:\MinGit\cmd;C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\VFS\ProgramFiles\WindowsApps;%PATH%"
+
+# Verify Python, WinGet, and Git installation
+RUN python --version
+RUN powershell -Command "winget --version"
+RUN git --version
+
+# Install pip dependencies
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Create volumes for audio cache, config, data and logs
+VOLUME ["/musicbot/audio_cache", "/musicbot/config", "/musicbot/data", "/musicbot/logs", "/musicbot/media"]
+
+ENV APP_ENV=docker
+
+ENTRYPOINT ["run.bat"]

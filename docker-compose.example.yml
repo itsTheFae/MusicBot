@@ -1,8 +1,21 @@
 services:
-  musicbot:
-    build: .
+  musicbot_linux:
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./config:/musicbot/config/
-      - ./audio_cache:/musicbot/audio_cache
-      - ./data:/musicbot/data
-      - ./logs:/musicbot/logs
+      - ./audio_cache:/musicbot/audio_cache/
+      - ./data:/musicbot/data/
+      - ./logs:/musicbot/logs/
+      - ./media:/musicbot/media/
+  musicbot_windows:
+    build:
+      context: .
+      dockerfile: Dockerfile.windows
+    volumes:
+      - ./config:/musicbot/config/
+      - ./audio_cache:/musicbot/audio_cache/
+      - ./data:/musicbot/data/
+      - ./logs:/musicbot/logs/
+      - ./media:/musicbot/media/

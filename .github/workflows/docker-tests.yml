@@ -20,17 +20,17 @@ jobs:
       - uses: adambirds/docker-compose-action@v1.5.0
         with:
           compose-file: "./docker-compose.example.yml"
-          up-flags: "--build"
+          up-flags: "--build musicbot_linux"
           down-flags: "--volumes"
   docker_windows:
     name: Docker Windows
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       # Run Docker Compose Action
       - uses: adambirds/docker-compose-action@v1.5.0
         with:
           compose-file: "./docker-compose.example.yml"
-          up-flags: "--build"
+          up-flags: "--build musicbot_windows"
           down-flags: "--volumes"    
 
