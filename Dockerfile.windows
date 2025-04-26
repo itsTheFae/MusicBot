@@ -6,31 +6,22 @@ WORKDIR /musicbot
 COPY . ./
 COPY ./config sample_config
 
-# Set environment variables for non-interactive installations
-ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
-ENV DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-
-# Install PowerShell using the MSI package method
-RUN powershell -Command " \
-    Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/latest/download/PowerShell-7.3.5-win-x64.msi -OutFile powershell.msi; \
-    Start-Process msiexec.exe -ArgumentList '/i', 'powershell.msi', '/quiet', '/norestart' -NoNewWindow -Wait; \
-    Remove-Item powershell.msi -Force;"
-
-# Download and install WinGet CLI (App Installer Package)
+# Install WinGet CLI (App Installer Package)
 RUN powershell -Command " \
     Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile WinGet.msixbundle; \
     Add-AppxPackage -Path WinGet.msixbundle; \
     Remove-Item WinGet.msixbundle -Force;"
 
-# Install Git for Windows
-RUN powershell -Command " \
-    Invoke-WebRequest -Uri https://github.com/git-for-windows/git/releases/latest/download/MinGit-2.41.0-64-bit.zip -OutFile MinGit.zip; \
-    Expand-Archive MinGit.zip -DestinationPath C:\\MinGit; \
-    Remove-Item MinGit.zip -Force; \
-    [Environment]::SetEnvironmentVariable('Path', $Env:Path + ';C:\\MinGit\\cmd', [EnvironmentVariableTarget]::Machine)"
+# Use WinGet to install FFmpeg
+RUN powershell -Command "winget install -e --id Gyan.FFmpeg -h"
 
-# Set PATH for Python, PowerShell, WinGet, and Git
-ENV PATH="C:\PowerShell;C:\MinGit\cmd;C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\VFS\ProgramFiles\WindowsApps;%PATH%"
+# Use WinGet to install Git
+RUN powershell -Command "winget install -e --id Git.Git -h"
+
+# Verify installations
+RUN powershell -Command " \
+    ffmpeg -version; \
+    git --version;"
 
 # Verify Python, WinGet, and Git installation
 RUN python --version
