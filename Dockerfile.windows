@@ -1,5 +1,5 @@
 # Use a Windows-compatible Python base image
-FROM python:3.12-windowsservercore-ltsc2025
+FROM python:3.12-windowsservercore
 
 # Add project source
 WORKDIR /musicbot
