@@ -6,14 +6,10 @@ WORKDIR /musicbot
 COPY . ./
 COPY ./config sample_config
 
-# Download the WinGet App Installer package
+# Install PowerShell modules for WinGet
 RUN powershell -Command " \
-    Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile WinGet.msixbundle;"
-
-# Install the package using DISM
-RUN powershell -Command " \
-    dism.exe /Online /Add-ProvisionedAppxPackage /PackagePath:WinGet.msixbundle /SkipLicense; \
-    Remove-Item WinGet.msixbundle -Force;"
+    Install-PackageProvider -Name NuGet -Force; \
+    Install-Module -Name Microsoft.WinGet.Client -Force -Scope AllUsers;"
 
 # Use WinGet to install FFmpeg
 RUN powershell -Command "winget install -e --id Gyan.FFmpeg -h"
@@ -25,11 +21,6 @@ RUN powershell -Command "winget install -e --id Git.Git -h"
 RUN powershell -Command " \
     ffmpeg -version; \
     git --version;"
-
-# Verify Python, WinGet, and Git installation
-RUN python --version
-RUN powershell -Command "winget --version"
-RUN git --version
 
 # Install pip dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
