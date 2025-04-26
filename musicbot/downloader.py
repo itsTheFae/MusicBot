@@ -90,7 +90,18 @@ ytdl_format_options_immutable = MappingProxyType(
 
 
 # Fuck your useless bugreports message that gets two link embeds and confuses users
-youtube_dl.utils.bug_reports_message = lambda: ""
+# TODO:  perhaps -some- note here wouldn't be a terrible idea. Maybe just remove the links.
+def _ytdlp_bug_msg(*_args: Any) -> str:
+    """
+    Removes bug report text from exceptions to clean them up for musicbot.
+    It also issues a debug message to let users/devs know that ytdlp thinks the
+    error may be a bug worth reporting.
+    """
+    log.debug("YTDLP thinks there may be a bug in processing.")
+    return ""
+
+
+youtube_dl.utils.bug_reports_message = _ytdlp_bug_msg
 
 """
     Alright, here's the problem.  To catch youtube-dl errors for their useful information, I have to
