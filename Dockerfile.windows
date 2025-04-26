@@ -9,7 +9,8 @@ RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; \
     Remove-Item install.ps1 -Force"
 
 # Use Chocolatey to install Python 3.12, FFmpeg, and Git
-RUN powershell -Command "choco install -y python --version=3.12 ffmpeg git"
+RUN powershell -Command "choco install -y python --version=3.12"
+RUN powershell -Command "choco install -y ffmpeg git"
 
 # Set the PATH for Python
 RUN powershell -Command "[Environment]::SetEnvironmentVariable('Path', $Env:Path + ';C:\\Python312;C:\\Python312\\Scripts', [EnvironmentVariableTarget]::Machine)"
