@@ -6,10 +6,13 @@ WORKDIR /musicbot
 COPY . ./
 COPY ./config sample_config
 
-# Install WinGet CLI (App Installer Package)
+# Download the WinGet App Installer package
 RUN powershell -Command " \
-    Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile WinGet.msixbundle; \
-    Add-AppxPackage -Path WinGet.msixbundle; \
+    Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile WinGet.msixbundle;"
+
+# Install the package using DISM
+RUN powershell -Command " \
+    dism.exe /Online /Add-ProvisionedAppxPackage /PackagePath:WinGet.msixbundle /SkipLicense; \
     Remove-Item WinGet.msixbundle -Force;"
 
 # Use WinGet to install FFmpeg
