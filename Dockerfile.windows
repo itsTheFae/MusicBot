@@ -1,36 +1,16 @@
 # Use a Windows-compatible Python base image
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
-# Install Chocolatey (a lightweight package manager for Windows)
-RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; \
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; \
-    Invoke-WebRequest -Uri https://chocolatey.org/install.ps1 -OutFile install.ps1; \
-    .\\install.ps1; \
-    Remove-Item install.ps1 -Force"
-
-# Use Chocolatey to install Python 3.12, FFmpeg, and Git
-RUN powershell -Command "choco install -y python --version=3.12"
-RUN powershell -Command "choco install -y ffmpeg git"
-
-# Set the PATH for Python
-RUN powershell -Command "[Environment]::SetEnvironmentVariable('Path', $Env:Path + ';C:\\Python312;C:\\Python312\\Scripts', [EnvironmentVariableTarget]::Machine)"
-
-# Verify installations
-RUN powershell -Command " \
-    python --version; \
-    ffmpeg -version; \
-    git --version"
-
 # Add project source
-WORKDIR /musicbot
+WORKDIR ./musicbot
 COPY . ./
 COPY ./config sample_config
 
 # Install pip dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
+#RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Create volumes for audio cache, config, data and logs
-VOLUME ["C:\musicbot\audio_cache", "C:\musicbot\config", "C:\musicbot\data", "C:\musicbot\logs", "C:\musicbot\media"]
+VOLUME ["musicbot/audio_cache", "musicbot/config", "musicbot/data", "musicbot/logs", "musicbot/media"]
 
 ENV APP_ENV=docker
 
