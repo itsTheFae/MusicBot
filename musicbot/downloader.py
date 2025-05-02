@@ -90,8 +90,9 @@ ytdl_format_options_immutable = MappingProxyType(
 
 
 # Fuck your useless bugreports message that gets two link embeds and confuses users
-# TODO:  perhaps -some- note here wouldn't be a terrible idea. Maybe just remove the links.
-def _ytdlp_bug_msg(*_args: Any) -> str:
+# TODO:  maybe a note about this potentially being a yt-dlp bug should be returned?
+#  based on state of `before` kwarg?  More code exploration required.
+def _ytdlp_bug_msg(*_args: Any, **_kwargs: Any) -> str:
     """
     Removes bug report text from exceptions to clean them up for musicbot.
     It also issues a debug message to let users/devs know that ytdlp thinks the
