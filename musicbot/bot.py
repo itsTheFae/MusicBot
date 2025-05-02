@@ -5327,10 +5327,6 @@ class MusicBot(discord.Client):
         - Mention a user: `{command_prefix}remove @user` removes their entries.
         - Provide nothing: `{command_prefix}remove` removes the last song. (LIFO-style)
         """
-        # add abort if no player to make mypy happy
-        if not player:
-            log.warning(f"No player for {guild}!")
-            return
 
         if not player.playlist.entries:
             raise exceptions.CommandError("Nothing in the queue to remove!")
