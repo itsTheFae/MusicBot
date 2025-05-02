@@ -5311,7 +5311,6 @@ class MusicBot(discord.Client):
     async def cmd_remove(
         self,
         ssd_: Optional[GuildSpecificData],
-        guild: discord.Guild,
         user_mentions: UserMentions,
         author: discord.Member,
         permissions: PermissionGroup,
