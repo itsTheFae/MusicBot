@@ -89,14 +89,11 @@ ytdl_format_options_immutable = MappingProxyType(
 )
 
 
-# Fuck your useless bugreports message that gets two link embeds and confuses users
-# TODO:  maybe a note about this potentially being a yt-dlp bug should be returned?
-#  based on state of `before` kwarg?  More code exploration required.
 def _ytdlp_bug_msg(*_args: Any, **_kwargs: Any) -> str:
     """
     Removes bug report text from exceptions to clean them up for musicbot.
     It also issues a debug message to let users/devs know that ytdlp thinks the
-    error may be a bug worth reporting.
+    error could be a bug worth reporting.
     """
     log.debug("YTDLP thinks there may be a bug in processing.")
     return ""
@@ -156,6 +153,12 @@ class Downloader:
         # apply source address settings.
         if bot.config.ytdlp_source_address != "*":
             ytdl_format_options["source_address"] = bot.config.ytdlp_source_address
+
+        # apply download concurrency settings.
+        if bot.config.ytdlp_concurrent_frags > 1:
+            ytdl_format_options["concurrent_fragment_downloads"] = (
+                bot.config.ytdlp_concurrent_frags
+            )
 
         # enable verbose ytdlp logs if debug mode is enabled.
         if bot.config.debug_mode:

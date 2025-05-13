@@ -975,10 +975,10 @@ class Config:
             default=ConfigDefaults.ytdlp_concurrent_frags,
             getter="getint",
             comment=_Dd(
-                "Use this many simultaneous threads to download each track.\n"
-                "Same as ytdlp -N or --concurrent-fragments options.\n"
-                "This option may speed up downloads, but has no effect on streams.\n"
-                "Should not be higher than the available number of CPU cores."
+                "The number of threads used to download a (one) track.\n"
+                "Higher number is faster at the cost of CPU and network load.\n"
+                "Effectively the same as ytdlp -N or --concurrent-fragments option.\n"
+                "This option has no effect on streams."
             ),
         )
 
@@ -989,9 +989,10 @@ class Config:
             default=ConfigDefaults.downloader_threads_max,
             getter="getint",
             comment=_Dd(
-                "MusicBot may use up-to this many threads for each separate extraction.\n"
-                "Basically, the max number of simultaneous downloads or extractions.\n"
-                "MusicBot will spawn threads as they are needed, not right away.\n"
+                "The number of threads MusicBot may use for yt-dlp calls.\n"
+                "Most useful for multi-server bot's with high traffic.\n"
+                "These threads are spawned as-needed, not immediately.\n"
+                "NOTE: Each thread may spawn up to YtdlpConcurrentFrags child-threads."
             ),
         )
 
