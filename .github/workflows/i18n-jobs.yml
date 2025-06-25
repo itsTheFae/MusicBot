@@ -47,29 +47,19 @@ jobs:
           python ./i18n/lang.py -u
           python ./i18n/lang.py -sJ
       - name: Commit changed i18n data
-        # continue-on-error: true
-        run: |
-          BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          I18N_BRANCH="i18n-auto-$BASE_BRANCH"
-          git add . >/dev/null 2>&1
-          set +e
-          CHANGED=$(git diff --cached --exit-code >/dev/null 2>&1; echo $?)
-          set -e
-          if [ $CHANGED -eq 1 ]; then
-            git config --global user.name 'MusicBot Automation'
-            git config --global user.email 'no-mail@musicbot.autobot'
-            git commit -am "Auto-update i18n data." >/dev/null 2>&1
-          fi
-          echo "CHANGED=$CHANGED" >> $GITHUB_ENV
-      - name: Update i18n-auto branch and create PR
         env:
           GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
           REPO: ${{ github.repository }}
-          CHANGED: ${{ env.CHANGED }}
         run: |
           BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           I18N_BRANCH="i18n-auto-$BASE_BRANCH"
-          if [ $CHANGED -eq 1 ]; then
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes detected"
+          else
+            git config --global user.name 'MusicBot Automation'
+            git config --global user.email 'no-mail@musicbot.autobot'
+            git commit -am "Auto-update i18n data."
             git checkout -B $I18N_BRANCH origin/$BASE_BRANCH
             git push origin $I18N_BRANCH --force
             gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
