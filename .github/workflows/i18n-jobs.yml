@@ -61,18 +61,16 @@ jobs:
             git commit -am "Auto-update i18n data." >/dev/null 2>&1
           fi
           echo "CHANGED=$CHANGED" >> $GITHUB_ENV
-          echo "BASE_BRACH=$BASE_BRANCH" >> $GITHUB_ENV
-          echo "I18N_BRANCH=$I18N_BRANCH" >> $GITHUB_ENV
       - name: Update i18n-auto branch and create PR
         env:
           GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
           REPO: ${{ github.repository }}
           CHANGED: ${{ env.CHANGED }}
-          BASE_BRANCH: $(( env.BASE_BRANCH }}
-          I18N_BRANCH: ${{ env.I18N_BRANCH }}
         run: |
+          BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          I18N_BRANCH="i18n-auto-$BASE_BRANCH"
           if [ $CHANGED -eq 1 ]; then
             git checkout -B $I18N_BRANCH origin/$BASE_BRANCH
-            git push origin $I18N_BRANCH
+            git push origin $I18N_BRANCH --force
             gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
           fi
