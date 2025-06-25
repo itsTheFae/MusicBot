@@ -72,10 +72,7 @@ jobs:
           I18N_BRANCH: ${{ env.I18N_BRANCH }}
         run: |
           if [ $CHANGED -eq 1 ]; then
-            git remote -v
-            git fetch origin
-            git remote -v
             git checkout -B $I18N_BRANCH origin/$BASE_BRANCH
-            git push origin $I18N_AUTO_BRANCH
+            git push origin $I18N_BRANCH
             gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
           fi
