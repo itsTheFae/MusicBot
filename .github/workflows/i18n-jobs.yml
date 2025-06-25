@@ -1,8 +1,14 @@
 name: Translation Updates
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+#  pull_request:
+#    types: [opened, synchronize]
+  push:
+    branches:
+      - fae
+      - dev
+      - review
+      - master
   workflow_dispatch:
 
 concurrency:
@@ -41,12 +47,32 @@ jobs:
           python ./i18n/lang.py -u
           python ./i18n/lang.py -sJ
       - name: Commit changed i18n data
+        env:
+          GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
+          REPO: ${{ github.repository }}
         run: |
-          git config --global user.name 'MusicBot Automation'
-          git config --global user.email 'no-mail@musicbot.autobot'
-          git add ./.github/i18n_stats.json
-          if ! git diff --cached --exit-code ; then
+          BASE_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+          I18N_BRANCH="i18n-auto-$BASE_BRANCH"
+          git add .
+          CHANGED=$(git diff --cached --exit-code ; echo $?)
+          if [ $CHANGED -eq 1 ]; then
+            git config --global user.name 'MusicBot Automation'
+            git config --global user.email 'no-mail@musicbot.autobot'
             git commit -am "Auto-update i18n data."
-            git push
           fi
-
+          echo "CHANGED=$CHANGED" >> $GITHUB_ENV
+          echo "BASE_BRACH=$BASE_BRANCH" >> $GITHUB_ENV
+          echo "I18N_BRANCH=$I18N_BRANCH" >> $GITHUB_ENV
+      - name: Update i18n-auto branch and create PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
+          REPO: ${{ github.repository }}
+          CHANGED: ${{ env.CHANGED }}
+          BASE_BRANCH: $(( env.BASE_BRANCH }}
+          I18N_BRANCH: ${{ env.I18N_BRANCH }}
+        run: |
+          if [ $CHANGED -eq 1 ]; then
+            git checkout -B $I18N_BRANCH origin/$BASE_BRANCH
+            git push origin $I18N_AUTO_BRANCH
+            gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
+          fi
