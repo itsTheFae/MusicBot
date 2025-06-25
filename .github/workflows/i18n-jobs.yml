@@ -47,12 +47,14 @@ jobs:
           python ./i18n/lang.py -u
           python ./i18n/lang.py -sJ
       - name: Commit changed i18n data
-        continue-on-error: true
+        # continue-on-error: true
         run: |
           BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           I18N_BRANCH="i18n-auto-$BASE_BRANCH"
           git add . >/dev/null 2>&1
-          CHANGED=$(git diff --cached --exit-code; echo $?)
+          set +e
+          CHANGED=$(git diff --cached --exit-code >/dev/null 2>&1; echo $?)
+          set -e
           if [ $CHANGED -eq 1 ]; then
             git config --global user.name 'MusicBot Automation'
             git config --global user.email 'no-mail@musicbot.autobot'
