@@ -48,11 +48,12 @@ jobs:
           python ./i18n/lang.py -sJ
       - name: Commit changed i18n data
         run: |
-          set +e
           BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           I18N_BRANCH="i18n-auto-$BASE_BRANCH"
           git add .
+          set +e
           CHANGED=$(git diff --cached --exit-code; echo $?)
+          set -e
           echo "$CHANGED"
           echo "$BASE_BRANCH"
           echo "$I18N_BRANCH"
