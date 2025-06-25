@@ -51,8 +51,8 @@ jobs:
           BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           I18N_BRANCH="i18n-auto-$BASE_BRANCH"
           git add .
-          CHANGED=$(git diff --cached --exit-code ; echo $?)
-          echo "$CHANGED"
+          CHANGED=$(git diff --cached --exit-code; echo $?)
+          # echo "$CHANGED"
           echo "$BASE_BRANCH"
           echo "$I18N_BRANCH"
           if [ $CHANGED -eq 1 ]; then
