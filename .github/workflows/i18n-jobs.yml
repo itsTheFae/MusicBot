@@ -50,7 +50,7 @@ jobs:
         run: |
           BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           I18N_BRANCH="i18n-auto-$BASE_BRANCH"
-          git add .
+          git add . >/dev/null 2>&1
           set +e
           CHANGED=$(git diff --cached --exit-code; echo $?)
           set -e
@@ -60,7 +60,7 @@ jobs:
           if [ $CHANGED -eq 1 ]; then
             git config --global user.name 'MusicBot Automation'
             git config --global user.email 'no-mail@musicbot.autobot'
-            git commit -am "Auto-update i18n data."
+            git commit -am "Auto-update i18n data." >/dev/null 2>&1
           fi
           echo "CHANGED=$CHANGED" >> $GITHUB_ENV
           echo "BASE_BRACH=$BASE_BRANCH" >> $GITHUB_ENV
