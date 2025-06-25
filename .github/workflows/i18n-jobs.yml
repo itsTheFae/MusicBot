@@ -51,7 +51,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          BASE_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+          BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           I18N_BRANCH="i18n-auto-$BASE_BRANCH"
           git add .
           CHANGED=$(git diff --cached --exit-code ; echo $?)
