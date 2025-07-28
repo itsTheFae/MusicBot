@@ -1173,7 +1173,11 @@ class MusicBot(discord.Client):
             if not np_channel and ssd_.last_np_channel:
                 np_channel = ssd_.last_np_channel  # type: ignore[assignment]
 
-        content = Response("")
+        auto_delete_np: Union[int, float] = 0
+        if self.config.delete_nowplaying:
+            auto_delete_np = self.config.delete_delay_short
+
+        content = Response("", delete_after=auto_delete_np)
         if entry.thumbnail_url:
             content.set_image(url=entry.thumbnail_url)
         else:
