@@ -69,5 +69,5 @@ jobs:
               https://api.github.com/repos/${REPO}/pulls \
               -H 'Content-Type: application/json' \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-              -d '{"title": "Auto-update i18n data for `$BASE_BRANCH`", "body": "Automatically updated i18n data for `$BASE_BRANCH`", "head": "$I18N_BRANCH", "base": "$BASE_BRANCH" }' 
+              -d  "{'title': 'Auto-update i18n data for `${BASE_BRANCH}`', 'body': 'Automatically updated i18n data for `${BASE_BRANCH}`', 'head': '${I18N_BRANCH}', 'base': '${BASE_BRANCH}' }" 
           fi
