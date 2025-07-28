@@ -46,6 +46,9 @@ jobs:
         run: |
           python ./i18n/lang.py -u
           python ./i18n/lang.py -sJ
+      - name: Login to GitHub CLI
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
       - name: Commit changed i18n data
         env:
           GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
@@ -57,11 +60,10 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes detected"
           else
-            echo $(gh repo view --json name,owner --output json | jq -r '.name + "/" + .owner.login')
             git config --global user.name 'MusicBot Automation'
             git config --global user.email 'no-mail@musicbot.autobot'
             git commit -am "Auto-update i18n data."
             git checkout -B $I18N_BRANCH
             git push origin $I18N_BRANCH --force
-            gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
+            gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH --repo 
           fi
