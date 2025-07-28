@@ -57,6 +57,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes detected"
           else
+            echo $(gh repo view --json name,owner --output json | jq -r '.name + "/" + .owner.login')
             git config --global user.name 'MusicBot Automation'
             git config --global user.email 'no-mail@musicbot.autobot'
             git commit -am "Auto-update i18n data."
