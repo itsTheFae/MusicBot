@@ -1,73 +1,74 @@
-name: Translation Updates
-
-on:
-#  pull_request:
-#    types: [opened, synchronize]
-  push:
-    branches:
-      - fae
-      - dev
-      - review
-      - master
-  workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  langtool:
-    name: Update translation data
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-      - name: Load cached pip dependencies
-        uses: actions/cache/restore@v4
-        id: cache
-        with:
-          path: ~/.cache/pip
-          key: pip-${{ runner.os }}-py3.10-translate
-          restore-keys: |
-            pip-${{ runner.os }}-py3.10-translate
-      - name: Install dependencies
-        run: |
-          python -m pip install -U polib
-      - name: Save pip dependencies cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ~/.cache/pip
-          key: pip-${{ runner.os }}-py3.10-translate
-      - name: Run lang.py tool
-        run: |
-          python ./i18n/lang.py -u
-          python ./i18n/lang.py -sJ
-      - name: Login to GitHub CLI
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
-      - name: Commit changed i18n data
-        env:
-          GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          I18N_BRANCH="i18n-auto-$BASE_BRANCH"
-          git add .
-          if git diff --cached --quiet; then
-            echo "No changes detected"
-          else
-            git config --global user.name 'MusicBot Automation'
-            git config --global user.email 'no-mail@musicbot.autobot'
-            git commit -am "Auto-update i18n data."
-            git checkout -B $I18N_BRANCH
-            git push origin $I18N_BRANCH --force
-            curl -X POST \
-              https://api.github.com/repos/${REPO}/pulls \
-              -H 'Content-Type: application/json' \
-              -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-              -d '{"title": "Auto-update i18n data for ${BASE_BRANCH}", "body": "Automatically updated i18n data for ${BASE_BRANCH}", "head": "${I18N_BRANCH}", "base": "${BASE_BRANCH}" }'  
-          fi
+#name: Translation Updates
+#
+#on:
+##  pull_request:
+##    types: [opened, synchronize]
+#  push:
+#    branches:
+#      - fae
+#      - dev
+#      - review
+#      - master
+#  workflow_dispatch:
+#
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+#  cancel-in-progress: true
+#
+#jobs:
+#  langtool:
+#    name: Update translation data
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: Set up Python 3.10
+#        uses: actions/setup-python@v5
+#        with:
+#          python-version: '3.10'
+#      - name: Load cached pip dependencies
+#        uses: actions/cache/restore@v4
+#        id: cache
+#        with:
+#          path: ~/.cache/pip
+#          key: pip-${{ runner.os }}-py3.10-translate
+#          restore-keys: |
+#            pip-${{ runner.os }}-py3.10-translate
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install -U polib
+#      - name: Save pip dependencies cache
+#        if: steps.cache.outputs.cache-hit != 'true'
+#        uses: actions/cache/save@v4
+#        with:
+#          path: ~/.cache/pip
+#          key: pip-${{ runner.os }}-py3.10-translate
+#      - name: Run lang.py tool
+#        run: |
+#          python ./i18n/lang.py -u
+#          python ./i18n/lang.py -sJ
+#      - name: Login to GitHub CLI
+#        run: |
+#          echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+#      - name: Commit changed i18n data
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
+#          REPO: ${{ github.repository }}
+#        run: |
+#          BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+#          I18N_BRANCH="i18n-auto-$BASE_BRANCH"
+#          git add .
+#          if git diff --cached --quiet; then
+#            echo "No changes detected"
+#          else
+#            git config --global user.name 'MusicBot Automation'
+#            git config --global user.email 'no-mail@musicbot.autobot'
+#            git commit -am "Auto-update i18n data."
+#            git checkout -B $I18N_BRANCH
+#            git push origin $I18N_BRANCH --force
+#            curl -X POST \
+#              https://api.github.com/repos/${REPO}/pulls \
+#              -H 'Content-Type: application/json' \
+#              -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+#              -d '{"title": "Auto-update i18n data for ${BASE_BRANCH}", "body": "Automatically updated i18n data for ${BASE_BRANCH}", "head": "${I18N_BRANCH}", "base": "${BASE_BRANCH}" }'  
+#          fi
+#
