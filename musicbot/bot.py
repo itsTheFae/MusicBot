@@ -4360,32 +4360,19 @@ class MusicBot(discord.Client):
                 head,
             )
 
-        # correctly format non-URL inputs for "search" type input.
-        if (
-            not valid_song_url
-            and leftover_args
-            and not (
-                self.config.enable_local_media
-                and song_url.lower().startswith("file://")
-            )
-        ):
+        # correctly format non-URL input as search or local file input
+        if not valid_song_url and leftover_args:
             # treat all arguments as a search string.
             song_url = " ".join([song_url, *leftover_args])
             leftover_args = []  # prevent issues later.
-            self._do_song_blocklist_check(song_url)
-            if song_url:
-                song_url = f"{self.config.default_search_service}:{song_url}"
-        # if file:// is enabled, ensure support for spaces in names.
-        elif (
-            not valid_song_url
-            and leftover_args
-            and (
+
+            # format as a search input if not a file:// input
+            if song_url and not (
                 self.config.enable_local_media
                 and song_url.lower().startswith("file://")
-            )
-        ):
-            song_url = " ".join([song_url, *leftover_args])
-            leftover_args = []  # prevent issues later.
+            ):
+                song_url = f"{self.config.default_search_service}:{song_url}"
+
             self._do_song_blocklist_check(song_url)
 
         # Validate spotify links are supported before we try them.
