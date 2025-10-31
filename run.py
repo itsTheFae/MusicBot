@@ -837,6 +837,13 @@ def parse_cli_args() -> argparse.Namespace:
         help="Update or create example config files and then exit. Useful if code is changed or examples are out-of-date for some reason.",
     )
 
+    ap.add_argument(
+        "--mk-docs",
+        dest="make_docs",
+        action="store_true",
+        help="Update documentation files used in the github pages. Useful if config or command help are changed / extended.",
+    )
+
     args = ap.parse_args()
 
     # Show version and exit.
@@ -973,6 +980,63 @@ def set_console_title() -> None:
         pass
 
 
+async def mk_docs(m) -> None:  # type: ignore[no-untyped-def]
+    """
+    This function is used for automation of MusicBot documentation.
+    It creates github-flavored markdown documents which can update github pages.
+    """
+    file_config = "export_config.md"
+    file_perms = "export_perms.md"
+    file_cmd = "export_cmd.md"
+
+    # Show/Hide markup template.
+    show_hide_html = '<p><a class="expand-all-details">Show/Hide All</a></p>'
+
+    # Make config docs
+    config_md = m.config.register.export_markdown()
+    config_md += f"\n\n---\n{show_hide_html}\n"
+
+    with open(file_config, "w", encoding="utf8") as fh:
+        fh.write(config_md)
+        log.info("Saved config docs.")
+
+    # Make perms docs, using only default section.
+    perms_md = m.permissions.register.export_markdown(only_section="Default")
+
+    with open(file_perms, "w", encoding="utf8") as fh:
+        fh.write(perms_md)
+        log.info("Saved permissions docs.")
+
+    # Make commands docs.
+    cmd_md = "### General Commands  \n\n"
+    admin_commands = []
+    dev_commands = []
+    for att in dir(m):
+        if att.startswith("cmd_"):
+            cmd = getattr(m, att, None)
+            doc = await m.gen_cmd_help(att.replace("cmd_", ""), None, for_md=True)
+            command_name = att.replace("cmd_", "").lower()
+            cmd_a = hasattr(cmd, "admin_only")
+            cmd_d = hasattr(cmd, "dev_cmd")
+            command_text = (
+                f"<details>\n  <summary>{command_name}</summary>\n{doc}\n</details>\n\n"
+            )
+            if cmd_d:
+                dev_commands.append(command_text)
+                continue
+            if cmd_a:
+                admin_commands.append(command_text)
+                continue
+            cmd_md += command_text
+    cmd_md += f"### Owner Commands  \n\n{''.join(admin_commands)}"
+    cmd_md += f"### Dev Commands  \n\n{''.join(dev_commands)}"
+
+    with open(file_cmd, "w", encoding="utf8") as fh:
+        fh.write(cmd_md)
+        log.info("Saved command docs.")
+    log.info("Export complete.")
+
+
 def main() -> None:
     """
     All of the MusicBot starts here.
@@ -1054,6 +1118,11 @@ def main() -> None:
                 log.info("Updating example config files...")
                 m.config.register.write_default_ini(write_path(EXAMPLE_OPTIONS_FILE))
                 m.permissions.register.write_default_ini(write_path(EXAMPLE_PERMS_FILE))
+                raise TerminateSignal()
+
+            if cli_args.make_docs:
+                log.info("Updating documentation files...")
+                event_loop.run_until_complete(mk_docs(m))
                 raise TerminateSignal()
 
             # register system signal handlers with the event loop.
