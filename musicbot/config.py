@@ -1289,7 +1289,8 @@ class Config:
         if self.default_speed < 0.5 or self.default_speed > 100.0:
             log.warning(
                 "The default playback speed must be between 0.5 and 100.0. "
-                "The option value of %.3f will be limited instead."
+                "The option value of %.3f will be limited instead.",
+                self.default_speed,
             )
             self.default_speed = max(min(self.default_speed, 100.0), 0.5)
 
