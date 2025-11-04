@@ -742,6 +742,9 @@ class URLPlaylistEntry(BasePlaylistEntry):
                     fmt_args={"raw_error": e},
                 ) from e
 
+            except MusicbotException as e:
+                raise e
+
             except Exception as e:
                 log.error(
                     "Extraction encountered an unhandled exception.",
