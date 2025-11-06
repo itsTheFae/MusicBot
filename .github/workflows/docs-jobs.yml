@@ -1,0 +1,105 @@
+name: Auto Update Docs
+
+on:
+#  pull_request:
+#    types: [opened, synchronize]
+  push:
+    branches:
+      - fae
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  makedocs:
+    name: Update documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout musicbot
+        uses: actions/checkout@v4
+        with:
+          ref: fae
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Load cached pip dependencies
+        uses: actions/cache/restore@v4
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-py3.10-docs
+          restore-keys: |
+            pip-${{ runner.os }}-py3.10-docs
+      - name: Install dependencies
+        run: |
+          python -m pip install -U -r ./requirements.txt
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Save pip dependencies cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-py3.10-docs
+
+      - name: Generate docs data
+        env:
+          MUSICBOT_TOKEN: "empty_token"
+        run: |
+          python ./run.py --mk-docs --no-checks
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Copy and update pages
+        run: |
+          cd gh-pages
+
+          python -c "import pathlib as p
+          fi = p.Path('../export_cmd.md').read_text()
+          h = fi.splitlines()[0]
+          f = p.Path('./_docs/using/commands.md')
+          fo = f.read_text()
+          fo = fo.split(h)[0] + fi
+          f.write_text(fo)
+          "
+
+          python -c "import pathlib as p
+          fi = p.Path('../export_config.md').read_text()
+          h = fi.splitlines()[0]
+          f = p.Path('./_docs/using/configuration.md')
+          fo = f.read_text()
+          fo = fo.split(h)[0] + fi
+          f.write_text(fo)
+          "
+
+          python -c "import pathlib as p
+          fi = p.Path('../export_perms.md').read_text()
+          h = fi.splitlines()[0]
+          f = p.Path('./_docs/using/permissions.md')
+          fo = f.read_text()
+          fo = fo.split(h)[0] + fi
+          f.write_text(fo)
+          "
+
+      - name: Commit updated docs
+        env:
+          GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          if git diff --cached --quiet; then
+            echo "No changes detected"
+          else
+            git config --global user.name 'MusicBot Automation'
+            git config --global user.email 'no-mail@musicbot.autobot'
+            git commit -am "Auto-update documentation data."
+            #git push origin gh-pages
+            git diff
+          fi
