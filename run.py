@@ -994,7 +994,7 @@ async def mk_docs(m) -> None:  # type: ignore[no-untyped-def]
 
     # Make config docs
     config_md = m.config.register.export_markdown()
-    config_md += f"\n\n---\n{show_hide_html}\n"
+    config_md += f"---\n\n{show_hide_html}\n\n"
 
     with open(file_config, "w", encoding="utf8") as fh:
         fh.write(config_md)
@@ -1002,13 +1002,18 @@ async def mk_docs(m) -> None:  # type: ignore[no-untyped-def]
 
     # Make perms docs, using only default section.
     perms_md = m.permissions.register.export_markdown(only_section="Default")
+    perms_md = perms_md.replace(
+        "#### [Default]", 
+        f"### Available Permission Options  \n\n{show_hide_html}",
+    )
+    perms_md += f"---\n\n{show_hide_html}\n\n"
 
     with open(file_perms, "w", encoding="utf8") as fh:
         fh.write(perms_md)
         log.info("Saved permissions docs.")
 
     # Make commands docs.
-    cmd_md = "### General Commands  \n\n"
+    cmd_md = f"### General Commands  \n\n{show_hide_html}\n\n"
     admin_commands = []
     dev_commands = []
     for att in dir(m):
@@ -1030,6 +1035,7 @@ async def mk_docs(m) -> None:  # type: ignore[no-untyped-def]
             cmd_md += command_text
     cmd_md += f"### Owner Commands  \n\n{''.join(admin_commands)}"
     cmd_md += f"### Dev Commands  \n\n{''.join(dev_commands)}"
+    cmd_md += f"---\n\n{show_hide_html}\n\n"
 
     with open(file_cmd, "w", encoding="utf8") as fh:
         fh.write(cmd_md)
