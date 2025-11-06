@@ -47,6 +47,8 @@ jobs:
           key: pip-${{ runner.os }}-py3.10-docs
 
       - name: Generate docs data
+        env:
+          MUSICBOT_TOKEN: "empty_token"
         run: |
           python ./run.py --mk-docs --no-checks
 
