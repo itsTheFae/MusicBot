@@ -94,6 +94,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
+          git diff
+          git status
           if git diff --cached --quiet; then
             echo "No changes detected"
           else
