@@ -62,5 +62,9 @@ jobs:
             git commit -am "Auto-update i18n data."
             git checkout -B $I18N_BRANCH
             git push origin $I18N_BRANCH --force
-            gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
+            if gh pr list --head $I18N_BRANCH --state open | grep -q "i18n-auto-$BASE_BRANCH"; then
+              echo "A PR already exists for this update."
+            else
+              gh pr create --title "Auto-update i18n data for $BASE_BRANCH" --body "Automatically updated i18n data for $BASE_BRANCH" --head $I18N_BRANCH --base $BASE_BRANCH
+            fi
           fi
