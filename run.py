@@ -1003,7 +1003,7 @@ async def mk_docs(m) -> None:  # type: ignore[no-untyped-def]
     # Make perms docs, using only default section.
     perms_md = m.permissions.register.export_markdown(only_section="Default")
     perms_md = perms_md.replace(
-        "#### [Default]", 
+        "#### [Default]",
         f"### Available Permission Options  \n\n{show_hide_html}",
     )
     perms_md += f"---\n\n{show_hide_html}\n\n"
