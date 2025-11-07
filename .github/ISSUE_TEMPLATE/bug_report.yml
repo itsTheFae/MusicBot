@@ -31,6 +31,7 @@ body:
         - release-151221
         - release-260419
         - I am using the "review" branch
+        - I am using the "dev" branch
   - type: dropdown
     id: system
     attributes:
@@ -50,7 +51,7 @@ body:
       options:
         - label: I have confirmed that my issue has not already been reported.
           required: true
-        - label: I am using Python 3.8 or higher.
+        - label: I am using Python 3.9 or higher.
           required: true
         - label: I have updated my Python dependencies.
           required: true
