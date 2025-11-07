@@ -69,6 +69,7 @@ jobs:
           fo = f.read_text()
           fo = fo.split(h)[0] + fi
           f.write_text(fo)
+          print(h)
           "
 
           python -c "import pathlib as p
@@ -78,6 +79,7 @@ jobs:
           fo = f.read_text()
           fo = fo.split(h)[0] + fi
           f.write_text(fo)
+          print(h)
           "
 
           python -c "import pathlib as p
@@ -87,6 +89,7 @@ jobs:
           fo = f.read_text()
           fo = fo.split(h)[0] + fi
           f.write_text(fo)
+          print(h)
           "
 
       - name: Commit updated docs
@@ -94,6 +97,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.MB_GH_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
+          cd gh-pages
           git diff
           git status
           if git diff --cached --quiet; then
