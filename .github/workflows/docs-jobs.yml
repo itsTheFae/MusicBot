@@ -67,36 +67,36 @@ jobs:
           cd gh-pages
 
           python -c "import pathlib as p
-          print("Combine Commands...")
+          print('Combine Commands...')
           fi = p.Path('../export_cmd.md').read_text()
           h = fi.splitlines()[0]
           f = p.Path('./_docs/using/commands.md')
           fo = f.read_text()
           fo = fo.split(h)[0] + fi
           f.write_text(fo)
-          print("Done")
+          print('Done')
           "
 
           python -c "import pathlib as p
-          print("Combine Options...")
+          print('Combine Options...')
           fi = p.Path('../export_config.md').read_text()
           h = fi.splitlines()[0]
           f = p.Path('./_docs/using/configuration.md')
           fo = f.read_text()
           fo = fo.split(h)[0] + fi
           f.write_text(fo)
-          print("Done")
+          print('Done')
           "
 
           python -c "import pathlib as p
-          print("Combine Permissions...")
+          print('Combine Permissions...')
           fi = p.Path('../export_perms.md').read_text()
           h = fi.splitlines()[0]
           f = p.Path('./_docs/using/permissions.md')
           fo = f.read_text()
           fo = fo.split(h)[0] + fi
           f.write_text(fo)
-          print("Done")
+          print('Done')
           "
 
       - name: Commit updated docs
