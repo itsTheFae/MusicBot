@@ -4361,7 +4361,7 @@ class MusicBot(discord.Client):
             )
 
         # correctly format non-URL input as search or local file input
-        # make sure spotify URI input don't get treated as search terms.
+        # make sure spotify URI input is not treated as search terms.
         if not valid_song_url and not song_url.lower().startswith("spotify:"):
             # treat all arguments as a search string.
             if leftover_args:
