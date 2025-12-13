@@ -636,6 +636,7 @@ class Config:
             option="DefaultSearchService",
             dest="default_search_service",
             default=ConfigDefaults.default_search_service,
+            getter="getstr",
             comment=_Dd(
                 "This option sets the default search service used by MusicBot through ytdlp.\n"
                 "Read ytdlp's list of supported sites to find supported prefixes you can use here.\n"
