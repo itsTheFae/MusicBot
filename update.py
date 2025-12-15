@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import os
 import pathlib
 import shutil
@@ -10,14 +11,20 @@ import zipfile
 from typing import Any, List, Optional, Tuple
 from urllib.request import urlopen
 
+g_do_dry_run = False
 
-def yes_or_no_input(question: str) -> bool:
+
+def yes_or_no_input(question: str, answer: str = "") -> bool:
     """
     Prompt the user for a yes or no response to given `question`
     As many times as it takes to get yes or no.
     """
     while True:
-        ri = input(f"{question} (y/n): ")
+        if not answer:
+            ri = input(f"{question} (y/n): ")
+        else:
+            print(f"{question} (y/n):  [{answer}]")
+            ri = answer
 
         if ri.lower() in ["yes", "y"]:
             return True
@@ -33,6 +40,11 @@ def run_or_raise_error(cmd: List[str], message: str, **kws: Any) -> None:
     :kwparam: ok_codes:  A list of non-zero exit codes to consider OK.
     :raises: RuntimeError  with given `message` as exception text.
     """
+    # global g_do_dry_run
+    if g_do_dry_run:
+        print(f"Dry Run:  {' '.join(cmd)}")
+        return
+
     ok_codes = kws.pop("ok_codes", [])
     try:
         subprocess.check_call(cmd, **kws)
@@ -291,7 +303,7 @@ def check_ffmpeg_running() -> None:
         check_for_process(ffmpeg_bin)
 
 
-def update_ffmpeg() -> None:
+def update_ffmpeg(cli_args: argparse.Namespace) -> None:
     """
     Handles checking for new versions of ffmpeg and requesting update.
     """
@@ -336,7 +348,9 @@ def update_ffmpeg() -> None:
             print("You will need to manually update FFmpeg instead.")
             return
 
-        do_upgrade = yes_or_no_input("Should we upgrade FFmpeg using winget? [Y/n]")
+        do_upgrade = yes_or_no_input(
+            "Should we upgrade FFmpeg using winget? [Y/n]", cli_args.q_ffmpeg
+        )
         if do_upgrade:
             run_or_raise_error(
                 [
@@ -356,7 +370,8 @@ def update_ffmpeg() -> None:
 
     elif ffmpeg_bin.lower() == bundle_ffmpeg_bin.lower():
         do_dl = yes_or_no_input(
-            "Should we update the MusicBot bundled ffmpeg executables? [Y/n]"
+            "Should we update the MusicBot bundled ffmpeg executables? [Y/n]",
+            cli_args.q_ffmpeg,
         )
         if do_dl:
             dl_windows_ffmpeg()
@@ -387,6 +402,177 @@ def finalize() -> None:
     print("Done!")
 
 
+def parse_cli_args() -> argparse.Namespace:
+    """
+    Parse command line arguments and do reasonable checks and assignments.
+
+    :returns:  Command line arguments parsed via argparse.
+    """
+
+    ap = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=(
+            "Update script for MusicBot. Supports interactive and non-interactive modes.\n"
+            "Use the listed command line flags in any combination to control non-interactive update process.\n"
+            "Available via Github:"
+            "\n  https://github.com/Just-Some-Bots/MusicBot"
+        ),
+        epilog=(
+            "For help with this script or MusicBot, join our discord:"
+            "\n  https://discord.gg/bots\n\n"
+            "This software is provided under the MIT License.\n"
+            "See the `LICENSE` text file for complete details."
+        ),
+    )
+
+    # display version and exit.
+    ap.add_argument(
+        "-V",
+        "--version",
+        dest="show_version",
+        action="store_true",
+        help="Print the MusicBot version information and exit.",
+    )
+
+    # dry run, does not run commands.
+    ap.add_argument(
+        "--dry-run",
+        dest="is_dry",
+        action="store_true",
+        help="Do a dry run, only prints commands instead of running them.",
+    )
+
+    # skip all, no
+    ap.add_argument(
+        "-n",
+        "--all-no",
+        dest="all_no",
+        action="store_true",
+        help="Answer 'no' to all questions, and skip all prompts.",
+    )
+
+    # skip all, yes
+    ap.add_argument(
+        "-y",
+        "--all-yes",
+        dest="all_yes",
+        action="store_true",
+        help="Answer 'yes' to all questions, and skip all prompts.",
+    )
+
+    # ffmpeg no
+    ap.add_argument(
+        "--no-ffmpeg",
+        dest="q_ffmpeg",
+        action="store_const",
+        const="no",
+        default="",
+        help="Answer 'no' to update ffmpeg prompt. (windows only)",
+    )
+    # ffmpeg yes
+    ap.add_argument(
+        "--ffmpeg",
+        dest="q_ffmpeg",
+        action="store_const",
+        const="yes",
+        default="",
+        help="Answer 'yes' to update ffmpeg prompt. (windows only)",
+    )
+
+    # bot code no
+    ap.add_argument(
+        "--no-bot",
+        dest="q_bot",
+        action="store_const",
+        const="no",
+        default="",
+        help="Answer 'no' to update bot code prompt.",
+    )
+    # bot code yes
+    ap.add_argument(
+        "--bot",
+        dest="q_bot",
+        action="store_const",
+        const="yes",
+        default="",
+        help="Answer 'yes' to update bot code prompt.",
+    )
+    # bot code, git reset no
+    ap.add_argument(
+        "--no-reset",
+        dest="q_reset",
+        action="store_const",
+        const="no",
+        default="",
+        help="Answer 'no' to git hard reset prompt, if applicable.",
+    )
+    # bot code yes
+    ap.add_argument(
+        "--reset",
+        dest="q_reset",
+        action="store_const",
+        const="yes",
+        default="",
+        help="Answer 'yes' to git hard reset prompt, if applicable.",
+    )
+
+    # pip no
+    ap.add_argument(
+        "--no-pip",
+        dest="q_pip",
+        action="store_const",
+        const="no",
+        default="",
+        help="Answer 'no' to update pip packages prompt.",
+    )
+    # pip yes
+    ap.add_argument(
+        "--pip",
+        dest="q_pip",
+        action="store_const",
+        const="yes",
+        default="",
+        help="Answer 'yes' to update pip packages prompt.",
+    )
+
+    args = ap.parse_args()
+
+    # Show version and exit.
+    if args.show_version:
+        git_bin = shutil.which("git")
+        if not git_bin:
+            raise EnvironmentError(
+                "Could not determine MusicBot version.\n"
+                "Check that `git` is installed and available in your environment path."
+            )
+        print("Just-Some-Bots/MusicBot")
+        get_bot_version(git_bin)
+        print(f"Current Branch:  {get_bot_branch(git_bin)}\n")
+        sys.exit(0)
+
+    if args.is_dry:
+        global g_do_dry_run  # pylint: disable=global-statement
+        g_do_dry_run = True
+
+    if args.all_no and args.all_yes:
+        print("Error:  cannot use --all-no and --all-yes at the same time.")
+        sys.exit(1)
+
+    if args.all_no:
+        args.q_ffmpeg = "no" if not args.q_ffmpeg else args.q_ffmpeg
+        args.q_reset = "no" if not args.q_reset else args.q_reset
+        args.q_bot = "no" if not args.q_bot else args.q_bot
+        args.q_pip = "no" if not args.q_pip else args.q_pip
+
+    if args.all_yes:
+        args.q_ffmpeg = "yes" if not args.q_ffmpeg else args.q_ffmpeg
+        args.q_reset = "yes" if not args.q_reset else args.q_reset
+        args.q_bot = "yes" if not args.q_bot else args.q_bot
+        args.q_pip = "yes" if not args.q_pip else args.q_pip
+
+    return args
+
+
 def main() -> None:
     """
     Runs several checks, starting with making sure there is a .git folder
@@ -394,6 +580,7 @@ def main() -> None:
     Attempt to detect a git executable and use it to run git pull.
     Later, we try to use pip module to upgrade dependency modules.
     """
+    cli_args = parse_cli_args()
     print("Starting update checks...")
 
     if sys.platform.startswith("win"):
@@ -448,7 +635,8 @@ def main() -> None:
         )
         hard_reset = yes_or_no_input(
             "WARNING:  All changed files listed above will be reset!\n"
-            "Would you like to reset the Source code, to allow MusicBot to update?"
+            "Would you like to reset the Source code, to allow MusicBot to update?",
+            cli_args.q_reset,
         )
         if hard_reset:
             check_ffmpeg_running()
@@ -459,12 +647,13 @@ def main() -> None:
             )
         else:
             do_deps = yes_or_no_input(
-                "OK, skipping bot update. Do you still want to update dependencies?"
+                "OK, skipping bot update. Do you still want to update dependencies?",
+                cli_args.q_pip,
             )
             if do_deps:
                 update_deps()
 
-            update_ffmpeg()
+            update_ffmpeg(cli_args)
             finalize()
             return
 
@@ -483,7 +672,7 @@ def main() -> None:
         print("No updates found for bot source code.")
     else:
         print(f"Updates are available, latest commit ID is:  {updates[1]}")
-        do_bot_upgrade = yes_or_no_input("Would you like to update?")
+        do_bot_upgrade = yes_or_no_input("Would you like to update?", cli_args.q_bot)
         if do_bot_upgrade:
             check_ffmpeg_running()
             run_or_raise_error(
@@ -492,7 +681,7 @@ def main() -> None:
             )
 
     update_deps()
-    update_ffmpeg()
+    update_ffmpeg(cli_args)
     finalize()
 
 

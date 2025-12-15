@@ -77,7 +77,8 @@ if [[ "$VerGood" == "0" ]]; then
 fi
 
 echo "Using '${Python_Bin}' to update MusicBot..."
-$Python_Bin update.py
+# We also pass all arguments from this script into python.
+$Python_Bin update.py "$@"
 
 # exit using the code that python exited with.
 do_exit $?
