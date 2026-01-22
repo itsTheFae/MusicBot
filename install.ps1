@@ -163,6 +163,23 @@ else
 }
 ""
 
+# Check if deno is installed
+"Checking if deno is already installed..."
+Invoke-Expression "winget list -q deno" | Out-Null
+if (!($LastExitCode -eq 0))
+{
+    # install deno js runtime
+    "Installing deno..."
+    Invoke-Expression "winget install --id=DenoLand.Deno"
+    $NeedsEnvReload = 1
+    "Done."
+}
+else
+{
+    "deno already installed."
+}
+""
+
 # try to reload environment variables...
 if ($NeedsEnvReload -eq 1) 
 {

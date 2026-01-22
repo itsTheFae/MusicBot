@@ -674,6 +674,27 @@ function configure_bot() {
     fi
 }
 
+function install_deno() {
+    # look for deno before installing it.
+    if command -v deno >/dev/null; then
+        echo "deno is already installed and in PATH."
+        return
+    else
+        DenoPath="$HOME/.deno/bin/"
+        if [ -d "$DenoPath" ] && [ -x "${DenoPath}deno" ] ; then
+            echo "deno is already installed but may not be in path."
+            return
+        fi
+    fi
+    
+    echo "Downloading deno installer..."
+    curl -o "install_deno.sh" "https://deno.land/install.sh"
+    chmod +x "install_deno.sh"
+    echo ""
+    echo "Running deno installer..."
+    ./install_deno.sh -y
+}
+
 #------------------------------------------CLI Arguments----------------------------------------------#
 INSTALL_SYS_PKGS="1"
 INSTALL_BOT_BITS="1"
@@ -845,6 +866,8 @@ case $DISTRO_NAME in
         # NOTE: Arch now uses system managed python packages, so venv is required.
         $SUDO_BIN pacman -Syu
         $SUDO_BIN pacman -S curl ffmpeg git jq python python-pip
+
+        install_deno
     fi
 
     if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -863,6 +886,8 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-pip python3-dev jq -y
+
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -877,6 +902,8 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-full python3-pip python3-venv python3-dev jq -y
+
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -905,6 +932,8 @@ case $DISTRO_NAME in
                 libreadline-dev libsqlite3-dev libbz2-dev \
                 unzip curl git jq ffmpeg -y
             
+            install_deno
+            
             build_python
         fi
 
@@ -923,6 +952,8 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-pip python3-dev jq -y
+            
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -939,6 +970,8 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get install build-essential software-properties-common \
                 unzip curl git ffmpeg libopus-dev libffi-dev libsodium-dev \
                 python3-full python3-pip python3-venv python3-dev jq -y
+            
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -969,6 +1002,8 @@ case $DISTRO_NAME in
                 libreadline-dev libsqlite3-dev libbz2-dev \
                 unzip curl git jq ffmpeg
 
+            install_deno
+
             build_python
         fi
 
@@ -985,6 +1020,8 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get update -y
             $SUDO_BIN apt-get upgrade -y
             $SUDO_BIN apt-get install -y jq git curl ffmpeg python3 python3-pip
+            
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -1002,6 +1039,8 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get upgrade -y
             $SUDO_BIN apt-get install -y build-essential libopus-dev libffi-dev libsodium-dev \
                 python3-full python3-dev python3-venv python3-pip git ffmpeg curl
+                
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -1027,6 +1066,8 @@ case $DISTRO_NAME in
             libgdbm-dev libnss3-dev libreadline-dev libsqlite3-dev \
             libbz2-dev liblzma-dev lzma-dev uuid-dev \
             unzip curl git ffmpeg
+
+        install_deno
 
         build_python
 
@@ -1072,6 +1113,8 @@ case $DISTRO_NAME in
             $SUDO_BIN yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
                 git curl jq ffmpeg
 
+            install_deno
+
             # Ask if we should build python
             echo "We need to build python from source for your system. It will be installed using altinstall target."
             read -rp "Would you like to continue ? [N/y]" BuildPython
@@ -1116,6 +1159,8 @@ case $DISTRO_NAME in
 
             # Install available packages.
             $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel
+            
+            install_deno
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -1145,6 +1190,7 @@ case $DISTRO_NAME in
         brew install libsodium
         brew install curl
         brew install jq
+        brew install deno
     fi
 
     if [ "$INSTALL_BOT_BITS" == "1" ] ; then

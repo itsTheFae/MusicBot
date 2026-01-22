@@ -571,6 +571,42 @@ def req_ensure_env() -> None:
             )
         bugger_off()
 
+    # Ensure we have the stuff needed to run js in yt-dlp.
+    # First we check for the yt-dlp-ejs package.
+    if not importlib.util.find_spec("yt_dlp_ejs"):
+        # Note: consider this check/warning as transitional code, could be removed later.
+        log.warning(
+            "YouTube support may not work!\n"
+            "MusicBot could not find the yt-dlp EJS package.\n"
+            "Update your pip packages, and make sure 'yt-dlp[default]' is in your requirements.txt"
+        )
+
+    # Next we look for node or deno, as one is needed for EJS to work.
+    # deno is supported and enabled by default, so we'll do checks for it first.
+    deno_bin = shutil.which("deno")
+    # Since deno may be installed in user-space, it may not be in common env paths.
+    # An issue for SystemD (maybe others) which don't load user config files.
+    # Fall back to looking in user space path if it isn't found right away.
+    if not deno_bin:
+        deno_common_path = pathlib.Path.home().joinpath(".deno").joinpath("bin")
+        log.debug("Adding environment PATH fallback for deno as: %s ", deno_common_path)
+        path_char = ":"  # used to separate paths in the environment PATH var.
+        if sys.platform.startswith("win"):
+            path_char = ";"
+        os.environ["PATH"] += path_char + os.path.abspath(deno_common_path)
+        # now try again to get deno bin.
+        deno_bin = shutil.which("deno")
+
+    node_bin = shutil.which("node")
+    if not deno_bin and not node_bin:
+        log.warning(
+            "YouTube support may not work!\n"
+            "MusicBot could not find deno or node executables in your environment.\n"
+            "Install deno from:  https://github.com/denoland/deno/\n"
+            " -OR-\n"
+            "Install node (version 25 or newer) via your package manager.\n"
+        )
+
 
 def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
     """

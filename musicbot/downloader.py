@@ -144,6 +144,14 @@ class Downloader:
         ytdl_format_options = ytdl_format_options_immutable.copy()
         ytdl_format_options["http_headers"] = self.http_req_headers
 
+        # Since yt-dlp version 2025.11.12, EJS and a js runtime are needed.
+        # This should enable nodejs as a fallback to deno, if available.
+        # Value is a dict of: {'runtime': {'path': '/opt/path/config'}, ...}
+        ytdl_format_options["js_runtimes"] = {
+            "deno": {},
+            "node": {},
+        }
+
         # add concurrent-fragments option if it is needed.
         if bot.config.ytdlp_concurrent_frags > 1:
             ytdl_format_options["concurrent_fragment_downloads"] = (
