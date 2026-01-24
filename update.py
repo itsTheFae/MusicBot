@@ -191,7 +191,6 @@ def update_deno(cli_args: argparse.Namespace) -> None:
     deno_bin = shutil.which("deno")
     deno_common_path = pathlib.Path.home().joinpath(".deno").joinpath("bin")
     if not deno_bin:
-        print(f"Adding environment PATH fallback for deno as: {deno_common_path}")
         path_char = ":"  # used to separate paths in the environment PATH var.
         if sys.platform.startswith("win"):
             path_char = ";"
@@ -202,15 +201,17 @@ def update_deno(cli_args: argparse.Namespace) -> None:
     node_bin = shutil.which("node")
     # if no JS runtime is installed, ask to install deno.
     if not deno_bin and not node_bin:
+        print("\n")
         print(
             "Since yt-dlp version 2025.11.12, a JS runtime is needed for YouTube.\n"
             "The recommended JS runtime is 'deno' which is not currently installed.\n"
             "  https://github.com/denoland/deno/\n\n"
             "MusicBot will still function without deno, but may not be able to"
             " play media from YouTube without it."
-        
         )
-        install_deno = yes_or_no_input("Would you like to install deno JS runtime?")
+        install_deno = yes_or_no_input(
+            "Would you like to install deno JS runtime?", cli_args.q_deno
+        )
         if install_deno:
             if sys.platform.startswith("win"):  # windows
                 run_or_raise_error(
@@ -234,17 +235,16 @@ def update_deno(cli_args: argparse.Namespace) -> None:
                 )
         return
 
-    # check if deno is installed in user space, return if not.
-    if deno_common_path not in pathlib.Path(deno_bin).parents:
+    if not deno_bin:
+        print("deno not installed, skipped.")
         return
 
-    print("Found deno in user home, could be out of date.")
-    print("The latest version is strongly recommended for best security.")
-    do_deno = yes_or_no_input("Would you like to attempt deno upgrade?", cli_args.q_deno)
+    print("It is recommended to use the latest version of deno.")
+    do_deno = yes_or_no_input("Would you like to run deno upgrade?", cli_args.q_deno)
     if do_deno:
         try:
-            run_or_raise_error([deno_bin, "upgrade"], "NoOp")
-        except RuntimeError as e:
+            run_or_raise_error([str(deno_bin), "upgrade"], "NoOp")
+        except RuntimeError:
             print("The deno upgrade may have failed.")
     else:
         print("Skipped deno upgrade.")
