@@ -18,6 +18,8 @@ def yes_or_no_input(question: str, answer: str = "") -> bool:
     """
     Prompt the user for a yes or no response to given `question`
     As many times as it takes to get yes or no.
+    If `answer` is given, the question is automatically answered.
+    The value of `answer` should be "yes" or "no" only.
     """
     while True:
         if not answer:
@@ -42,7 +44,7 @@ def run_or_raise_error(cmd: List[str], message: str, **kws: Any) -> None:
     """
     # global g_do_dry_run
     if g_do_dry_run:
-        print(f"Dry Run:  {' '.join(cmd)}")
+        print(f"[DRY RUN]:  {' '.join(cmd)}")
         return
 
     ok_codes = kws.pop("ok_codes", [])
@@ -178,11 +180,86 @@ def check_for_process(proc_path: str) -> None:
         )
 
 
-def update_deps() -> None:
+def update_deno(cli_args: argparse.Namespace) -> None:
+    """
+    Looks for and tries to run 'deno upgrade' at user discretion, if it is
+    installed in user-space rather than globally.
+    If deno is not found, this will notify the user to install it, and continue.
+    If deno fails to upgrade, the user is informed but the script continues.
+    """
+    # look for deno, make temp adjustments to PATH if needed.
+    deno_bin = shutil.which("deno")
+    deno_common_path = pathlib.Path.home().joinpath(".deno").joinpath("bin")
+    if not deno_bin:
+        print(f"Adding environment PATH fallback for deno as: {deno_common_path}")
+        path_char = ":"  # used to separate paths in the environment PATH var.
+        if sys.platform.startswith("win"):
+            path_char = ";"
+        os.environ["PATH"] += path_char + os.path.abspath(deno_common_path)
+        deno_bin = shutil.which("deno")
+
+    # cover node as well.
+    node_bin = shutil.which("node")
+    # if no JS runtime is installed, ask to install deno.
+    if not deno_bin and not node_bin:
+        print(
+            "Since yt-dlp version 2025.11.12, a JS runtime is needed for YouTube.\n"
+            "The recommended JS runtime is 'deno' which is not currently installed.\n"
+            "  https://github.com/denoland/deno/\n\n"
+            "MusicBot will still function without deno, but may not be able to"
+            " play media from YouTube without it."
+        
+        )
+        install_deno = yes_or_no_input("Would you like to install deno JS runtime?")
+        if install_deno:
+            if sys.platform.startswith("win"):  # windows
+                run_or_raise_error(
+                    ["winget", "install", "--id=DenoLand.Deno"],
+                    "Failed to install deno using winget.",
+                )
+            elif sys.platform.startswith("darwin"):  # mac OS
+                run_or_raise_error(
+                    ["homebrew", "install", "deno"],
+                    "Failed to install deno using homebrew.",
+                )
+            else:  # some *nix/other os
+                deno_install = pathlib.Path.cwd().joinpath("install_deno.sh")
+                # curl -fsSL https://deno.land/install.sh | sh
+                with urlopen("https://deno.land/install.sh") as denodl:
+                    with open(deno_install, "w", encoding="utf8") as tmp:
+                        tmp.write(denodl.read().decode("utf8"))
+                run_or_raise_error(
+                    ["sh", f"{deno_install}", "-y"],
+                    "Failed to install deno.",
+                )
+        return
+
+    # check if deno is installed in user space, return if not.
+    if deno_common_path not in pathlib.Path(deno_bin).parents:
+        return
+
+    print("Found deno in user home, could be out of date.")
+    print("The latest version is strongly recommended for best security.")
+    do_deno = yes_or_no_input("Would you like to attempt deno upgrade?", cli_args.q_deno)
+    if do_deno:
+        try:
+            run_or_raise_error([deno_bin, "upgrade"], "NoOp")
+        except RuntimeError as e:
+            print("The deno upgrade may have failed.")
+    else:
+        print("Skipped deno upgrade.")
+
+
+def update_deps(cli_args: argparse.Namespace) -> None:
     """
     Tries to upgrade MusicBot dependencies using pip module.
     This will use the same exe/bin as is running this code without version checks.
     """
+    do_pip = yes_or_no_input("Do you want to update dependencies?", cli_args.q_pip)
+    if not do_pip:
+        print("Skipping update of pip dependencies.")
+        return
+
     print("Attempting to update dependencies...")
 
     # outside a venv these args are used for pip update
@@ -471,12 +548,33 @@ def parse_cli_args() -> argparse.Namespace:
     )
     # ffmpeg yes
     ap.add_argument(
+        "-f",
         "--ffmpeg",
         dest="q_ffmpeg",
         action="store_const",
         const="yes",
         default="",
         help="Answer 'yes' to update ffmpeg prompt. (windows only)",
+    )
+
+    # deno no
+    ap.add_argument(
+        "--no-deno",
+        dest="q_deno",
+        action="store_const",
+        const="no",
+        default="",
+        help="Answer 'no' to update deno prompt.",
+    )
+    # deno yes
+    ap.add_argument(
+        "-d",
+        "--deno",
+        dest="q_deno",
+        action="store_const",
+        const="yes",
+        default="",
+        help="Answer 'yes' to update deno prompt.",
     )
 
     # bot code no
@@ -490,6 +588,7 @@ def parse_cli_args() -> argparse.Namespace:
     )
     # bot code yes
     ap.add_argument(
+        "-b",
         "--bot",
         dest="q_bot",
         action="store_const",
@@ -506,8 +605,9 @@ def parse_cli_args() -> argparse.Namespace:
         default="",
         help="Answer 'no' to git hard reset prompt, if applicable.",
     )
-    # bot code yes
+    # bot code, git reset yes
     ap.add_argument(
+        "-r",
         "--reset",
         dest="q_reset",
         action="store_const",
@@ -527,6 +627,7 @@ def parse_cli_args() -> argparse.Namespace:
     )
     # pip yes
     ap.add_argument(
+        "-p",
         "--pip",
         dest="q_pip",
         action="store_const",
@@ -563,12 +664,14 @@ def parse_cli_args() -> argparse.Namespace:
         args.q_reset = "no" if not args.q_reset else args.q_reset
         args.q_bot = "no" if not args.q_bot else args.q_bot
         args.q_pip = "no" if not args.q_pip else args.q_pip
+        args.q_deno = "no" if not args.q_deno else args.q_deno
 
     if args.all_yes:
         args.q_ffmpeg = "yes" if not args.q_ffmpeg else args.q_ffmpeg
         args.q_reset = "yes" if not args.q_reset else args.q_reset
         args.q_bot = "yes" if not args.q_bot else args.q_bot
         args.q_pip = "yes" if not args.q_pip else args.q_pip
+        args.q_deno = "yes" if not args.q_deno else args.q_deno
 
     return args
 
@@ -646,13 +749,10 @@ def main() -> None:
                 "You will need to manually reset the local git repository, or make a new clone of MusicBot.",
             )
         else:
-            do_deps = yes_or_no_input(
-                "OK, skipping bot update. Do you still want to update dependencies?",
-                cli_args.q_pip,
-            )
-            if do_deps:
-                update_deps()
+            print("OK, skipping bot update via git pull.")
 
+            update_deps(cli_args)
+            update_deno(cli_args)
             update_ffmpeg(cli_args)
             finalize()
             return
@@ -665,7 +765,7 @@ def main() -> None:
     if repo_url:
         print(f"Current git repo URL:  {repo_url}")
 
-    # Check for updates.
+    # Check for bot git updates.
     print("Checking remote repo for bot updates...")
     updates = check_bot_updates(git_bin, branch_name)
     if not updates:
@@ -680,7 +780,8 @@ def main() -> None:
                 "Could not update the bot. You will need to run 'git pull' manually.",
             )
 
-    update_deps()
+    update_deps(cli_args)
+    update_deno(cli_args)
     update_ffmpeg(cli_args)
     finalize()
 
