@@ -865,7 +865,7 @@ case $DISTRO_NAME in
     if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
         # NOTE: Arch now uses system managed python packages, so venv is required.
         $SUDO_BIN pacman -Syu
-        $SUDO_BIN pacman -S curl ffmpeg git jq python python-pip
+        $SUDO_BIN pacman -S curl ffmpeg git jq python python-pip unzip
 
         install_deno
     fi
@@ -1019,7 +1019,7 @@ case $DISTRO_NAME in
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
             $SUDO_BIN apt-get upgrade -y
-            $SUDO_BIN apt-get install -y jq git curl ffmpeg python3 python3-pip
+            $SUDO_BIN apt-get install -y jq git curl ffmpeg python3 python3-pip unzip
             
             install_deno
         fi
@@ -1038,7 +1038,7 @@ case $DISTRO_NAME in
             $SUDO_BIN apt-get update -y
             $SUDO_BIN apt-get upgrade -y
             $SUDO_BIN apt-get install -y build-essential libopus-dev libffi-dev libsodium-dev \
-                python3-full python3-dev python3-venv python3-pip git ffmpeg curl
+                python3-full python3-dev python3-venv python3-pip git ffmpeg curl unzip
                 
             install_deno
         fi
@@ -1111,7 +1111,7 @@ case $DISTRO_NAME in
             # Install available packages and libraries for building python 3.8+
             $SUDO_BIN yum -y groupinstall "Development Tools"
             $SUDO_BIN yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
-                git curl jq ffmpeg
+                git curl jq ffmpeg unzip
 
             install_deno
 
@@ -1158,7 +1158,7 @@ case $DISTRO_NAME in
             $SUDO_BIN dnf config-manager --enable powertools
 
             # Install available packages.
-            $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel
+            $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel unzip
             
             install_deno
         fi

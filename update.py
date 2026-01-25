@@ -224,6 +224,15 @@ def update_deno(cli_args: argparse.Namespace) -> None:
                     "Failed to install deno using homebrew.",
                 )
             else:  # some *nix/other os
+                bin_unzip = shutil.which("unzip")
+                bin_7z = shutil.which("7z")
+                if not bin_unzip and not bin_7z:
+                    print(
+                        "Error:  Cannot install deno without unzip or 7zip.\n"
+                        "Install unzip or 7z programs first."
+                    )
+                    return
+                
                 deno_install = pathlib.Path.cwd().joinpath("install_deno.sh")
                 # curl -fsSL https://deno.land/install.sh | sh
                 with urlopen("https://deno.land/install.sh") as denodl:
@@ -242,10 +251,7 @@ def update_deno(cli_args: argparse.Namespace) -> None:
     print("It is recommended to use the latest version of deno.")
     do_deno = yes_or_no_input("Would you like to run deno upgrade?", cli_args.q_deno)
     if do_deno:
-        try:
-            run_or_raise_error([str(deno_bin), "upgrade"], "NoOp")
-        except RuntimeError:
-            print("The deno upgrade may have failed.")
+        run_or_raise_error([str(deno_bin), "upgrade"], "NoOp")
     else:
         print("Skipped deno upgrade.")
 
