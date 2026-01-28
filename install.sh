@@ -688,7 +688,7 @@ function install_deno() {
     fi
     
     echo "Downloading deno installer..."
-    curl -o "install_deno.sh" "https://deno.land/install.sh"
+    curl -sL -o "install_deno.sh" "https://deno.land/install.sh"
     chmod +x "install_deno.sh"
     echo ""
     echo "Running deno installer..."
