@@ -32,7 +32,7 @@ DEBUG=0
 
 #----------------------------------------------Constants----------------------------------------------#
 # Suported versions of python using only major.minor format
-PySupported=("3.13" "3.12" "3.11" "3.10" "3.9")
+PySupported=("3.13" "3.12" "3.11" "3.10")
 PyBin="python3"
 # Path updated by find_python
 PyBinPath="$(command -v "$PyBin")"
@@ -235,8 +235,8 @@ function find_python() {
 
         # Major version must be 3+
         if [[ $PY_VER_MAJOR -ge 3 ]]; then
-            # if 3.9+ it should work.
-            if [[ $PY_VER_MINOR -ge 9 ]]; then
+            # if 3.10+ it should work.
+            if [[ $PY_VER_MINOR -ge 10 ]]; then
                 PyBinPath="$(which "$PyBinTest")"
                 PyBin="$PyBinTest"
                 debug "Selected: $PyBinTest  @  $PyBinPath"
@@ -985,7 +985,10 @@ case $DISTRO_NAME in
 # NOTE: Raspberry Pi OS 11, i386 arch, returns Debian as distro name.
 *"Debian"* )
     case $DISTRO_NAME in
-    *"Debian GNU/Linux 10"*)
+    # Tested Working:
+    # R-Pi OS 11  @  2024/03/29
+    # Debian 11.3  @  2024/03/29
+    *"Debian GNU/Linux 10"*|*"Debian GNU/Linux 11"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
             $SUDO_BIN apt-get upgrade -y
@@ -997,22 +1000,6 @@ case $DISTRO_NAME in
                 unzip curl git jq ffmpeg
 
             build_python
-        fi
-
-        if [ "$INSTALL_BOT_BITS" == "1" ] ; then
-            pull_musicbot_git
-            install_deno
-        fi
-        ;;
-    
-    # Tested working:
-    # R-Pi OS 11  @  2024/03/29
-    # Debian 11.3  @  2024/03/29
-    *"Debian GNU/Linux 11"*)
-        if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            $SUDO_BIN apt-get update -y
-            $SUDO_BIN apt-get upgrade -y
-            $SUDO_BIN apt-get install -y jq git curl ffmpeg python3 python3-pip unzip
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then

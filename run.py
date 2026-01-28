@@ -353,7 +353,7 @@ def sanity_checks(args: argparse.Namespace) -> None:
     """
     log.info("Starting sanity checks")
     """Required Checks"""
-    # Make sure we're on Python 3.9+
+    # Make sure we're on Python 3.10+
     req_ensure_py3()
 
     # Make sure we're in a writable env
@@ -385,13 +385,13 @@ def req_ensure_py3() -> None:
     Verify the current running version of Python and attempt to find a
     suitable minimum version in the system if the running version is too old.
     """
-    log.info("Checking for Python 3.9+")
+    log.info("Checking for Python 3.10+")
 
-    if sys.version_info < (3, 9):
+    if sys.version_info < (3, 10):
         log.warning(
-            "Python 3.9+ is required. This version is %s", sys.version.split()[0]
+            "Python 3.10+ is required. This version is %s", sys.version.split()[0]
         )
-        log.warning("Attempting to locate Python 3.9...")
+        log.warning("Attempting to locate Python 3.10...")
         # Should we look for other versions than min-ver?
 
         pycom = None
@@ -402,15 +402,15 @@ def req_ensure_py3() -> None:
                 log.warning("Could not locate py.exe")
 
             try:
-                subprocess.check_output([pycom, "-3.9", '-c "exit()"'])
-                pycom = f"{pycom} -3.9"
+                subprocess.check_output([pycom, "-3.10", '-c "exit()"'])
+                pycom = f"{pycom} -3.10"
             except (
                 OSError,
                 PermissionError,
                 FileNotFoundError,
                 subprocess.CalledProcessError,
             ):
-                log.warning("Could not execute `py.exe -3.9` ")
+                log.warning("Could not execute `py.exe -3.10` ")
                 pycom = None
 
             if pycom:
@@ -419,10 +419,10 @@ def req_ensure_py3() -> None:
                 sys.exit(0)
 
         else:
-            log.info('Trying "python3.9"')
-            pycom = shutil.which("python3.9")
+            log.info('Trying "python3.10"')
+            pycom = shutil.which("python3.10")
             if not pycom:
-                log.warning("Could not locate python3.9 on path.")
+                log.warning("Could not locate python3.10 on path.")
 
             try:
                 subprocess.check_output([pycom, '-c "exit()"'])
@@ -436,12 +436,12 @@ def req_ensure_py3() -> None:
 
             if pycom:
                 log.info(
-                    "\nPython 3.9 found.  Re-launching bot using: %s run.py\n", pycom
+                    "\nPython 3.10 found.  Re-launching bot using: %s run.py\n", pycom
                 )
                 os.execlp(pycom, pycom, "run.py")
 
         log.critical(
-            "Could not find Python 3.9 or higher.  Please run the bot using Python version 3.9 to 3.13"
+            "Could not find Python 3.10 or higher.  Please run the bot using Python version 3.10 to 3.13"
         )
         bugger_off()
 
@@ -1224,6 +1224,7 @@ def main() -> None:
 
         except (AttributeError, ImportError, ModuleNotFoundError) as e:
             # In case a discord extension is installed but discord.py isn't.
+            log.warning("Processing Error Data:  %s", e)
             if isinstance(e, AttributeError):
                 if "module 'discord'" not in str(e):
                     raise
@@ -1305,10 +1306,6 @@ def main() -> None:
                 retries += 1
                 break
 
-            log.error(
-                "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
-            )
-            log.exception("The exception which caused the above error: ")
             retries = 0
             exit_signal = TerminateSignal(exit_code=1)
             break
