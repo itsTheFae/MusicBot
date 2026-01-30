@@ -242,7 +242,7 @@ if((Test-Path $MB_Reqs_File) -and (Test-Path $MB_Module_Dir) -and (Test-Path $MB
 
 if (Get-Command "python" -errorAction SilentlyContinue)
 {
-    Invoke-Expression "python -c 'import sys; exit(0 if sys.version_info >= (3, 8) else 1)'" | Out-Null
+    Invoke-Expression "python -c 'import sys; exit(0 if sys.version_info >= (3, 10) else 1)'" | Out-Null
     if($LastExitCode -eq 0)
     {
         $PYTHON = "python"
