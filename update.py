@@ -125,13 +125,44 @@ def get_bot_remote_url(git_bin: str) -> str:
 
 
 def check_bot_updates(git_bin: str, branch_name: str) -> Optional[Tuple[str, str]]:
-    """Attempt a dry-run with git fetch to detect updates on remote."""
+    """
+    Attempt a dry-run with git fetch to detect updates on remote.
+    Falls back to status -b to check if the current branch is behind.
+    Returns a tuple of commit IDs if an update is detected, or None otherwise.
+    """
     try:
         updates = (
             subprocess.check_output([git_bin, "fetch", "--dry-run"])
             .decode("utf8")
             .split("\n")
         )
+
+        # in case 'git fetch' has already been run, but pull still hasn't been done.
+        if (len(updates) == 1 and not updates[0]) or not updates:
+            updates = (
+                subprocess.check_output([git_bin, "status", "-b", "--porcelain"])
+                .decode("utf8")
+                .split("\n")
+            )
+            is_behind = False
+            for line in updates:
+                if branch_name in line and "behind" in line:
+                    is_behind = True
+                    break
+            if is_behind:
+                commit_at = (
+                    subprocess.check_output([git_bin, "rev-parse", "@"])
+                    .decode("utf8")
+                    .strip()
+                )
+                commit_to = (
+                    subprocess.check_output([git_bin, "rev-parse", "@{u}"])
+                    .decode("utf8")
+                    .strip()
+                )
+                return (commit_at, commit_to)
+            return None
+
         for line in updates:
             parts = line.split()
             if branch_name in parts:
@@ -229,10 +260,10 @@ def update_deno(cli_args: argparse.Namespace) -> None:
                 if not bin_unzip and not bin_7z:
                     print(
                         "Error:  Cannot install deno without unzip or 7zip.\n"
-                        "Install unzip or 7z programs first."
+                        "Install unzip or 7z program first."
                     )
                     return
-                
+
                 deno_install = pathlib.Path.cwd().joinpath("install_deno.sh")
                 # curl -fsSL https://deno.land/install.sh | sh
                 with urlopen("https://deno.land/install.sh") as denodl:
