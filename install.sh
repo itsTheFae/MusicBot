@@ -28,6 +28,10 @@ ServiceName="musicbot"
 
 EnableUnlistedBranches=0
 DEBUG=0
+# Storage for --branch [name] CLI flag, bypasses branch prompt.
+UsingBranch=""
+# Storage for --auto CLI flag, bypass all prompts.
+AutoInstall=0
 
 
 #----------------------------------------------Constants----------------------------------------------#
@@ -111,7 +115,7 @@ function show_help() {
     echo "The user should have permission to install system packages using sudo."
     echo "Do NOT run this script with sudo, you will be prompted when it is needed!"
     echo "To bypass steps that use sudo, use --no-sudo or --no-sys as desired."
-    echo " Note: Your system admin must install the packages before hand, by using:"
+    echo " Note: Your system admin must install the system packages by using:"
     echo "   $0 --sys-only"
     echo ""
     echo "Available Options:"
@@ -119,14 +123,28 @@ function show_help() {
     echo "  --list      List potentially supported versions and exits."
     echo "  --help      Show this help text and exit."
     echo "  --sys-only  Install only system packages, no bot or pip libraries."
-    echo "  --service   Install only the system service for MusicBot."
+    echo "  --service   Install only the systemd service file for MusicBot."
     echo "  --no-sys    Bypass system packages, install bot and pip libraries."
     echo "  --no-sudo   Skip all steps that use sudo. This implies --no-sys."
-    echo "  --debug     Enter debug mode, with extra output. (for developers)"
-    echo "  --any-branch    Allow any existing branch to be given at the branch prompt. (for developers)"
+    echo "  --debug     Enter debug mode, with extra output."
+    echo "  --auto      Bypass all prompts using default values."
+    echo "  --any-branch    Allow any existing branch to be given at the branch prompt."
+    echo "  --branch [NAME] Bypass branch prompt and use the given branch name."
     echo "  --dir [PATH]    Directory into which MusicBot will be installed. Default is user Home directory."
     echo ""
     exit 0
+}
+
+function ask_input() {
+    # a prompt which can be bypassed by AutoInstall=1
+    local prompt="$1"
+    local varname="$2"
+    local defval="$3"
+    if [ "$AutoInstall" == "1" ] ; then
+        eval "$varname=\"$defval\""
+    else
+        read -rp "$prompt" "$varname"
+    fi
 }
 
 function exit_err() {
@@ -152,7 +170,7 @@ function build_python() {
         fi
     fi
 
-    # actually build python
+    # variables for what python source to actually build
     PyBuildVer="3.10.14"
     PySrcDir="Python-${PyBuildVer}"
     PySrcFile="${PySrcDir}.tgz"
@@ -163,7 +181,7 @@ function build_python() {
     echo "It will be installed using the altinstall target to avoid conflicts."
     echo "This process can take several minutes!"
     echo " Building Python ${PyBuildVer}  from: ${PySrcUrl}"
-    read -rp "Would you like to continue ? [N/y]" BuildPython
+    ask_input "Would you like to continue ? [n/Y]" BuildPython "y"
     if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
         # Build python.
         curl -o "$PySrcFile" "$PySrcUrl"
@@ -282,13 +300,57 @@ function in_venv() {
     return 1
 }
 
+function handle_branch_selection() {
+    # If auto install but --branch wasn't given, we default to current branch name.
+    if [ "$AutoInstall" == "1" ] && ["$UsingBranch" == "" ] ; then
+        UsingBranch="$(git rev-parse --abbrev-ref HEAD)"
+    fi
+
+    if [ "$UsingBranch" == "" ] ; then
+        echo ""
+        echo "MusicBot currently has three branches available."
+        echo "  master - An older MusicBot, for older discord.py. May not work without tweaks!"
+        echo "  review - Newer MusicBot, usually stable with less updates than the dev branch."
+        echo "  dev    - The newest MusicBot, latest features and changes which may need testing."
+        if [ "$EnableUnlistedBranches" == "1" ] ; then
+        echo "  *      - WARNING: Any branch name is allowed, if it exists on github."
+        fi
+        echo ""
+        read -rp "Enter the branch name you want to install:  " BRANCH
+    else
+        BRANCH="$UsingBranch"
+    fi
+    case ${BRANCH,,} in
+    "dev")
+        echo "Installing from 'dev' branch..."
+        git clone "${MusicBotGitURL}" "${CloneDir}" -b dev
+        ;;
+    "review")
+        echo "Installing from 'review' branch..."
+        git clone "${MusicBotGitURL}" "${CloneDir}" -b review
+        ;;
+    "master")
+        echo "Installing from 'master' branch..."
+        git clone "${MusicBotGitURL}" "${CloneDir}" -b master
+        ;;
+    *)
+        if [ "$EnableUnlistedBranches" == "1" ] ; then
+            echo "Installing from '${BRANCH}' branch..."
+            git clone "${MusicBotGitURL}" "${CloneDir}" -b "$BRANCH"
+        else
+            exit_err "Unknown branch name given, install cannot continue."
+        fi
+        ;;
+    esac
+}
+
 function pull_musicbot_git() {
     echo ""
     # Check if we're running inside a previously pulled repo.
     # ignore this if InstallDir is set.
     if in_existing_repo && [ "$InstallDir" == "" ]; then
         echo "Existing MusicBot repo detected."
-        read -rp "Would you like to install using the current repo? [Y/n]" UsePwd
+        ask_input "Would you like to install using the current repo? [Y/n]" UsePwd "y"
         if [ "${UsePwd,,}" == "y" ] || [ "${UsePwd,,}" == "yes" ] ; then
             echo ""
             CloneDir="${PWD}"
@@ -326,38 +388,8 @@ function pull_musicbot_git() {
         fi
     fi
 
-    echo ""
-    echo "MusicBot currently has three branches available."
-    echo "  master - An older MusicBot, for older discord.py. May not work without tweaks!"
-    echo "  review - Newer MusicBot, usually stable with less updates than the dev branch."
-    echo "  dev    - The newest MusicBot, latest features and changes which may need testing."
-    if [ "$EnableUnlistedBranches" == "1" ] ; then
-    echo "  *      - WARNING: Any branch name is allowed, if it exists on github."
-    fi
-    echo ""
-    read -rp "Enter the branch name you want to install:  " BRANCH
-    case ${BRANCH,,} in
-    "dev")
-        echo "Installing from 'dev' branch..."
-        git clone "${MusicBotGitURL}" "${CloneDir}" -b dev
-        ;;
-    "review")
-        echo "Installing from 'review' branch..."
-        git clone "${MusicBotGitURL}" "${CloneDir}" -b review
-        ;;
-    "master")
-        echo "Installing from 'master' branch..."
-        git clone "${MusicBotGitURL}" "${CloneDir}" -b master
-        ;;
-    *)
-        if [ "$EnableUnlistedBranches" == "1" ] ; then
-            echo "Installing from '${BRANCH}' branch..."
-            git clone "${MusicBotGitURL}" "${CloneDir}" -b "$BRANCH"
-        else
-            exit_err "Unknown branch name given, install cannot continue."
-        fi
-        ;;
-    esac
+    handle_branch_selection
+
     cd "${CloneDir}" || exit_err "Fatal:  Could not change to MusicBot directory."
 
     # find python before using it
@@ -471,7 +503,7 @@ function ask_change_user_group() {
     User_Group="${Inst_User} / ${Inst_Group}"
     echo ""
     echo "The installer is currently running as:  ${User_Group}"
-    read -rp "Set a different User / Group to run the service? [N/y]: " MakeChange
+    ask_input "Set a different User / Group to run the service? [N/y]: " MakeChange "n"
     case $MakeChange in
     [Yy]*)
         ask_for_user
@@ -483,7 +515,7 @@ function ask_change_user_group() {
 function ask_change_service_name() {
     echo ""
     echo "The service will be installed as:  $ServiceName"
-    read -rp "Would you like to change the name? [N/y]: " ChangeSrvName
+    ask_input "Would you like to change the name? [N/y]: " ChangeSrvName
     case $ChangeSrvName in
     [Yy]*)
         while :; do
@@ -492,7 +524,7 @@ function ask_change_service_name() {
             echo ""
             echo "Service names may use only letters, numbers, and the listed special characters."
             echo "Spaces are not allowed. Special characters:  -_.:"
-            read -rp "Provide a name for the service:  " ServiceName
+            ask_input "Provide a name for the service:  " ServiceName "musicbot"
             # validate service name is allowed.
             if [[ "$ServiceName" =~ ^[a-zA-Z0-9:-_\.]+$ ]] ; then
                 # attempt to avoid conflicting service names...
@@ -585,7 +617,7 @@ function setup_as_service() {
     echo ""
     echo "The installer can also install MusicBot as a system service."
     echo "This starts the MusicBot at boot and restarts after failures."
-    read -rp "Install the musicbot system service? [N/y] " SERVICE
+    ask_input "Install the musicbot system service? [N/y] " SERVICE "n"
     case $SERVICE in
     [Yy]*)
         ask_change_service_name
@@ -621,7 +653,7 @@ function setup_as_service() {
 
             echo ""
             echo "MusicBot will start automatically after the next reboot."
-            read -rp "Would you like to start MusicBot now? [N/y]" StartService
+            ask_input "Would you like to start MusicBot now? [N/y]" StartService "n"
             case $StartService in
             [Yy]*)
                 echo "Running:  sudo systemctl start $ServiceName"
@@ -659,7 +691,7 @@ function configure_bot() {
     find_python
 
     echo "You can now configure MusicBot!"
-    read -rp "Would you like to launch the 'configure.py' tool? [N/y]" YesConfig
+    ask_input "Would you like to launch the 'configure.py' tool? [N/y]" YesConfig "n"
     if [[ "${YesConfig,,}" != "y" && "${YesConfig,,}" != "yes" ]] ; then
         echo ""
         echo "Open the 'config' directory, then copy and rename the example files to get started."
@@ -756,6 +788,18 @@ while [[ $# -gt 0 ]]; do
         fi
         VenvDir="${InstallDir}${VenvDir}"
     ;;
+    
+    "--branch" )
+        EnableUnlistedBranches=1
+        UsingBranch="$2"
+        shift
+        shift
+    ;;
+    
+    "--auto" )
+        AutoInstall=1
+        shift
+    ;;
 
     * )
         exit_err "Unknown option $1"
@@ -801,7 +845,7 @@ EOF
 
 echo "We detected your OS is:  $(distro_supported)"
 
-read -rp "Would you like to continue with the installer? [Y/n]:  " iagree
+ask_input "Would you like to continue with the installer? [Y/n]:  " iagree "y"
 if [[ "${iagree,,}" != "y" && "${iagree,,}" != "yes" ]] ; then
     exit 2
 fi
@@ -816,7 +860,7 @@ if [ "$(id -u)" -eq "0" ] && [ "$INSTALL_BOT_BITS" == "1" ] ;  then
     echo "        Meaning, little or no support and you have to fix stuff manually."
     echo "        Running MuiscBot as root is not recommended. You have been warned."
     echo ""
-    read -rp "Type 'I understand' (without quotes) to continue installing:" iunderstand
+    ask_input "Type 'I understand' (without quotes) to continue installing:" iunderstand "i understand"
     if [[ "${iunderstand,,}" != "i understand" ]] ; then
         echo ""
         exit_err "Try again with --sys-only or change to a non-root user and use --no-sys and/or --no-sudo"
@@ -1070,59 +1114,10 @@ case $DISTRO_NAME in
 
     case $DISTRO_NAME in
     # Handle the versions which are EOL.
-    *"CentOS "[2-6]* |*"CentOS 8."[0-5]* )
+    *"CentOS "[2-7]* |*"CentOS 8."[0-5]* )
         echo "Unfortunately, this version of CentOS has reached End-of-Life, and will not be supported."
         echo "You should consider upgrading to the latest version to make installing MusicBot easier."
         exit 1
-        ;;
-
-    # Supported versions.
-    *"CentOS 7"*)  # Tested 7.9 @ 2024/03/28
-        # TODO:  CentOS 7 reaches EOL June 2024.
-        if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            # Enable extra repos, as required for ffmpeg
-            # We DO NOT use the -y flag here.
-            $SUDO_BIN yum install epel-release
-            $SUDO_BIN yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
-
-            # Install available packages and libraries for building python 3.8+
-            $SUDO_BIN yum -y groupinstall "Development Tools"
-            $SUDO_BIN yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
-                git curl jq ffmpeg unzip
-
-            # Ask if we should build python
-            echo "We need to build python from source for your system. It will be installed using altinstall target."
-            read -rp "Would you like to continue ? [N/y]" BuildPython
-            if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
-                # Build python.
-                PyBuildVer="3.10.14"
-                PySrcDir="Python-${PyBuildVer}"
-                PySrcFile="${PySrcDir}.tgz"
-
-                curl -o "$PySrcFile" "https://www.python.org/ftp/python/${PyBuildVer}/${PySrcFile}"
-                tar -xzf "$PySrcFile"
-                cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
-
-                ./configure --enable-optimizations
-                $SUDO_BIN make altinstall
-
-                # Ensure python bin is updated with altinstall name.
-                find_python
-                RetVal=$?
-                if [ "$RetVal" == "0" ] ; then
-                    # manually install pip package for the current user.
-                    $PyBin <(curl -s https://bootstrap.pypa.io/get-pip.py)
-                else
-                    echo "Error:  Could not find python on the PATH after installing it."
-                    exit 1
-                fi
-            fi
-        fi
-
-        if [ "$INSTALL_BOT_BITS" == "1" ] ; then
-            pull_musicbot_git
-            install_deno
-        fi
         ;;
 
     *"CentOS Stream 8"*)  # Tested 2024/03/28
