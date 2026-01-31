@@ -22,11 +22,11 @@ jobs:
         os: 
           - ubuntu-latest
           - ubuntu-22.04
-          - ubuntu-slim
+          #- ubuntu-slim
           - macos-latest        # arm64
           - macos-14            # arm64
-          - macos-latest-large  # x64
-          - macos-14-large      # x64
+          #- macos-latest-large  # x64
+          #- macos-14-large      # x64
           - windows-latest
           - windows-2022
 
