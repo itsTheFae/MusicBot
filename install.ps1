@@ -27,7 +27,7 @@ function AskInput {
     $prompt = $args[0]
     $defval = $args[1]
     if ($auto) {
-        Write-Host "$prompt: $defval"
+        Write-Host "${prompt}: $defval"
         return $defval
     }
     $userInput = Read-Host "$prompt"
