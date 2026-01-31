@@ -1,0 +1,37 @@
+name: Test Installers
+
+on: 
+  push:
+    branches:
+      - test-auto-install
+  pull_request:
+    branches:
+      - test-auto-install
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: 
+          - ubuntu-latest
+          - ubuntu-22.04
+          - ubuntu-slim
+          - macos-latest        # arm64
+          - macos-14            # arm64
+          - macos-latest-large  # x64
+          - macos-14-large      # x64
+          - windows-latest
+          - windows-2022
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run install script
+        run: |
+          if [[ "${{ matrix.os }}" == *"windows"* ]]; then
+            call install.bat -auto
+          else
+            bash install.sh --auto
+          fi
