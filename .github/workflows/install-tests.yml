@@ -52,5 +52,5 @@ jobs:
           if [[ "${{ matrix.os }}" == *"windows"* ]]; then
             ./install.bat -auto
           else
-            ./install.sh --auto
+            ./install.sh --auto --branch ${GITHUB_REF#dev}
           fi
