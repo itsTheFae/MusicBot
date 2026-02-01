@@ -34,6 +34,14 @@ function AskInput {
     return $userInput
 }
 
+function ErrorExit {
+    $message = if ($args.Count -ge 1) { $args[0] } else { "Error. Install halted." }
+    $exitCodeRaw = if ($args.Count -ge 2) { $args[1] } else { 1 }
+
+    Write-Host $message
+    exit $exitCode
+}
+
 function wgInstall {
     $command = "winget install $args"
     if ($auto) {
@@ -70,6 +78,8 @@ if($iagree -ne "Y" -and $iagree -ne "y")
     Return
 }
 
+# ensure $auto implies any
+
 # First, unhide file extensions...
 $FERegPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
 $HideExt = (Get-ItemProperty -Path $FERegPath -Name "HideFileExt").HideFileExt
@@ -95,11 +105,12 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
     $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri "https://aka.ms/getwinget" -OutFile "winget.msixbundle"
     $ProgressPreference = 'Continue'
-    Add-AppxPackage "winget.msixbundle"
+    #Add-AppxPackage "winget.msixbundle"
+    Start-Process "winget.msixbundle"
 
     # check if winget is available post-install.
     if (-Not (Get-Command winget -ErrorAction SilentlyContinue) ) {
-        "WinGet is not available.  Installer cannot continue."
+        ErrorExit "WinGet is not available.  Installer cannot continue."
         Return
     }
 }
