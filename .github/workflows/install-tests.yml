@@ -32,23 +32,20 @@ jobs:
           - windows-2022
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
+      - name:
+        shell: bash
+        run: |
+          Branch="${GITHUB_REF#refs/heads/}"
+          if [[ "${{ matrix.os }}" == *"windows"* ]]; then
+            curl "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${Branch}/install.bat" -o install.bat
+            curl "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${Branch}/install.ps1" -o install.ps1
+          else
+            curl "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${Branch}/install.sh" -o install.sh
+            chmod +x ./install.sh
+          fi
       - name: Run install script
         shell: bash
         run: |
-          # Make a temp directory to run install in.
-          mkdir -p /tmp/install
-          pwd
-          echo "$GITHUB_WORKSPACE"
-          ls -lah
-          cp -a "${GITHUB_WORKSPACE}/" /tmp/install/
-          cd /tmp/install/MusicBot
-          pwd
-          ls -lah
-
-          # Run the install script.
           if [[ "${{ matrix.os }}" == *"windows"* ]]; then
             ./install.bat -auto
           else
