@@ -43,7 +43,7 @@ jobs:
           pwd
           echo "$GITHUB_WORKSPACE"
           ls -lah
-          cp -a "${GITHUB_WORKSPACE}" /tmp/install/
+          cp -a "${GITHUB_WORKSPACE}/" /tmp/install/
           cd /tmp/install
           pwd
           ls -lah
