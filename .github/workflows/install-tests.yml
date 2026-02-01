@@ -44,7 +44,7 @@ jobs:
           echo "$GITHUB_WORKSPACE"
           ls -lah
           cp -a "${GITHUB_WORKSPACE}/" /tmp/install/
-          cd /tmp/install
+          cd /tmp/install/MusicBot
           pwd
           ls -lah
 
