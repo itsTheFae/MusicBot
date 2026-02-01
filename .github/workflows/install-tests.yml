@@ -21,6 +21,7 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
+          - ubuntu-slim
           - ubuntu-22.04
           #- ubuntu-slim
           - macos-latest        # arm64
