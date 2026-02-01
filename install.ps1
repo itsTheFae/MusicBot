@@ -95,11 +95,7 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
     $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri "https://aka.ms/getwinget" -OutFile "winget.msixbundle"
     $ProgressPreference = 'Continue'
-    if ($auto) {
-        Add-AppxPackage "winget.msixbundle" -Force
-    } else {
-        Add-AppxPackage "winget.msixbundle"
-    }
+    Add-AppxPackage "winget.msixbundle"
 
     # check if winget is available post-install.
     if (-Not (Get-Command winget -ErrorAction SilentlyContinue) ) {
