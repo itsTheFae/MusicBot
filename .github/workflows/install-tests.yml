@@ -35,9 +35,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install Node 24 on Ubuntu 24.04
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-slim'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          check-latest: true
+
       - name: Run install script
         shell: bash
         run: |
+          mkdir -p /tmp/install/
+          
           if [[ "${{ matrix.os }}" == *"windows"* ]]; then
             ./install.bat -auto
           else
