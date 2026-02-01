@@ -40,8 +40,13 @@ jobs:
         run: |
           # Make a temp directory to run install in.
           mkdir -p /tmp/install
+          pwd
+          echo "$GITHUB_WORKSPACE"
+          ls -lah
           cp -a "${GITHUB_WORKSPACE}" /tmp/install/
           cd /tmp/install
+          pwd
+          ls -lah
 
           # Run the install script.
           if [[ "${{ matrix.os }}" == *"windows"* ]]; then
