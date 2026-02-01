@@ -110,10 +110,11 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
     # if the above fails, fall back to the more manual way...
     if (-Not (Get-Command winget -ErrorAction SilentlyContinue) ) {
         "... Trying a more manual install for winget..."
-        Start-BitsTransfer -Source "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -Destination "WinGet.msixbundle"
-        Start-BitsTransfer -Source "https://github.com/microsoft/winget-cli/releases/latest/download/DesktopAppInstaller_Dependencies.zip" -Destination "DesktopAppInstaller_Dependencies.zip"
-        Start-BitsTransfer -Source "https://github.com/microsoft/winget-cli/releases/latest/download/e53e159d00e04f729cc2180cffd1c02e_License1.xml" -Destination "license.xml"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile "WinGet.msixbundle"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/latest/download/DesktopAppInstaller_Dependencies.zip" -OutFile "DesktopAppInstaller_Dependencies.zip"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/latest/download/e53e159d00e04f729cc2180cffd1c02e_License1.xml" -OutFile "license.xml"
         Expand-Archive -Path "DesktopAppInstaller_Dependencies.zip"
+        dir
         Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.UI.Xaml*x64.appx"
         Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.VCLibs*x64.appx"
         Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.WindowsAppRuntime*x64.appx"
@@ -121,6 +122,7 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
         Get-AppPackage *Microsoft.DesktopAppInstaller*|select Name,PackageFullName
         winget --info
         Remove-Item -Path "WinGet.msixbundle", "DesktopAppInstaller_Dependencies.zip", "DesktopAppInstaller_Dependencies", "license.xml" -Recurse -Force
+        dir
     }
 
     # check if winget is available post-install.
