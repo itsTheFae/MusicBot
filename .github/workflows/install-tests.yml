@@ -50,7 +50,7 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == *"windows"* ]]; then
-            ./install.bat -auto
+            ./install.bat -auto -anybranch -branch ${GITHUB_REF#refs/heads/}
           else
             ./install.sh --auto --branch ${GITHUB_REF#refs/heads/}
           fi
