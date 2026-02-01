@@ -1,0 +1,56 @@
+name: Test Installers
+
+on: 
+  push:
+    branches:
+      - test-auto-install
+  pull_request:
+    branches:
+      - test-auto-install
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        os: 
+          - ubuntu-latest
+          - ubuntu-slim
+          - ubuntu-22.04
+          #- ubuntu-slim
+          - macos-latest        # arm64
+          - macos-14            # arm64
+          #- macos-latest-large  # x64
+          #- macos-14-large      # x64
+          - windows-latest
+          - windows-2022
+
+    steps:
+      - name: Download Installer Script
+        shell: bash
+        run: |
+          Branch="${GITHUB_REF#refs/heads/}"
+          DL_Base="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${Branch}/"
+          echo "Download Base:  $DL_Base"
+
+          if [[ "${{ matrix.os }}" == *"windows"* ]]; then
+            curl "${DL_Base}install.bat" -o install.bat
+            curl "${DL_Base}install.ps1" -o install.ps1
+          else
+            curl "${DL_Base}install.sh" -o install.sh
+            chmod +x ./install.sh
+          fi
+      - name: Run Installer Script
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == *"windows"* ]]; then
+            ./install.bat -auto -anybranch -branch ${GITHUB_REF#refs/heads/}
+          else
+            ./install.sh --auto --branch ${GITHUB_REF#refs/heads/}
+          fi

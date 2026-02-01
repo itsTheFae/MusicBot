@@ -13,11 +13,44 @@
 # --------------------------------------------------CLI Parameters-----------------------------------------------------
 param (
     # -anybranch  Enables the use of any named branch, if it exists on repo.
-    [switch]$anybranch = $false
+    [switch]$anybranch = $false,
+    [switch]$auto = $false,
+    [string]$branch = ""
 )
 # Where to put MusicBot by default.  Updated by repo detection.
 # prolly should be param, but someone who cares about windows can code for it.
 $Install_Dir = (pwd).Path + '\MusicBot\'
+
+# --------------------------------------------------Functions----------------------------------------------------------
+
+function AskInput {
+    $prompt = $args[0]
+    $defval = $args[1]
+    if ($auto) {
+        Write-Host "${prompt}: $defval"
+        return $defval
+    }
+    $userInput = Read-Host "$prompt"
+    return $userInput
+}
+
+function ErrorExit {
+    $message = if ($args.Count -ge 1) { $args[0] } else { "Error. Install halted." }
+    $exitCodeRaw = if ($args.Count -ge 2) { $args[1] } else { 1 }
+
+    Write-Host $message
+    exit $exitCode
+}
+
+function wgInstall {
+    $command = "winget install $args"
+    if ($auto) {
+        $command += " --silent"
+    }
+    Write-Host "Running:  $command"
+    Invoke-Expression $command
+}
+
 
 # ---------------------------------------------Install notice and prompt-----------------------------------------------
 "MusicBot Installer"
@@ -38,12 +71,14 @@ $Install_Dir = (pwd).Path + '\MusicBot\'
 "    https://discord.gg/bots"
 ""
 
-$iagree = Read-Host "Would you like to continue with the install? [y/n]"
+$iagree = AskInput "Would you like to continue with the install? [Y/n]" "y"
 if($iagree -ne "Y" -and $iagree -ne "y")
 {
     # exit early if the user does not want to continue.
     Return
 }
+
+# ensure $auto implies any
 
 # First, unhide file extensions...
 $FERegPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
@@ -70,18 +105,33 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
     $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri "https://aka.ms/getwinget" -OutFile "winget.msixbundle"
     $ProgressPreference = 'Continue'
-    Start-Process "winget.msixbundle"
-    
-    # wait for user to finish installing winget...
-    $ready = Read-Host "Is WinGet installed and ready to continue? [y/n]"
-    if ($ready -ne "Y" -and $ready -ne "y") {
-        # exit if not ready.
-        Return
+    Add-AppxPackage "winget.msixbundle"
+
+    # if the above fails, fall back to the more manual way...
+    if (-Not (Get-Command winget -ErrorAction SilentlyContinue) ) {
+        "... Trying a more manual install for winget..."
+        "Downloading winget & dependencies..."
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile "WinGet.msixbundle"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/latest/download/DesktopAppInstaller_Dependencies.zip" -OutFile "DesktopAppInstaller_Dependencies.zip"
+        Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/latest/download/e53e159d00e04f729cc2180cffd1c02e_License1.xml" -OutFile "license.xml"
+        "Unpacking dependencies..."
+        Expand-Archive -Path "DesktopAppInstaller_Dependencies.zip"
+        "Installing dependencies..."
+        " - Installing UI Xaml ..."
+        Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.UI.Xaml*x64.appx"
+        " - Installing VC Libs ..."
+        Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.VCLibs*x64.appx"
+        " - Installing Windows App Runtime ..."
+        Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.WindowsAppRuntime*x64.appx"
+        "Installing winget..."
+        Add-AppxProvisionedPackage -Online -PackagePath "WinGet.msixbundle" -LicensePath "license.xml"
+        Get-AppPackage *Microsoft.DesktopAppInstaller*|select Name,PackageFullName
+        Remove-Item -Path "WinGet.msixbundle", "DesktopAppInstaller_Dependencies.zip", "DesktopAppInstaller_Dependencies", "license.xml" -Recurse -Force
     }
-    
+
     # check if winget is available post-install.
     if (-Not (Get-Command winget -ErrorAction SilentlyContinue) ) {
-        "WinGet is not available.  Installer cannot continue."
+        ErrorExit "WinGet is not available.  Installer cannot continue."
         Return
     }
 }
@@ -119,7 +169,7 @@ if (!($LastExitCode -eq 0))
 {
     # install git
     "Installing git..."
-    Invoke-Expression "winget install Git.Git"
+    wgInstall "Git.Git"
     $NeedsEnvReload = 1
     "Done."
 }
@@ -136,7 +186,7 @@ if (!($LastExitCode -eq 0))
 {
     # install python version 3.11 with the py.exe launcher.
     "Installing python..."
-    Invoke-Expression "winget install Python.Python.3.11 --custom \`"/passive Include_launcher=1\`""
+    wgInstall "Python.Python.3.11 --custom \`"/passive Include_launcher=1\`""
     $NeedsEnvReload = 1
     "Done."
 }
@@ -153,7 +203,7 @@ if (!($LastExitCode -eq 0))
 {
     # install FFmpeg
     "Installing FFmpeg..."
-    Invoke-Expression "winget install ffmpeg"
+    wgInstall "ffmpeg"
     $NeedsEnvReload = 1
     "Done."
 }
@@ -170,7 +220,7 @@ if (!($LastExitCode -eq 0))
 {
     # install deno js runtime
     "Installing deno..."
-    Invoke-Expression "winget install --id=DenoLand.Deno"
+    wgInstall "--id=DenoLand.Deno"
     $NeedsEnvReload = 1
     "Done."
 }
@@ -208,7 +258,7 @@ if((Test-Path $MB_Reqs_File) -and (Test-Path $MB_Module_Dir) -and (Test-Path $MB
     "   *     - WARNING: Any branch name is allowed, if it exists on github."
     }
     ""
-    $experimental = Read-Host "Enter the branch name you want to install"
+    $experimental = AskInput "Enter the branch name you want to install" "$branch"
     $experimental = $experimental.Trim()
     switch($experimental) {
         "dev" {
@@ -270,7 +320,7 @@ Invoke-Expression "$PYTHON -m pip install --upgrade -r requirements.txt"
 "This installer provides an automated, but minimal, guided configuration."
 "It will ask you to enter a bot token."
 ""
-$iagree = Read-Host "Would you like to continue with configuration? [y/n]"
+$iagree = AskInput "Would you like to continue with configuration? [y/N]" "n"
 if($iagree -ne "Y" -and $iagree -ne "y")
 {
     "All done!"
