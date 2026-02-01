@@ -40,7 +40,7 @@ jobs:
         run: |
           # Make a temp directory to run install in.
           mkdir -p /tmp/install
-          cp -a "${GITHUB_WORKSPACE}/MusicBot/MusicBot"/ /tmp/install/
+          cp -a "${GITHUB_WORKSPACE}" /tmp/install/
           cd /tmp/install
 
           # Run the install script.
