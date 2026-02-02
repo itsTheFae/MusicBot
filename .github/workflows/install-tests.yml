@@ -3,10 +3,10 @@ name: Test Installers
 on: 
   push:
     branches:
-      - test-auto-install
+      - fae
   pull_request:
     branches:
-      - test-auto-install
+      - fae
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
