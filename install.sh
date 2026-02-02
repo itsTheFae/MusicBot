@@ -784,8 +784,7 @@ while [[ $# -gt 0 ]]; do
         shift
     ;;
 
-    --any-branch )
-    --anybranch )
+    --any-branch | --anybranch )
         UNLISTED_BRANCHES="1"
         shift
     ;;
