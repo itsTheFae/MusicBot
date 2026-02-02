@@ -213,8 +213,23 @@ TESTRIG_TEST_CASES: List[CmdTest] = [
     # Play adjustable media before testing speed
     CmdTest("playnow", ["https://www.youtube.com/watch?v=bm48ncbhU10"]),
     CmdTest("speed", ["", "1", "1.", "1.1", "six", "-0.3", "40"]),
+    # Play playlist for testing multi-entry command forms.
+    CmdTest("clear", [""]),
+    CmdTest("skip", [""]),
+    CmdTest(
+        "play", ["https://youtu.be/E3xbLcTj_bs?list=PLTxsp5i8fQO51pAymuKRfkmL4GnPRa6iC"]
+    ),
     CmdTest("move", ["", "2 4", "-1 -2", "x y"]),
-    CmdTest("remove", ["", "5", "a"]),
+    CmdTest(  # remove
+        "remove",
+        [
+            "",
+            "5",
+            "a",
+            "@TestUser",
+            "2 6",
+        ],
+    ),
     CmdTest("skip", [""]),
     CmdTest("pause", [""]),
     CmdTest("resume", [""]),

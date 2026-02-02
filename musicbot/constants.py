@@ -5,7 +5,7 @@ from typing import List
 # This fails if not cloned, or if git is not available for some reason.
 # VERSION should never be empty though.
 # Note this code is duplicated in update.py for stand-alone use.
-VERSION: str = ""
+VERSION: str = ""  # pylint: disable=invalid-name
 try:
     # Get the last release tag, number of commits since, and g{commit_id} as string.
     _VERSION_DESC = (
@@ -20,7 +20,7 @@ try:
         .strip()
     )
     # Check if any tracked files are modified for -modded version flag.
-    _VERSION_MOD = (
+    _VERSION_MOD = (  # pylint: disable=invalid-name
         subprocess.check_output(
             ["git", "-c", "core.fileMode=false", "status", "-suno", "--porcelain"]
         )
@@ -28,15 +28,15 @@ try:
         .strip()
     )
     if _VERSION_MOD:
-        _VERSION_MOD = "-modded"
+        _VERSION_MOD = "-modded"  # pylint: disable=invalid-name
     else:
-        _VERSION_MOD = ""
+        _VERSION_MOD = ""  # pylint: disable=invalid-name
 
-    VERSION = f"{_VERSION_DESC}-{_VERSION_BRANCH}{_VERSION_MOD}"
+    VERSION = f"{_VERSION_DESC}-{_VERSION_BRANCH}{_VERSION_MOD}"  # pylint: disable=invalid-name
 
 except (subprocess.SubprocessError, OSError, ValueError) as e:
     print(f"Failed setting version constant, reason:  {str(e)}")
-    VERSION = "version_unknown"
+    VERSION = "version_unknown"  # pylint: disable=invalid-name
 
 # constant string exempt from i18n
 DEFAULT_FOOTER_TEXT: str = f"Just-Some-Bots/MusicBot ({VERSION})"

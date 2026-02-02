@@ -3,7 +3,7 @@
 ~*/
 .vscode/
 *.service
-*.coverage
+.coverage*
 
 audio_cache/
 dectalk/

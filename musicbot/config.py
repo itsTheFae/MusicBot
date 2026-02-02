@@ -2091,12 +2091,14 @@ class ConfigOptionRegistry:
 
         return str(conf_value)
 
-    def export_markdown(self) -> str:
+    def export_markdown(self, only_section: str = "") -> str:
         """
         Transform registered config / permissions options into "markdown".
         This is intended to generate documentation from the code for publishing to pages.
         Currently will print options in order they are registered.
         But prints sections in the order ConfigParser loads them.
+
+        :param: only_section:   Only prints the given section, if it exists.
         """
         basedir = get_write_base()
         if not basedir:
@@ -2135,6 +2137,8 @@ class ConfigOptionRegistry:
         markdown = ""
         for sect in self._parser.sections():
             if sect not in md_sections:
+                continue
+            if only_section and only_section != sect:
                 continue
             opts = md_sections[sect]
             markdown += f"#### [{sect}]\n\n{''.join(opts)}\n\n"

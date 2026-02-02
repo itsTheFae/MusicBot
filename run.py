@@ -353,7 +353,7 @@ def sanity_checks(args: argparse.Namespace) -> None:
     """
     log.info("Starting sanity checks")
     """Required Checks"""
-    # Make sure we're on Python 3.9+
+    # Make sure we're on Python 3.10+
     req_ensure_py3()
 
     # Make sure we're in a writable env
@@ -385,13 +385,13 @@ def req_ensure_py3() -> None:
     Verify the current running version of Python and attempt to find a
     suitable minimum version in the system if the running version is too old.
     """
-    log.info("Checking for Python 3.9+")
+    log.info("Checking for Python 3.10+")
 
-    if sys.version_info < (3, 9):
+    if sys.version_info < (3, 10):
         log.warning(
-            "Python 3.9+ is required. This version is %s", sys.version.split()[0]
+            "Python 3.10+ is required. This version is %s", sys.version.split()[0]
         )
-        log.warning("Attempting to locate Python 3.9...")
+        log.warning("Attempting to locate Python 3.10...")
         # Should we look for other versions than min-ver?
 
         pycom = None
@@ -402,15 +402,15 @@ def req_ensure_py3() -> None:
                 log.warning("Could not locate py.exe")
 
             try:
-                subprocess.check_output([pycom, "-3.9", '-c "exit()"'])
-                pycom = f"{pycom} -3.9"
+                subprocess.check_output([pycom, "-3.10", '-c "exit()"'])
+                pycom = f"{pycom} -3.10"
             except (
                 OSError,
                 PermissionError,
                 FileNotFoundError,
                 subprocess.CalledProcessError,
             ):
-                log.warning("Could not execute `py.exe -3.9` ")
+                log.warning("Could not execute `py.exe -3.10` ")
                 pycom = None
 
             if pycom:
@@ -419,29 +419,29 @@ def req_ensure_py3() -> None:
                 sys.exit(0)
 
         else:
-            log.info('Trying "python3.9"')
-            pycom = shutil.which("python3.9")
+            log.info('Trying "python3.10"')
+            pycom = shutil.which("python3.10")
             if not pycom:
-                log.warning("Could not locate python3.9 on path.")
-
-            try:
-                subprocess.check_output([pycom, '-c "exit()"'])
-            except (
-                OSError,
-                PermissionError,
-                FileNotFoundError,
-                subprocess.CalledProcessError,
-            ):
-                pycom = None
+                log.warning("Could not locate python3.10 on path.")
+            else:
+                try:
+                    subprocess.check_output([pycom, '-c "exit()"'])
+                except (
+                    OSError,
+                    PermissionError,
+                    FileNotFoundError,
+                    subprocess.CalledProcessError,
+                ):
+                    pycom = None
 
             if pycom:
                 log.info(
-                    "\nPython 3.9 found.  Re-launching bot using: %s run.py\n", pycom
+                    "\nPython 3.10 found.  Re-launching bot using: %s run.py\n", pycom
                 )
                 os.execlp(pycom, pycom, "run.py")
 
         log.critical(
-            "Could not find Python 3.9 or higher.  Please run the bot using Python version 3.9 to 3.13"
+            "Could not find Python 3.10 or higher.  Please run the bot using Python version 3.10 to 3.13"
         )
         bugger_off()
 
@@ -570,6 +570,42 @@ def req_ensure_env() -> None:
                 "Check for ffmpeg with your system package manager or build from sources."
             )
         bugger_off()
+
+    # Ensure we have the stuff needed to run js in yt-dlp.
+    # First we check for the yt-dlp-ejs package.
+    if not importlib.util.find_spec("yt_dlp_ejs"):
+        # Note: consider this check/warning as transitional code, could be removed later.
+        log.warning(
+            "YouTube support may not work!\n"
+            "MusicBot could not find the yt-dlp EJS package.\n"
+            "Update your pip packages, and make sure 'yt-dlp[default]' is in your requirements.txt"
+        )
+
+    # Next we look for node or deno, as one is needed for EJS to work.
+    # deno is supported and enabled by default, so we'll do checks for it first.
+    deno_bin = shutil.which("deno")
+    # Since deno may be installed in user-space, it may not be in common env paths.
+    # An issue for SystemD (maybe others) which don't load user config files.
+    # Fall back to looking in user space path if it isn't found right away.
+    if not deno_bin:
+        deno_common_path = pathlib.Path.home().joinpath(".deno").joinpath("bin")
+        log.debug("Adding environment PATH fallback for deno as: %s ", deno_common_path)
+        path_char = ":"  # used to separate paths in the environment PATH var.
+        if sys.platform.startswith("win"):
+            path_char = ";"
+        os.environ["PATH"] += path_char + os.path.abspath(deno_common_path)
+        # now try again to get deno bin.
+        deno_bin = shutil.which("deno")
+
+    node_bin = shutil.which("node")
+    if not deno_bin and not node_bin:
+        log.warning(
+            "YouTube support may not work!\n"
+            "MusicBot could not find deno or node executables in your environment.\n"
+            "Install deno from:  https://github.com/denoland/deno/\n"
+            " -OR-\n"
+            "Install node (version 25 or newer) via your package manager.\n"
+        )
 
 
 def opt_check_disk_space(warnlimit_mb: int = 200) -> None:
@@ -837,6 +873,13 @@ def parse_cli_args() -> argparse.Namespace:
         help="Update or create example config files and then exit. Useful if code is changed or examples are out-of-date for some reason.",
     )
 
+    ap.add_argument(
+        "--mk-docs",
+        dest="make_docs",
+        action="store_true",
+        help="Update documentation files used in the github pages. Useful if config or command help are changed / extended.",
+    )
+
     args = ap.parse_args()
 
     # Show version and exit.
@@ -973,6 +1016,69 @@ def set_console_title() -> None:
         pass
 
 
+async def mk_docs(m) -> None:  # type: ignore[no-untyped-def]
+    """
+    This function is used for automation of MusicBot documentation.
+    It creates github-flavored markdown documents which can update github pages.
+    """
+    file_config = "export_config.md"
+    file_perms = "export_perms.md"
+    file_cmd = "export_cmd.md"
+
+    # Show/Hide markup template.
+    show_hide_html = '<p><a class="expand-all-details">Show/Hide All</a></p>'
+
+    # Make config docs
+    config_md = m.config.register.export_markdown()
+    config_md += f"---\n\n{show_hide_html}\n\n"
+
+    with open(file_config, "w", encoding="utf8") as fh:
+        fh.write(config_md)
+        log.info("Saved config docs.")
+
+    # Make perms docs, using only default section.
+    perms_md = m.permissions.register.export_markdown(only_section="Default")
+    perms_md = perms_md.replace(
+        "#### [Default]",
+        f"### Available Permission Options  \n\n{show_hide_html}",
+    )
+    perms_md += f"---\n\n{show_hide_html}\n\n"
+
+    with open(file_perms, "w", encoding="utf8") as fh:
+        fh.write(perms_md)
+        log.info("Saved permissions docs.")
+
+    # Make commands docs.
+    cmd_md = f"### General Commands  \n\n{show_hide_html}\n\n"
+    admin_commands = []
+    dev_commands = []
+    for att in dir(m):
+        if att.startswith("cmd_"):
+            cmd = getattr(m, att, None)
+            doc = await m.gen_cmd_help(att.replace("cmd_", ""), None, for_md=True)
+            command_name = att.replace("cmd_", "").lower()
+            cmd_a = hasattr(cmd, "admin_only")
+            cmd_d = hasattr(cmd, "dev_cmd")
+            command_text = (
+                f"<details>\n  <summary>{command_name}</summary>\n{doc}\n</details>\n\n"
+            )
+            if cmd_d:
+                dev_commands.append(command_text)
+                continue
+            if cmd_a:
+                admin_commands.append(command_text)
+                continue
+            cmd_md += command_text
+    cmd_md += f"### Owner Commands  \n\n{''.join(admin_commands)}"
+    cmd_md += f"### Dev Commands  \n\n{''.join(dev_commands)}"
+    cmd_md += f"---\n\n{show_hide_html}\n\n"
+
+    with open(file_cmd, "w", encoding="utf8") as fh:
+        fh.write(cmd_md)
+        log.info("Saved command docs.")
+    log.info("Export complete.")
+
+
 def main() -> None:
     """
     All of the MusicBot starts here.
@@ -1056,6 +1162,11 @@ def main() -> None:
                 m.permissions.register.write_default_ini(write_path(EXAMPLE_PERMS_FILE))
                 raise TerminateSignal()
 
+            if cli_args.make_docs:
+                log.info("Updating documentation files...")
+                event_loop.run_until_complete(mk_docs(m))
+                raise TerminateSignal()
+
             # register system signal handlers with the event loop.
             if not getattr(event_loop, "_sig_handler_set", False):
                 setup_signal_handlers(event_loop, m.on_os_signal)
@@ -1113,6 +1224,7 @@ def main() -> None:
 
         except (AttributeError, ImportError, ModuleNotFoundError) as e:
             # In case a discord extension is installed but discord.py isn't.
+            log.warning("Processing Error Data:  %s", e)
             if isinstance(e, AttributeError):
                 if "module 'discord'" not in str(e):
                     raise
@@ -1194,10 +1306,6 @@ def main() -> None:
                 retries += 1
                 break
 
-            log.error(
-                "MusicBot got an ImportError after trying to install packages. MusicBot must exit..."
-            )
-            log.exception("The exception which caused the above error: ")
             retries = 0
             exit_signal = TerminateSignal(exit_code=1)
             break

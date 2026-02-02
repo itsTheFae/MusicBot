@@ -29,7 +29,7 @@ if [ -f "../bin/activate" ] ; then
 fi
 
 # Suported versions of python using only major.minor format
-PySupported=("3.13" "3.12" "3.11" "3.10" "3.9")
+PySupported=("3.13" "3.12" "3.11" "3.10")
 
 # compile a list of bin names to try for.
 PyBins=("python3")  # We hope that python3 maps to a good version.
@@ -63,8 +63,8 @@ for PyBin in "${PyBins[@]}" ; do
 
     # Major version must be 3+
     if [[ $PY_VER_MAJOR -ge 3 ]]; then
-        # if 3.9+ it should work.
-        if [[ $PY_VER_MINOR -ge 9 ]]; then
+        # if 3.10+ it should work.
+        if [[ $PY_VER_MINOR -ge 10 ]]; then
             VerGood=1
             Python_Bin="$PyBin"
             break
@@ -74,7 +74,7 @@ done
 
 # if we don't have a good version for python, bail.
 if [[ "$VerGood" == "0" ]]; then
-    echo "Python 3.9 or higher is required to run MusicBot."
+    echo "Python 3.10 or higher is required to run MusicBot."
     do_exit 1
 fi
 

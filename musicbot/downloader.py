@@ -101,7 +101,6 @@ def _ytdlp_bug_msg(*_args: Any, **_kwargs: Any) -> str:
 
 youtube_dl.utils.bug_reports_message = _ytdlp_bug_msg
 
-
 """
     Alright, here's the problem.  To catch youtube-dl errors for their useful information, I have to
     catch the exceptions with `ignoreerrors` off.  To not break when ytdl hits a dumb video
@@ -144,6 +143,20 @@ class Downloader:
         # Copy immutable dict and use the mutable copy for everything else.
         ytdl_format_options = ytdl_format_options_immutable.copy()
         ytdl_format_options["http_headers"] = self.http_req_headers
+
+        # Since yt-dlp version 2025.11.12, EJS and a js runtime are needed.
+        # This should enable nodejs as a fallback to deno, if available.
+        # Value is a dict of: {'runtime': {'path': '/opt/path/config'}, ...}
+        ytdl_format_options["js_runtimes"] = {
+            "deno": {},
+            "node": {},
+        }
+
+        # add concurrent-fragments option if it is needed.
+        if bot.config.ytdlp_concurrent_frags > 1:
+            ytdl_format_options["concurrent_fragment_downloads"] = (
+                bot.config.ytdlp_concurrent_frags
+            )
 
         # apply source address settings.
         if bot.config.ytdlp_source_address != "*":
