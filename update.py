@@ -11,7 +11,7 @@ import zipfile
 from typing import Any, List, Optional, Tuple
 from urllib.request import urlopen
 
-g_do_dry_run = False
+G_DO_DRY_RUN = False
 
 
 def yes_or_no_input(question: str, answer: str = "") -> bool:
@@ -42,8 +42,8 @@ def run_or_raise_error(cmd: List[str], message: str, **kws: Any) -> None:
     :kwparam: ok_codes:  A list of non-zero exit codes to consider OK.
     :raises: RuntimeError  with given `message` as exception text.
     """
-    # global g_do_dry_run
-    if g_do_dry_run:
+    # global G_DO_DRY_RUN
+    if G_DO_DRY_RUN:
         print(f"[DRY RUN]:  {' '.join(cmd)}")
         return
 
@@ -224,15 +224,15 @@ def update_deno(cli_args: argparse.Namespace) -> None:
     deno_bin = shutil.which("deno")
     deno_common_path = pathlib.Path.home().joinpath(".deno").joinpath("bin")
     if not deno_bin:
-        path_char = ":"  # used to separate paths in the environment PATH var.
+        path_char = ":"  # separates paths in PATH var.
         if sys.platform.startswith("win"):
             path_char = ";"
         os.environ["PATH"] += path_char + os.path.abspath(deno_common_path)
         deno_bin = shutil.which("deno")
 
-    # cover node as well.
+    # look for node as well.
     node_bin = shutil.which("node")
-    # if no JS runtime is installed, ask to install deno.
+    # if no JS runtime is installed, try to install deno.
     if not deno_bin and not node_bin:
         print("\n")
         print(
@@ -545,8 +545,8 @@ def parse_cli_args() -> argparse.Namespace:
     ap.add_argument(
         "-V",
         "--version",
-        dest="show_version",
         action="store_true",
+        dest="show_version",
         help="Print the MusicBot version information and exit.",
     )
 
@@ -691,8 +691,8 @@ def parse_cli_args() -> argparse.Namespace:
         sys.exit(0)
 
     if args.is_dry:
-        global g_do_dry_run  # pylint: disable=global-statement
-        g_do_dry_run = True
+        global G_DO_DRY_RUN  # pylint: disable=global-statement
+        G_DO_DRY_RUN = True
 
     if args.all_no and args.all_yes:
         print("Error:  cannot use --all-no and --all-yes at the same time.")

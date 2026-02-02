@@ -31,8 +31,7 @@ except ImportError:
         return msg
 
 
-__doc__ = _(
-    """pygettext -- Python equivalent of xgettext(1)
+__doc__ = _("""pygettext -- Python equivalent of xgettext(1)
 
 Many systems (Solaris, Linux, Gnu) provide extensive tools that ease the
 internationalization of C programs. Most of these tools are independent of
@@ -165,8 +164,7 @@ Options:
         conjunction with the -D option above.
 
 If `inputfile' is -, standard input is read.
-"""
-)
+""")
 
 import ast
 import getopt
@@ -190,8 +188,7 @@ EMPTYSTRING = ""
 
 # The normal pot-file header. msgmerge and Emacs's po-mode work better if it's
 # there.
-pot_header = _(
-    """\
+pot_header = _("""\
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the %(package_name)s package.
@@ -212,8 +209,7 @@ msgstr ""
 "Content-Transfer-Encoding: %(encoding)s\\n"
 "X-Generated-By: pygettext.py %(version)s-mb01\\n"
 
-"""
-)
+""")
 # Matches literal escape sequences so they can be preserved.
 pre_escape = re.compile(r"(?<!\\)(\\[NUu](?:[a-fA-F0-9]+|\{[^\}]+\}))")
 

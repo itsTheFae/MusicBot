@@ -3,7 +3,7 @@ import pathlib
 import sys
 from typing import Any, Dict, NoReturn, Union
 
-BASE_WRITE_PATH: str = ""  # pylint: disable=invalid-name
+BASE_WRITE_PATH: str = ""
 
 
 def parse_write_base_arg() -> None:

@@ -423,16 +423,16 @@ def req_ensure_py3() -> None:
             pycom = shutil.which("python3.10")
             if not pycom:
                 log.warning("Could not locate python3.10 on path.")
-
-            try:
-                subprocess.check_output([pycom, '-c "exit()"'])
-            except (
-                OSError,
-                PermissionError,
-                FileNotFoundError,
-                subprocess.CalledProcessError,
-            ):
-                pycom = None
+            else:
+                try:
+                    subprocess.check_output([pycom, '-c "exit()"'])
+                except (
+                    OSError,
+                    PermissionError,
+                    FileNotFoundError,
+                    subprocess.CalledProcessError,
+                ):
+                    pycom = None
 
             if pycom:
                 log.info(

@@ -33,19 +33,17 @@ try:
     # import colorama  # type: ignore[import-untyped]
     colorama.just_fix_windows_console()
 
-    C_RED = colorama.Fore.RED  # pylint: disable=invalid-name
-    C_GREEN = colorama.Fore.GREEN  # pylint: disable=invalid-name
-    C_YELLOW = colorama.Fore.YELLOW  # pylint: disable=invalid-name
-    C_BWHITE = (  # pylint: disable=invalid-name
-        f"{colorama.Style.BRIGHT}{colorama.Fore.WHITE}"
-    )
-    C_END = colorama.Style.RESET_ALL  # pylint: disable=invalid-name
+    C_RED = colorama.Fore.RED
+    C_GREEN = colorama.Fore.GREEN
+    C_YELLOW = colorama.Fore.YELLOW
+    C_BWHITE = f"{colorama.Style.BRIGHT}{colorama.Fore.WHITE}"
+    C_END = colorama.Style.RESET_ALL
 except Exception:  # pylint: disable=broad-exception-caught
-    C_RED = ""  # pylint: disable=invalid-name
-    C_GREEN = ""  # pylint: disable=invalid-name
-    C_YELLOW = ""  # pylint: disable=invalid-name
-    C_BWHITE = ""  # pylint: disable=invalid-name
-    C_END = ""  # pylint: disable=invalid-name
+    C_RED = ""
+    C_GREEN = ""
+    C_YELLOW = ""
+    C_BWHITE = ""
+    C_END = ""
 
 
 class LangTool:
