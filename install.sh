@@ -26,13 +26,6 @@ VenvDir="MusicBotVenv"
 InstallDir=""
 ServiceName="musicbot"
 
-EnableUnlistedBranches=0
-DEBUG=0
-# Storage for --branch [name] CLI flag, bypasses branch prompt.
-UsingBranch=""
-# Storage for --auto CLI flag, bypass all prompts.
-AutoInstall=0
-
 
 #----------------------------------------------Constants----------------------------------------------#
 # Suported versions of python using only major.minor format
@@ -136,11 +129,11 @@ function show_help() {
 }
 
 function ask_input() {
-    # a prompt which can be bypassed by AutoInstall=1
+    # a prompt which can be bypassed by AUTO_INSTALL=1
     local prompt="$1"
     local varname="$2"
     local defval="$3"
-    if [ "$AutoInstall" == "1" ] ; then
+    if [ "$AUTO_INSTALL" == "1" ] ; then
         eval "$varname=\"$defval\""
     else
         read -rp "$prompt" "${varname?}"
@@ -287,8 +280,10 @@ function in_existing_repo() {
     ReqFile="${PWD}/requirements.txt"
     RunFile="${PWD}/run.py"
     if [ -d "$GitDir" ] && [ -d "$BotDir" ] && [ -f "$ReqFile" ] && [ -f "$RunFile" ]; then
+        debug "yes"
         return 0
     fi
+    debug "no"
     return 1
 }
 
@@ -296,30 +291,37 @@ function in_venv() {
     # Check if the current directory is inside a Venv, does not activate.
     # Assumes the current directory is a MusicBot clone.
     if [ -f "../bin/activate" ] ; then
+        debug "yes"
         return 0
     fi
+    debug "no"
     return 1
 }
 
-function handle_branch_selection() {
+function clone_branch_selection() {
     # If auto install but --branch wasn't given, we default to current branch name.
-    if [ "$AutoInstall" == "1" ] && [ "$UsingBranch" == "" ] ; then
-        UsingBranch="$(git rev-parse --abbrev-ref HEAD)"
+    if [ "$AUTO_INSTALL" == "1" ] && [ "$USING_BRANCH" == "" ] ; then
+        if in_existing_repo ; then
+            USING_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+        else
+            # TODO: change this when merging to review or master.
+            USING_BRANCH="dev"
+        fi
     fi
 
-    if [ "$UsingBranch" == "" ] ; then
+    if [ "$USING_BRANCH" == "" ] ; then
         echo ""
         echo "MusicBot currently has three branches available."
         echo "  master - An older MusicBot, for older discord.py. May not work without tweaks!"
         echo "  review - Newer MusicBot, usually stable with less updates than the dev branch."
         echo "  dev    - The newest MusicBot, latest features and changes which may need testing."
-        if [ "$EnableUnlistedBranches" == "1" ] ; then
+        if [ "$UNLISTED_BRANCHES" == "1" ] ; then
         echo "  *      - WARNING: Any branch name is allowed, if it exists on github."
         fi
         echo ""
         read -rp "Enter the branch name you want to install:  " BRANCH
     else
-        BRANCH="$UsingBranch"
+        BRANCH="$USING_BRANCH"
     fi
     case ${BRANCH,,} in
     "dev")
@@ -335,7 +337,7 @@ function handle_branch_selection() {
         git clone "${MusicBotGitURL}" "${CloneDir}" -b master
         ;;
     *)
-        if [ "$EnableUnlistedBranches" == "1" ] ; then
+        if [ "$UNLISTED_BRANCHES" == "1" ] ; then
             echo "Installing from '${BRANCH}' branch..."
             git clone "${MusicBotGitURL}" "${CloneDir}" -b "$BRANCH"
         else
@@ -347,6 +349,7 @@ function handle_branch_selection() {
 
 function pull_musicbot_git() {
     echo ""
+    debug "Starting in: '$InstallDir'"
     # Check if we're running inside a previously pulled repo.
     # ignore this if InstallDir is set.
     if in_existing_repo && [ "$InstallDir" == "" ]; then
@@ -384,13 +387,15 @@ function pull_musicbot_git() {
             exit_err "Delete the ${CloneDir} directory and try again, or complete the install manually."
         fi
     else
-        cd "$InstallDir" || exit_err "Fatal:  Could not change into install directory:  ${InstallDir}"
+        if [ "$InstallDir" != "" ] ; then
+            cd "$InstallDir" || exit_err "Fatal:  Could not change into install directory:  ${InstallDir}"  
+        fi
         if [ "$InstalledViaVenv" != "1" ] ; then
             CloneDir="${InstallDir}"
         fi
     fi
 
-    handle_branch_selection
+    clone_branch_selection
 
     cd "${CloneDir}" || exit_err "Fatal:  Could not change to MusicBot directory."
 
@@ -679,8 +684,10 @@ function setup_as_service() {
 
 function debug() {
     local msg=$1
-    if [[ $DEBUG == '1' ]]; then
-        echo -e "\e[1;36m[DEBUG]\e[0m $msg" 1>&2
+    if [ "$DEBUG" == "1" ]; then
+        FN="${FUNCNAME[1]:-install.sh}"
+        LN="${BASH_LINENO[0]:-?}"
+        echo -e "\e[1;36m[DEBUG]\e[0m[${FN} line:${LN}] $msg" 1>&2
     fi
 }
 
@@ -740,6 +747,10 @@ INSTALL_SYS_PKGS="1"
 INSTALL_BOT_BITS="1"
 SERVICE_ONLY="0"
 SKIP_ALL_SUDO="0"
+USING_BRANCH=""
+AUTO_INSTALL="0"
+UNLISTED_BRANCHES="0"
+DEBUG="0"
 
 while [[ $# -gt 0 ]]; do
   case ${1,,} in
@@ -774,12 +785,13 @@ while [[ $# -gt 0 ]]; do
     ;;
 
     --any-branch )
-        EnableUnlistedBranches=1
+    --anybranch )
+        UNLISTED_BRANCHES="1"
         shift
     ;;
 
     --debug )
-        DEBUG=1
+        DEBUG="1"
         shift
         echo "DEBUG MODE IS ENABLED!"
     ;;
@@ -788,6 +800,7 @@ while [[ $# -gt 0 ]]; do
         InstallDir="$2"
         shift
         shift
+        # Ensure path has trailing slash.
         if [ "${InstallDir:0-1}" != "/" ] ; then
             InstallDir="${InstallDir}/"
         fi
@@ -798,14 +811,17 @@ while [[ $# -gt 0 ]]; do
     ;;
     
     "--branch" )
-        EnableUnlistedBranches=1
-        UsingBranch="$2"
+        UNLISTED_BRANCHES="1"
+        USING_BRANCH="$2"
         shift
         shift
+        if [ "$USING_BRANCH" == "" ] ; then
+            exit_err "The option --branch requires a branch name."
+        fi
     ;;
     
     "--auto" )
-        AutoInstall=1
+        AUTO_INSTALL="1"
         shift
     ;;
 
@@ -1130,7 +1146,10 @@ case $DISTRO_NAME in
         exit 1
         ;;
 
-    *"CentOS Stream 9"*)  
+    *"CentOS Stream 9"*)
+    # Added On:  2026/02/02
+    # Last Change;  never
+    # Last Test:  never
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             # Install extra repos, needed for ffmpeg.
             # Do not use -y flag here.
@@ -1152,6 +1171,9 @@ case $DISTRO_NAME in
         ;;
 
     *"CentOS Stream 10"*)
+    # Added On:  2026/02/02
+    # Last Change;  never
+    # Last Test:  2026/02/02
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             # Install extra repos, needed for ffmpeg.
             # Do not use -y flag here.
