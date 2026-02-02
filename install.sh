@@ -143,7 +143,7 @@ function ask_input() {
     if [ "$AutoInstall" == "1" ] ; then
         eval "$varname=\"$defval\""
     else
-        read -rp "$prompt" "$varname"
+        read -rp "$prompt" "${varname?}"
     fi
 }
 
@@ -181,6 +181,7 @@ function build_python() {
     echo "It will be installed using the altinstall target to avoid conflicts."
     echo "This process can take several minutes!"
     echo " Building Python ${PyBuildVer}  from: ${PySrcUrl}"
+    BuildPython="y"
     ask_input "Would you like to continue ? [n/Y]" BuildPython "y"
     if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
         # Build python.
@@ -302,7 +303,7 @@ function in_venv() {
 
 function handle_branch_selection() {
     # If auto install but --branch wasn't given, we default to current branch name.
-    if [ "$AutoInstall" == "1" ] && ["$UsingBranch" == "" ] ; then
+    if [ "$AutoInstall" == "1" ] && [ "$UsingBranch" == "" ] ; then
         UsingBranch="$(git rev-parse --abbrev-ref HEAD)"
     fi
 
@@ -350,6 +351,7 @@ function pull_musicbot_git() {
     # ignore this if InstallDir is set.
     if in_existing_repo && [ "$InstallDir" == "" ]; then
         echo "Existing MusicBot repo detected."
+        UsePwd="y"
         ask_input "Would you like to install using the current repo? [Y/n]" UsePwd "y"
         if [ "${UsePwd,,}" == "y" ] || [ "${UsePwd,,}" == "yes" ] ; then
             echo ""
@@ -503,6 +505,7 @@ function ask_change_user_group() {
     User_Group="${Inst_User} / ${Inst_Group}"
     echo ""
     echo "The installer is currently running as:  ${User_Group}"
+    MakeChange="n"
     ask_input "Set a different User / Group to run the service? [N/y]: " MakeChange "n"
     case $MakeChange in
     [Yy]*)
@@ -515,7 +518,8 @@ function ask_change_user_group() {
 function ask_change_service_name() {
     echo ""
     echo "The service will be installed as:  $ServiceName"
-    ask_input "Would you like to change the name? [N/y]: " ChangeSrvName
+    ChangeSrvName="n"
+    ask_input "Would you like to change the name? [N/y]: " ChangeSrvName "n"
     case $ChangeSrvName in
     [Yy]*)
         while :; do
@@ -524,6 +528,7 @@ function ask_change_service_name() {
             echo ""
             echo "Service names may use only letters, numbers, and the listed special characters."
             echo "Spaces are not allowed. Special characters:  -_.:"
+            ServiceName="musicbot"
             ask_input "Provide a name for the service:  " ServiceName "musicbot"
             # validate service name is allowed.
             if [[ "$ServiceName" =~ ^[a-zA-Z0-9:-_\.]+$ ]] ; then
@@ -617,6 +622,7 @@ function setup_as_service() {
     echo ""
     echo "The installer can also install MusicBot as a system service."
     echo "This starts the MusicBot at boot and restarts after failures."
+    SERVICE="n"
     ask_input "Install the musicbot system service? [N/y] " SERVICE "n"
     case $SERVICE in
     [Yy]*)
@@ -653,6 +659,7 @@ function setup_as_service() {
 
             echo ""
             echo "MusicBot will start automatically after the next reboot."
+            StartService="n"
             ask_input "Would you like to start MusicBot now? [N/y]" StartService "n"
             case $StartService in
             [Yy]*)
@@ -691,6 +698,7 @@ function configure_bot() {
     find_python
 
     echo "You can now configure MusicBot!"
+    YesConfig="n"
     ask_input "Would you like to launch the 'configure.py' tool? [N/y]" YesConfig "n"
     if [[ "${YesConfig,,}" != "y" && "${YesConfig,,}" != "yes" ]] ; then
         echo ""
@@ -845,6 +853,7 @@ EOF
 
 echo "We detected your OS is:  $(distro_supported)"
 
+iagree="y"
 ask_input "Would you like to continue with the installer? [Y/n]:  " iagree "y"
 if [[ "${iagree,,}" != "y" && "${iagree,,}" != "yes" ]] ; then
     exit 2
@@ -860,6 +869,7 @@ if [ "$(id -u)" -eq "0" ] && [ "$INSTALL_BOT_BITS" == "1" ] ;  then
     echo "        Meaning, little or no support and you have to fix stuff manually."
     echo "        Running MuiscBot as root is not recommended. You have been warned."
     echo ""
+    iunderstand="i understand"
     ask_input "Type 'I understand' (without quotes) to continue installing:" iunderstand "i understand"
     if [[ "${iunderstand,,}" != "i understand" ]] ; then
         echo ""
