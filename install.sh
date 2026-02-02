@@ -1124,53 +1124,25 @@ case $DISTRO_NAME in
 
     case $DISTRO_NAME in
     # Handle the versions which are EOL.
-    *"CentOS "[2-6]* |*"CentOS 8."[0-5]* )
+    *"CentOS "[2-7]* |*"CentOS 8."[0-5]* |*"CentOS Stream "[0-8]* )
         echo "Unfortunately, this version of CentOS has reached End-of-Life, and will not be supported."
         echo "You should consider upgrading to the latest version to make installing MusicBot easier."
         exit 1
         ;;
 
-    # Supported versions.
-    *"CentOS 7"*)  # Tested 7.9 @ 2024/03/28
-        # TODO:  CentOS 7 reaches EOL June 2024.
+    *"CentOS Stream 9"*)  
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
-            # Enable extra repos, as required for ffmpeg
-            # We DO NOT use the -y flag here.
-            $SUDO_BIN yum install epel-release
-            $SUDO_BIN yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+            # Install extra repos, needed for ffmpeg.
+            # Do not use -y flag here.
+            $SUDO_BIN dnf config-manager --set-enabled crb
+            $SUDO_BIN dnf install --nogpgcheck https://dl.fedoraproject.org/pub/epel/epel{,-next}-release-latest-9.noarch.rpm
+            $SUDO_BIN dnf install --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-9.noarch.rpm
 
-            # Install available packages and libraries for building python 3.8+
-            $SUDO_BIN yum -y groupinstall "Development Tools"
-            $SUDO_BIN yum -y install opus-devel libffi-devel openssl-devel bzip2-devel \
-                git curl jq ffmpeg unzip
+            # Install dependency packages.
+            $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg unzip \
+                yum-utils make gcc openssl-devel bzip2-devel libffi-devel zlib-devel 
 
-            # Ask if we should build python
-            echo "We need to build python from source for your system. It will be installed using altinstall target."
-            read -rp "Would you like to continue ? [N/y]" BuildPython
-            if [ "${BuildPython,,}" == "y" ] || [ "${BuildPython,,}" == "yes" ] ; then
-                # Build python.
-                PyBuildVer="3.10.14"
-                PySrcDir="Python-${PyBuildVer}"
-                PySrcFile="${PySrcDir}.tgz"
-
-                curl -o "$PySrcFile" "https://www.python.org/ftp/python/${PyBuildVer}/${PySrcFile}"
-                tar -xzf "$PySrcFile"
-                cd "${PySrcDir}" || exit_err "Fatal:  Could not change to python source directory."
-
-                ./configure --enable-optimizations
-                $SUDO_BIN make altinstall
-
-                # Ensure python bin is updated with altinstall name.
-                find_python
-                RetVal=$?
-                if [ "$RetVal" == "0" ] ; then
-                    # manually install pip package for the current user.
-                    $PyBin <(curl -s https://bootstrap.pypa.io/get-pip.py)
-                else
-                    echo "Error:  Could not find python on the PATH after installing it."
-                    exit 1
-                fi
-            fi
+            build_python
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
@@ -1179,16 +1151,16 @@ case $DISTRO_NAME in
         fi
         ;;
 
-    *"CentOS Stream 8"*)  # Tested 2024/03/28
+    *"CentOS Stream 10"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             # Install extra repos, needed for ffmpeg.
             # Do not use -y flag here.
-            $SUDO_BIN dnf install epel-release
-            $SUDO_BIN dnf install --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm
-            $SUDO_BIN dnf config-manager --enable powertools
+            $SUDO_BIN dnf config-manager --set-enabled crb
+            $SUDO_BIN dnf install --nogpgcheck https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+            $SUDO_BIN dnf install --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-10.noarch.rpm
 
             # Install available packages.
-            $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg python39 python39-devel unzip
+            $SUDO_BIN yum -y install opus-devel libffi-devel git curl jq ffmpeg python3 python3-pip python3-devel unzip
         fi
 
         if [ "$INSTALL_BOT_BITS" == "1" ] ; then
