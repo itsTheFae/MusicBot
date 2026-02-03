@@ -19,7 +19,7 @@ param (
 )
 # Where to put MusicBot by default.  Updated by repo detection.
 # prolly should be param, but someone who cares about windows can code for it.
-$Install_Dir = (pwd).Path + '\MusicBot\'
+$Install_Dir = (Get-Location).Path + '\MusicBot\'
 
 # --------------------------------------------------Functions----------------------------------------------------------
 
@@ -27,7 +27,7 @@ function AskInput {
     $prompt = $args[0]
     $defval = $args[1]
     if ($auto) {
-        Write-Host "${prompt}: $defval"
+        Write-Output "${prompt}: $defval"
         return $defval
     }
     $userInput = Read-Host "$prompt"
@@ -36,9 +36,9 @@ function AskInput {
 
 function ErrorExit {
     $message = if ($args.Count -ge 1) { $args[0] } else { "Error. Install halted." }
-    $exitCodeRaw = if ($args.Count -ge 2) { $args[1] } else { 1 }
+    $exitCode = if ($args.Count -ge 2) { $args[1] } else { 1 }
 
-    Write-Host $message
+    Write-Output $message
     exit $exitCode
 }
 
@@ -47,7 +47,7 @@ function wgInstall {
     if ($auto) {
         $command += " --silent"
     }
-    Write-Host "Running:  $command"
+    Write-Output "Running:  $command"
     Invoke-Expression $command
 }
 
@@ -136,7 +136,7 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
     }
 }
 
-# 
+
 ""
 "Checking WinGet can be used..."
 "If prompted, you must agree to the MS terms to continue installing."
@@ -155,7 +155,6 @@ Remove-Item "cert.fetch"
 
 # -----------------------------------------------------CONSTANTS-------------------------------------------------------
 
-$DEFAULT_URL_BASE = "https://discordapp.com/api"
 #$MB_RepoURL = "https://github.com/Just-Some-Bots/MusicBot.git"
 $MB_RepoURL = "https://github.com/itsthefae/MusicBot.git"
 
@@ -231,7 +230,7 @@ else
 ""
 
 # try to reload environment variables...
-if ($NeedsEnvReload -eq 1) 
+if ($NeedsEnvReload -eq 1)
 {
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 }
@@ -239,15 +238,15 @@ if ($NeedsEnvReload -eq 1)
 # --------------------------------------------------PULLING THE BOT----------------------------------------------------
 
 # Test if we need to pull the bot or not by checking for some files.
-$MB_Reqs_File=(pwd).Path + '\requirements.txt'
-$MB_Module_Dir=(pwd).Path + '\musicbot'
-$MB_Git_Dir=(pwd).Path + '\.git'
+$MB_Reqs_File=(Get-Location).Path + '\requirements.txt'
+$MB_Module_Dir=(Get-Location).Path + '\musicbot'
+$MB_Git_Dir=(Get-Location).Path + '\.git'
 
 if((Test-Path $MB_Reqs_File) -and (Test-Path $MB_Module_Dir) -and (Test-Path $MB_Git_Dir) ) {
     ""
     "Installer detected an existing clone, and will continue installing with the current source."
     ""
-    $Install_Dir = (pwd).Path
+    $Install_Dir = (Get-Location).Path
 } else {
     ""
     "MusicBot currently has three branches available."
@@ -312,7 +311,7 @@ foreach ($version in $versionArray)
 
 "Using $PYTHON to install and run MusicBot..."
 ""
-Invoke-Expression "$PYTHON -m pip install --upgrade -r requirements.txt" 
+Invoke-Expression "$PYTHON -m pip install --upgrade -r requirements.txt"
 
 # -------------------------------------------------CONFIGURE THE BOT---------------------------------------------------
 ""
