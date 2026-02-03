@@ -27,7 +27,7 @@ function AskInput {
     $prompt = $args[0]
     $defval = $args[1]
     if ($auto) {
-        Write-Output "${prompt}: $defval"
+        Write-Information "${prompt}: $defval"
         return $defval
     }
     $userInput = Read-Host "$prompt"
@@ -38,7 +38,7 @@ function ErrorExit {
     $message = if ($args.Count -ge 1) { $args[0] } else { "Error. Install halted." }
     $exitCode = if ($args.Count -ge 2) { $args[1] } else { 1 }
 
-    Write-Output $message
+    Write-Information $message
     exit $exitCode
 }
 
@@ -47,7 +47,7 @@ function wgInstall {
     if ($auto) {
         $command += " --silent"
     }
-    Write-Output "Running:  $command"
+    Write-Information "Running:  $command"
     Invoke-Expression $command
 }
 
@@ -125,7 +125,7 @@ if (-Not (Get-Command winget -ErrorAction SilentlyContinue) )
         Add-AppxPackage "DesktopAppInstaller_Dependencies\x64\Microsoft.WindowsAppRuntime*x64.appx"
         "Installing winget..."
         Add-AppxProvisionedPackage -Online -PackagePath "WinGet.msixbundle" -LicensePath "license.xml"
-        Get-AppPackage *Microsoft.DesktopAppInstaller*|select Name,PackageFullName
+        Get-AppPackage *Microsoft.DesktopAppInstaller*|Select-Object Name,PackageFullName
         Remove-Item -Path "WinGet.msixbundle", "DesktopAppInstaller_Dependencies.zip", "DesktopAppInstaller_Dependencies", "license.xml" -Recurse -Force
     }
 
