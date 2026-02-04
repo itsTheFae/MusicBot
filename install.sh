@@ -930,7 +930,7 @@ fi
 echo ""
 
 case $DISTRO_NAME in
-*"Arch Linux"*)  # Tested working 2024.03.01  @  2024/03/31
+*"Arch Linux"*)  # Last Tested: 2026/02/04
     if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
         # NOTE: Arch now uses system managed python packages, so venv is required.
         $SUDO_BIN pacman -Syu
@@ -946,7 +946,7 @@ case $DISTRO_NAME in
 *"Pop!_OS"* )
     case $DISTRO_NAME in
 
-    # Tested working 22.04  @  2024/03/29
+    # Tested working 22.04  @  2026/02/04
     *"Pop!_OS 22.04"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
@@ -962,6 +962,7 @@ case $DISTRO_NAME in
         fi
         ;;
 
+    # Tested working 24.04  @ 2026/02/04
     *"Pop!_OS 24.04"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
@@ -1009,7 +1010,7 @@ case $DISTRO_NAME in
 
     # Tested working:
     # 20.04  @  2024/03/28
-    # 22.04  @  2024/03/30
+    # 22.04  @  2026/02/04
     *"Ubuntu 20"*|*"Ubuntu 22"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
@@ -1026,7 +1027,7 @@ case $DISTRO_NAME in
         ;;
 
     # Tested working:
-    # 24.04  @  2024/09/04
+    # 24.04  @  2026/02/04
     *"Ubuntu 24"*)
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
@@ -1077,11 +1078,10 @@ case $DISTRO_NAME in
         fi
         ;;
 
-    # Tested working 12.5  @  2024/03/31
-    # Tested working 12.7  @  2024/09/05
-    # Tested working trixie  @  2024/09/05
-    *"Debian GNU/Linux 12"*|*"Debian GNU/Linux trixie"*|*"Debian GNU/Linux sid"*)
-        # Debian 12 uses system controlled python packages.
+    # Tested working 12.13  @  2026/02/04
+    # Tested working 13.3  @  2026/02/04
+    *"Debian GNU/Linux 12"*|*"Debian GNU/Linux 13"*|*"Debian GNU/Linux sid"*)
+        # Debian 12+ uses system controlled python packages.
         if [ "$INSTALL_SYS_PKGS" == "1" ] ; then
             $SUDO_BIN apt-get update -y
             $SUDO_BIN apt-get upgrade -y
