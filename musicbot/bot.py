@@ -2806,16 +2806,16 @@ class MusicBot(discord.Client):
             return
         event.activate()
 
-        try:
-            chname = _L("Unknown Channel")
-            if hasattr(guild.voice_client.channel, "name"):
-                chname = guild.voice_client.channel.name
+        event_channel_name = _L("Unknown Channel")
+        if hasattr(guild.voice_client.channel, "name"):
+            event_channel_name = guild.voice_client.channel.name
 
+        try:
             log.info(
                 "Channel activity waiting %(time)d seconds to leave channel: %(channel)s",
                 {
                     "time": self.config.leave_inactive_channel_timeout,
-                    "channel": chname,
+                    "channel": event_channel_name,
                 },
             )
             await discord.utils.sane_wait_for(
@@ -2835,9 +2835,7 @@ class MusicBot(discord.Client):
             log.info(
                 "Channel activity timer canceled for: %(channel)s in %(guild)s",
                 {
-                    "channel": getattr(
-                        guild.voice_client.channel, "name", guild.voice_client.channel
-                    ),
+                    "channel": event_channel_name,
                     "guild": guild.name,
                 },
             )
